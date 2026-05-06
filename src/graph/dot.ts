@@ -1,0 +1,250 @@
+import { BaseNode, CatchClause, ForInStatement, SwitchCase } from "estree";
+import { ConnectionType, FlowNode } from "../flownode/flownode";
+import PageModels from "../model/pageModels";
+import Set from "../utils/set";
+import Var from "../def-use/types/var";
+import DUPair from "../def-use/types/duPair";
+
+export interface DotOptions {
+  counter?: number;
+  source?: string;
+}
+
+/**
+ * Node visual styles in DOT graph
+ */
+const NODE_STYLES: Record<
+  string,
+  { shape: string; style: string; fillcolor: string }
+> = {
+  [FlowNode.ENTRY_NODE_TYPE]: {
+    shape: "ellipse",
+    style: "filled",
+    fillcolor: "#FFF59D",
+  },
+  [FlowNode.EXIT_NODE_TYPE]: {
+    shape: "ellipse",
+    style: "filled",
+    fillcolor: "#FFF59D",
+  },
+};
+
+/**
+ * Edge visual styles by connection type
+ */
+const EDGE_STYLES: Record<ConnectionType, string> = {
+  [FlowNode.EXCEPTION_CONNECTION_TYPE]:
+    'color="#E57373", style="bold", penwidth=2.2, fontsize=12, fontcolor="#D32F2F", label="exception"',
+
+  [FlowNode.TRUE_BRANCH_CONNECTION_TYPE]:
+    'color="#43A047", penwidth=1.8, fontsize=12, fontcolor="#2E7D32", label="true"',
+
+  [FlowNode.FALSE_BRANCH_CONNECTION_TYPE]:
+    'color="#E53935", penwidth=1.8, fontsize=12, fontcolor="#C62828", label="false"',
+
+  [FlowNode.NORMAL_CONNECTION_TYPE]:
+    'color="#9E9E9E", penwidth=1.5, fontsize=12, fontcolor="#424242"',
+};
+
+/**
+ * Generate a complete DOT graph for all page models
+ */
+export default function generateDot(
+  pageModels: PageModels,
+  options: DotOptions = {},
+): string {
+  const output: string[] = [];
+
+  /* ================= Graph Header ================= */
+
+  output.push(`digraph FullGraph {`);
+  output.push(`  rankdir=TB;`);
+  output.push(`  ranksep=1.2;`);
+  output.push(`  nodesep=0.8;`);
+  output.push(
+    `  graph [bgcolor="#FAFAFA", splines=true, overlap=false, layout=dot];`,
+  );
+  output.push(
+    `  node [fontname="Consolas", fontsize=12, style="rounded,filled", color="#424242", width=1.0, height=0.4];`,
+  );
+  output.push(
+    `  edge [fontname="Consolas", fontsize=12, fontcolor="#424242", arrowsize=0.8];`,
+  );
+
+  /* ================= Edge Deduplication ================= */
+
+  const edgeSet = new Set<string>();
+
+  const addEdge = (src: string, dst: string, attributes: string) => {
+    edgeSet.add(`${src} -> ${dst} [${attributes}];`);
+  };
+
+  /* ================= Node → Scope Mapping ================= */
+
+  const nodeScopeMap = new Map<number, string>();
+
+  pageModels.intraProceduralModels.forEach((model) => {
+    const scopeName = model.mainlyRelatedScope?.name || "Anonymous Scope";
+    model.graph?.allNodes?.forEach((node) => {
+      nodeScopeMap.set(node.cfgId!, scopeName);
+    });
+  });
+
+  pageModels.interProceduralModels.forEach((model) => {
+    const scopeName = model.mainlyRelatedScope?.name || "Anonymous Scope";
+    model.graph?.allNodes?.forEach((node) => {
+      if (!nodeScopeMap.has(node.cfgId!)) {
+        nodeScopeMap.set(node.cfgId!, scopeName);
+      }
+    });
+  });
+
+  /* ================= Group Nodes by Scope ================= */
+
+  const scopeToNodes = new Map<string, FlowNode[]>();
+  const allNodes: FlowNode[] = [];
+
+  pageModels.intraProceduralModels.forEach((model) => {
+    model.graph?.allNodes && allNodes.push(...model.graph.allNodes);
+  });
+
+  pageModels.interProceduralModels.forEach((model) => {
+    model.graph?.allNodes && allNodes.push(...model.graph.allNodes);
+  });
+
+  allNodes.forEach((node) => {
+    const scopeName = nodeScopeMap.get(node.cfgId!) || "Global";
+    if (!scopeToNodes.has(scopeName)) {
+      scopeToNodes.set(scopeName, []);
+    }
+    scopeToNodes.get(scopeName)!.push(node);
+  });
+
+  /* ================= Generate Subgraphs ================= */
+
+  let clusterIndex = 0;
+
+  scopeToNodes.forEach((nodes, scopeName) => {
+    const clusterId = clusterIndex++;
+
+    output.push(`  subgraph cluster_${clusterId} {`);
+    output.push(`    label="${sanitizeString(scopeName)}";`);
+    output.push(`    style="filled,rounded";`);
+    output.push(`    color="#E0E0E0";`);
+    output.push(`    fillcolor="#F5F5F5";`);
+
+    nodes.forEach((node) => {
+      const style =
+        NODE_STYLES[node.type] || {
+          shape: "box",
+          style: "filled,rounded",
+          fillcolor: "#FFFFFF",
+        };
+
+      const label = sanitizeString(
+        getNodeLabel(node, options.source),
+      );
+
+      output.push(
+        `    n${node.cfgId} [label="${label}", shape="${style.shape}", style="${style.style}", fillcolor="${style.fillcolor}"];`,
+      );
+    });
+
+    output.push(`  }`);
+  });
+
+  /* ================= Control Flow Edges ================= */
+
+  const processModelEdges = (model: any) => {
+    model.graph?.allNodes?.forEach((node: FlowNode) => {
+      FlowNode.CONNECTION_TYPES.forEach((type) => {
+        const targets = node.typeTable[type]
+          ? [node.typeTable[type]]
+          : [];
+
+        targets.forEach((target) => {
+          if (target?.cfgId !== undefined) {
+            const attrs =
+              EDGE_STYLES[type] ||
+              'color="#9E9E9E", fontsize=12';
+            addEdge(`n${node.cfgId}`, `n${target.cfgId}`, attrs);
+          }
+        });
+      });
+    });
+  };
+
+  pageModels.intraProceduralModels.forEach(processModelEdges);
+  pageModels.interProceduralModels.forEach(processModelEdges);
+
+  /* ================= Def-Use Data Flow Edges ================= */
+
+  const addDUEdges = (dupairsMap: Map<Var, Set<DUPair>>) => {
+    dupairsMap.forEach((pairs, variable) => {
+      pairs.values().forEach((pair) => {
+        if (
+          pair.first?.cfgId !== undefined &&
+          pair.second?.cfgId !== undefined
+        ) {
+          addEdge(
+            `n${pair.first.cfgId}`,
+            `n${pair.second.cfgId}`,
+            `color="#43A047", style="dashed", penwidth=1.5, fontsize=12, fontcolor="#1B5E20", label="DU: ${sanitizeString(variable.name)}"`,
+          );
+        }
+      });
+    });
+  };
+
+  pageModels.intraProceduralModels.forEach((m) =>
+    addDUEdges(m.dupairs),
+  );
+  pageModels.interProceduralModels.forEach((m) =>
+    addDUEdges(m.dupairs),
+  );
+
+  /* ================= Final Output ================= */
+
+  output.push(...Array.from(edgeSet));
+  output.push(`}`);
+
+  return output.join("\n");
+}
+
+/* ================= Utility Functions ================= */
+
+function getNodeLabel(node: FlowNode, source?: string): string {
+  if (node.label) return node.label;
+  if (source && node.astNode?.range) {
+    return extractSourceLabel(node.astNode, source);
+  }
+  return node.astNode?.type || "Unnamed";
+}
+
+function extractSourceLabel(astNode: BaseNode, source: string): string {
+  let [start, end] = astNode.range!;
+  let suffix = "";
+
+  if (astNode.type === "SwitchCase") {
+    const test = (astNode as SwitchCase).test;
+    end = test ? test.range![1] : start;
+    suffix = test ? ":" : "default:";
+  } else if (astNode.type === "ForInStatement") {
+    end = (astNode as ForInStatement).right.range![1];
+    suffix = ")";
+  } else if (astNode.type === "CatchClause") {
+    end = (astNode as CatchClause).param?.range?.[1] || end;
+    suffix = ")";
+  }
+
+  return sanitizeString(source.slice(start, end) + suffix);
+}
+
+function sanitizeString(str: string): string {
+  return str
+    .replace(/\n/g, "\\n")
+    .replace(/\t/g, " ")
+    .replace(/"/g, '\\"')
+    .replace(/\s+/g, " ")
+    .trim();
+}

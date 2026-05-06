@@ -1,0 +1,15 @@
+import { SinkType, SourceType } from "../taint";
+export declare const ATTACKER_SOURCES: SourceType[];
+export declare const WEB_EVENT_SOURCES: SourceType[];
+export declare const SENSITIVE_SOURCES: SourceType[];
+export declare const SYSTEM_SOURCES: SourceType[];
+export declare const NETWORK_SOURCES: SourceType[];
+export declare const DOCUMENT_SOURCES: SourceType[];
+export declare const STORAGE_SOURCES: SourceType[];
+export declare const CODE_SINKS: SinkType[];
+export declare const NETWORK_SINKS: SinkType[];
+export declare const MESSAGE_SINKS: SinkType[];
+export declare const DOM_SINKS: SinkType[];
+export declare const STORAGE_SINKS: SinkType[];
+export declare const WEB_STORAGE_SINKS: SinkType[];
+export declare const PRIVILEGED_SINKS: SinkType[];

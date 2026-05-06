@@ -1,0 +1,31 @@
+export declare class Selector {
+    private value;
+    private constructor();
+    toString(): string;
+    static type(name: string): Selector;
+    static wildcard(): Selector;
+    static raw(selector: string): Selector;
+    attr(name: string): Selector;
+    attrEq(name: string, value: string | number): Selector;
+    attrNe(name: string, value: string | number): Selector;
+    attrCmp(name: string, op: ">" | "<" | ">=" | "<=", value: number): Selector;
+    attrRegex(name: string, regex: RegExp): Selector;
+    descendant(sel: Selector): Selector;
+    child(sel: Selector): Selector;
+    adjacent(sel: Selector): Selector;
+    sibling(sel: Selector): Selector;
+    has(sel: Selector): Selector;
+    not(sel: Selector): Selector;
+    is(...sels: Selector[]): Selector;
+    firstChild(): Selector;
+    lastChild(): Selector;
+    nthChild(n: number): Selector;
+    nthLastChild(n: number): Selector;
+    subject(): Selector;
+    statement(): Selector;
+    expression(): Selector;
+    declaration(): Selector;
+    function(): Selector;
+    pattern(): Selector;
+    private append;
+}
