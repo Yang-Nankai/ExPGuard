@@ -105,18 +105,13 @@ function runSingleTask(opts) {
         finally {
             timer.stop();
             const fileStats = (_c = (_b = epgmodelbuilder_1.epgModelBuilder.extensionContext) === null || _b === void 0 ? void 0 : _b.getScriptsSummary()) !== null && _c !== void 0 ? _c : [];
-            //  try {
-            //    const report = printTaintReportsCLI(
-            //      taintManager.generateGlobalReport(),
-            //    );
-            //    await fs.appendFile(
-            //      path.join(outputDir, "report.txt"),
-            //      report,
-            //      "utf-8",
-            //    );
-            //  } catch (err) {
-            //    logger.error("[REPORT] Failed to generate/write report");
-            //  }
+            try {
+                const report = (0, taint_1.printTaintReportsCLI)(taint_1.taintManager.generateGlobalReport());
+                yield promises_1.default.appendFile(path_1.default.join(outputDir, "report.txt"), report, "utf-8");
+            }
+            catch (err) {
+                logger_1.default.error("[REPORT] Failed to generate/write report");
+            }
             const baseSummary = (_e = (_d = taint_1.taintManager.getGlobalSummary) === null || _d === void 0 ? void 0 : _d.call(taint_1.taintManager)) !== null && _e !== void 0 ? _e : {};
             const summary = Object.assign({ extensionId: opts.extensionId, extensionVersion: opts.extensionVersion, sourceType: opts.sourceType, status, duration: timer.getDuration(), files: fileStats, totalFiles: fileStats.length, totalSize: fileStats.reduce((acc, f) => acc + f.size, 0), cacheStats: (_f = interProceduralAnalyzer_1.interAnalyzer.getCacheReport) === null || _f === void 0 ? void 0 : _f.call(interProceduralAnalyzer_1.interAnalyzer), errorType: taskError === null || taskError === void 0 ? void 0 : taskError.type, errorMessage: taskError === null || taskError === void 0 ? void 0 : taskError.message }, baseSummary);
             yield safeWriteFile(path_1.default.join(outputDir, "summary.json"), JSON.stringify(summary, null, 2));

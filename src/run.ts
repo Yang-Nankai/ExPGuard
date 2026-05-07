@@ -78,18 +78,18 @@ export async function runSingleTask(opts: RunOptions) {
     timer.stop();
     const fileStats: any[] = epgModelBuilder.extensionContext?.getScriptsSummary() ?? [];
 
-  //  try {
-  //    const report = printTaintReportsCLI(
-  //      taintManager.generateGlobalReport(),
-  //    );
-  //    await fs.appendFile(
-  //      path.join(outputDir, "report.txt"),
-  //      report,
-  //      "utf-8",
-  //    );
-  //  } catch (err) {
-  //    logger.error("[REPORT] Failed to generate/write report");
-  //  }
+   try {
+     const report = printTaintReportsCLI(
+       taintManager.generateGlobalReport(),
+     );
+     await fs.appendFile(
+       path.join(outputDir, "report.txt"),
+       report,
+       "utf-8",
+     );
+   } catch (err) {
+     logger.error("[REPORT] Failed to generate/write report");
+   }
 
     const baseSummary = taintManager.getGlobalSummary?.() ?? {};
     const summary = {

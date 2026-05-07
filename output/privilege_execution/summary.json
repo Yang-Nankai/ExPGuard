@@ -1,0 +1,221 @@
+{
+  "extensionId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "extensionVersion": "1.0",
+  "sourceType": "DIR",
+  "status": "success",
+  "duration": 0.085,
+  "files": [
+    {
+      "file": "background.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 430,
+      "durationMs": 11.8279
+    },
+    {
+      "file": "content.js",
+      "frame": "CS_1",
+      "frameTags": [
+        "CS_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "size": 311,
+      "durationMs": 31.095800000000054
+    },
+    {
+      "file": "utils.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 219,
+      "durationMs": 3.9121999999999844
+    }
+  ],
+  "totalFiles": 3,
+  "totalSize": 960,
+  "cacheStats": {
+    "totalCalls": 0,
+    "hits": 0,
+    "misses": 0,
+    "evictions": 0,
+    "hitRate": 0,
+    "cacheSize": 0,
+    "maxEntries": 4096
+  },
+  "hasFlows": true,
+  "flows": [
+    {
+      "flowType": "STORAGE_POSOING",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "window.addEventListener(message)",
+      "sourceFile": "content",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L3:C20 -> L3:C35",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "title",
+      "sinkFile": "content",
+      "sinkFrame": "CS_1",
+      "sinkFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sinkFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sinkLoc": "L5:C4 -> L7:C6",
+      "ctx": "content",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "sourceCode": "  if (event.data && >>>event.data.type<<< === \"SAVE_BMK\") {\r\n",
+      "sinkCode": "rage Poisoning\r\n    >>>chrome.storage.local.set({ title: event.data.title }, () => {\r\n      chrome.runtime.sendMessage({ type: \"EXEC\", url: event.data.url });\r\n    })<<<;\r\n  }\r\n});"
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "window.addEventListener(message)",
+      "sourceFile": "content",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L10:C0 -> L19:C2",
+      "sinkType": "CHROME_BOOKMARK_CREATE_INFO",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L4:C2 -> L6:C4",
+      "ctx": "background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[content->background]",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "sourceCode": "url);\r\n  });\r\n};\r\n\r\n>>>chrome.runtime.onMessage.addListener((req) => {\r\n  if (req.type === \"EXEC\") {\r\n    const funcs = [\"saveBmk\"];\r\n    for (const func of funcs) {\r\n      if (typeof self[func] === \"function\") {\r\n        self[func](req.url); \r\n      }\r\n    }\r\n  }\r\n})<<<;",
+      "sinkCode": "mk = function(url) {>>>\r\n  chrome.storage.local.get([\"title\"], ({ title }) => {\r\n    addBmk(title, url);\r\n  });\r\n};\r\n\r\nchrome.runtime.onMess<<<age.addListener((req"
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "From storage.local.set('title') in content",
+      "sourceFile": "content",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L3:C20 -> L3:C35",
+      "sinkType": "CHROME_BOOKMARK_CREATE_INFO",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L4:C2 -> L6:C4",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": true,
+      "area": "STORAGE_FLOW[area: local, key: title, sender: content, receiver: background]",
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "sourceCode": "aveBmk = function(ur>>>l) {\r\n  chrome.<<<storage.local.get([\"",
+      "sinkCode": "mk = function(url) {>>>\r\n  chrome.storage.local.get([\"title\"], ({ title }) => {\r\n    addBmk(title, url);\r\n  });\r\n};\r\n\r\nchrome.runtime.onMess<<<age.addListener((req"
+    }
+  ]
+}
