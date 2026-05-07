@@ -57,11 +57,11 @@ node dist/main.js analyze --type <CRX|DIR|WEB> --input <path> [options]
 
 **Options**:
 
-- --type <type>: (Required) The format of the input extension. Valid options are CRX (packaged extension), DIR (unpacked extension directory), and WEB (Chrome Web Store online extension).
-- --input <path>: (Required) Path to the target extension (.crx file, local directory path, or URL).
-- --out <dir>: Directory where the analysis results will be saved. (Default: results)
-- --id <extensionId>: Limit analysis or explicitly pass the custom extension ID.
-- --version <version>: Specify the extension version.
+- --type \<type\>: (Required) The format of the input extension. Valid options are CRX (packaged extension), DIR (unpacked extension directory), and WEB (Chrome Web Store online extension).
+- --input \<path\>: (Required) Path to the target extension (.crx file, local directory path, or URL).
+- --out \<dir\>: Directory where the analysis results will be saved. (Default: results)
+- --id \<extensionId\>: Limit analysis or explicitly pass the custom extension ID.
+- --version \<version\>: Specify the extension version.
 
 **Examples:**
 
