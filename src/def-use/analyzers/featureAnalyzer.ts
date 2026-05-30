@@ -1,6 +1,4 @@
 // analyzers/featureModelAnalyzer.ts
-import Model from "../../model/model";
-import { modelController } from "../../model/modelCtrl";
 import Scope from "../../scope/scope";
 import ScopeTree from "../../scope/scopeTree";
 import logger from "../../utils/logger";
@@ -8,11 +6,9 @@ import { FeatureModelRegistry } from "../features/features";
 import { Range } from "../types/range";
 
 class FeatureModelAnalyzer {
-  analyze(model: Model, scopeTree: ScopeTree) {
-    if (!model?.graph) return;
-
-    const scope = model.mainlyRelatedScope;
-    if (!scope || !Scope.isPageScope(scope)) return;
+  analyze(scope: Scope, scopeTree: ScopeTree) {
+    if (!scope?.graph) return;
+    if (!Scope.isPageScope(scope)) return;
 
     const ast = scope.ast;
     if (!ast) return;
@@ -25,25 +21,13 @@ class FeatureModelAnalyzer {
       );
       if (!funcScope) continue;
 
-      const funcModel =
-        modelController.getIntraProceduralModelByMainlyRelatedScopeFromAPageModels(
-          scopeTree,
-          funcScope,
-        );
-      if (!funcModel) continue;
+      funcScope.featureSemantic = feature;
 
-      funcModel.featureSemantic = feature;
-
-      // TODO: the code here will be beautified later.
-      funcModel.hasTaintAnalyzed = true;
-      const children = funcScope.getAllDescendants();
-      for (const child of children) {
-        const model =
-          modelController.getIntraProceduralModelByMainlyRelatedScopeFromAPageModels(
-            scopeTree,
-            child,
-          );
-        if (model) model.hasTaintAnalyzed = true;
+      // Mark the function and everything inside it as already taint-analyzed,
+      // since the feature semantic replaces the body's CFG walk.
+      funcScope.hasTaintAnalyzed = true;
+      for (const child of funcScope.getAllDescendants()) {
+        child.hasTaintAnalyzed = true;
       }
 
       logger.info(

@@ -1,6 +1,5 @@
 import { traverseSimple } from "../../ast/walkes";
 import { ExtensionScript } from "../../extension/extensionScript";
-import Model from "../../model/model";
 import PageScope from "../../scope/pageScope";
 import Scope from "../../scope/scope";
 import { scopeController } from "../../scope/scopeCtrl";
@@ -16,13 +15,11 @@ import { scriptUsageTracker } from "../../extension/scriptUsageTracker";
  *   localName -> exported Def
  */
 export class ImportAnalyzer {
-  analyze(model: Model, scopeTree: ScopeTree) {
-    if (!model?.graph) return;
+  analyze(scope: Scope, scopeTree: ScopeTree) {
+    if (!scope?.graph) return;
+    if (!Scope.isPageScope(scope)) return;
 
-    const scope = model.mainlyRelatedScope;
-    if (!scope || !Scope.isPageScope(scope)) return;
-
-    const entryNode = model.graph.entryNode;
+    const entryNode = scope.graph.entryNode;
     const ast = scope.ast;
     if (!ast) return;
 

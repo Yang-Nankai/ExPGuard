@@ -1,5 +1,4 @@
 import { FlowNode } from "../../flownode/flownode";
-import Model from "../../model/model";
 import Scope from "../../scope/scope";
 import { Queue } from "../../utils/queue";
 import { worklist } from "../../utils/worklist";
@@ -12,14 +11,14 @@ import { getFeasibleSuccessors } from "../utils/utils";
  * Performs forward intra/inter-procedural analysis on the CFG.
  */
 export class ReachingDefinitionAnalyzer {
-  public doAnalysis(model: Model) {
-    if (!model?.graph) return;
+  public doAnalysis(scope: Scope) {
+    if (!scope?.graph) return;
 
     // mark analysis executed
-    model.hasTaintAnalyzed = true;
+    scope.hasTaintAnalyzed = true;
 
     worklist(
-      model.graph,
+      scope.graph,
       function (this: FlowNode, queue: Queue<FlowNode>) {
         if (!this.scope || FlowNode.isEntryType(this)) return;
 
@@ -37,8 +36,7 @@ export class ReachingDefinitionAnalyzer {
     );
 
     // clear reaching definitions when exiting non-page scope
-    const scope = model.mainlyRelatedScope;
-    if (scope && !Scope.isPageScope(scope)) {
+    if (!Scope.isPageScope(scope)) {
       scope.resetReachingDefinitions();
     }
   }

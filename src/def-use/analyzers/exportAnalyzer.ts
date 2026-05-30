@@ -1,5 +1,4 @@
 import { traverseSimple } from "../../ast/walkes";
-import Model from "../../model/model";
 import PageScope from "../../scope/pageScope";
 import Scope from "../../scope/scope";
 import { scopeController } from "../../scope/scopeCtrl";
@@ -12,19 +11,18 @@ import { lookupMatchingDef } from "../utils/utils";
  * ExportAnalyzer
  */
 export class ExportAnalyzer {
-  analyze(model: Model, scopeTree: ScopeTree) {
-    if (!model?.graph) return;
+  analyze(scope: Scope, scopeTree: ScopeTree) {
+    if (!scope?.graph) return;
 
     const script = scopeTree.script;
-    const scope = model.mainlyRelatedScope;
 
     // Export only applies to the top-level (module) scope
-    if (!scope || !Scope.isPageScope(scope)) return;
+    if (!Scope.isPageScope(scope)) return;
 
     const ast = scope.ast;
     if (!ast) return;
 
-    const exitNode = model.graph.exitNode;
+    const exitNode = scope.graph.exitNode;
 
     const handleExportDeclaration = (decl: any) => {
       if (!decl) return;

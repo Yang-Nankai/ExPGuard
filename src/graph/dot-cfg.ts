@@ -1,6 +1,6 @@
 import { ConnectionType, FlowNode } from "../flownode/flownode";
-import Model from "../model/model";
-import PageModels from "../model/pageModels";
+import Scope from "../scope/scope";
+import ScopeTree from "../scope/scopeTree";
 
 export interface CfgDotOptions {
   graphName?: string;
@@ -27,7 +27,7 @@ const EDGE_STYLES: Record<ConnectionType, string> = {
     'color="#8E24AA", style="bold", penwidth=2.0, fontcolor="#6A1B9A", label="exception"',
 };
 
-export function generateCfgDot(pageModels: PageModels, options: CfgDotOptions = {}): string {
+export function generateCfgDot(scopeTree: ScopeTree, options: CfgDotOptions = {}): string {
   const lines: string[] = [];
   const graphName = options.graphName ?? "CFG";
   const includeLineCol = options.includeLineCol ?? true;
@@ -46,8 +46,7 @@ export function generateCfgDot(pageModels: PageModels, options: CfgDotOptions = 
     '  edge [fontname="Consolas", fontsize=10, arrowsize=0.75, color="#78909C"];',
   );
 
-  const models = getAllModels(pageModels);
-  const nodes = collectAllNodes(models).sort(
+  const nodes = collectAllNodes(scopeTree).sort(
     (a, b) => (a.cfgId ?? Number.MAX_SAFE_INTEGER) - (b.cfgId ?? Number.MAX_SAFE_INTEGER),
   );
 
@@ -91,24 +90,18 @@ function getNodeId(node: FlowNode): string {
   return `n${node.cfgId ?? "unknown"}`;
 }
 
-function getAllModels(pageModels: PageModels): Model[] {
-  return [
-    ...pageModels.intraProceduralModels,
-    ...pageModels.interProceduralModels,
-  ];
-}
-
-function collectAllNodes(models: Model[]): FlowNode[] {
+function collectAllNodes(scopeTree: ScopeTree): FlowNode[] {
   const nodeMap = new Map<number | string, FlowNode>();
 
-  models.forEach((model) => {
-    model.graph?.allNodes.forEach((node) => {
+  for (const scope of scopeTree.getCFGEligibleScopes()) {
+    if (!scope.graph) continue;
+    scope.graph.allNodes.forEach((node) => {
       const key = node.cfgId ?? `unknown-${node.type}-${node.line ?? -1}-${node.col ?? -1}`;
       if (!nodeMap.has(key)) {
         nodeMap.set(key, node);
       }
     });
-  });
+  }
 
   return Array.from(nodeMap.values());
 }
