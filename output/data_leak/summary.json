@@ -1,0 +1,216 @@
+{
+  "extensionId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "extensionVersion": "1.0",
+  "sourceType": "DIR",
+  "status": "success",
+  "duration": 0.038,
+  "files": [
+    {
+      "file": "background.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 3183,
+      "durationMs": 4.012499999999989
+    },
+    {
+      "file": "content.js",
+      "frame": "CS_1",
+      "frameTags": [
+        "CS_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "https://*.shop.example/*"
+            ]
+          }
+        }
+      ],
+      "size": 1460,
+      "durationMs": 3.5782079999999894
+    },
+    {
+      "file": "reporter.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 751,
+      "durationMs": 1.1985420000000033
+    },
+    {
+      "file": "util.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "CS_1",
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "https://*.shop.example/*"
+            ]
+          }
+        },
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 464,
+      "durationMs": 5.458665999999994
+    }
+  ],
+  "totalFiles": 4,
+  "totalSize": 5858,
+  "cacheStats": {
+    "totalCalls": 0,
+    "hits": 0,
+    "misses": 0,
+    "evictions": 0,
+    "hitRate": 0,
+    "cacheSize": 0,
+    "maxEntries": 4096
+  },
+  "hasFlows": true,
+  "flows": [
+    {
+      "flowType": "DATA_LEAK",
+      "sourceType": "CHROME_HISTORY_INFO",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L29:C4 -> L34:C5",
+      "sinkType": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+      "sinkRemark": "chrome.runtime.onMessageExternal.addListener[sendResponse]",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L32:C8 -> L32:C43",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "LOW",
+      "severityReason": "Only specific extension IDs are allowed.",
+      "severityEvidence": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceCode": "\"GET_RECENT\") {\n    >>>chrome.history.search(\n      { text: msg.query || \"\", maxResults: 25 },\n      (results) => {\n        sendResponse({ ok: true, results });                    // SINK MESSAGE\n      },\n    )<<<;\n    return true;  ",
+      "sinkCode": "sults) => {\n        >>>sendResponse({ ok: true, results })<<<;                   "
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "chrome.runtime.onMessageExternal.addListener[message]",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L28:C6 -> L28:C9",
+      "sinkType": "CHROME_HISTORY_ADD_URL",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L41:C4 -> L41:C43",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "LOW",
+      "severityReason": "Only specific extension IDs are allowed.",
+      "severityEvidence": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "sourceCode": "esponse) => {\n  if (>>>msg<<< && msg.kind === \"GE",
+      "sinkCode": "=== \"string\") {\n    >>>chrome.history.addUrl({ url: msg.url })<<<;                   "
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "window.addEventListener(message)",
+      "sourceFile": "content",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "https://*.shop.example/*"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "https://*.shop.example/*"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L69:C0 -> L76:C2",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "[Unknown URL]",
+      "sinkUrlTaintControl": "FULL",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L19:C25 -> L23:C4",
+      "ctx": "background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[content->background]",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "HIGH",
+      "severityReason": "Wildcard subdomain matching is allowed.",
+      "severityEvidence": [
+        "https://*.shop.example/*"
+      ],
+      "sourceCode": "(payload),\n  });\n}\n\n>>>chrome.runtime.onMessage.addListener((msg) => {\n  if (msg && msg.kind === \"FLUSH_PROFILE\") {\n    flushProfileSnapshot();\n  }\n  if (msg && msg.kind === \"EXPORT_COOKIES\" && typeof msg.domain === \"string\") {\n    exportCookiesForDomain(msg.domain);\n  }\n})<<<;\n",
+      "sinkCode": "r.js\";\nimport { merg>>>eWithDefaults } from \"./util.js\";\n\nconst REMOTE_BASE = \"https://collector.partner-analytics.example/v1\";\n\n// ─── Source: chrome.cookies.getAll  ────<<<────────────────────"
+    }
+  ]
+}

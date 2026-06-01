@@ -15,7 +15,7 @@ const EDGE_STYLES = {
     [flownode_1.FlowNode.FALSE_BRANCH_CONNECTION_TYPE]: 'color="#E53935", penwidth=1.8, fontcolor="#B71C1C", label="false"',
     [flownode_1.FlowNode.EXCEPTION_CONNECTION_TYPE]: 'color="#8E24AA", style="bold", penwidth=2.0, fontcolor="#6A1B9A", label="exception"',
 };
-function generateCfgDot(pageModels, options = {}) {
+function generateCfgDot(scopeTree, options = {}) {
     var _a, _b;
     const lines = [];
     const graphName = (_a = options.graphName) !== null && _a !== void 0 ? _a : "CFG";
@@ -27,8 +27,7 @@ function generateCfgDot(pageModels, options = {}) {
     lines.push('  graph [bgcolor="#FAFAFA", splines=true, overlap=false, layout=dot];');
     lines.push('  node [style="rounded,filled", color="#455A64", fontname="Consolas", fontsize=11];');
     lines.push('  edge [fontname="Consolas", fontsize=10, arrowsize=0.75, color="#78909C"];');
-    const models = getAllModels(pageModels);
-    const nodes = collectAllNodes(models).sort((a, b) => { var _a, _b; return ((_a = a.cfgId) !== null && _a !== void 0 ? _a : Number.MAX_SAFE_INTEGER) - ((_b = b.cfgId) !== null && _b !== void 0 ? _b : Number.MAX_SAFE_INTEGER); });
+    const nodes = collectAllNodes(scopeTree).sort((a, b) => { var _a, _b; return ((_a = a.cfgId) !== null && _a !== void 0 ? _a : Number.MAX_SAFE_INTEGER) - ((_b = b.cfgId) !== null && _b !== void 0 ? _b : Number.MAX_SAFE_INTEGER); });
     nodes.forEach((node) => {
         var _a;
         const style = (_a = NODE_STYLES[node.type]) !== null && _a !== void 0 ? _a : {
@@ -60,24 +59,19 @@ function getNodeId(node) {
     var _a;
     return `n${(_a = node.cfgId) !== null && _a !== void 0 ? _a : "unknown"}`;
 }
-function getAllModels(pageModels) {
-    return [
-        ...pageModels.intraProceduralModels,
-        ...pageModels.interProceduralModels,
-    ];
-}
-function collectAllNodes(models) {
+function collectAllNodes(scopeTree) {
     const nodeMap = new Map();
-    models.forEach((model) => {
-        var _a;
-        (_a = model.graph) === null || _a === void 0 ? void 0 : _a.allNodes.forEach((node) => {
+    for (const scope of scopeTree.getCFGEligibleScopes()) {
+        if (!scope.graph)
+            continue;
+        scope.graph.allNodes.forEach((node) => {
             var _a, _b, _c;
             const key = (_a = node.cfgId) !== null && _a !== void 0 ? _a : `unknown-${node.type}-${(_b = node.line) !== null && _b !== void 0 ? _b : -1}-${(_c = node.col) !== null && _c !== void 0 ? _c : -1}`;
             if (!nodeMap.has(key)) {
                 nodeMap.set(key, node);
             }
         });
-    });
+    }
     return Array.from(nodeMap.values());
 }
 function getNodeLabel(node, _source, includeLineCol = true) {

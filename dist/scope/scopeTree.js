@@ -10,6 +10,8 @@ const range_1 = require("../def-use/types/range");
 const rangeFactory_1 = require("../def-use/factories/rangeFactory");
 const logger_1 = __importDefault(require("../utils/logger"));
 const patternVisitor_1 = require("../ast/patternVisitor");
+const cfgBuilder_1 = require("../cfg/cfgBuilder");
+const cfgValidator_1 = require("../cfg/cfgValidator");
 /**
  * ScopeTree inside a page
  */
@@ -542,6 +544,77 @@ class ScopeTree {
      */
     getCFGEligibleScopes() {
         return this.scopes.filter((scope) => scope_1.default.isCFGEligibleScope(scope));
+    }
+    /**
+     * Build intra-procedural CFG for every CFG-eligible scope in this tree.
+     * Each CFG is attached to its owning Scope (`scope.graph`); flow nodes are
+     * back-linked to their scope/scopeTree for downstream analyses.
+     */
+    buildIntraProceduralCFGs() {
+        for (const scope of this.getCFGEligibleScopes()) {
+            this._buildCFGForScope(scope);
+        }
+    }
+    /**
+     * Build a CFG for a single scope and bind every FlowNode back to its
+     * containing scope and this scope tree. Invalid CFGs are dropped with a
+     * warning to keep downstream analyses safe.
+     */
+    _buildCFGForScope(scope) {
+        try {
+            const astNode = scope.ast;
+            if (!astNode) {
+                scope.graph = null;
+                return;
+            }
+            const graph = scope_1.default.isFunctionScope(scope)
+                ? cfgBuilder_1.cfgBuilder.getCFG(astNode.body)
+                : cfgBuilder_1.cfgBuilder.getCFG(astNode);
+            if (!graph || !cfgValidator_1.cfgValidator.isValidCFG(graph)) {
+                logger_1.default.warn(`Invalid CFG for scope: ${scope.name}`);
+                scope.graph = null;
+                return;
+            }
+            scope.graph = graph;
+            this._bindGraphNodesToScopes(graph, scope);
+        }
+        catch (err) {
+            logger_1.default.error(`Failed to build CFG for scope "${scope.name}": ${String(err)}`);
+            scope.graph = null;
+        }
+    }
+    /**
+     * Resolve every FlowNode's owning scope using the AST range index, falling
+     * back to `defaultScope` when a node has no range or no narrower match.
+     */
+    _bindGraphNodesToScopes(graph, defaultScope) {
+        var _a, _b;
+        for (const node of graph.allNodes) {
+            const range = (_a = node.astNode) === null || _a === void 0 ? void 0 : _a.range;
+            node.scope = range
+                ? (_b = this.getNodeScopeByRangeOptimized(range)) !== null && _b !== void 0 ? _b : defaultScope
+                : defaultScope;
+            node.scopeTree = this;
+        }
+    }
+    /**
+     * Lookup the CFG-eligible scope whose `mainlyRelatedScope` equals `scope`.
+     * In the new model, every CFG is owned by its scope directly, so this just
+     * checks the scope itself.
+     */
+    getCFGScope(scope) {
+        if (!scope_1.default.isScope(scope))
+            return null;
+        if (!scope_1.default.isCFGEligibleScope(scope))
+            return null;
+        return this._scopes.includes(scope) ? scope : null;
+    }
+    /**
+     * Iterate the CFG-bearing scopes (the equivalent of the former
+     * `pageModels.intraProceduralModels`).
+     */
+    get cfgBearingScopes() {
+        return this.getCFGEligibleScopes();
     }
     get root() {
         return this._root;

@@ -9,6 +9,7 @@ const astValidator_1 = require("../ast/astValidator");
 const var_1 = __importDefault(require("../def-use/types/var"));
 const varFactory_1 = require("../def-use/factories/varFactory");
 const errorCode_1 = require("../utils/errorCode");
+const cfgValidator_1 = require("../cfg/cfgValidator");
 /**
  * Scope
  */
@@ -16,6 +17,8 @@ class Scope {
     constructor(ast, name, type, parent) {
         this._builtInObjects = [];
         this._isFunctionExpressionNameScope = false;
+        this._graph = null;
+        this._hasTaintAnalyzed = false;
         this._ast = ast;
         this._name = name;
         this._type = type;
@@ -460,6 +463,47 @@ class Scope {
         };
         visit(this);
         return result;
+    }
+    /**
+     * CFG attached to this scope (only meaningful for CFG-eligible scopes).
+     * Setting an invalid CFG is silently ignored to preserve the previous
+     * Model.graph semantics that callers relied on.
+     */
+    get graph() {
+        return this._graph;
+    }
+    set graph(graph) {
+        if (graph === null) {
+            this._graph = null;
+            return;
+        }
+        if (cfgValidator_1.cfgValidator.isValidCFG(graph)) {
+            this._graph = graph;
+        }
+    }
+    /**
+     * Flag tracking whether this scope's reaching-definition / taint pass
+     * has executed. Used to deduplicate work in the coverage phase.
+     */
+    get hasTaintAnalyzed() {
+        return this._hasTaintAnalyzed;
+    }
+    set hasTaintAnalyzed(value) {
+        this._hasTaintAnalyzed = value;
+    }
+    /**
+     * Optional helper-function summary. When present, the inter-procedural
+     * analyzer dispatches directly into this semantic instead of stepping
+     * through the callee's CFG.
+     */
+    get featureSemantic() {
+        return this._featureSemantic;
+    }
+    set featureSemantic(value) {
+        this._featureSemantic = value;
+    }
+    isFeatureModel() {
+        return !!this._featureSemantic;
     }
 }
 Scope.NAME_EXTENSION = "$EXTENSION";

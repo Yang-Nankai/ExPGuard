@@ -80,3 +80,30 @@ node dist/main.js analyze --type CRX --input ./samples/code_injection/example.cr
 ```bash
 node dist/main.js analyze --type WEB --input=https://chromewebstore.google.com/detail/sponsorblock-for-youtube/mnjggcdmjocbbbhaepdhchncahnbgone --out=./output/cws_example --id=mnjggcdmjocbbbhaepdhchncahnbgone --version=6.1.5
 ```
+
+## Documentation
+
+In-depth component-level docs live under [`docs/`](./docs):
+
+- [`docs/architecture.md`](./docs/architecture.md) — high-level pipeline tour
+- [`docs/extension_loader.md`](./docs/extension_loader.md) — loader, unpacking, frame tagging, dependency graph
+- [`docs/ast_cfg.md`](./docs/ast_cfg.md) — parser strategy, CFG construction, FlowNode model
+- [`docs/scope_def_use.md`](./docs/scope_def_use.md) — scope tree, def-use, inter-procedural call analyzer, builtin semantics
+- [`docs/taint_engine.md`](./docs/taint_engine.md) — TaintManager, cross-context bridges, policy, severity
+- [`docs/taint_policy_catalog.md`](./docs/taint_policy_catalog.md) — full catalog of supported sources / sinks / sanitizers
+- [`docs/output_format.md`](./docs/output_format.md) — `report.txt` and `summary.json` reference
+- [`docs/samples_guide.md`](./docs/samples_guide.md) — what each sample under `samples/` exercises plus verified baseline flow counts
+
+## Test samples
+
+| Sample | Detector class | Run with `--input` |
+|--------|----------------|---------------------|
+| `samples/privilege_execution/` | PRIVILEGE_ESCALATION + STORAGE_POSOING via `chrome.runtime.sendMessage` + `chrome.storage.local` | `./samples/privilege_execution/` |
+| `samples/code_injection/` (CRX) | CODE_INJECTION via `setTimeout(string)` | (use `--type=CRX --input=./samples/code_injection/example.crx --id=caofmekclcabakldafkjbfkkmcebndal`) |
+| `samples/data_leak/` | DATA_LEAK + REQUEST_FORGERY via `chrome.cookies` / `chrome.history` → `fetch` / `onMessageExternal` | `./samples/data_leak/` |
+| `samples/storage_poisoning/` | STORAGE_POSOING + PRIVILEGE_ESCALATION via `WINDOW_CUSTOM_EVENT` → `chrome.storage.sync` → `chrome.tabs.*` | `./samples/storage_poisoning/` |
+| `samples/request_forgery/` | REQUEST_FORGERY via `onMessageExternal` → `fetch` / XHR / WebSocket / axios; sanitiser demo via `crypto.subtle.digest` | `./samples/request_forgery/` |
+| `samples/dom_xss/` | CODE_INJECTION via `location.hash` / `postMessage` / `element.value` / custom events | `./samples/dom_xss/` |
+| `samples/multi_channel/` | DATA_LEAK + PRIVILEGE_ESCALATION + REQUEST_FORGERY via `runtime.connect` / `onConnectExternal` / `pageCapture`; demonstrates `chrome.runtime.getURL` frame propagation to `helper.js` | `./samples/multi_channel/` |
+
+Each new sample is exercised by the same CLI invocation as the existing examples; just swap `--input` and adjust `--out`. See [`docs/samples_guide.md`](./docs/samples_guide.md) for the expected flow set per sample.

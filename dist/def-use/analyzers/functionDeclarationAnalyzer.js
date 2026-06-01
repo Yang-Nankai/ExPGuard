@@ -9,12 +9,11 @@ const logger_1 = __importDefault(require("../../utils/logger"));
 const defFactory_1 = require("../factories/defFactory");
 const utils_1 = require("../utils/utils");
 class FunctionDeclarationAnalyzer {
-    analyze(model) {
-        if (!(model === null || model === void 0 ? void 0 : model.graph))
+    analyze(scope) {
+        if (!(scope === null || scope === void 0 ? void 0 : scope.graph))
             return;
-        const scope = model.mainlyRelatedScope;
-        const entryNode = model.graph.entryNode;
-        if (!scope || !entryNode.astNode) {
+        const entryNode = scope.graph.entryNode;
+        if (!entryNode.astNode) {
             logger_1.default.warn(`Scope ${scope === null || scope === void 0 ? void 0 : scope.name} entry node does not have an AST node`);
             return;
         }

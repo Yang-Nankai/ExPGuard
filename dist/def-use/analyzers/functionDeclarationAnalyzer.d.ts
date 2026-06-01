@@ -1,5 +1,5 @@
-import Model from "../../model/model";
+import Scope from "../../scope/scope";
 export declare class FunctionDeclarationAnalyzer {
-    analyze(model: Model): void;
+    analyze(scope: Scope): void;
 }
 export declare const functionDeclarationAnalyzer: FunctionDeclarationAnalyzer;

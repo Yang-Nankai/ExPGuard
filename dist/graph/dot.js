@@ -31,11 +31,10 @@ const EDGE_STYLES = {
     [flownode_1.FlowNode.NORMAL_CONNECTION_TYPE]: 'color="#9E9E9E", penwidth=1.5, fontsize=12, fontcolor="#424242"',
 };
 /**
- * Generate a complete DOT graph for all page models
+ * Generate a complete DOT graph for all CFG-bearing scopes in a ScopeTree
  */
-function generateDot(pageModels, options = {}) {
+function generateDot(scopeTree, options = {}) {
     const output = [];
-    /* ================= Graph Header ================= */
     output.push(`digraph FullGraph {`);
     output.push(`  rankdir=TB;`);
     output.push(`  ranksep=1.2;`);
@@ -43,48 +42,36 @@ function generateDot(pageModels, options = {}) {
     output.push(`  graph [bgcolor="#FAFAFA", splines=true, overlap=false, layout=dot];`);
     output.push(`  node [fontname="Consolas", fontsize=12, style="rounded,filled", color="#424242", width=1.0, height=0.4];`);
     output.push(`  edge [fontname="Consolas", fontsize=12, fontcolor="#424242", arrowsize=0.8];`);
-    /* ================= Edge Deduplication ================= */
     const edgeSet = new set_1.default();
     const addEdge = (src, dst, attributes) => {
         edgeSet.add(`${src} -> ${dst} [${attributes}];`);
     };
-    /* ================= Node → Scope Mapping ================= */
+    const cfgScopes = scopeTree
+        .getCFGEligibleScopes()
+        .filter((s) => Boolean(s.graph));
+    // Map every flow node to its owning scope name (first writer wins)
     const nodeScopeMap = new Map();
-    pageModels.intraProceduralModels.forEach((model) => {
-        var _a, _b, _c;
-        const scopeName = ((_a = model.mainlyRelatedScope) === null || _a === void 0 ? void 0 : _a.name) || "Anonymous Scope";
-        (_c = (_b = model.graph) === null || _b === void 0 ? void 0 : _b.allNodes) === null || _c === void 0 ? void 0 : _c.forEach((node) => {
-            nodeScopeMap.set(node.cfgId, scopeName);
-        });
-    });
-    pageModels.interProceduralModels.forEach((model) => {
-        var _a, _b, _c;
-        const scopeName = ((_a = model.mainlyRelatedScope) === null || _a === void 0 ? void 0 : _a.name) || "Anonymous Scope";
-        (_c = (_b = model.graph) === null || _b === void 0 ? void 0 : _b.allNodes) === null || _c === void 0 ? void 0 : _c.forEach((node) => {
-            if (!nodeScopeMap.has(node.cfgId)) {
+    cfgScopes.forEach((scope) => {
+        var _a, _b;
+        const scopeName = scope.name || "Anonymous Scope";
+        (_b = (_a = scope.graph) === null || _a === void 0 ? void 0 : _a.allNodes) === null || _b === void 0 ? void 0 : _b.forEach((node) => {
+            if (node.cfgId !== undefined && !nodeScopeMap.has(node.cfgId)) {
                 nodeScopeMap.set(node.cfgId, scopeName);
             }
         });
     });
-    /* ================= Group Nodes by Scope ================= */
+    // Group nodes by scope
     const scopeToNodes = new Map();
-    const allNodes = [];
-    pageModels.intraProceduralModels.forEach((model) => {
-        var _a;
-        ((_a = model.graph) === null || _a === void 0 ? void 0 : _a.allNodes) && allNodes.push(...model.graph.allNodes);
+    cfgScopes.forEach((scope) => {
+        var _a, _b;
+        (_b = (_a = scope.graph) === null || _a === void 0 ? void 0 : _a.allNodes) === null || _b === void 0 ? void 0 : _b.forEach((node) => {
+            const scopeName = nodeScopeMap.get(node.cfgId) || "Global";
+            if (!scopeToNodes.has(scopeName)) {
+                scopeToNodes.set(scopeName, []);
+            }
+            scopeToNodes.get(scopeName).push(node);
+        });
     });
-    pageModels.interProceduralModels.forEach((model) => {
-        var _a;
-        ((_a = model.graph) === null || _a === void 0 ? void 0 : _a.allNodes) && allNodes.push(...model.graph.allNodes);
-    });
-    allNodes.forEach((node) => {
-        const scopeName = nodeScopeMap.get(node.cfgId) || "Global";
-        if (!scopeToNodes.has(scopeName)) {
-            scopeToNodes.set(scopeName, []);
-        }
-        scopeToNodes.get(scopeName).push(node);
-    });
-    /* ================= Generate Subgraphs ================= */
     let clusterIndex = 0;
     scopeToNodes.forEach((nodes, scopeName) => {
         const clusterId = clusterIndex++;
@@ -104,46 +91,23 @@ function generateDot(pageModels, options = {}) {
         });
         output.push(`  }`);
     });
-    /* ================= Control Flow Edges ================= */
-    const processModelEdges = (model) => {
+    // Control-flow edges
+    cfgScopes.forEach((scope) => {
         var _a, _b;
-        (_b = (_a = model.graph) === null || _a === void 0 ? void 0 : _a.allNodes) === null || _b === void 0 ? void 0 : _b.forEach((node) => {
+        (_b = (_a = scope.graph) === null || _a === void 0 ? void 0 : _a.allNodes) === null || _b === void 0 ? void 0 : _b.forEach((node) => {
             flownode_1.FlowNode.CONNECTION_TYPES.forEach((type) => {
-                const targets = node.typeTable[type]
-                    ? [node.typeTable[type]]
-                    : [];
-                targets.forEach((target) => {
-                    if ((target === null || target === void 0 ? void 0 : target.cfgId) !== undefined) {
-                        const attrs = EDGE_STYLES[type] ||
-                            'color="#9E9E9E", fontsize=12';
-                        addEdge(`n${node.cfgId}`, `n${target.cfgId}`, attrs);
-                    }
-                });
-            });
-        });
-    };
-    pageModels.intraProceduralModels.forEach(processModelEdges);
-    pageModels.interProceduralModels.forEach(processModelEdges);
-    /* ================= Def-Use Data Flow Edges ================= */
-    const addDUEdges = (dupairsMap) => {
-        dupairsMap.forEach((pairs, variable) => {
-            pairs.values().forEach((pair) => {
-                var _a, _b;
-                if (((_a = pair.first) === null || _a === void 0 ? void 0 : _a.cfgId) !== undefined &&
-                    ((_b = pair.second) === null || _b === void 0 ? void 0 : _b.cfgId) !== undefined) {
-                    addEdge(`n${pair.first.cfgId}`, `n${pair.second.cfgId}`, `color="#43A047", style="dashed", penwidth=1.5, fontsize=12, fontcolor="#1B5E20", label="DU: ${sanitizeString(variable.name)}"`);
+                const target = node.typeTable[type];
+                if ((target === null || target === void 0 ? void 0 : target.cfgId) !== undefined) {
+                    const attrs = EDGE_STYLES[type] || 'color="#9E9E9E", fontsize=12';
+                    addEdge(`n${node.cfgId}`, `n${target.cfgId}`, attrs);
                 }
             });
         });
-    };
-    pageModels.intraProceduralModels.forEach((m) => addDUEdges(m.dupairs));
-    pageModels.interProceduralModels.forEach((m) => addDUEdges(m.dupairs));
-    /* ================= Final Output ================= */
+    });
     output.push(...Array.from(edgeSet));
     output.push(`}`);
     return output.join("\n");
 }
-/* ================= Utility Functions ================= */
 function getNodeLabel(node, source) {
     var _a, _b;
     if (node.label)

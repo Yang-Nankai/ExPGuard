@@ -1,4 +1,4 @@
-import Model from "../../model/model";
+import Scope from "../../scope/scope";
 import ScopeTree from "../../scope/scopeTree";
 /**
  * ImportAnalyzer
@@ -7,7 +7,7 @@ import ScopeTree from "../../scope/scopeTree";
  *   localName -> exported Def
  */
 export declare class ImportAnalyzer {
-    analyze(model: Model, scopeTree: ScopeTree): void;
+    analyze(scope: Scope, scopeTree: ScopeTree): void;
     private resolveSourcePageContext;
     private isImportScriptsCall;
 }

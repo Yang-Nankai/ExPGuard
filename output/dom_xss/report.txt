@@ -1,0 +1,122 @@
+══════════════════════════════════════════════
+TAINT REPORT  content
+FRAME        CS_1
+CONSTRAINT   {"matches":["<all_urls>"]}
+══════════════════════════════════════════════
+
+[!] Issue #1
+ ├─ Source     : DOCUMENT_LOCATION
+ ├─ Remark     : location.hash
+ │  Location   : L11:C33 -> L11:C40
+ │  File       : content
+ │  Frame      : CS_1
+ │  Constraint : {"matches":["<all_urls>"]}
+ │
+ ├─ Propagation:
+ │   ASSIGN     @ L11:C33 -> L11:C40 (identifier)
+ │   RETURN     @ L11:C14 -> L11:C41 (decodeURIComponent)
+ │   ASSIGN     @ L12:C5 -> L12:C12 (identifier)
+ │   (total steps: 3)
+ │
+ ├─ Sink(s):
+ │   - EVAL       @ L12:C0 -> L12:C13  [file: content]
+ │     frame: CS_1
+ │     constraint: {"matches":["<all_urls>"]}
+ │
+ └─ Sanitized : NO
+
+[!] Issue #2
+ ├─ Source     : ELEMENT_VALUE
+ ├─ Remark     : translate-source
+ │  Location   : L16:C36 -> L16:C47
+ │  File       : content
+ │  Frame      : CS_1
+ │  Constraint : {"matches":["<all_urls>"]}
+ │
+ ├─ Propagation:
+ │   ASSIGN     @ L16:C36 -> L16:C47 (binary-right)
+ │   ASSIGN     @ L16:C15 -> L16:C47 (binary-left)
+ │   ASSIGN     @ L17:C15 -> L17:C23 (identifier)
+ │   (total steps: 3)
+ │
+ ├─ Sink(s):
+ │
+ └─ Sanitized : NO
+
+[!] Issue #3
+ ├─ Source     : WINDOW_MESSAGE_EVENT
+ ├─ Remark     : window.addEventListener(message)
+ │  Location   : L21:C6 -> L21:C14
+ │  File       : content
+ │  Frame      : CS_1
+ │  Constraint : {"matches":["<all_urls>"]}
+ │
+ ├─ Propagation:
+ │   ASSIGN     @ L21:C6 -> L21:C14 (unary)
+ │   ASSIGN     @ L21:C6 -> L21:C14 (unary)
+ │   ELEMENT    @ L22:C6 -> L22:C18 (member-element)
+ │   ASSIGN     @ L22:C6 -> L22:C18 (binary-left)
+ │   ELEMENT    @ L22:C6 -> L22:C18 (member-element)
+ │   ASSIGN     @ L22:C6 -> L22:C18 (binary-left)
+ │   ELEMENT    @ L23:C13 -> L23:C25 (member-element)
+ │   ELEMENT    @ L23:C27 -> L23:C40 (member-element)
+ │   ASSIGN     @ L23:C27 -> L23:C47 (logical-left)
+ │   (total steps: 9)
+ │
+ ├─ Sink(s):
+ │   - TIME_EVAL  @ L23:C2 -> L23:C48  [file: content]
+ │     frame: CS_1
+ │     constraint: {"matches":["<all_urls>"]}
+ │
+ └─ Sanitized : NO
+
+[!] Issue #4
+ ├─ Source     : WINDOW_CUSTOM_EVENT
+ ├─ Remark     : window.addEventListener(translateRule)
+ │  Location   : L29:C12 -> L29:C21
+ │  File       : content
+ │  Frame      : CS_1
+ │  Constraint : {"matches":["<all_urls>"]}
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L29:C12 -> L29:C21 (member-element)
+ │   ASSIGN     @ L29:C6 -> L29:C21 (logical-left)
+ │   ASSIGN     @ L29:C6 -> L29:C21 (logical-right)
+ │   ELEMENT    @ L29:C25 -> L29:C34 (member-element)
+ │   ELEMENT    @ L29:C25 -> L29:C39 (member-element)
+ │   ASSIGN     @ L29:C6 -> L29:C39 (logical-left)
+ │   ASSIGN     @ L29:C6 -> L29:C39 (logical-right)
+ │   ELEMENT    @ L29:C12 -> L29:C21 (member-element)
+ │   ASSIGN     @ L29:C6 -> L29:C21 (logical-left)
+ │   ASSIGN     @ L29:C6 -> L29:C21 (logical-right)
+ │   ELEMENT    @ L29:C25 -> L29:C34 (member-element)
+ │   ELEMENT    @ L29:C25 -> L29:C39 (member-element)
+ │   ASSIGN     @ L29:C6 -> L29:C39 (logical-left)
+ │   ASSIGN     @ L29:C6 -> L29:C39 (logical-right)
+ │   ELEMENT    @ L30:C11 -> L30:C20 (member-element)
+ │   ELEMENT    @ L30:C11 -> L30:C25 (member-element)
+ │   ELEMENT    @ L30:C11 -> L30:C20 (member-element)
+ │   ELEMENT    @ L30:C11 -> L30:C25 (member-element)
+ │   ASSIGN     @ L32:C34 -> L32:C38 (identifier)
+ │   (total steps: 19)
+ │
+ ├─ Sink(s):
+ │
+ └─ Sanitized : NO
+
+Summary:
+  File            : content
+  Issues          : 4
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+TAINT REPORT  background
+FRAME        BG_1
+══════════════════════════════════════════════
+
+✓ No issues in this file.
+Summary:
+  File            : background
+  Issues          : 0
+══════════════════════════════════════════════
+

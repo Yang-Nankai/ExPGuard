@@ -15,12 +15,12 @@ const utils_1 = require("../utils/utils");
  * Performs forward intra/inter-procedural analysis on the CFG.
  */
 class ReachingDefinitionAnalyzer {
-    doAnalysis(model) {
-        if (!(model === null || model === void 0 ? void 0 : model.graph))
+    doAnalysis(scope) {
+        if (!(scope === null || scope === void 0 ? void 0 : scope.graph))
             return;
         // mark analysis executed
-        model.hasTaintAnalyzed = true;
-        (0, worklist_1.worklist)(model.graph, function (queue) {
+        scope.hasTaintAnalyzed = true;
+        (0, worklist_1.worklist)(scope.graph, function (queue) {
             if (!this.scope || flownode_1.FlowNode.isEntryType(this))
                 return;
             (0, generateHandler_1.computeGenFromAST)(this);
@@ -33,8 +33,7 @@ class ReachingDefinitionAnalyzer {
             }
         }, { direction: "forward" });
         // clear reaching definitions when exiting non-page scope
-        const scope = model.mainlyRelatedScope;
-        if (scope && !scope_1.default.isPageScope(scope)) {
+        if (!scope_1.default.isPageScope(scope)) {
             scope.resetReachingDefinitions();
         }
     }

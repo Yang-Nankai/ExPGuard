@@ -9,16 +9,13 @@ const builtinRegistry_1 = require("../builtins/builtinRegistry");
 const defFactory_1 = require("../factories/defFactory");
 const utils_1 = require("../utils/utils");
 class BuiltInAnalyzer {
-    analyze(model) {
-        if (!(model === null || model === void 0 ? void 0 : model.graph))
+    analyze(scope) {
+        if (!(scope === null || scope === void 0 ? void 0 : scope.graph))
             return;
         builtinRegistry_1.BuiltInRegistry.initialize();
         // FIX: attribute should taint in every model
         builtinRegistry_1.BuiltInRegistry.registerAttributeSources();
-        const scope = model.mainlyRelatedScope;
-        const entryNode = model.graph.entryNode;
-        if (!scope)
-            return;
+        const entryNode = scope.graph.entryNode;
         const builtIns = scope.builtInObjects; // [{ name: "Array" }, ...]
         const builtInVars = scope.builtInObjectVars; // Map(name → Var)
         builtIns === null || builtIns === void 0 ? void 0 : builtIns.forEach((name) => {

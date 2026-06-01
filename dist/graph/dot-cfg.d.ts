@@ -1,7 +1,7 @@
-import PageModels from "../model/pageModels";
+import ScopeTree from "../scope/scopeTree";
 export interface CfgDotOptions {
     graphName?: string;
     source?: string;
     includeLineCol?: boolean;
 }
-export declare function generateCfgDot(pageModels: PageModels, options?: CfgDotOptions): string;
+export declare function generateCfgDot(scopeTree: ScopeTree, options?: CfgDotOptions): string;

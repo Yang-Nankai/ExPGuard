@@ -1,0 +1,269 @@
+══════════════════════════════════════════════
+TAINT REPORT  content
+FRAME        CS_1
+CONSTRAINT   {"matches":["*://*.theme-marketplace.example/*"]}
+══════════════════════════════════════════════
+
+[!] Issue #1
+ ├─ Source     : WINDOW_CUSTOM_EVENT
+ ├─ Remark     : window.addEventListener(themeImport)
+ │  Location   : L14:C20 -> L14:C30
+ │  File       : content
+ │  Frame      : CS_1
+ │  Constraint : {"matches":["*://*.theme-marketplace.example/*"]}
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L14:C20 -> L14:C30 (member-element)
+ │   ASSIGN     @ L14:C20 -> L14:C36 (logical-left)
+ │   ASSIGN     @ L18:C19 -> L18:C26 (identifier)
+ │   ELEMENT    @ L18:C19 -> L18:C33 (member-element)
+ │   ELEMENT    @ L17:C4 -> L21:C6 (object.setProperty)
+ │   ASSIGN     @ L19:C17 -> L19:C24 (identifier)
+ │   ELEMENT    @ L19:C17 -> L19:C29 (member-element)
+ │   ELEMENT    @ L17:C4 -> L21:C6 (object.setProperty)
+ │   ASSIGN     @ L20:C20 -> L20:C27 (identifier)
+ │   ELEMENT    @ L20:C20 -> L20:C40 (member-element)
+ │   ELEMENT    @ L17:C4 -> L21:C6 (object.setProperty)
+ │   (total steps: 11)
+ │
+ ├─ Sink(s):
+ │   - CHROME_SYNC_STORAGE @ L17:C4 -> L21:C6 (themePreset)  [file: content]
+ │     frame: CS_1
+ │     constraint: {"matches":["*://*.theme-marketplace.example/*"]}
+ │   - CHROME_SYNC_STORAGE @ L17:C4 -> L21:C6 (themeName)  [file: content]
+ │     frame: CS_1
+ │     constraint: {"matches":["*://*.theme-marketplace.example/*"]}
+ │   - CHROME_SYNC_STORAGE @ L17:C4 -> L21:C6 (autoRedirect)  [file: content]
+ │     frame: CS_1
+ │     constraint: {"matches":["*://*.theme-marketplace.example/*"]}
+ │
+ └─ Sanitized : NO
+
+[!] Issue #2
+ ├─ Source     : TARGET_CUSTOM_EVENT
+ ├─ Remark     : target.addEventListener(themeCommit)
+ │  Location   : L28:C19 -> L28:C29
+ │  File       : content
+ │  Frame      : CS_1
+ │  Constraint : {"matches":["*://*.theme-marketplace.example/*"]}
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L28:C19 -> L28:C29 (member-element)
+ │   ELEMENT    @ L28:C19 -> L28:C35 (member-element)
+ │   ASSIGN     @ L29:C11 -> L29:C15 (identifier)
+ │   ASSIGN     @ L29:C10 -> L29:C15 (unary)
+ │   ASSIGN     @ L29:C11 -> L29:C15 (identifier)
+ │   ASSIGN     @ L29:C10 -> L29:C15 (unary)
+ │   ASSIGN     @ L34:C15 -> L34:C19 (identifier)
+ │   ELEMENT    @ L34:C15 -> L34:C25 (member-element)
+ │   ELEMENT    @ L32:C6 -> L36:C8 (object.setProperty)
+ │   ASSIGN     @ L35:C13 -> L35:C17 (identifier)
+ │   ELEMENT    @ L35:C13 -> L35:C21 (member-element)
+ │   ELEMENT    @ L32:C6 -> L36:C8 (object.setProperty)
+ │   (total steps: 12)
+ │
+ ├─ Sink(s):
+ │
+ └─ Sanitized : NO
+
+Summary:
+  File            : content
+  Issues          : 2
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+TAINT REPORT  rules
+FRAME        BG_1
+══════════════════════════════════════════════
+
+✓ No issues in this file.
+Summary:
+  File            : rules
+  Issues          : 0
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+TAINT REPORT  background
+FRAME        BG_1
+══════════════════════════════════════════════
+
+[!] Issue #1
+ ├─ Source     : TARGET_CUSTOM_EVENT
+ ├─ Remark     : target.addEventListener(themeCommit)
+ │  Location   : L13:C0 -> L20:C2
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   MESSAGE    @ L13:C0 -> L20:C2 (runtime.single.sender.message[content->background])
+ │   ASSIGN     @ L14:C6 -> L14:C42 (logical-left)
+ │   ASSIGN     @ L14:C6 -> L14:C42 (logical-left)
+ │   ELEMENT    @ L15:C4 -> L18:C6 (object.setProperty)
+ │   ELEMENT    @ L15:C4 -> L18:C6 (object.setProperty)
+ │   (total steps: 5)
+ │
+ ├─ Sink(s):
+ │   - CHROME_BOOKMARK_CREATE_INFO @ L15:C4 -> L18:C6  [file: background]
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+[!] Issue #2
+ ├─ Source     : STORAGE_ALL_ITEMS
+ ├─ Remark     : storage.all.items[sync]
+ │  Location   : L50:C18 -> L50:C36
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L50:C18 -> L50:C36 (member-element)
+ │   ASSIGN     @ L50:C6 -> L50:C36 (logical-left)
+ │   ASSIGN     @ L50:C6 -> L50:C36 (logical-right)
+ │   ELEMENT    @ L50:C18 -> L50:C36 (member-element)
+ │   ASSIGN     @ L50:C6 -> L50:C36 (logical-left)
+ │   ASSIGN     @ L50:C6 -> L50:C36 (logical-right)
+ │   ELEMENT    @ L51:C47 -> L51:C65 (member-element)
+ │   ASSIGN     @ L51:C47 -> L51:C65 (binary-right)
+ │   ELEMENT    @ L51:C4 -> L51:C68 (object.setProperty)
+ │   (total steps: 9)
+ │
+ ├─ Sink(s):
+ │   - CHROME_TABS_CREATE_OPTIONS @ L51:C4 -> L51:C68  [file: background]
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+[!] Issue #3
+ ├─ Source     : WINDOW_CUSTOM_EVENT
+ ├─ Remark     : From storage.sync.set('themePreset') in content
+ │  Location   : L14:C20 -> L14:C30
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L14:C20 -> L14:C30 (member-element)
+ │   ASSIGN     @ L14:C20 -> L14:C36 (logical-left)
+ │   ASSIGN     @ L18:C19 -> L18:C26 (identifier)
+ │   ELEMENT    @ L18:C19 -> L18:C33 (member-element)
+ │   ELEMENT    @ L17:C4 -> L21:C6 (object.setProperty)
+ │   ASSIGN     @ L19:C17 -> L19:C24 (identifier)
+ │   ELEMENT    @ L19:C17 -> L19:C29 (member-element)
+ │   ELEMENT    @ L17:C4 -> L21:C6 (object.setProperty)
+ │   ASSIGN     @ L20:C20 -> L20:C27 (identifier)
+ │   ELEMENT    @ L20:C20 -> L20:C40 (member-element)
+ │   ELEMENT    @ L17:C4 -> L21:C6 (object.setProperty)
+ │   STORAGE    @ L24:C10 -> L28:C6 (STORAGE_FLOW[area: sync, key: themePreset, sender: content, receiver: background])
+ │   ELEMENT    @ L23:C8 -> L28:C6 (object.setProperty)
+ │   ASSIGN     @ L34:C6 -> L34:C17 (identifier)
+ │   ASSIGN     @ L35:C33 -> L35:C44 (identifier)
+ │   ELEMENT    @ L35:C33 -> L35:C55 (member-element)
+ │   ELEMENT    @ L35:C4 -> L35:C58 (object.setProperty)
+ │   (total steps: 17)
+ │
+ ├─ Sink(s):
+ │   - CHROME_HISTORY_ADD_URL @ L35:C4 -> L35:C58  [file: background]
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+[!] Issue #4
+ ├─ Source     : WINDOW_CUSTOM_EVENT
+ ├─ Remark     : From storage.sync.set('autoRedirect') in content
+ │  Location   : L14:C20 -> L14:C30
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L14:C20 -> L14:C30 (member-element)
+ │   ASSIGN     @ L14:C20 -> L14:C36 (logical-left)
+ │   ASSIGN     @ L18:C19 -> L18:C26 (identifier)
+ │   ELEMENT    @ L18:C19 -> L18:C33 (member-element)
+ │   ELEMENT    @ L17:C4 -> L21:C6 (object.setProperty)
+ │   ASSIGN     @ L19:C17 -> L19:C24 (identifier)
+ │   ELEMENT    @ L19:C17 -> L19:C29 (member-element)
+ │   ELEMENT    @ L17:C4 -> L21:C6 (object.setProperty)
+ │   ASSIGN     @ L20:C20 -> L20:C27 (identifier)
+ │   ELEMENT    @ L20:C20 -> L20:C40 (member-element)
+ │   ELEMENT    @ L17:C4 -> L21:C6 (object.setProperty)
+ │   STORAGE    @ L24:C10 -> L28:C6 (STORAGE_FLOW[area: sync, key: autoRedirect, sender: content, receiver: background])
+ │   ELEMENT    @ L23:C8 -> L28:C6 (object.setProperty)
+ │   ASSIGN     @ L30:C6 -> L30:C18 (identifier)
+ │   ASSIGN     @ L30:C22 -> L30:C34 (identifier)
+ │   ELEMENT    @ L30:C22 -> L30:C38 (member-element)
+ │   ASSIGN     @ L30:C6 -> L30:C38 (logical-left)
+ │   ASSIGN     @ L30:C6 -> L30:C38 (logical-right)
+ │   ASSIGN     @ L30:C6 -> L30:C18 (identifier)
+ │   ASSIGN     @ L30:C22 -> L30:C34 (identifier)
+ │   ELEMENT    @ L30:C22 -> L30:C38 (member-element)
+ │   ASSIGN     @ L30:C6 -> L30:C38 (logical-left)
+ │   ASSIGN     @ L30:C6 -> L30:C38 (logical-right)
+ │   ASSIGN     @ L31:C30 -> L31:C42 (identifier)
+ │   ELEMENT    @ L31:C30 -> L31:C46 (member-element)
+ │   ELEMENT    @ L31:C4 -> L31:C49 (object.setProperty)
+ │   ASSIGN     @ L38:C20 -> L38:C32 (identifier)
+ │   ELEMENT    @ L38:C20 -> L38:C39 (member-element)
+ │   ASSIGN     @ L38:C20 -> L38:C32 (identifier)
+ │   ELEMENT    @ L38:C20 -> L38:C39 (member-element)
+ │   ASSIGN     @ L39:C23 -> L39:C35 (identifier)
+ │   ELEMENT    @ L39:C23 -> L39:C41 (member-element)
+ │   ASSIGN     @ L2:C21 -> L2:C26 (identifier)
+ │   ITERATE    @ L2:C7 -> L2:C17 (loop.iteration)
+ │   ASSIGN     @ L3:C9 -> L3:C13 (identifier)
+ │   ASSIGN     @ L3:C8 -> L3:C13 (unary)
+ │   ASSIGN     @ L3:C9 -> L3:C13 (identifier)
+ │   ASSIGN     @ L3:C8 -> L3:C13 (unary)
+ │   ASSIGN     @ L4:C30 -> L4:C34 (identifier)
+ │   ELEMENT    @ L4:C30 -> L4:C38 (member-element)
+ │   ELEMENT    @ L4:C4 -> L4:C64 (object.setProperty)
+ │   ASSIGN     @ L4:C50 -> L4:C54 (identifier)
+ │   ELEMENT    @ L4:C50 -> L4:C61 (member-element)
+ │   ASSIGN     @ L4:C49 -> L4:C61 (unary)
+ │   ASSIGN     @ L4:C48 -> L4:C61 (unary)
+ │   ELEMENT    @ L4:C4 -> L4:C64 (object.setProperty)
+ │   ASSIGN     @ L6:C40 -> L6:C44 (identifier)
+ │   ELEMENT    @ L6:C40 -> L6:C51 (member-element)
+ │   ELEMENT    @ L6:C6 -> L6:C54 (object.setProperty)
+ │   (total steps: 49)
+ │
+ ├─ Sink(s):
+ │   - CHROME_TABS_CREATE_OPTIONS @ L31:C4 -> L31:C49  [file: background]
+ │     frame: BG_1
+ │   - CHROME_TABS_CREATE_OPTIONS @ L4:C4 -> L4:C64  [file: background]
+ │     frame: BG_1
+ │   - CHROME_TABS_EXECUTE @ L6:C6 -> L6:C54  [file: background]
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+[!] Issue #5
+ ├─ Source     : WINDOW_CUSTOM_EVENT
+ ├─ Remark     : From storage.sync.set('themeName') in content
+ │  Location   : L14:C20 -> L14:C30
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L14:C20 -> L14:C30 (member-element)
+ │   ASSIGN     @ L14:C20 -> L14:C36 (logical-left)
+ │   ASSIGN     @ L18:C19 -> L18:C26 (identifier)
+ │   ELEMENT    @ L18:C19 -> L18:C33 (member-element)
+ │   ELEMENT    @ L17:C4 -> L21:C6 (object.setProperty)
+ │   ASSIGN     @ L19:C17 -> L19:C24 (identifier)
+ │   ELEMENT    @ L19:C17 -> L19:C29 (member-element)
+ │   ELEMENT    @ L17:C4 -> L21:C6 (object.setProperty)
+ │   ASSIGN     @ L20:C20 -> L20:C27 (identifier)
+ │   ELEMENT    @ L20:C20 -> L20:C40 (member-element)
+ │   ELEMENT    @ L17:C4 -> L21:C6 (object.setProperty)
+ │   STORAGE    @ L24:C10 -> L28:C6 (STORAGE_FLOW[area: sync, key: themeName, sender: content, receiver: background])
+ │   ELEMENT    @ L23:C8 -> L28:C6 (object.setProperty)
+ │   (total steps: 13)
+ │
+ ├─ Sink(s):
+ │
+ └─ Sanitized : NO
+
+Summary:
+  File            : background
+  Issues          : 5
+══════════════════════════════════════════════
+

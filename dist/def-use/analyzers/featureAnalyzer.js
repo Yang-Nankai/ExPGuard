@@ -4,17 +4,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.featureModelAnalyzer = void 0;
-const modelCtrl_1 = require("../../model/modelCtrl");
+// analyzers/featureModelAnalyzer.ts
 const scope_1 = __importDefault(require("../../scope/scope"));
 const logger_1 = __importDefault(require("../../utils/logger"));
 const features_1 = require("../features/features");
 const range_1 = require("../types/range");
 class FeatureModelAnalyzer {
-    analyze(model, scopeTree) {
-        if (!(model === null || model === void 0 ? void 0 : model.graph))
+    analyze(scope, scopeTree) {
+        if (!(scope === null || scope === void 0 ? void 0 : scope.graph))
             return;
-        const scope = model.mainlyRelatedScope;
-        if (!scope || !scope_1.default.isPageScope(scope))
+        if (!scope_1.default.isPageScope(scope))
             return;
         const ast = scope.ast;
         if (!ast)
@@ -24,17 +23,12 @@ class FeatureModelAnalyzer {
             const funcScope = scopeTree.getScopeByRange(new range_1.Range(functionNode.range));
             if (!funcScope)
                 continue;
-            const funcModel = modelCtrl_1.modelController.getIntraProceduralModelByMainlyRelatedScopeFromAPageModels(scopeTree, funcScope);
-            if (!funcModel)
-                continue;
-            funcModel.featureSemantic = feature;
-            // TODO: the code here will be beautified later.
-            funcModel.hasTaintAnalyzed = true;
-            const children = funcScope.getAllDescendants();
-            for (const child of children) {
-                const model = modelCtrl_1.modelController.getIntraProceduralModelByMainlyRelatedScopeFromAPageModels(scopeTree, child);
-                if (model)
-                    model.hasTaintAnalyzed = true;
+            funcScope.featureSemantic = feature;
+            // Mark the function and everything inside it as already taint-analyzed,
+            // since the feature semantic replaces the body's CFG walk.
+            funcScope.hasTaintAnalyzed = true;
+            for (const child of funcScope.getAllDescendants()) {
+                child.hasTaintAnalyzed = true;
             }
             logger_1.default.info(`[FEATURE] bind ${feature.id} -> function @[${functionNode.loc.start.line}:${functionNode.loc.start.column}],[${functionNode.loc.end.line}:${functionNode.loc.end.column}] in scope ${funcScope.toString()}`);
         }

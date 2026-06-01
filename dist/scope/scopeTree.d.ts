@@ -122,6 +122,34 @@ declare class ScopeTree {
      * Get model scope
      */
     getCFGEligibleScopes(): Scope[];
+    /**
+     * Build intra-procedural CFG for every CFG-eligible scope in this tree.
+     * Each CFG is attached to its owning Scope (`scope.graph`); flow nodes are
+     * back-linked to their scope/scopeTree for downstream analyses.
+     */
+    buildIntraProceduralCFGs(): void;
+    /**
+     * Build a CFG for a single scope and bind every FlowNode back to its
+     * containing scope and this scope tree. Invalid CFGs are dropped with a
+     * warning to keep downstream analyses safe.
+     */
+    private _buildCFGForScope;
+    /**
+     * Resolve every FlowNode's owning scope using the AST range index, falling
+     * back to `defaultScope` when a node has no range or no narrower match.
+     */
+    private _bindGraphNodesToScopes;
+    /**
+     * Lookup the CFG-eligible scope whose `mainlyRelatedScope` equals `scope`.
+     * In the new model, every CFG is owned by its scope directly, so this just
+     * checks the scope itself.
+     */
+    getCFGScope(scope: Scope): Scope | null;
+    /**
+     * Iterate the CFG-bearing scopes (the equivalent of the former
+     * `pageModels.intraProceduralModels`).
+     */
+    get cfgBearingScopes(): Scope[];
     get root(): PageScope | null;
     get scopes(): Scope[];
     get mapFromNameToScope(): Map<string, Scope>;

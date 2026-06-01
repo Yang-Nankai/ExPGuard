@@ -14,8 +14,6 @@ const scriptDependenctGraph_1 = require("./scriptDependenctGraph");
 const extensionScript_1 = require("./extensionScript");
 const topoSort_1 = require("../utils/topoSort");
 const scopeCtrl_1 = require("../scope/scopeCtrl");
-const modelCtrl_1 = require("../model/modelCtrl");
-const modelBuilder_1 = require("../model/modelBuilder");
 const config_1 = __importDefault(require("../config"));
 const defuseanalyzer_1 = require("../def-use/defuseanalyzer");
 const taint_1 = require("../taint");
@@ -141,9 +139,8 @@ class ExtensionContext {
             try {
                 const ast = script.getAST();
                 const scopeTree = scopeCtrl_1.scopeController.addPageScopeTree(ast, script);
-                modelCtrl_1.modelController.addPageModels(scopeTree);
-                // Create Intra Model
-                modelBuilder_1.modelBuilder.buildIntraProceduralModelsForAPage(scopeTree);
+                // Build intra-procedural CFGs and bind them onto their scopes.
+                scopeTree.buildIntraProceduralCFGs();
                 if (config_1.default.enableInterProcedural) {
                     taint_1.taintManager.enterFile(script);
                     defuseanalyzer_1.defuseAnalyzer.buildInterProceduralModelsPDG(scopeTree);

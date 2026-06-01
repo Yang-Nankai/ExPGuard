@@ -14,18 +14,17 @@ const utils_1 = require("../utils/utils");
  * ExportAnalyzer
  */
 class ExportAnalyzer {
-    analyze(model, scopeTree) {
-        if (!(model === null || model === void 0 ? void 0 : model.graph))
+    analyze(scope, scopeTree) {
+        if (!(scope === null || scope === void 0 ? void 0 : scope.graph))
             return;
         const script = scopeTree.script;
-        const scope = model.mainlyRelatedScope;
         // Export only applies to the top-level (module) scope
-        if (!scope || !scope_1.default.isPageScope(scope))
+        if (!scope_1.default.isPageScope(scope))
             return;
         const ast = scope.ast;
         if (!ast)
             return;
-        const exitNode = model.graph.exitNode;
+        const exitNode = scope.graph.exitNode;
         const handleExportDeclaration = (decl) => {
             var _a, _b;
             if (!decl)

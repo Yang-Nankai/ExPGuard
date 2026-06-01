@@ -1,9 +1,9 @@
-import Model from "../../model/model";
+import Scope from "../../scope/scope";
 /**
  * Reaching Definition Analyzer
  * Performs forward intra/inter-procedural analysis on the CFG.
  */
 export declare class ReachingDefinitionAnalyzer {
-    doAnalysis(model: Model): void;
+    doAnalysis(scope: Scope): void;
 }
 export declare const reachingDefAnalyzer: ReachingDefinitionAnalyzer;

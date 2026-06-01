@@ -16,13 +16,12 @@ const scriptUsageTracker_1 = require("../../extension/scriptUsageTracker");
  *   localName -> exported Def
  */
 class ImportAnalyzer {
-    analyze(model, scopeTree) {
-        if (!(model === null || model === void 0 ? void 0 : model.graph))
+    analyze(scope, scopeTree) {
+        if (!(scope === null || scope === void 0 ? void 0 : scope.graph))
             return;
-        const scope = model.mainlyRelatedScope;
-        if (!scope || !scope_1.default.isPageScope(scope))
+        if (!scope_1.default.isPageScope(scope))
             return;
-        const entryNode = model.graph.entryNode;
+        const entryNode = scope.graph.entryNode;
         const ast = scope.ast;
         if (!ast)
             return;

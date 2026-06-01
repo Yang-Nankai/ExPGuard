@@ -43,7 +43,6 @@ const functionCallItem_1 = require("../utils/functionCallItem");
 const functionCallStack_1 = require("../utils/functionCallStack");
 const defFactory_1 = require("../factories/defFactory");
 const range_1 = require("../types/range");
-const modelCtrl_1 = require("../../model/modelCtrl");
 const reachingDefinitionAnalyzer_1 = require("./reachingDefinitionAnalyzer");
 const patternAwareTypeHandler_1 = require("../handlers/patternAwareTypeHandler");
 const errorCode_1 = require("../../utils/errorCode");
@@ -142,21 +141,20 @@ class InterProceduralAnalyzer {
             logger_1.default.debug("callee.scope or callee.scopeTree is null");
             return;
         }
-        const calleeModel = modelCtrl_1.modelController.getIntraProceduralModelByMainlyRelatedScopeFromAPageModels(callee.fromNode.scopeTree, calleeScope);
-        if (calleeModel === null || calleeModel === void 0 ? void 0 : calleeModel.featureSemantic) {
-            const returnDef = (_b = calleeModel.featureSemantic.exec(argDefs, caller, thisDef)) !== null && _b !== void 0 ? _b : defFactory_1.defFactory.createUndefinedDef(caller);
+        if (calleeScope.featureSemantic) {
+            const returnDef = (_b = calleeScope.featureSemantic.exec(argDefs, caller, thisDef)) !== null && _b !== void 0 ? _b : defFactory_1.defFactory.createUndefinedDef(caller);
             this.setCurrentReturnDef(returnDef);
-            if (calleeModel.featureSemantic.hasSideEffect)
+            if (calleeScope.featureSemantic.hasSideEffect)
                 this.setCurrentSideEffects();
             return;
         }
-        if (!((_c = calleeModel === null || calleeModel === void 0 ? void 0 : calleeModel.graph) === null || _c === void 0 ? void 0 : _c.entryNode))
+        if (!((_c = calleeScope.graph) === null || _c === void 0 ? void 0 : _c.entryNode))
             return;
-        const entryNode = calleeModel.graph.entryNode;
+        const entryNode = calleeScope.graph.entryNode;
         this.bindFunctionParameters(entryNode, calleeScope, argDefs);
         /** ---- side effect snapshot (before) ---- */
         const beforeSnapshot = this.calcSideEffectSnapshot(calleeScope);
-        reachingDefinitionAnalyzer_1.reachingDefAnalyzer.doAnalysis(calleeModel);
+        reachingDefinitionAnalyzer_1.reachingDefAnalyzer.doAnalysis(calleeScope);
         /** ---- side effect snapshot (after) ---- */
         const afterSnapshot = this.calcSideEffectSnapshot(calleeScope);
         if (beforeSnapshot !== afterSnapshot) {

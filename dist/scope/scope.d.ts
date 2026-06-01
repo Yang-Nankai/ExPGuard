@@ -4,6 +4,8 @@ import Var from "../def-use/types/var";
 import Def from "../def-use/types/def";
 import PageScope from "./pageScope";
 import FunctionScope from "./functionScope";
+import { CFGResult } from "../cfg/cfgResult";
+import { FeatureModelSemantic } from "../def-use/features/features";
 /**
  * Scope
  */
@@ -23,6 +25,9 @@ declare class Scope {
     private _lastReachIns;
     private _builtInObjects;
     protected _isFunctionExpressionNameScope: boolean;
+    private _graph;
+    private _hasTaintAnalyzed;
+    private _featureSemantic;
     static readonly NAME_EXTENSION = "$EXTENSION";
     static readonly NAME_PAGE_PREFIX = "$PAGE";
     static readonly NAME_ANONYMOUS_FUNCTION_PREFIX = "$ANONF";
@@ -247,5 +252,26 @@ declare class Scope {
      * Get all descendant scopes (children, children of children, ...)
      */
     getAllDescendants(): Scope[];
+    /**
+     * CFG attached to this scope (only meaningful for CFG-eligible scopes).
+     * Setting an invalid CFG is silently ignored to preserve the previous
+     * Model.graph semantics that callers relied on.
+     */
+    get graph(): CFGResult | null;
+    set graph(graph: CFGResult | null);
+    /**
+     * Flag tracking whether this scope's reaching-definition / taint pass
+     * has executed. Used to deduplicate work in the coverage phase.
+     */
+    get hasTaintAnalyzed(): boolean;
+    set hasTaintAnalyzed(value: boolean);
+    /**
+     * Optional helper-function summary. When present, the inter-procedural
+     * analyzer dispatches directly into this semantic instead of stepping
+     * through the callee's CFG.
+     */
+    get featureSemantic(): FeatureModelSemantic | undefined;
+    set featureSemantic(value: FeatureModelSemantic | undefined);
+    isFeatureModel(): boolean;
 }
 export default Scope;
