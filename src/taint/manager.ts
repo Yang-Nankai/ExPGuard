@@ -20,7 +20,7 @@ import config, { DEFAULT_REPORT_OPTIONS, ReportOptions } from "../config";
 import { Errors } from "../utils/errorCode";
 import { ExtensionScript } from "../extension/extensionScript";
 import {
-  getFlowType,
+  getFlowMatches,
   shouldFilterSourceByFrame,
   shouldIncludeScriptInPolicy,
 } from "./policy";
@@ -1332,9 +1332,13 @@ export class TaintManager {
         const source = ctx.sources.find((s) => s.taintId === taintId);
         if (!source || source.isPseudo) continue;
 
-        const flowType = getFlowType(source.sourceType, sink.sinkType);
-
-        if (!flowType) continue;
+        // The rule engine may return multiple FlowTypes for the same
+        // (source, sink) pair — e.g. cookies → fetch.body matching both a
+        // SENSITIVE_DATA → MESSAGE_RESPONSE rule and a NETWORK_SEND rule.
+        // We emit one summary record per matched FlowType so analysts can
+        // triage them as distinct findings.
+        const matches = getFlowMatches(source.sourceType, sink.sinkType);
+        if (matches.length === 0) continue;
 
         const sourceNode =
           ctx.paths.find((p) => p.taintId === taintId)?.astNode ?? sink.astNode;
@@ -1342,10 +1346,15 @@ export class TaintManager {
         const sourceLoc = sourceNode ? fmt(sourceNode) : "[unknown]";
         const sinkLoc = fmt(sink.astNode);
 
-        const key = `${source.sourceType}|${ctx.filename}|${sourceLoc}|${sink.sinkType}|${sinkLoc}|${sink.remark ?? ""}|${sink.urlTaintControl ?? ""}`;
+        for (const match of matches) {
+          const flowType = match.flowType;
+          // Dedup key now includes flowType so the same source/sink pair can
+          // surface under multiple categories without being collapsed.
+          const key = `${flowType}|${source.sourceType}|${ctx.filename}|${sourceLoc}|${sink.sinkType}|${sinkLoc}|${sink.remark ?? ""}|${sink.urlTaintControl ?? ""}`;
 
-        if (!flowSet.has(key)) {
+          if (flowSet.has(key)) continue;
           flowSet.add(key);
+
           const message = ctx.paths.find(
             (p) => p.taintId === taintId && p.PropagateType === "MESSAGE",
           );
@@ -1399,6 +1408,8 @@ export class TaintManager {
 
           const flowObj: any = {
             flowType,
+            ruleId: match.ruleId,
+            ruleDescription: match.ruleDescription,
             sourceType: source.sourceType,
             sourceRemark: source.remark,
             sourceFile,

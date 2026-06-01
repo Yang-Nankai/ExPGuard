@@ -26,6 +26,8 @@ import {
 import config from "../config";
 import { scriptUsageTracker } from "../extension/scriptUsageTracker";
 import { ScriptFrameTag } from "../extension/extensionScript";
+import { taintRuleEngine } from "./ruleEngine";
+import { RuleMatch } from "./ruleTypes";
 
 /* ================= Script Filter ================= */
 
@@ -34,6 +36,12 @@ export function shouldIncludeScriptInPolicy(scriptKey: string): boolean {
   return scriptUsageTracker.isScriptUsed(scriptKey);
 }
 
+/**
+ * Frame-feasibility filter — orthogonal to the rule engine. Even if a rule
+ * matches a (source, sink) pair, the analyzer may know the source can't
+ * physically fire in the source frame (e.g. window message events in a
+ * background service worker). Returning `true` here drops the flow.
+ */
 export function shouldFilterSourceByFrame(
   source: SourceType,
   sourceFrame: ScriptFrameTag,
@@ -86,149 +94,34 @@ export function classifySink(sink: SinkType): SinkCapability {
 
 /* ================= Core Flow Logic ================= */
 
+/**
+ * Resolve a (source, sink) pair through the rule engine. Returns every
+ * matching FlowType minus any suppressed by the loaded rule set.
+ *
+ * The default rule set (src/taint/rules/default-rules.json) reproduces the
+ * original hand-written matrix exactly; user-supplied rule files (loaded via
+ * `config.taintRulesPath` / `--taint-rules`) can add or refine categories
+ * (e.g. classify cookies → fetch body as DATA_LEAK while still flagging
+ * REQUEST_FORGERY for the same pair).
+ */
+export function getFlowTypes(source: SourceType, sink: SinkType): FlowType[] {
+  return taintRuleEngine.getFlowTypes(source, sink);
+}
+
+/** Like `getFlowTypes` but keeps the rule provenance for reporting. */
+export function getFlowMatches(source: SourceType, sink: SinkType): RuleMatch[] {
+  return taintRuleEngine.matchFlowTypes(source, sink);
+}
+
+/**
+ * @deprecated Use `getFlowTypes` (all-match) or `getFlowMatches` (with rule
+ * provenance). Kept for any out-of-tree callers that still expect a single
+ * FlowType; returns the first match or null.
+ */
 export function getFlowType(
   source: SourceType,
   sink: SinkType,
 ): FlowType | null {
-  if (isNativeOutputSource(source)) return null;
-  if (isNativeOutputSink(sink)) return null;
-
-  const srcCap = classifySource(source);
-  const sinkCap = classifySink(sink);
-
-  switch (srcCap) {
-    /* ===== ATTACKER INPUT ===== */
-
-    case "ATTACKER_INPUT":
-      if (sinkCap === "PRIVILEGED_OPERATION") return "PRIVILEGE_ESCALATION";
-
-      if (sinkCap === "STORAGE_WRITE") return "STORAGE_POSOING";
-
-      if (sinkCap === "NETWORK_SEND") return "REQUEST_FORGERY";
-
-      if (sinkCap === "CODE_EXECUTION") return "CODE_INJECTION";
-
-      if (
-        sinkCap === "MESSAGE_RESPONSE" &&
-        filterMessageTaint(source, sink)
-      )
-        return "PRIVILEGE_ESCALATION";
-
-      break;
-
-    /* ===== SENSITIVE DATA ===== */
-
-    case "SENSITIVE_DATA":
-      if (
-        sinkCap === "MESSAGE_RESPONSE" &&
-        shouldReportDataLeakSource(source)
-      )
-        return "DATA_LEAK";
-      break;
-
-    /* ===== SYSTEM INFO (Fingerprint → DATA_LEAK) ===== */
-
-    case "SYSTEM_INFO":
-      if (
-        sinkCap === "MESSAGE_RESPONSE" &&
-        shouldReportDataLeakSource(source)
-      )
-        return "DATA_LEAK";
-      break;
-
-    /* ===== NETWORK RESPONSE ===== */
-
-    case "NETWORK_RESPONSE":
-      if (sinkCap === "CODE_EXECUTION") return "CODE_INJECTION";
-
-      if (sinkCap === "PRIVILEGED_OPERATION")
-        return "PRIVILEGE_ESCALATION";
-
-      if (sinkCap === "STORAGE_WRITE") return "STORAGE_POSOING";
-
-      break;
-
-    /* ===== WEB CONTENT ===== */
-
-    case "WEB_CONTENT":
-      if (sinkCap === "CODE_EXECUTION") return "CODE_INJECTION";
-      // if (sinkCap === "STORAGE_WRITE") return "STORAGE_POSOING";
-      if (sinkCap === "PRIVILEGED_OPERATION") return "PRIVILEGE_ESCALATION";
-
-      break;
-
-    /* ===== STORAGE DATA ===== */
-
-    case "STORAGE_DATA":
-      if (
-        sinkCap === "MESSAGE_RESPONSE" &&
-        shouldReportDataLeakSource(source)
-      )
-        return "DATA_LEAK";
-      break;
-  }
-
-  return null;
-}
-
-function shouldReportDataLeakSource(source: SourceType): boolean {
-  if (source === "SCREEN_INFO") return false;
-
-  // Keep compatibility with current enum typo NAVIGAROR_GEOLOCATION.
-  if (source.startsWith("NAVIGATOR_") || source.startsWith("NAVIGAROR_")) {
-    return false;
-  }
-
-  return true;
-}
-
-/* ================= Native Filter ================= */
-
-function isNativeOutputSink(sink: SinkType): boolean {
-  return (
-    sink === "CHROME_RUNTIME_SENDNATIVEMESSAGE_EXTERNAL" ||
-    sink === "CHROME_RUNTIME_ONCONNECTNATIVE_POSTMESSAGE"
-  );
-}
-
-function isNativeOutputSource(source: SourceType): boolean {
-  return (
-    source === "CHROME_CONNECTNATIVE_ONMESSAGE" ||
-    source === "CHROME_SENDNATIVEMESSAGE_EXTERNAL_RESPONSE"
-  );
-}
-
-/* ================= FP Reduction ================= */
-
-function filterMessageTaint(source: SourceType, sink: SinkType): boolean {
-  const safePairs: [SourceType, SinkType][] = [
-    // ==========================================
-    // 1. Window & DOM Level
-    // ==========================================
-    ["WINDOW_MESSAGE_EVENT", "WINDOW_POSTMESSAGE"],
-    ["WINDOW_CUSTOM_EVENT", "WINDOW_POSTMESSAGE"],
-    ["TARGET_CUSTOM_EVENT", "WINDOW_POSTMESSAGE"],
-
-    // ==========================================
-    // 2. Extension External
-    // ==========================================
-    ["WINDOW_MESSAGE_EVENT", "CHROME_RUNTIME_SENDMESSAGE_EXTERNAL"],
-    ["WINDOW_CUSTOM_EVENT", "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE"],
-    ["CHROME_ONMESSAGEEXTERNAL_MESSAGE", "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE"],
-    ["CHROME_ONMESSAGEEXTERNAL_MESSAGE", "CHROME_RUNTIME_SENDMESSAGE_EXTERNAL"],
-    ["CHROME_ONMESSAGEEXTERNAL_MESSAGE", "CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE"],
-    ["CHROME_ONMESSAGEEXTERNAL_MESSAGE", "WINDOW_POSTMESSAGE"],
-    ["CHROME_ONCONNECTEXTERNAL_ONMESSAGE", "CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE"],
-    ["CHROME_SENDMESSAGE_EXTERNAL_RESPONSE", "CHROME_RUNTIME_SENDMESSAGE_EXTERNAL"],
-
-    // ==========================================
-    // 3. Extension Native
-    // ==========================================
-    ["CHROME_SENDNATIVEMESSAGE_EXTERNAL_RESPONSE", "CHROME_RUNTIME_SENDNATIVEMESSAGE_EXTERNAL"],
-    ["CHROME_CONNECTNATIVE_ONMESSAGE", "CHROME_RUNTIME_ONCONNECTNATIVE_POSTMESSAGE"],
-  ];
-
-  return !safePairs.some(
-    ([safeSrc, safeSink]) => source === safeSrc && sink === safeSink
-  );
+  const matches = taintRuleEngine.getFlowTypes(source, sink);
+  return matches.length > 0 ? matches[0] : null;
 }

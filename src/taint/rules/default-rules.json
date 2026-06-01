@@ -1,0 +1,245 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "attacker-input-privileged-operation",
+      "description": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+      "flowType": "PRIVILEGE_ESCALATION",
+      "match": {
+        "sourceCapability": "ATTACKER_INPUT",
+        "sinkCapability": "PRIVILEGED_OPERATION"
+      }
+    },
+    {
+      "id": "attacker-input-storage-write",
+      "description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "flowType": "STORAGE_POSOING",
+      "match": {
+        "sourceCapability": "ATTACKER_INPUT",
+        "sinkCapability": "STORAGE_WRITE"
+      }
+    },
+    {
+      "id": "attacker-input-network-send",
+      "description": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "flowType": "REQUEST_FORGERY",
+      "match": {
+        "sourceCapability": "ATTACKER_INPUT",
+        "sinkCapability": "NETWORK_SEND"
+      }
+    },
+    {
+      "id": "attacker-input-code-execution",
+      "description": "Attacker-controlled data into eval / new Function / setTimeout(string) — code injection.",
+      "flowType": "CODE_INJECTION",
+      "match": {
+        "sourceCapability": "ATTACKER_INPUT",
+        "sinkCapability": "CODE_EXECUTION"
+      }
+    },
+    {
+      "id": "attacker-input-message-egress",
+      "description": "Attacker-controlled message echoed back through an extension message sink — most matches are noise (postMessage round-trips); the suppress list below filters the safe ones.",
+      "flowType": "PRIVILEGE_ESCALATION",
+      "match": {
+        "sourceCapability": "ATTACKER_INPUT",
+        "sinkCapability": "MESSAGE_RESPONSE"
+      }
+    },
+
+    {
+      "id": "sensitive-data-message-egress",
+      "description": "User-permission-gated data (bookmarks, history, cookies, identity, ...) leaving via a cross-extension or window message channel.",
+      "flowType": "DATA_LEAK",
+      "match": {
+        "sourceCapability": "SENSITIVE_DATA",
+        "sinkCapability": "MESSAGE_RESPONSE"
+      }
+    },
+    {
+      "id": "system-info-message-egress",
+      "description": "Fingerprint / system info (navigator.*, screen.*, chrome.system.*) leaving via a message channel. The navigator/screen carve-out lives in 'suppress' below — pure-navigator leaks are too noisy to report by default.",
+      "flowType": "DATA_LEAK",
+      "match": {
+        "sourceCapability": "SYSTEM_INFO",
+        "sinkCapability": "MESSAGE_RESPONSE"
+      }
+    },
+    {
+      "id": "storage-data-message-egress",
+      "description": "Data read from chrome.storage being exfiltrated through a message channel.",
+      "flowType": "DATA_LEAK",
+      "match": {
+        "sourceCapability": "STORAGE_DATA",
+        "sinkCapability": "MESSAGE_RESPONSE"
+      }
+    },
+
+    {
+      "id": "network-response-code-execution",
+      "description": "Untrusted server response feeding eval / new Function — classic remote code execution surface.",
+      "flowType": "CODE_INJECTION",
+      "match": {
+        "sourceCapability": "NETWORK_RESPONSE",
+        "sinkCapability": "CODE_EXECUTION"
+      }
+    },
+    {
+      "id": "network-response-privileged-operation",
+      "description": "Server-controlled response driving a privileged chrome.* API.",
+      "flowType": "PRIVILEGE_ESCALATION",
+      "match": {
+        "sourceCapability": "NETWORK_RESPONSE",
+        "sinkCapability": "PRIVILEGED_OPERATION"
+      }
+    },
+    {
+      "id": "network-response-storage-write",
+      "description": "Server-controlled response stored in chrome.storage for later use.",
+      "flowType": "STORAGE_POSOING",
+      "match": {
+        "sourceCapability": "NETWORK_RESPONSE",
+        "sinkCapability": "STORAGE_WRITE"
+      }
+    },
+
+    {
+      "id": "web-content-code-execution",
+      "description": "DOM / document content (innerHTML, document.URL, element values, ...) reaching a code-execution sink.",
+      "flowType": "CODE_INJECTION",
+      "match": {
+        "sourceCapability": "WEB_CONTENT",
+        "sinkCapability": "CODE_EXECUTION"
+      }
+    },
+    {
+      "id": "web-content-privileged-operation",
+      "description": "DOM / document content driving a privileged chrome.* API.",
+      "flowType": "PRIVILEGE_ESCALATION",
+      "match": {
+        "sourceCapability": "WEB_CONTENT",
+        "sinkCapability": "PRIVILEGED_OPERATION"
+      }
+    }
+  ],
+  "suppress": [
+    {
+      "id": "suppress-native-output-source",
+      "description": "Drop every flow whose source is a native-messaging endpoint — these are out-of-process and the project intentionally treats them as opaque (matches the original isNativeOutputSource check).",
+      "match": {
+        "sourceType": [
+          "CHROME_CONNECTNATIVE_ONMESSAGE",
+          "CHROME_SENDNATIVEMESSAGE_EXTERNAL_RESPONSE"
+        ]
+      }
+    },
+    {
+      "id": "suppress-native-output-sink",
+      "description": "Drop every flow whose sink is a native-messaging endpoint (matches the original isNativeOutputSink check).",
+      "match": {
+        "sinkType": [
+          "CHROME_RUNTIME_SENDNATIVEMESSAGE_EXTERNAL",
+          "CHROME_RUNTIME_ONCONNECTNATIVE_POSTMESSAGE"
+        ]
+      }
+    },
+
+    {
+      "id": "suppress-navigator-data-leak",
+      "description": "navigator.* fingerprint sources are too noisy as DATA_LEAK; suppress that specific flow type while leaving CODE_INJECTION etc. alone.",
+      "flowType": "DATA_LEAK",
+      "match": {
+        "sourceType": ["NAVIGATOR_*", "NAVIGAROR_*"]
+      }
+    },
+    {
+      "id": "suppress-screen-info-data-leak",
+      "description": "screen.* dimensions are usually not interesting as DATA_LEAK.",
+      "flowType": "DATA_LEAK",
+      "match": {
+        "sourceType": "SCREEN_INFO"
+      }
+    },
+
+    {
+      "id": "suppress-window-message-postmessage",
+      "description": "window.addEventListener('message') → window.postMessage is the standard cross-frame bus and not by itself an escalation.",
+      "match": {
+        "sourceType": "WINDOW_MESSAGE_EVENT",
+        "sinkType": "WINDOW_POSTMESSAGE"
+      }
+    },
+    {
+      "id": "suppress-window-custom-event-postmessage",
+      "match": {
+        "sourceType": "WINDOW_CUSTOM_EVENT",
+        "sinkType": "WINDOW_POSTMESSAGE"
+      }
+    },
+    {
+      "id": "suppress-target-custom-event-postmessage",
+      "match": {
+        "sourceType": "TARGET_CUSTOM_EVENT",
+        "sinkType": "WINDOW_POSTMESSAGE"
+      }
+    },
+    {
+      "id": "suppress-window-message-runtime-send-external",
+      "description": "Page postMessage being relayed out via chrome.runtime.sendMessage to another extension is expected bridge behavior (the relay itself, not the data, is the concern).",
+      "match": {
+        "sourceType": "WINDOW_MESSAGE_EVENT",
+        "sinkType": "CHROME_RUNTIME_SENDMESSAGE_EXTERNAL"
+      }
+    },
+    {
+      "id": "suppress-window-custom-event-external-sendresponse",
+      "match": {
+        "sourceType": "WINDOW_CUSTOM_EVENT",
+        "sinkType": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE"
+      }
+    },
+    {
+      "id": "suppress-external-message-external-sendresponse",
+      "description": "External message coming in via onMessageExternal being echoed back is a normal request/response — not a privilege escalation by itself.",
+      "match": {
+        "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "sinkType": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE"
+      }
+    },
+    {
+      "id": "suppress-external-message-external-sendmessage",
+      "match": {
+        "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "sinkType": "CHROME_RUNTIME_SENDMESSAGE_EXTERNAL"
+      }
+    },
+    {
+      "id": "suppress-external-message-external-connect-postmessage",
+      "match": {
+        "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "sinkType": "CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE"
+      }
+    },
+    {
+      "id": "suppress-external-message-window-postmessage",
+      "match": {
+        "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "sinkType": "WINDOW_POSTMESSAGE"
+      }
+    },
+    {
+      "id": "suppress-external-connect-onmessage-external-postmessage",
+      "match": {
+        "sourceType": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+        "sinkType": "CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE"
+      }
+    },
+    {
+      "id": "suppress-external-sendmessage-response-external-sendmessage",
+      "match": {
+        "sourceType": "CHROME_SENDMESSAGE_EXTERNAL_RESPONSE",
+        "sinkType": "CHROME_RUNTIME_SENDMESSAGE_EXTERNAL"
+      }
+    }
+  ]
+}

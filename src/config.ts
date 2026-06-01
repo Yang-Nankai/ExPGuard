@@ -116,6 +116,14 @@ export interface AppConfig {
   /** Taint analysis report configuration */
   taintReportOptions: ReportOptions;
 
+  /**
+   * Optional path to a user-supplied taint rule file (.json or .ts/.js).
+   * When set, the rule engine layers these rules on top of the defaults at
+   * startup. Use it to add new (source, sink) → FlowType mappings or to
+   * suppress noisy categories without editing the engine.
+   */
+  taintRulesPath?: string;
+
   // Allow additional properties
   coverageAnalysis: boolean;
 }

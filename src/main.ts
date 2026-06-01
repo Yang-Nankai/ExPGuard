@@ -17,6 +17,10 @@ program
   .option("--out <dir>", "output directory", "./results")
   .option("--id <extensionId>", "extension id")
   .option("--version <version>", "extension version")
+  .option(
+    "--taint-rules <path>",
+    "path to a custom taint rule file (.json or .ts/.js) to layer on top of the defaults",
+  )
   .action(async (opts) => {
     const sourceType = opts.type.toUpperCase();
 
@@ -31,6 +35,7 @@ program
       outputDir: path.resolve(opts.out),
       extensionId: opts.id,
       extensionVersion: opts.version,
+      taintRulesPath: opts.taintRules ? path.resolve(opts.taintRules) : undefined,
     });
   });
 

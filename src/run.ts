@@ -3,6 +3,8 @@ import fs from "fs/promises";
 import { epgModelBuilder } from "./epgmodelbuilder";
 import { ExtensionSourceType } from "./extension/extensionLoader";
 import { taintManager, printTaintReportsCLI } from "./taint";
+import { taintRuleEngine } from "./taint/ruleEngine";
+import config from "./config";
 import logger, { setLogFile } from "./utils/logger";
 import { interAnalyzer } from "./def-use/analyzers/interProceduralAnalyzer";
 import { cleanupArtifacts } from "./utils/cleanup";
@@ -16,6 +18,12 @@ interface RunOptions {
   outputDir: string;
   extensionId?: string;
   extensionVersion?: string;
+  /**
+   * Optional path to a custom taint-rule file. Overrides
+   * `config.taintRulesPath` for this run only. The engine layers the file
+   * on top of the bundled defaults — it does not replace them.
+   */
+  taintRulesPath?: string;
 }
 
 interface TaskError {
@@ -53,6 +61,21 @@ export async function runSingleTask(opts: RunOptions) {
 
   await fs.mkdir(outputDir, { recursive: true });
   setLogFile(path.join(outputDir, "analysis.log"));
+
+  // Load any user-supplied taint rules before analysis starts. The CLI flag
+  // takes precedence over `config.taintRulesPath`; pass `--taint-rules ""`
+  // to skip both. Failures here are logged and the analyzer falls back to
+  // the bundled default ruleset.
+  const rulesPath = opts.taintRulesPath ?? config.taintRulesPath;
+  if (rulesPath) {
+    try {
+      taintRuleEngine.loadFromFile(rulesPath);
+    } catch (err) {
+      logger.error(
+        `[TAINT-RULES] Failed to load ${rulesPath}, falling back to defaults: ${String(err)}`,
+      );
+    }
+  }
 
   const timer = new Timer("EPG Run Analysis Task");
   timer.start();

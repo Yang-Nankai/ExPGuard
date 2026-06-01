@@ -96,7 +96,9 @@ Message channels create deferred sender/receiver pairs identified by a channel n
 
 ### What flow type?
 
-`getFlowType(source, sink)` maps a `(SourceCapability, SinkCapability)` pair to a `FlowType`:
+`getFlowTypes(source, sink): FlowType[]` is the engine-facing API; `getFlowMatches(source, sink): RuleMatch[]` adds rule provenance. Both delegate to the **`TaintRuleEngine`** singleton in `src/taint/ruleEngine.ts`, which evaluates a user-extensible JSON rule set.
+
+The bundled default rule file (`src/taint/rules/default-rules.json`) reproduces the original hand-written matrix exactly:
 
 | Source capability | Sink capability | FlowType |
 |-------------------|-----------------|----------|
@@ -106,7 +108,7 @@ Message channels create deferred sender/receiver pairs identified by a channel n
 | ATTACKER_INPUT | CODE_EXECUTION | `CODE_INJECTION` |
 | ATTACKER_INPUT | MESSAGE_RESPONSE (filtered) | `PRIVILEGE_ESCALATION` |
 | SENSITIVE_DATA | MESSAGE_RESPONSE | `DATA_LEAK` |
-| SYSTEM_INFO | MESSAGE_RESPONSE | `DATA_LEAK` (navigator.* are excluded; raw fingerprint leaks are too noisy) |
+| SYSTEM_INFO | MESSAGE_RESPONSE | `DATA_LEAK` (navigator.*/screen.* suppressed) |
 | NETWORK_RESPONSE | CODE_EXECUTION | `CODE_INJECTION` |
 | NETWORK_RESPONSE | PRIVILEGED_OPERATION | `PRIVILEGE_ESCALATION` |
 | NETWORK_RESPONSE | STORAGE_WRITE | `STORAGE_POSOING` |
@@ -114,9 +116,84 @@ Message channels create deferred sender/receiver pairs identified by a channel n
 | WEB_CONTENT | PRIVILEGED_OPERATION | `PRIVILEGE_ESCALATION` |
 | STORAGE_DATA | MESSAGE_RESPONSE | `DATA_LEAK` |
 
-`filterMessageTaint(source, sink)` suppresses obvious safe pairs (e.g. `WINDOW_MESSAGE_EVENT` → `WINDOW_POSTMESSAGE` is treated as expected bus traffic, not a privilege escalation).
+Default suppress rules also reproduce the original carve-outs:
 
-Native messaging endpoints (`CHROME_RUNTIME_SENDNATIVEMESSAGE_EXTERNAL`, `CHROME_RUNTIME_ONCONNECTNATIVE_POSTMESSAGE`) are excluded entirely — `isNativeOutputSink` / `isNativeOutputSource` short-circuit `getFlowType`.
+- Native messaging endpoints (`CHROME_RUNTIME_SENDNATIVEMESSAGE_EXTERNAL`, `CHROME_RUNTIME_ONCONNECTNATIVE_POSTMESSAGE`) are blanket-suppressed.
+- `navigator.*` / `NAVIGAROR_*` / `SCREEN_INFO` are suppressed for `DATA_LEAK` only (other flow types still apply).
+- "Safe message pairs" (e.g. `WINDOW_MESSAGE_EVENT` → `WINDOW_POSTMESSAGE`, `CHROME_ONMESSAGEEXTERNAL_MESSAGE` → `…_SENDRESPONSE`) are suppressed entirely.
+
+#### Resolution model
+
+The engine uses **all-match**: a single `(source, sink)` pair may produce multiple FlowTypes if multiple inclusive rules match (e.g. a user-added "cookies → fetch body = DATA_LEAK" rule coexists with the built-in `REQUEST_FORGERY` rule). Each match emits its own record in `summary.json` with `ruleId` and `ruleDescription` set so analysts can trace which rule fired.
+
+#### Adding custom rules
+
+Two layering knobs:
+
+- `config.taintRulesPath` — set in `src/config.ts` to a default path
+- `--taint-rules <path>` CLI flag — overrides for one run
+
+User rules are *layered on top* of the defaults (additive). To replace the defaults wholesale, use `taintRuleEngine.setRuleSet({ version: 1, rules: [...] })` programmatically.
+
+Minimal JSON example:
+
+```json
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "sensitive-data-network-send",
+      "description": "Cookies / bookmarks / history exfiltrated via fetch / XHR / WebSocket",
+      "flowType": "DATA_LEAK",
+      "match": {
+        "sourceCapability": "SENSITIVE_DATA",
+        "sinkCapability": "NETWORK_SEND"
+      }
+    }
+  ],
+  "suppress": [
+    {
+      "id": "ignore-bookmarks-create-self",
+      "description": "We invoke bookmarks.create from our own background as part of normal operation; suppress that one pair.",
+      "flowType": "PRIVILEGE_ESCALATION",
+      "match": {
+        "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "sinkType": "CHROME_BOOKMARK_CREATE_INFO"
+      }
+    }
+  ]
+}
+```
+
+Matcher fields (all AND'd, all optional except the don't-match-everything rule):
+
+- `sourceCapability` / `sinkCapability` — one of the union types in `src/taint/types.ts` (single value or array)
+- `sourceType` / `sinkType` — exact type name or a `*`-glob (e.g. `"NAVIGATOR_*"`, `"CHROME_BOOKMARK_*"`). Single value or array (any-of).
+
+Suppress rules accept the same matcher shape plus an optional `flowType`: present → scoped suppress (only that flow type), absent → blanket suppress (drops every emission for the pair).
+
+#### TS / JS escape hatch
+
+For dynamic rule generation (computed values, shared constants, conditional rules), point `--taint-rules` at a `.ts` / `.js` file that exports a `TaintRuleSet`:
+
+```ts
+// my-rules.ts
+import type { TaintRuleSet } from "expguard/taint/ruleTypes";
+const HIGH_VALUE_SINKS = ["FETCH_RESOURCE", "FETCH_OPTIONS", "XML_HTTP_REQUEST_SEND"];
+const rules: TaintRuleSet = {
+  version: 1,
+  rules: [{
+    id: "sensitive-to-high-value-sinks",
+    flowType: "DATA_LEAK",
+    match: { sourceCapability: "SENSITIVE_DATA", sinkType: HIGH_VALUE_SINKS },
+  }],
+};
+module.exports = rules;
+```
+
+The loader accepts `module.exports = rules`, `module.exports.default = rules`, or an inline `module.exports = { version: 1, rules: [...] }`.
+
+Native messaging endpoints (`CHROME_RUNTIME_SENDNATIVEMESSAGE_EXTERNAL`, `CHROME_RUNTIME_ONCONNECTNATIVE_POSTMESSAGE`) are excluded entirely via blanket suppress rules in the default file.
 
 ## Severity
 
