@@ -44,9 +44,13 @@ export function shouldFilterSourceByFrame(
   const sinkFamily = scriptUsageTracker.getFrameFamily(sinkFrame);
 
   if (WEB_EVENT_SOURCES.includes(source)) {
-    if (sourceFamily === "BG") {
+    // Background service workers and offscreen documents have no `window`
+    // event loop — any `window.addEventListener("message", ...)` registered
+    // there can never fire. Drop those flows as infeasible.
+    if (sourceFamily === "BG" || sourceFamily === "OF") {
       return true;
-    } else if (
+    }
+    if (
       sourceFamily === "CS" &&
       sinkFamily === "CS" &&
       WEB_STORAGE_SINKS.includes(sink)
@@ -55,7 +59,7 @@ export function shouldFilterSourceByFrame(
     }
   }
 
-  return sourceFamily === "BG" && WEB_EVENT_SOURCES.includes(source);
+  return false;
 }
 
 /* ================= Classification ================= */

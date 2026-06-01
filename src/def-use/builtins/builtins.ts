@@ -469,6 +469,19 @@ const BUILTINS: BuiltinSchema[] = [
           },
         },
       },
+      devtools: {
+        type: "object",
+        name: "chrome.devtools",
+        props: {
+          panels: {
+            type: "object",
+            name: "chrome.devtools.panels",
+            props: {
+              create: method("chrome.devtools.panels.create"),
+            },
+          },
+        },
+      },
       downloads: {
         type: "object",
         name: "chrome.downloads",
@@ -583,6 +596,15 @@ const BUILTINS: BuiltinSchema[] = [
           saveAsMHTML: method("chrome.pageCapture.saveAsMHTML"),
         },
       },
+      offscreen: {
+        type: "object",
+        name: "chrome.offscreen",
+        props: {
+          createDocument: method("chrome.offscreen.createDocument"),
+          closeDocument: method("chrome.offscreen.closeDocument"),
+          hasDocument: method("chrome.offscreen.hasDocument"),
+        },
+      },
       proxy: {
         type: "object",
         name: "chrome.proxy",
@@ -660,6 +682,16 @@ const BUILTINS: BuiltinSchema[] = [
         name: "chrome.scripting",
         props: {
           executeScript: method("chrome.scripting.executeScript"),
+        },
+      },
+      sidePanel: {
+        type: "object",
+        name: "chrome.sidePanel",
+        props: {
+          // Modeled as side-effect-only no-ops; nothing taints through here today.
+          setOptions: method("chrome.sidePanel.setOptions"),
+          setPanelBehavior: method("chrome.sidePanel.setPanelBehavior"),
+          open: method("chrome.sidePanel.open"),
         },
       },
       storage: {

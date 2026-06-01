@@ -9,6 +9,16 @@ import {
 } from "./extensionScript";
 import { ScriptRegistry } from "./extensionRegistry";
 import { isIgnoredAbsolutePath } from "../utils/scriptPathFilter";
+import {
+  ComponentDiscovery,
+  componentRegistry,
+  componentTypeToFrameFamily,
+  defaultPermissionsContext,
+  ExtensionComponent,
+  ExtensionComponentType,
+  ManifestVersion,
+} from "./extensionComponent";
+import { extractScriptsFromHtml } from "./htmlScriptExtractor";
 
 export interface FrameConstraint {
   matches?: string[];
@@ -27,6 +37,8 @@ class ScriptUsageTracker {
   private _enabled = false;
   private _baseDir = "";
   private _registry: ScriptRegistry | null = null;
+  private _manifest: Record<string, any> | null = null;
+  private _manifestVersion: ManifestVersion = 3;
   private _usedScriptKeys: Set<string> = new Set();
   private _scriptFrames: Map<string, Set<ScriptFrameTag>> = new Map();
   private _frameFamilies: Map<ScriptFrameTag, ScriptFrameFamily> = new Map();
@@ -36,11 +48,16 @@ class ScriptUsageTracker {
   private _externallyConnectableDeclared = false;
   private _externallyConnectableMatches?: string[];
   private _externallyConnectableIds?: string[];
+  // Counter for monotonically-named frames (popups/options often only ship one,
+  // but devtools_panel / offscreen pages can repeat).
+  private _frameCounters: Map<string, number> = new Map();
 
   reset() {
     this._enabled = false;
     this._baseDir = "";
     this._registry = null;
+    this._manifest = null;
+    this._manifestVersion = 3;
     this._usedScriptKeys.clear();
     this._scriptFrames.clear();
     this._frameFamilies.clear();
@@ -50,6 +67,8 @@ class ScriptUsageTracker {
     this._externallyConnectableDeclared = false;
     this._externallyConnectableMatches = undefined;
     this._externallyConnectableIds = undefined;
+    this._frameCounters.clear();
+    componentRegistry.reset();
   }
 
   initialize(opts: {
@@ -62,11 +81,13 @@ class ScriptUsageTracker {
     this._enabled = config.filterUnusedRuntimeScripts;
     this._baseDir = opts.baseDir;
     this._registry = opts.scripts;
+    this._manifest = opts.manifest;
+    this._manifestVersion = this.detectManifestVersion(opts.manifest);
 
     this.seedFromManifest(opts.manifest);
 
     logger.info(
-      `[SCRIPT-USAGE] initialized, frames=${this._frameFamilies.size}, scriptsWithFrame=${this._scriptFrames.size}, initialOrder=${this._initialAnalysisOrder.length}`,
+      `[SCRIPT-USAGE] initialized, mv=${this._manifestVersion}, frames=${this._frameFamilies.size}, scriptsWithFrame=${this._scriptFrames.size}, initialOrder=${this._initialAnalysisOrder.length}, components=${componentRegistry.size()}`,
     );
   }
 
@@ -110,20 +131,33 @@ class ScriptUsageTracker {
     return list;
   }
 
+  /**
+   * Pick the most "important" frame tag of a script for reporting.
+   *
+   * Precedence: BG > CS > EX > DT > OF > UNKNOWN. Background and content
+   * scripts come first because they were the original primary surfaces;
+   * extension UI pages and devtools/offscreen follow, which means a script
+   * shared by background + popup is still reported as `BG_1`. This matches
+   * the pre-existing reporting heuristic for CS/BG.
+   */
   getPrimaryFrameByKey(scriptKey: string): ScriptFrameTag {
     const tags = this._scriptFrames.get(scriptKey);
     if (!tags || tags.size === 0) return "UNKNOWN";
 
+    const familyOrder: Record<ScriptFrameFamily, number> = {
+      BG: 0,
+      CS: 1,
+      EX: 2,
+      DT: 3,
+      OF: 4,
+      UNKNOWN: 5,
+    };
+
     const arr = Array.from(tags.values());
     arr.sort((a, b) => {
-      const af = this.getFrameFamily(a);
-      const bf = this.getFrameFamily(b);
-      if (af !== bf) {
-        if (af === "BG") return -1;
-        if (bf === "BG") return 1;
-        if (af === "CS") return -1;
-        if (bf === "CS") return 1;
-      }
+      const af = familyOrder[this.getFrameFamily(a)];
+      const bf = familyOrder[this.getFrameFamily(b)];
+      if (af !== bf) return af - bf;
       return a.localeCompare(b);
     });
 
@@ -217,28 +251,79 @@ class ScriptUsageTracker {
     this.markReferencedScriptByKey(fromScriptKey, value);
   }
 
+  /**
+   * Register an HTML-backed component discovered at runtime via constant
+   * folding of a builtin (`chrome.offscreen.createDocument`,
+   * `chrome.devtools.panels.create`). The caller has already confirmed the
+   * URL argument is a string literal — we just resolve it and forward to the
+   * regular component-registration path.
+   *
+   * Returns the registered component, or `null` if the HTML couldn't be
+   * resolved (missing file, ignored path, etc.).
+   */
+  registerRuntimeDiscoveredComponent(opts: {
+    type: ExtensionComponentType;
+    htmlRelPath: string;
+    manifestSource: string;
+    discoveredFromScriptKey?: string;
+  }): ExtensionComponent | null {
+    if (!this._baseDir || !this._registry) return null;
+
+    const trimmed = opts.htmlRelPath.replace(/^\/+/, "").trim();
+    if (!trimmed) return null;
+
+    const absPath = path.resolve(this._baseDir, trimmed);
+    if (isIgnoredAbsolutePath(absPath, this._baseDir)) return null;
+    if (!fs.existsSync(absPath)) {
+      logger.warn(
+        `[SCRIPT-USAGE] runtime component HTML not found: ${trimmed} (source=${opts.manifestSource})`,
+      );
+      return null;
+    }
+
+    const id = `${opts.type}:${trimmed}`;
+    const existing = componentRegistry.get(id);
+    if (existing) {
+      // Already discovered — still propagate frames in case the call appears
+      // in multiple sites (idempotent).
+      this.activateComponent(existing);
+      return existing;
+    }
+
+    const component = this.discoverHtmlBackedComponent({
+      type: opts.type,
+      htmlAbsPath: absPath,
+      manifestSource: opts.manifestSource,
+      discovery: "runtime-static",
+      id,
+    });
+
+    if (component) {
+      logger.info(
+        `[SCRIPT-USAGE] discovered runtime component: ${component.id} via ${opts.manifestSource} (${component.scriptPaths.length} scripts)`,
+      );
+    }
+
+    return component;
+  }
+
+  private detectManifestVersion(manifest: Record<string, any>): ManifestVersion {
+    const v = Number(manifest?.manifest_version);
+    return v === 2 ? 2 : 3;
+  }
+
   private seedFromManifest(manifest: Record<string, any>) {
-    const initialOrderSet = new Set<string>();
+    this.seedExternallyConnectable(manifest);
+    this.seedContentScripts(manifest);
+    this.seedBackground(manifest);
+    this.seedPopup(manifest);
+    this.seedOptions(manifest);
+    this.seedSidePanel(manifest);
+    this.seedDevtools(manifest);
+    this.seedChromeUrlOverrides(manifest);
+  }
 
-    const addToInitialOrder = (key: string) => {
-      if (!this._registry?.has(key)) return;
-      if (initialOrderSet.has(key)) return;
-      initialOrderSet.add(key);
-      this._initialAnalysisOrder.push(key);
-    };
-
-    const registerInFrameOrder = (frameId: ScriptFrameTag, key: string) => {
-      if (!this._registry?.has(key)) return;
-      if (!this._frameScriptOrder.has(frameId)) {
-        this._frameScriptOrder.set(frameId, []);
-      }
-
-      const order = this._frameScriptOrder.get(frameId)!;
-      if (!order.includes(key)) {
-        order.push(key);
-      }
-    };
-
+  private seedExternallyConnectable(manifest: Record<string, any>) {
     const externallyConnectable = manifest?.externally_connectable;
     if (externallyConnectable && typeof externallyConnectable === "object") {
       this._externallyConnectableDeclared = true;
@@ -249,7 +334,9 @@ class ScriptUsageTracker {
         externallyConnectable.ids,
       );
     }
+  }
 
+  private seedContentScripts(manifest: Record<string, any>) {
     const contentScripts = Array.isArray(manifest?.content_scripts)
       ? manifest.content_scripts
       : [];
@@ -267,78 +354,361 @@ class ScriptUsageTracker {
         excludeGlobs: this.normalizeStrArray(item?.exclude_globs),
       });
 
+      const scriptKeys: string[] = [];
       const jsArr = Array.isArray(item?.js) ? item.js : [];
       for (const js of jsArr) {
         const key = this.sourceToScriptKey(String(js));
         if (!key) continue;
 
         this.markFrameByKey(key, frameId, "manifest-content-script");
-        registerInFrameOrder(frameId, key);
-        addToInitialOrder(key);
-
-        if (this._enabled) {
-          this.markUsedByKey(key, "manifest-content-script");
-        }
+        this.appendFrameOrderIfMissing(frameId, key);
+        this.addToInitialOrder(key);
+        if (this._enabled) this.markUsedByKey(key, "manifest-content-script");
+        scriptKeys.push(key);
       }
-    }
 
+      this.registerComponent({
+        id: `content_script:${csIndex}`,
+        type: "content_script",
+        scriptPaths: scriptKeys,
+        manifestSource: `content_scripts[${csIndex - 1}]`,
+        discovery: "manifest",
+        frameTag: frameId,
+      });
+    }
+  }
+
+  private seedBackground(manifest: Record<string, any>) {
     const background = manifest?.background;
-    if (background && typeof background === "object") {
-      const bgFrameId = "BG_1";
-      this._frameFamilies.set(bgFrameId, "BG");
+    if (!background || typeof background !== "object") return;
 
-      const bgScripts = Array.isArray(background.scripts)
-        ? background.scripts
-        : [];
+    const bgFrameId = "BG_1";
+    this._frameFamilies.set(bgFrameId, "BG");
+    const collected: string[] = [];
 
-      for (const s of bgScripts) {
-        const key = this.sourceToScriptKey(String(s));
-        if (!key) continue;
+    const bgScripts = Array.isArray(background.scripts)
+      ? background.scripts
+      : [];
 
-        this.markFrameByKey(key, bgFrameId, "manifest-background-scripts");
-        registerInFrameOrder(bgFrameId, key);
-        addToInitialOrder(key);
+    for (const s of bgScripts) {
+      const key = this.sourceToScriptKey(String(s));
+      if (!key) continue;
+      this.markFrameByKey(key, bgFrameId, "manifest-background-scripts");
+      this.appendFrameOrderIfMissing(bgFrameId, key);
+      this.addToInitialOrder(key);
+      if (this._enabled) this.markUsedByKey(key, "manifest-background-scripts");
+      collected.push(key);
+    }
 
-        if (this._enabled) {
-          this.markUsedByKey(key, "manifest-background-scripts");
-        }
-      }
-
-      if (typeof background.service_worker === "string") {
-        const key = this.sourceToScriptKey(background.service_worker);
-        if (key) {
-          this.markFrameByKey(key, bgFrameId, "manifest-service-worker");
-          registerInFrameOrder(bgFrameId, key);
-          addToInitialOrder(key);
-
-          if (this._enabled) {
-            this.markUsedByKey(key, "manifest-service-worker");
-          }
-        }
-      }
-
-      const backgroundPage =
-        typeof background.page === "string"
-          ? background.page
-          : typeof background.background_page === "string"
-            ? background.background_page
-            : null;
-
-      if (backgroundPage) {
-        const pageAbs = this.resolveFromBase(backgroundPage);
-        const scriptKeys = this.extractScriptKeysFromHtml(pageAbs);
-
-        for (const key of scriptKeys) {
-          this.markFrameByKey(key, bgFrameId, "manifest-background-page");
-          registerInFrameOrder(bgFrameId, key);
-          addToInitialOrder(key);
-
-          if (this._enabled) {
-            this.markUsedByKey(key, "manifest-background-page");
-          }
-        }
+    if (typeof background.service_worker === "string") {
+      const key = this.sourceToScriptKey(background.service_worker);
+      if (key) {
+        this.markFrameByKey(key, bgFrameId, "manifest-service-worker");
+        this.appendFrameOrderIfMissing(bgFrameId, key);
+        this.addToInitialOrder(key);
+        if (this._enabled) this.markUsedByKey(key, "manifest-service-worker");
+        collected.push(key);
       }
     }
+
+    const backgroundPage =
+      typeof background.page === "string"
+        ? background.page
+        : typeof background.background_page === "string"
+          ? background.background_page
+          : null;
+
+    if (backgroundPage) {
+      const pageAbs = this.resolveFromBase(backgroundPage);
+      const extracted = extractScriptsFromHtml(pageAbs, this._baseDir);
+      for (const item of extracted) {
+        this.registerExtractedScript(item.scriptKey, item.absPath);
+        this.markFrameByKey(item.scriptKey, bgFrameId, "manifest-background-page");
+        this.appendFrameOrderIfMissing(bgFrameId, item.scriptKey);
+        this.addToInitialOrder(item.scriptKey);
+        if (this._enabled) this.markUsedByKey(item.scriptKey, "manifest-background-page");
+        collected.push(item.scriptKey);
+      }
+    }
+
+    this.registerComponent({
+      id: "background:1",
+      type: "background",
+      scriptPaths: collected,
+      manifestSource: backgroundPage
+        ? "background.page"
+        : background.service_worker
+          ? "background.service_worker"
+          : "background.scripts",
+      discovery: "manifest",
+      frameTag: bgFrameId,
+    });
+  }
+
+  /**
+   * Popup discovery covers all three manifest spellings:
+   *   - MV3:  `action.default_popup`
+   *   - MV2:  `browser_action.default_popup`
+   *   - MV2:  `page_action.default_popup`
+   *
+   * `chrome_action.default_popup` (the legacy spelling some MV2 extensions
+   * still use) is intentionally NOT supported — it isn't part of the
+   * Chrome Extensions docs.
+   */
+  private seedPopup(manifest: Record<string, any>) {
+    const popupCandidates = [
+      { field: "action.default_popup", value: manifest?.action?.default_popup },
+      {
+        field: "browser_action.default_popup",
+        value: manifest?.browser_action?.default_popup,
+      },
+      {
+        field: "page_action.default_popup",
+        value: manifest?.page_action?.default_popup,
+      },
+    ];
+
+    let count = 0;
+    for (const { field, value } of popupCandidates) {
+      if (typeof value !== "string" || !value) continue;
+      count += 1;
+      this.discoverHtmlBackedComponent({
+        type: "popup",
+        htmlAbsPath: this.resolveFromBase(value),
+        manifestSource: field,
+        discovery: "manifest",
+        id: `popup:${count}`,
+      });
+    }
+  }
+
+  private seedOptions(manifest: Record<string, any>) {
+    const optionsCandidates = [
+      { field: "options_page", value: manifest?.options_page },
+      { field: "options_ui.page", value: manifest?.options_ui?.page },
+    ];
+
+    let count = 0;
+    for (const { field, value } of optionsCandidates) {
+      if (typeof value !== "string" || !value) continue;
+      count += 1;
+      this.discoverHtmlBackedComponent({
+        type: "options",
+        htmlAbsPath: this.resolveFromBase(value),
+        manifestSource: field,
+        discovery: "manifest",
+        id: `options:${count}`,
+      });
+    }
+  }
+
+  private seedSidePanel(manifest: Record<string, any>) {
+    const sidePanel = manifest?.side_panel?.default_path;
+    if (typeof sidePanel !== "string" || !sidePanel) return;
+
+    this.discoverHtmlBackedComponent({
+      type: "side_panel",
+      htmlAbsPath: this.resolveFromBase(sidePanel),
+      manifestSource: "side_panel.default_path",
+      discovery: "manifest",
+      id: "side_panel:1",
+    });
+  }
+
+  /**
+   * DevTools page itself is statically declared. Panels created via
+   * `chrome.devtools.panels.create` are picked up by the runtime semantic
+   * (see `chrome/devtools.ts`); the call site lives inside the devtools
+   * script, so panel frames are propagated as runtime-discovered components.
+   */
+  private seedDevtools(manifest: Record<string, any>) {
+    const devtoolsPage = manifest?.devtools_page;
+    if (typeof devtoolsPage !== "string" || !devtoolsPage) return;
+
+    this.discoverHtmlBackedComponent({
+      type: "devtools",
+      htmlAbsPath: this.resolveFromBase(devtoolsPage),
+      manifestSource: "devtools_page",
+      discovery: "manifest",
+      id: "devtools:1",
+    });
+  }
+
+  private seedChromeUrlOverrides(manifest: Record<string, any>) {
+    const overrides = manifest?.chrome_url_overrides;
+    if (!overrides || typeof overrides !== "object") return;
+
+    for (const slot of ["newtab", "history", "bookmarks"] as const) {
+      const value = overrides[slot];
+      if (typeof value !== "string" || !value) continue;
+      this.discoverHtmlBackedComponent({
+        type: "override_page",
+        htmlAbsPath: this.resolveFromBase(value),
+        manifestSource: `chrome_url_overrides.${slot}`,
+        discovery: "manifest",
+        id: `override_page:${slot}`,
+      });
+    }
+  }
+
+  /**
+   * Common path for HTML-backed components (popup / options / side_panel /
+   * devtools / overrides / offscreen). Extracts scripts via the regex parser,
+   * registers them under a freshly minted frame tag and routes them into the
+   * initial analysis order.
+   */
+  private discoverHtmlBackedComponent(opts: {
+    type: ExtensionComponentType;
+    htmlAbsPath: string;
+    manifestSource: string;
+    discovery: ComponentDiscovery;
+    id: string;
+  }): ExtensionComponent | null {
+    if (!fs.existsSync(opts.htmlAbsPath)) {
+      logger.warn(
+        `[SCRIPT-USAGE] component HTML missing: ${opts.htmlAbsPath} (source=${opts.manifestSource})`,
+      );
+      return null;
+    }
+
+    const frameTag = this.allocateFrameTag(opts.type, opts.id);
+    const family = componentTypeToFrameFamily(opts.type);
+    this._frameFamilies.set(frameTag, family);
+
+    const extracted = extractScriptsFromHtml(opts.htmlAbsPath, this._baseDir);
+    const scriptKeys: string[] = [];
+
+    for (const item of extracted) {
+      this.registerExtractedScript(item.scriptKey, item.absPath);
+      this.markFrameByKey(item.scriptKey, frameTag, opts.manifestSource);
+      this.appendFrameOrderIfMissing(frameTag, item.scriptKey);
+      this.addToInitialOrder(item.scriptKey);
+      if (this._enabled) this.markUsedByKey(item.scriptKey, opts.manifestSource);
+      scriptKeys.push(item.scriptKey);
+    }
+
+    const component: ExtensionComponent = {
+      id: opts.id,
+      type: opts.type,
+      htmlPath: path
+        .relative(this._baseDir, opts.htmlAbsPath)
+        .replace(/\\/g, "/"),
+      scriptPaths: scriptKeys,
+      permissionsContext: defaultPermissionsContext(opts.type),
+      manifestSource: opts.manifestSource,
+      mv: this._manifestVersion,
+      discovery: opts.discovery,
+      frameTag,
+    };
+
+    this.registerComponent(component);
+
+    if (scriptKeys.length === 0) {
+      logger.info(
+        `[SCRIPT-USAGE] component ${opts.id} has no scripts (HTML may use only inline / external URLs)`,
+      );
+    }
+
+    return component;
+  }
+
+  /**
+   * Newly-extracted scripts (inline materializations and `<script src=...>`
+   * targets that the initial JS-file walk missed) must end up in the global
+   * `ScriptRegistry`, otherwise downstream lookups will silently drop them.
+   */
+  private registerExtractedScript(scriptKey: string, absPath: string) {
+    if (!this._registry) return;
+    if (this._registry.has(scriptKey)) return;
+    this._registry.register(new ExtensionScript(absPath, this._baseDir));
+  }
+
+  /**
+   * Allocate a stable, unique frame tag for a component.
+   *
+   *  - Singletons (popup / options / devtools / side_panel) use a counter so
+   *    we don't accidentally collapse multiple discoveries under one tag.
+   *  - Repeated types (devtools_panel / offscreen / override_page /
+   *    extension_page) include a discriminator drawn from the component id.
+   */
+  private allocateFrameTag(
+    type: ExtensionComponentType,
+    componentId: string,
+  ): ScriptFrameTag {
+    const prefixMap: Record<ExtensionComponentType, string> = {
+      background: "BG",
+      content_script: "CS",
+      popup: "POPUP",
+      options: "OPTIONS",
+      side_panel: "SIDEPANEL",
+      devtools: "DEVTOOLS",
+      devtools_panel: "DEVTOOLS_PANEL",
+      override_page: "OVERRIDE",
+      offscreen: "OFFSCREEN",
+      extension_page: "EXTENSION_PAGE",
+    };
+    const prefix = prefixMap[type];
+
+    // Distinct id → distinct tag. Use the discriminator from componentId when
+    // available, fall back to a monotonic counter per prefix.
+    const discriminator = componentId.split(":").slice(1).join(":") || "";
+    if (discriminator && /^[\w.-]+$/.test(discriminator)) {
+      const tag = `${prefix}_${discriminator.replace(/[^\w.-]+/g, "_")}`;
+      return this.uniqueFrameTag(tag);
+    }
+
+    const n = (this._frameCounters.get(prefix) ?? 0) + 1;
+    this._frameCounters.set(prefix, n);
+    return this.uniqueFrameTag(`${prefix}_${n}`);
+  }
+
+  private uniqueFrameTag(candidate: ScriptFrameTag): ScriptFrameTag {
+    if (!this._frameFamilies.has(candidate)) return candidate;
+    let n = 2;
+    while (this._frameFamilies.has(`${candidate}#${n}`)) n += 1;
+    return `${candidate}#${n}`;
+  }
+
+  /** Push a registered component into the global registry. */
+  private registerComponent(opts: {
+    id: string;
+    type: ExtensionComponentType;
+    scriptPaths: string[];
+    manifestSource: string;
+    discovery: ComponentDiscovery;
+    frameTag: ScriptFrameTag;
+    htmlPath?: string;
+  }) {
+    componentRegistry.register({
+      id: opts.id,
+      type: opts.type,
+      htmlPath: opts.htmlPath,
+      scriptPaths: opts.scriptPaths,
+      permissionsContext: defaultPermissionsContext(opts.type),
+      manifestSource: opts.manifestSource,
+      mv: this._manifestVersion,
+      discovery: opts.discovery,
+      frameTag: opts.frameTag,
+    });
+  }
+
+  /**
+   * Re-mark every script of an already-known component so frame propagation
+   * picks it up on repeated runtime discoveries.
+   */
+  private activateComponent(component: ExtensionComponent) {
+    for (const key of component.scriptPaths) {
+      this.markFrameByKey(key, component.frameTag, component.manifestSource);
+      this.appendFrameOrderIfMissing(component.frameTag, key);
+      this.addToInitialOrder(key);
+      if (this._enabled) this.markUsedByKey(key, component.manifestSource);
+    }
+  }
+
+  private addToInitialOrder(key: string) {
+    if (!this._registry?.has(key)) return;
+    if (this._initialAnalysisOrder.includes(key)) return;
+    this._initialAnalysisOrder.push(key);
   }
 
   private normalizeStrArray(value: any): string[] | undefined {
@@ -347,41 +717,6 @@ class ScriptUsageTracker {
       .filter((v) => typeof v === "string")
       .map((v) => String(v));
     return list.length > 0 ? list : undefined;
-  }
-
-  private extractScriptKeysFromHtml(htmlAbsPath: string): string[] {
-    const result: string[] = [];
-    if (!fs.existsSync(htmlAbsPath)) return result;
-
-    let html = "";
-    try {
-      html = fs.readFileSync(htmlAbsPath, "utf-8");
-    } catch {
-      return result;
-    }
-
-    const dir = path.dirname(htmlAbsPath);
-    const scriptSrcRegex = /<script[^>]*\ssrc\s*=\s*["']([^"']+)["'][^>]*>/gi;
-
-    for (
-      let match = scriptSrcRegex.exec(html);
-      match;
-      match = scriptSrcRegex.exec(html)
-    ) {
-      const src = String(match[1] ?? "").trim();
-      if (!src || this.isExternalUrl(src)) continue;
-
-      const absPath = src.startsWith(".")
-        ? path.resolve(dir, src)
-        : path.resolve(this._baseDir, src.replace(/^\//, ""));
-
-      if (isIgnoredAbsolutePath(absPath, this._baseDir)) continue;
-      if (!fs.existsSync(absPath)) continue;
-
-      result.push(ExtensionScript.createScriptKey(absPath, this._baseDir));
-    }
-
-    return result;
   }
 
   private isExternalUrl(value: string): boolean {

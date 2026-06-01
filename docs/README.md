@@ -41,6 +41,7 @@ CLI (main.ts)
 |------|-------|
 | `architecture.md` | High-level component map and runtime walkthrough |
 | `extension_loader.md` | Loader / unpack / frame tagging / dependency graph |
+| `extension_components.md` | Unified component model (popup / options / side_panel / devtools / overrides / offscreen / inline scripts), HTML extractor, runtime-discovered components |
 | `ast_cfg.md` | Parser, AST validator, CFG builder, FlowNode model |
 | `scope_def_use.md` | Scope tree, Def-Use analysis, builtin semantics, inter-procedural call analysis |
 | `taint_engine.md` | TaintManager, sources/sinks/sanitizers, message/storage bridges, severity |
