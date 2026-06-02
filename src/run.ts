@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs/promises";
 import { epgModelBuilder } from "./epgmodelbuilder";
 import { ExtensionSourceType } from "./extension/extensionLoader";
-import { taintManager, printTaintReportsCLI } from "./taint";
+import { taintManager, printTaintReportsCLI, renderHtmlReport, collectFileTree } from "./taint";
 import { taintRuleEngine } from "./taint/ruleEngine";
 import config from "./config";
 import logger, { setLogFile } from "./utils/logger";
@@ -24,6 +24,12 @@ interface RunOptions {
    * on top of the bundled defaults — it does not replace them.
    */
   taintRulesPath?: string;
+
+  /**
+   * When true, also write a self-contained `report.html` to the output
+   * directory. Overrides `config.emitHtmlReport` for this run only.
+   */
+  emitHtml?: boolean;
 }
 
 interface TaskError {
@@ -134,6 +140,33 @@ export async function runSingleTask(opts: RunOptions) {
       path.join(outputDir, "summary.json"),
       JSON.stringify(summary, null, 2),
     );
+
+    // Optional self-contained HTML report. Must run BEFORE cleanupArtifacts(),
+    // which deletes the unpacked/ dir we read code snippets and the file tree
+    // from. Failures here are logged and never abort the run.
+    if ((opts.emitHtml ?? config.emitHtmlReport) && status !== "error") {
+      try {
+        const ctx = epgModelBuilder.extensionContext;
+        const html = renderHtmlReport({
+          meta: {
+            extensionId: opts.extensionId,
+            extensionVersion: opts.extensionVersion,
+            sourceType: opts.sourceType,
+            generatedAt: new Date().toISOString(),
+            durationMs: timer.getDurationMs(),
+          } as any,
+          manifest: ctx?.manifest ?? {},
+          files: ctx ? collectFileTree(ctx.baseDir) : [],
+          scripts: fileStats,
+          reports: taintManager.generateGlobalReport({ includeCode: true }),
+          flows: (baseSummary as any).flows ?? [],
+        });
+        await safeWriteFile(path.join(outputDir, "report.html"), html);
+        logger.info(`[HTML-REPORT] wrote ${path.join(outputDir, "report.html")}`);
+      } catch (err) {
+        logger.error(`[HTML-REPORT] Failed to generate report.html: ${String(err)}`);
+      }
+    }
 
     // cleanup
     await cleanupArtifacts(outputDir, summary);

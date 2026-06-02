@@ -21,6 +21,11 @@ program
     "--taint-rules <path>",
     "path to a custom taint rule file (.json or .ts/.js) to layer on top of the defaults",
   )
+  .option(
+    "--html",
+    "additionally emit a self-contained report.html (folder tree + propagation timeline)",
+    false,
+  )
   .action(async (opts) => {
     const sourceType = opts.type.toUpperCase();
 
@@ -36,6 +41,7 @@ program
       extensionId: opts.id,
       extensionVersion: opts.version,
       taintRulesPath: opts.taintRules ? path.resolve(opts.taintRules) : undefined,
+      emitHtml: opts.html,
     });
   });
 
