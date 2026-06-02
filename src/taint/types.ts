@@ -125,6 +125,11 @@ export type SinkType =
   | "TIME_EVAL"
   | "FETCH_RESOURCE"
   | "FETCH_OPTIONS"
+  // Granular fetch init sinks. The init object is split so that data placed in
+  // a request *body* (exfiltration) can be distinguished from data placed in a
+  // request *header* (benign auth — e.g. a cookie sent as the Cookie header).
+  | "FETCH_BODY"
+  | "FETCH_HEADERS"
   | "JQUERY_AJAX_URL"
   | "JQUERY_AJAX_DATA"
   | "JQUERY_AJAX_SETTINGS_URL"
@@ -138,6 +143,7 @@ export type SinkType =
   | "JQUERY_GLOBAL_EVAL"
   | "XML_HTTP_REQUEST_OPEN"
   | "XML_HTTP_REQUEST_SEND"
+  | "XML_HTTP_REQUEST_SETHEADER"
   | "AXIOS_URL"
   | "AXIOS_DATA"
   | "AXIOS_HEADERS"

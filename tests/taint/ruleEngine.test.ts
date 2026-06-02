@@ -142,15 +142,18 @@ describe("TaintRuleEngine", () => {
     engine.loadFromFile(file);
 
     // The default REQUEST_FORGERY rule no longer fires because the source is
-    // SENSITIVE_DATA (cookies), not ATTACKER_INPUT — but our user rule
-    // contributes DATA_LEAK. Confirm both:
+    // SENSITIVE_DATA (cookies), not ATTACKER_INPUT. The bundled
+    // `sensitive-data-network-send` rule contributes DATA_LEAK, and our layered
+    // user rule contributes a second DATA_LEAK record (all-match keeps both,
+    // deduped by (flowType, ruleId)). Confirm the user rule is present.
     const cookieFlow = engine.matchFlowTypes(
       "CHROME_COOKIES_INFO",
       "FETCH_RESOURCE",
     );
     expect(cookieFlow.map((m) => m.flowType)).toContain("DATA_LEAK");
-    expect(cookieFlow[0].ruleId).toBe("cookies-to-fetch-body");
-    expect(cookieFlow[0].ruleDescription).toBe("Cookies leaving via fetch body");
+    const userMatch = cookieFlow.find((m) => m.ruleId === "cookies-to-fetch-body");
+    expect(userMatch).toBeTruthy();
+    expect(userMatch!.ruleDescription).toBe("Cookies leaving via fetch body");
 
     // Defaults still work too.
     expect(

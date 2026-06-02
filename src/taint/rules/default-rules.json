@@ -76,6 +76,16 @@
     },
 
     {
+      "id": "sensitive-data-network-send",
+      "description": "User-permission-gated data (cookies, history, bookmarks, identity, downloads, system info, ...) exfiltrated via an outbound network request (fetch / XHR / axios / WebSocket). The flagship data-leak pattern. Benign auth-header use is filtered by suppress-sensitive-data-request-headers below.",
+      "flowType": "DATA_LEAK",
+      "match": {
+        "sourceCapability": "SENSITIVE_DATA",
+        "sinkCapability": "NETWORK_SEND"
+      }
+    },
+
+    {
       "id": "network-response-code-execution",
       "description": "Untrusted server response feeding eval / new Function — classic remote code execution surface.",
       "flowType": "CODE_INJECTION",
@@ -195,6 +205,20 @@
       "flowType": "DATA_LEAK",
       "match": {
         "sourceType": "SCREEN_INFO"
+      }
+    },
+
+    {
+      "id": "suppress-sensitive-data-request-headers",
+      "description": "Sensitive data placed in an outbound request HEADER (e.g. a cookie sent as the Cookie / Authorization header) is normal extension auth behavior, not exfiltration. Suppress only the DATA_LEAK flow type — body/URL leaks of the same data still report, and attacker-input → header (REQUEST_FORGERY) is unaffected.",
+      "flowType": "DATA_LEAK",
+      "match": {
+        "sourceCapability": "SENSITIVE_DATA",
+        "sinkType": [
+          "FETCH_HEADERS",
+          "AXIOS_HEADERS",
+          "XML_HTTP_REQUEST_SETHEADER"
+        ]
       }
     },
 
