@@ -79,4 +79,14 @@ describe("Framework sink modeling: React / Vue / Angular", () => {
     expect(xss).toBeTruthy();
     expect(xss?.flowType).toBe("DOM_XSS");
   });
+
+  it("dom_innerhtml_write: document.URL → el.innerHTML assignment is DOM_XSS", async () => {
+    const flows = await analyzeFixture("dom_innerhtml_write");
+    const xss = flows.find(
+      (f) =>
+        f.sourceType === "DOCUMENT_URL" && f.sinkType === "DOM_INNER_HTML",
+    );
+    expect(xss).toBeTruthy();
+    expect(xss?.flowType).toBe("DOM_XSS");
+  });
 });

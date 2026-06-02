@@ -10,7 +10,20 @@ import {
 } from "../utils/utils";
 import { Identifier } from "acorn";
 import { taintManager as tm } from "../../taint";
+import { SinkType } from "../../taint";
 import logger from "../../utils/logger";
+
+/**
+ * Element properties whose assignment parses the value as HTML. Writing a
+ * tainted value here is a DOM-based XSS sink. The receiver is not required to
+ * be a modeled DOM element — `x.innerHTML = tainted` is dangerous for any `x`,
+ * and `checkSink` already no-ops on untainted values, so the false-positive
+ * surface is limited to genuinely tainted writes.
+ */
+const DOM_WRITE_SINK_PROPS: Record<string, SinkType> = {
+  innerHTML: "DOM_INNER_HTML",
+  outerHTML: "DOM_INNER_HTML",
+};
 
 export function patternAwareTypeHandler(
   cfgNode: FlowNode,
@@ -196,6 +209,14 @@ export function patternAwareTypeHandler(
         if (!key) return;
 
         if (isLast) {
+          // [SINK] Assigning a tainted value to `.innerHTML` / `.outerHTML`
+          // parses it as HTML — a DOM-based XSS sink. checkSink no-ops unless
+          // the value is actually tainted.
+          const sinkType = DOM_WRITE_SINK_PROPS[key];
+          if (sinkType && def) {
+            tm.checkSink(def, sinkType, propNode, key);
+          }
+
           curObjDef.setProperty(
             key,
             def || defFactory.createUnknownDef(cfgNode),
