@@ -1,0 +1,3563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExPGuard Report — Custom Theme Cloud Sync</title>
+<style>
+
+:root{--bg:#0f1419;--panel:#161b22;--panel2:#1c2330;--line:#2a3240;--fg:#d6dde6;--muted:#8b97a7;--acc:#4ea1ff}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:18px 0 8px}
+small{color:var(--muted);font-weight:400}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.muted{color:var(--muted)}
+.overview{padding:20px 24px;border-bottom:1px solid var(--line);background:var(--panel)}
+.cards{display:flex;gap:12px;margin:14px 0}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px 18px;min-width:90px;text-align:center}
+.card .num{font-size:22px;font-weight:700}.card .lbl{font-size:11px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.meta{display:flex;gap:18px;font-size:12px;margin-top:8px}
+.layout{display:flex;align-items:flex-start}
+.sidebar{width:300px;flex:0 0 300px;padding:16px;border-right:1px solid var(--line);height:calc(100vh - 0px);overflow:auto;position:sticky;top:0}
+.main{flex:1;padding:16px 24px;min-width:0}
+.toolbar{margin-bottom:14px}
+#filter{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--fg)}
+ul.tree{list-style:none;margin:0;padding-left:14px}
+ul.tree>li{margin:2px 0}
+summary.dir{cursor:pointer;user-select:none}
+li.file{display:flex;align-items:center;gap:6px;padding:1px 0}
+li.file .fname{color:var(--fg)}
+li.kind-manifest .fname{color:#ffd479}
+li.kind-html .fname{color:#7ee787}
+li.kind-image .fname,li.kind-other .fname{color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;background:#f85149;display:inline-block}
+.sz{margin-left:auto;font-size:11px;color:var(--muted)}
+table.scripts{width:100%;border-collapse:collapse;font-size:12px}
+table.scripts th,table.scripts td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+.mono{font-family:ui-monospace,monospace;word-break:break-all}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid var(--line);background:var(--panel2);color:var(--fg)}
+.badge.fam-BG{background:#1f6feb33;border-color:#1f6feb}
+.badge.fam-CS{background:#23863633;border-color:#238636}
+.badge.fam-EX{background:#8957e533;border-color:#8957e5}
+.badge.fam-DT{background:#9e6a0333;border-color:#9e6a03}
+.badge.fam-OF{background:#6e768133;border-color:#6e7681}
+.badge.flow{background:#1f6feb22;border-color:#1f6feb}
+.badge.flow-DATA_LEAK,.badge.flow-DOM_DATA_LEAK{background:#9e6a0333;border-color:#d29922}
+.badge.flow-PRIVILEGE_ESCALATION,.badge.flow-CODE_INJECTION{background:#da363322;border-color:#f85149}
+.badge.flow-DOM_XSS,.badge.flow-REQUEST_FORGERY{background:#8957e522;border-color:#a371f7}
+.badge.sev-CRITICAL{background:#da3633;border-color:#f85149;color:#fff}
+.badge.sev-HIGH{background:#bb800933;border-color:#f0883e}
+.badge.sev-MEDIUM{background:#9e6a0322;border-color:#d29922}
+.badge.sev-LOW{background:#6e768122;border-color:#6e7681}
+.badge.cross{background:#1c2b22;border-color:#2ea043}
+.issue{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.issuehead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.issuehead .pair code{background:var(--panel2);padding:1px 6px;border-radius:5px}
+.issuehead .right{margin-left:auto;color:var(--muted);font-size:12px}
+.ruledesc{color:var(--muted);margin:8px 0 4px;font-size:13px}
+ul.timeline{list-style:none;margin:10px 0 0;padding:0;border-left:2px solid var(--line);margin-left:6px}
+li.step{position:relative;padding:4px 0 10px 18px}
+.dotmark{position:absolute;left:-7px;top:6px;width:11px;height:11px;border-radius:50%;border:2px solid var(--bg)}
+.dotmark.src{background:#2ea043}.dotmark.mid{background:#6e7681}.dotmark.sink{background:#f85149}
+.stephead{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.stephead .kind{font-weight:700;font-size:12px}
+.stephead .loc{color:var(--muted);font-size:12px;font-family:ui-monospace,monospace}
+.remark{color:var(--acc);font-size:12px}
+.stepfile{display:block;color:var(--muted);font-size:11px;margin:1px 0}
+pre.snippet{margin:6px 0 0;padding:8px 10px;background:#0b0f14;border:1px solid var(--line);border-radius:6px;overflow:auto;font-size:12px}
+pre.snippet mark.hl{background:#f8514955;color:#ffd7d5;border-radius:3px;padding:0 2px}
+.issuefoot{margin-top:10px;font-size:12px;color:var(--muted)}
+.ok{color:#2ea043;font-size:16px}
+.ellipsis .stepbody{font-style:italic}
+
+</style>
+</head>
+<body>
+<section class="overview">
+    <h1>Custom Theme Cloud Sync <small>v2.1.4</small></h1>
+    <p class="muted">Syncs the user&#39;s preferred theme + auto-redirect rules between devices via chrome.storage.sync.</p>
+    <div class="cards">
+      <div class="card"><div class="num">3</div><div class="lbl">Scripts</div></div>
+      <div class="card"><div class="num">13</div><div class="lbl">Findings</div></div>
+      <div class="card"><div class="num">MV3</div><div class="lbl">Manifest</div></div>
+      <div class="card"><div class="num">28</div><div class="lbl">Duration (ms)</div></div>
+    </div>
+    <div class="chips"><span class="badge flow flow-PRIVILEGE_ESCALATION">Privilege Escalation · 5</span> <span class="badge flow flow-STORAGE_POSOING">Storage Poisoning · 3</span> <span class="badge sev sev-HIGH">HIGH · 8</span></div>
+    <div class="meta muted">
+      <span>ID: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
+      <span>Source: DIR</span>
+      <span>Generated: 2026-06-02T10:32:54.403Z</span>
+    </div>
+  </section>
+<div class="layout">
+  <aside class="sidebar">
+    <h2>Files</h2>
+    <ul class="tree"><li class="file kind-js" data-path="background.js"><span class="fname">background.js</span><span class="sz">1.6 KB</span></li><li class="file kind-js" data-path="content.js"><span class="fname">content.js</span><span class="sz">1.4 KB</span></li><li class="file kind-manifest" data-path="manifest.json"><span class="fname">manifest.json</span><span class="sz">497 B</span></li><li class="file kind-js" data-path="rules.js"><span class="fname">rules.js</span><span class="sz">276 B</span></li></ul>
+    <h2>Scripts</h2>
+    <table class="scripts">
+    <thead><tr><th>Script</th><th>Frame</th><th>Size</th><th>Analysis</th></tr></thead>
+    <tbody><tr>
+      <td class="mono">background.js</td>
+      <td><span class="badge fam-BG">BG_1</span></td>
+      <td>1.6 KB</td>
+      <td>2.3 ms</td>
+    </tr><tr>
+      <td class="mono">content.js</td>
+      <td><span class="badge fam-CS">CS_1</span></td>
+      <td>1.4 KB</td>
+      <td>6.5 ms</td>
+    </tr><tr>
+      <td class="mono">rules.js</td>
+      <td><span class="badge fam-BG">BG_1</span></td>
+      <td>276 B</td>
+      <td>1.4 ms</td>
+    </tr></tbody></table>
+  </aside>
+  <main class="main">
+    <div class="toolbar">
+      <input id="filter" type="search" placeholder="Filter findings by file or flow type…" />
+    </div>
+    <div id="issues">
+      <article class="issue" data-flowtypes="STORAGE_POSOING" data-file="content">
+    <header class="issuehead">
+      <span class="badge flow flow-STORAGE_POSOING">Storage Poisoning</span> <span class="badge sev sev-HIGH">HIGH</span>
+      <span class="pair"><code>WINDOW_CUSTOM_EVENT</code> → <code>CHROME_SYNC_STORAGE, CHROME_SYNC_STORAGE, CHROME_SYNC_STORAGE</code></span>
+      
+      <span class="loc right">content : L14:C20 -&gt; L14:C30</span>
+    </header>
+    <p class="ruledesc">Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_CUSTOM_EVENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">window.addEventListener(themeImport)</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>    const payload = &gt;&gt;&gt;ev?.detail&lt;&lt;&lt; || {};
+
+    // STOR</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>    const payload = &gt;&gt;&gt;ev?.detail&lt;&lt;&lt; || {};
+
+    // STOR</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L14:C20 -&gt; L14:C36</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>    const payload = &gt;&gt;&gt;ev?.detail || {}&lt;&lt;&lt;;
+
+    // STORAGE po</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L18:C19 -&gt; L18:C26</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>
+      themePreset: &gt;&gt;&gt;payload&lt;&lt;&lt;.preset,
+      theme</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L18:C19 -&gt; L18:C33</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>
+      themePreset: &gt;&gt;&gt;payload.preset&lt;&lt;&lt;,
+      themeName: p</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>o sync storage.
+    &gt;&gt;&gt;chrome.storage.sync.set({                      // SINK CHROME_SYNC_STORAGE
+      themePreset: payload.preset,
+      themeName: payload.name,
+      autoRedirect: payload.autoRedirect,
+    })&lt;&lt;&lt;;
+  });
+
+  // ─── So</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L19:C17 -&gt; L19:C24</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>t,
+      themeName: &gt;&gt;&gt;payload&lt;&lt;&lt;.name,
+      autoRed</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L19:C17 -&gt; L19:C29</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>t,
+      themeName: &gt;&gt;&gt;payload.name&lt;&lt;&lt;,
+      autoRedirect</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>o sync storage.
+    &gt;&gt;&gt;chrome.storage.sync.set({                      // SINK CHROME_SYNC_STORAGE
+      themePreset: payload.preset,
+      themeName: payload.name,
+      autoRedirect: payload.autoRedirect,
+    })&lt;&lt;&lt;;
+  });
+
+  // ─── So</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L20:C20 -&gt; L20:C27</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>      autoRedirect: &gt;&gt;&gt;payload&lt;&lt;&lt;.autoRedirect,
+    }</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L20:C20 -&gt; L20:C40</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>      autoRedirect: &gt;&gt;&gt;payload.autoRedirect&lt;&lt;&lt;,
+    });
+  });
+
+  /</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>o sync storage.
+    &gt;&gt;&gt;chrome.storage.sync.set({                      // SINK CHROME_SYNC_STORAGE
+      themePreset: payload.preset,
+      themeName: payload.name,
+      autoRedirect: payload.autoRedirect,
+    })&lt;&lt;&lt;;
+  });
+
+  // ─── So</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_SYNC_STORAGE</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">themePreset</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>o sync storage.
+    &gt;&gt;&gt;chrome.storage.sync.set({                      // SINK CHROME_SYNC_STORAGE
+      themePreset: payload.preset,
+      themeName: payload.name,
+      autoRedirect: payload.autoRedirect,
+    })&lt;&lt;&lt;;
+  });
+
+  // ─── So</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_SYNC_STORAGE</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">themeName</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>o sync storage.
+    &gt;&gt;&gt;chrome.storage.sync.set({                      // SINK CHROME_SYNC_STORAGE
+      themePreset: payload.preset,
+      themeName: payload.name,
+      autoRedirect: payload.autoRedirect,
+    })&lt;&lt;&lt;;
+  });
+
+  // ─── So</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_SYNC_STORAGE</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">autoRedirect</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>o sync storage.
+    &gt;&gt;&gt;chrome.storage.sync.set({                      // SINK CHROME_SYNC_STORAGE
+      themePreset: payload.preset,
+      themeName: payload.name,
+      autoRedirect: payload.autoRedirect,
+    })&lt;&lt;&lt;;
+  });
+
+  // ─── So</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="UNKNOWN" data-file="content">
+    <header class="issuehead">
+      <span class="badge flow flow-UNCLASSIFIED">UNCLASSIFIED</span> 
+      <span class="pair"><code>TARGET_CUSTOM_EVENT</code> → <code></code></span>
+      
+      <span class="loc right">content : L28:C19 -&gt; L28:C29</span>
+    </header>
+    
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">TARGET_CUSTOM_EVENT</span>
+        <span class="loc">L28:C19 -&gt; L28:C29</span> · <span class="remark">target.addEventListener(themeCommit)</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>
+      const next = &gt;&gt;&gt;ev?.detail&lt;&lt;&lt;?.diff;
+      if (!n</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L28:C19 -&gt; L28:C29</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>
+      const next = &gt;&gt;&gt;ev?.detail&lt;&lt;&lt;?.diff;
+      if (!n</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L28:C19 -&gt; L28:C35</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>
+      const next = &gt;&gt;&gt;ev?.detail?.diff&lt;&lt;&lt;;
+      if (!next) r</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L29:C11 -&gt; L29:C15</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>l?.diff;
+      if (!&gt;&gt;&gt;next&lt;&lt;&lt;) return;
+
+      // </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L29:C10 -&gt; L29:C15</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code>il?.diff;
+      if (&gt;&gt;&gt;!next&lt;&lt;&lt;) return;
+
+      // </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L29:C11 -&gt; L29:C15</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>l?.diff;
+      if (!&gt;&gt;&gt;next&lt;&lt;&lt;) return;
+
+      // </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L34:C15 -&gt; L34:C19</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>RK&quot;,
+        title: &gt;&gt;&gt;next&lt;&lt;&lt;.title,
+        url:</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L34:C15 -&gt; L34:C25</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>RK&quot;,
+        title: &gt;&gt;&gt;next.title&lt;&lt;&lt;,
+        url: next.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L32:C6 -&gt; L36:C8</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>ound channel.
+      &gt;&gt;&gt;chrome.runtime.sendMessage({
+        kind: &quot;STAMP_BOOKMARK&quot;,
+        title: next.title,
+        url: next.url,
+      })&lt;&lt;&lt;;
+    });
+  }
+
+  ret</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L35:C13 -&gt; L35:C17</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>title,
+        url: &gt;&gt;&gt;next&lt;&lt;&lt;.url,
+      });
+    </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L35:C13 -&gt; L35:C21</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>title,
+        url: &gt;&gt;&gt;next.url&lt;&lt;&lt;,
+      });
+    });
+</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L32:C6 -&gt; L36:C8</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>ound channel.
+      &gt;&gt;&gt;chrome.runtime.sendMessage({
+        kind: &quot;STAMP_BOOKMARK&quot;,
+        title: next.title,
+        url: next.url,
+      })&lt;&lt;&lt;;
+    });
+  }
+
+  ret</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="PRIVILEGE_ESCALATION" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-PRIVILEGE_ESCALATION">Privilege Escalation</span> <span class="badge sev sev-HIGH">HIGH</span>
+      <span class="pair"><code>TARGET_CUSTOM_EVENT</code> → <code>CHROME_BOOKMARK_CREATE_INFO</code></span>
+      <span class="badge cross">message · runtime.single.sender.message[content-&gt;background]</span>
+      <span class="loc right">background : L13:C0 -&gt; L20:C2</span>
+    </header>
+    <p class="ruledesc">Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">TARGET_CUSTOM_EVENT</span>
+        <span class="loc">L13:C0 -&gt; L20:C2</span> · <span class="remark">target.addEventListener(themeCommit)</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>from &quot;./rules.js&quot;;
+
+&gt;&gt;&gt;chrome.runtime.onMessage.addListener((req) =&gt; {
+  if (req &amp;&amp; req.kind === &quot;STAMP_BOOKMARK&quot;) {
+    chrome.bookmarks.create({                                   // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+})&lt;&lt;&lt;;
+
+async function sy</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">MESSAGE</span>
+        <span class="loc">L13:C0 -&gt; L20:C2</span> · <span class="remark">runtime.single.sender.message[content-&gt;background]</span></div>
+      
+      <pre class="snippet"><code>from &quot;./rules.js&quot;;
+
+&gt;&gt;&gt;chrome.runtime.onMessage.addListener((req) =&gt; {
+  if (req &amp;&amp; req.kind === &quot;STAMP_BOOKMARK&quot;) {
+    chrome.bookmarks.create({                                   // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+})&lt;&lt;&lt;;
+
+async function sy</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L14:C13 -&gt; L14:C21</span> · <span class="remark">member-element-container</span></div>
+      
+      <pre class="snippet"><code>) =&gt; {
+  if (req &amp;&amp; &gt;&gt;&gt;req.kind&lt;&lt;&lt; === &quot;STAMP_BOOKMARK</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L14:C13 -&gt; L14:C21</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code>) =&gt; {
+  if (req &amp;&amp; &gt;&gt;&gt;req.kind&lt;&lt;&lt; === &quot;STAMP_BOOKMARK</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L14:C6 -&gt; L14:C42</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>er((req) =&gt; {
+  if (&gt;&gt;&gt;req &amp;&amp; req.kind === &quot;STAMP_BOOKMARK&quot;&lt;&lt;&lt;) {
+    chrome.bookm</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L14:C6 -&gt; L14:C42</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code>er((req) =&gt; {
+  if (&gt;&gt;&gt;req &amp;&amp; req.kind === &quot;STAMP_BOOKMARK&quot;&lt;&lt;&lt;) {
+    chrome.bookm</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L16:C13 -&gt; L16:C22</span> · <span class="remark">member-element-container</span></div>
+      
+      <pre class="snippet"><code>E_INFO
+      title: &gt;&gt;&gt;req.title&lt;&lt;&lt;,
+      url: req.url</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L15:C4 -&gt; L18:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>MP_BOOKMARK&quot;) {
+    &gt;&gt;&gt;chrome.bookmarks.create({                                   // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    })&lt;&lt;&lt;;
+  }
+});
+
+async fun</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C11 -&gt; L17:C18</span> · <span class="remark">member-element-container</span></div>
+      
+      <pre class="snippet"><code>q.title,
+      url: &gt;&gt;&gt;req.url&lt;&lt;&lt;,
+    });
+  }
+});
+
+a</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L15:C4 -&gt; L18:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>MP_BOOKMARK&quot;) {
+    &gt;&gt;&gt;chrome.bookmarks.create({                                   // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    })&lt;&lt;&lt;;
+  }
+});
+
+async fun</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_BOOKMARK_CREATE_INFO</span>
+        <span class="loc">L15:C4 -&gt; L18:C6</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>MP_BOOKMARK&quot;) {
+    &gt;&gt;&gt;chrome.bookmarks.create({                                   // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    })&lt;&lt;&lt;;
+  }
+});
+
+async fun</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="UNKNOWN" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-UNCLASSIFIED">UNCLASSIFIED</span> 
+      <span class="pair"><code>STORAGE_ALL_ITEMS</code> → <code>CHROME_TABS_CREATE_OPTIONS</code></span>
+      
+      <span class="loc right">background : L50:C18 -&gt; L50:C36</span>
+    </header>
+    
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">STORAGE_ALL_ITEMS</span>
+        <span class="loc">L50:C18 -&gt; L50:C36</span> · <span class="remark">storage.all.items[sync]</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>l
+  if (allItems &amp;&amp; &gt;&gt;&gt;allItems.themeName&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L50:C18 -&gt; L50:C36</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>l
+  if (allItems &amp;&amp; &gt;&gt;&gt;allItems.themeName&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L50:C6 -&gt; L50:C36</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>MS via getAll
+  if (&gt;&gt;&gt;allItems &amp;&amp; allItems.themeName&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L50:C6 -&gt; L50:C36</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code>MS via getAll
+  if (&gt;&gt;&gt;allItems &amp;&amp; allItems.themeName&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L50:C18 -&gt; L50:C36</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>l
+  if (allItems &amp;&amp; &gt;&gt;&gt;allItems.themeName&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L51:C47 -&gt; L51:C65</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>l: &quot;about:blank#&quot; + &gt;&gt;&gt;allItems.themeName&lt;&lt;&lt; });
+  }
+});
+</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L51:C47 -&gt; L51:C65</span> · <span class="remark">binary-right</span></div>
+      
+      <pre class="snippet"><code>l: &quot;about:blank#&quot; + &gt;&gt;&gt;allItems.themeName&lt;&lt;&lt; });
+  }
+});
+</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L51:C4 -&gt; L51:C68</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>ms.themeName) {
+    &gt;&gt;&gt;chrome.tabs.create({ url: &quot;about:blank#&quot; + allItems.themeName })&lt;&lt;&lt;;
+  }
+});
+</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_TABS_CREATE_OPTIONS</span>
+        <span class="loc">L51:C4 -&gt; L51:C68</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>ms.themeName) {
+    &gt;&gt;&gt;chrome.tabs.create({ url: &quot;about:blank#&quot; + allItems.themeName })&lt;&lt;&lt;;
+  }
+});
+</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="PRIVILEGE_ESCALATION" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-PRIVILEGE_ESCALATION">Privilege Escalation</span> <span class="badge sev sev-HIGH">HIGH</span>
+      <span class="pair"><code>WINDOW_CUSTOM_EVENT</code> → <code>CHROME_HISTORY_ADD_URL</code></span>
+      <span class="badge cross">storage · STORAGE_FLOW[area: sync, key: themePreset, sender: content, receiver: background]</span>
+      <span class="loc right">background : L14:C20 -&gt; L14:C30</span>
+    </header>
+    <p class="ruledesc">Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_CUSTOM_EVENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">From storage.sync.set(&#39;themePreset&#39;) in content</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L14:C20 -&gt; L14:C36</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+  if (&lt;&lt;&lt;req &amp;&amp; req.kind === </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L18:C19 -&gt; L18:C26</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    })&lt;&lt;&lt;;
+  }
+});
+
+async fun</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L18:C19 -&gt; L18:C33</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    });
+  }
+}&lt;&lt;&lt;);
+
+async function s</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L19:C17 -&gt; L19:C24</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFro&lt;&lt;&lt;mCloud() {
+  const {</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L19:C17 -&gt; L19:C29</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFromClou&lt;&lt;&lt;d() {
+  const { them</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L20:C20 -&gt; L20:C27</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, &lt;&lt;&lt;autoRedirect, themeN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L20:C20 -&gt; L20:C40</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, autoRedirect,&lt;&lt;&lt; themeName } =
+    a</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">STORAGE</span>
+        <span class="loc">L24:C10 -&gt; L28:C6</span> · <span class="remark">STORAGE_FLOW[area: sync, key: themePreset, sender: content, receiver: background]</span></div>
+      
+      <pre class="snippet"><code>eName } =
+    await &gt;&gt;&gt;chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L23:C8 -&gt; L28:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>omCloud() {
+  const &gt;&gt;&gt;{ themePreset, autoRedirect, themeName } =
+    await chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L34:C6 -&gt; L34:C17</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>_OPTIONS
+  }
+
+  if (&gt;&gt;&gt;themePreset&lt;&lt;&lt;) {
+    chrome.histo</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L35:C33 -&gt; L35:C44</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>story.addUrl({ url: &gt;&gt;&gt;themePreset&lt;&lt;&lt;.previewUrl });     </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L35:C33 -&gt; L35:C55</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>story.addUrl({ url: &gt;&gt;&gt;themePreset.previewUrl&lt;&lt;&lt; });     // SINK CHR</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L35:C4 -&gt; L35:C58</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>(themePreset) {
+    &gt;&gt;&gt;chrome.history.addUrl({ url: themePreset.previewUrl })&lt;&lt;&lt;;     // SINK CHROME</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_HISTORY_ADD_URL</span>
+        <span class="loc">L35:C4 -&gt; L35:C58</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>(themePreset) {
+    &gt;&gt;&gt;chrome.history.addUrl({ url: themePreset.previewUrl })&lt;&lt;&lt;;     // SINK CHROME</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="PRIVILEGE_ESCALATION" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-PRIVILEGE_ESCALATION">Privilege Escalation</span> <span class="badge sev sev-HIGH">HIGH</span>
+      <span class="pair"><code>WINDOW_CUSTOM_EVENT</code> → <code>CHROME_TABS_CREATE_OPTIONS, CHROME_TABS_CREATE_OPTIONS, CHROME_TABS_EXECUTE</code></span>
+      <span class="badge cross">storage · STORAGE_FLOW[area: sync, key: autoRedirect, sender: content, receiver: background]</span>
+      <span class="loc right">background : L14:C20 -&gt; L14:C30</span>
+    </header>
+    <p class="ruledesc">Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_CUSTOM_EVENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">From storage.sync.set(&#39;autoRedirect&#39;) in content</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L14:C20 -&gt; L14:C36</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+  if (&lt;&lt;&lt;req &amp;&amp; req.kind === </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L18:C19 -&gt; L18:C26</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    })&lt;&lt;&lt;;
+  }
+});
+
+async fun</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L18:C19 -&gt; L18:C33</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    });
+  }
+}&lt;&lt;&lt;);
+
+async function s</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L19:C17 -&gt; L19:C24</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFro&lt;&lt;&lt;mCloud() {
+  const {</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L19:C17 -&gt; L19:C29</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFromClou&lt;&lt;&lt;d() {
+  const { them</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L20:C20 -&gt; L20:C27</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, &lt;&lt;&lt;autoRedirect, themeN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L20:C20 -&gt; L20:C40</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, autoRedirect,&lt;&lt;&lt; themeName } =
+    a</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">STORAGE</span>
+        <span class="loc">L24:C10 -&gt; L28:C6</span> · <span class="remark">STORAGE_FLOW[area: sync, key: autoRedirect, sender: content, receiver: background]</span></div>
+      
+      <pre class="snippet"><code>eName } =
+    await &gt;&gt;&gt;chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L23:C8 -&gt; L28:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>omCloud() {
+  const &gt;&gt;&gt;{ themePreset, autoRedirect, themeName } =
+    await chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C6 -&gt; L30:C18</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>me&quot;,
+    ]);
+
+  if (&gt;&gt;&gt;autoRedirect&lt;&lt;&lt; &amp;&amp; autoRedirect.url</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C22 -&gt; L30:C34</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>if (autoRedirect &amp;&amp; &gt;&gt;&gt;autoRedirect&lt;&lt;&lt;.url) {
+    chrome.t</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L30:C22 -&gt; L30:C38</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>if (autoRedirect &amp;&amp; &gt;&gt;&gt;autoRedirect.url&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C6 -&gt; L30:C38</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>me&quot;,
+    ]);
+
+  if (&gt;&gt;&gt;autoRedirect &amp;&amp; autoRedirect.url&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C6 -&gt; L30:C38</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code>me&quot;,
+    ]);
+
+  if (&gt;&gt;&gt;autoRedirect &amp;&amp; autoRedirect.url&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C6 -&gt; L30:C18</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>me&quot;,
+    ]);
+
+  if (&gt;&gt;&gt;autoRedirect&lt;&lt;&lt; &amp;&amp; autoRedirect.url</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L31:C30 -&gt; L31:C42</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>.tabs.create({ url: &gt;&gt;&gt;autoRedirect&lt;&lt;&lt;.url });            </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L31:C30 -&gt; L31:C46</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>.tabs.create({ url: &gt;&gt;&gt;autoRedirect.url&lt;&lt;&lt; });              //</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L31:C4 -&gt; L31:C49</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>Redirect.url) {
+    &gt;&gt;&gt;chrome.tabs.create({ url: autoRedirect.url })&lt;&lt;&lt;;              // SI</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L38:C20 -&gt; L38:C32</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>  if (Array.isArray(&gt;&gt;&gt;autoRedirect&lt;&lt;&lt;?.rules)) {
+    appl</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L38:C20 -&gt; L38:C39</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>  if (Array.isArray(&gt;&gt;&gt;autoRedirect?.rules&lt;&lt;&lt;)) {
+    applyRedire</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L38:C20 -&gt; L38:C32</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>  if (Array.isArray(&gt;&gt;&gt;autoRedirect&lt;&lt;&lt;?.rules)) {
+    appl</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L38:C20 -&gt; L38:C39</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>  if (Array.isArray(&gt;&gt;&gt;autoRedirect?.rules&lt;&lt;&lt;)) {
+    applyRedire</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C23 -&gt; L39:C35</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> applyRedirectRules(&gt;&gt;&gt;autoRedirect&lt;&lt;&lt;.rules);
+  }
+}
+
+self</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L39:C23 -&gt; L39:C41</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> applyRedirectRules(&gt;&gt;&gt;autoRedirect.rules&lt;&lt;&lt;);
+  }
+}
+
+self.addEv</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L2:C21 -&gt; L2:C26</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> BG_1
+//
+// Flow pat&gt;&gt;&gt;terns&lt;&lt;&lt;:
+//   1. Storage ro</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ITERATE</span>
+        <span class="loc">L2:C7 -&gt; L2:C17</span> · <span class="remark">loop.iteration</span></div>
+      
+      <pre class="snippet"><code>rker
+// Frame: BG_1
+&gt;&gt;&gt;//
+// Flow&lt;&lt;&lt; patterns:
+//   1. S</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L3:C9 -&gt; L3:C13</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>atterns:
+//   1. Sto&gt;&gt;&gt;rage&lt;&lt;&lt; roundtrip: themePre</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L3:C8 -&gt; L3:C13</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code>patterns:
+//   1. St&gt;&gt;&gt;orage&lt;&lt;&lt; roundtrip: themePre</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L3:C9 -&gt; L3:C13</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>atterns:
+//   1. Sto&gt;&gt;&gt;rage&lt;&lt;&lt; roundtrip: themePre</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C30 -&gt; L4:C34</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>t/autoRedirect from &gt;&gt;&gt;cont&lt;&lt;&lt;ent.js (CUSTOM_EVENT</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L4:C30 -&gt; L4:C38</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>t/autoRedirect from &gt;&gt;&gt;content.&lt;&lt;&lt;js (CUSTOM_EVENT sou</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L4:C4 -&gt; L4:C64</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>rage roundtrip: them&gt;&gt;&gt;ePreset/autoRedirect from content.js (CUSTOM_EVENT source)
+/&lt;&lt;&lt;/      land in sync </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C50 -&gt; L4:C54</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>content.js (CUSTOM_E&gt;&gt;&gt;VENT&lt;&lt;&lt; source)
+//      lan</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L4:C50 -&gt; L4:C61</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>content.js (CUSTOM_E&gt;&gt;&gt;VENT source&lt;&lt;&lt;)
+//      land in sy</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C49 -&gt; L4:C61</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code> content.js (CUSTOM_&gt;&gt;&gt;EVENT source&lt;&lt;&lt;)
+//      land in sy</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C48 -&gt; L4:C61</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code>m content.js (CUSTOM&gt;&gt;&gt;_EVENT source&lt;&lt;&lt;)
+//      land in sy</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L4:C4 -&gt; L4:C64</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>rage roundtrip: them&gt;&gt;&gt;ePreset/autoRedirect from content.js (CUSTOM_EVENT source)
+/&lt;&lt;&lt;/      land in sync </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L6:C40 -&gt; L6:C44</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>abs (PRIVILEGE_ESCAL&gt;&gt;&gt;ATIO&lt;&lt;&lt;N)
+//      and adds </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L6:C40 -&gt; L6:C51</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>abs (PRIVILEGE_ESCAL&gt;&gt;&gt;ATION)
+//  &lt;&lt;&lt;    and adds URLs to</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L6:C6 -&gt; L6:C54</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>ackground reads them&gt;&gt;&gt; → opens new tabs (PRIVILEGE_ESCALATION)
+//     &lt;&lt;&lt; and adds URLs to hi</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_TABS_CREATE_OPTIONS</span>
+        <span class="loc">L31:C4 -&gt; L31:C49</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>Redirect.url) {
+    &gt;&gt;&gt;chrome.tabs.create({ url: autoRedirect.url })&lt;&lt;&lt;;              // SI</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_TABS_CREATE_OPTIONS</span>
+        <span class="loc">L4:C4 -&gt; L4:C64</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>rage roundtrip: them&gt;&gt;&gt;ePreset/autoRedirect from content.js (CUSTOM_EVENT source)
+/&lt;&lt;&lt;/      land in sync </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_TABS_EXECUTE</span>
+        <span class="loc">L6:C6 -&gt; L6:C54</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>ackground reads them&gt;&gt;&gt; → opens new tabs (PRIVILEGE_ESCALATION)
+//     &lt;&lt;&lt; and adds URLs to hi</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="UNKNOWN" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-UNCLASSIFIED">UNCLASSIFIED</span> 
+      <span class="pair"><code>WINDOW_CUSTOM_EVENT</code> → <code></code></span>
+      
+      <span class="loc right">background : L14:C20 -&gt; L14:C30</span>
+    </header>
+    
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_CUSTOM_EVENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">From storage.sync.set(&#39;themeName&#39;) in content</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L14:C20 -&gt; L14:C36</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+  if (&lt;&lt;&lt;req &amp;&amp; req.kind === </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L18:C19 -&gt; L18:C26</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    })&lt;&lt;&lt;;
+  }
+});
+
+async fun</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L18:C19 -&gt; L18:C33</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    });
+  }
+}&lt;&lt;&lt;);
+
+async function s</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L19:C17 -&gt; L19:C24</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFro&lt;&lt;&lt;mCloud() {
+  const {</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L19:C17 -&gt; L19:C29</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFromClou&lt;&lt;&lt;d() {
+  const { them</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L20:C20 -&gt; L20:C27</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, &lt;&lt;&lt;autoRedirect, themeN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L20:C20 -&gt; L20:C40</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, autoRedirect,&lt;&lt;&lt; themeName } =
+    a</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">STORAGE</span>
+        <span class="loc">L24:C10 -&gt; L28:C6</span> · <span class="remark">STORAGE_FLOW[area: sync, key: themeName, sender: content, receiver: background]</span></div>
+      
+      <pre class="snippet"><code>eName } =
+    await &gt;&gt;&gt;chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L23:C8 -&gt; L28:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>omCloud() {
+  const &gt;&gt;&gt;{ themePreset, autoRedirect, themeName } =
+    await chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="PRIVILEGE_ESCALATION" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-PRIVILEGE_ESCALATION">Privilege Escalation</span> <span class="badge sev sev-HIGH">HIGH</span>
+      <span class="pair"><code>WINDOW_CUSTOM_EVENT</code> → <code>CHROME_HISTORY_ADD_URL</code></span>
+      <span class="badge cross">storage · STORAGE_FLOW[area: sync, key: themePreset, sender: content, receiver: background]</span>
+      <span class="loc right">background : L14:C20 -&gt; L14:C30</span>
+    </header>
+    <p class="ruledesc">Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_CUSTOM_EVENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">From storage.sync.set(&#39;themePreset&#39;) in content</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L14:C20 -&gt; L14:C36</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+  if (&lt;&lt;&lt;req &amp;&amp; req.kind === </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L18:C19 -&gt; L18:C26</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    })&lt;&lt;&lt;;
+  }
+});
+
+async fun</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L18:C19 -&gt; L18:C33</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    });
+  }
+}&lt;&lt;&lt;);
+
+async function s</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L19:C17 -&gt; L19:C24</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFro&lt;&lt;&lt;mCloud() {
+  const {</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L19:C17 -&gt; L19:C29</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFromClou&lt;&lt;&lt;d() {
+  const { them</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L20:C20 -&gt; L20:C27</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, &lt;&lt;&lt;autoRedirect, themeN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L20:C20 -&gt; L20:C40</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, autoRedirect,&lt;&lt;&lt; themeName } =
+    a</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">STORAGE</span>
+        <span class="loc">L24:C10 -&gt; L28:C6</span> · <span class="remark">STORAGE_FLOW[area: sync, key: themePreset, sender: content, receiver: background]</span></div>
+      
+      <pre class="snippet"><code>eName } =
+    await &gt;&gt;&gt;chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L23:C8 -&gt; L28:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>omCloud() {
+  const &gt;&gt;&gt;{ themePreset, autoRedirect, themeName } =
+    await chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L34:C6 -&gt; L34:C17</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>_OPTIONS
+  }
+
+  if (&gt;&gt;&gt;themePreset&lt;&lt;&lt;) {
+    chrome.histo</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L35:C33 -&gt; L35:C44</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>story.addUrl({ url: &gt;&gt;&gt;themePreset&lt;&lt;&lt;.previewUrl });     </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L35:C33 -&gt; L35:C55</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>story.addUrl({ url: &gt;&gt;&gt;themePreset.previewUrl&lt;&lt;&lt; });     // SINK CHR</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L35:C4 -&gt; L35:C58</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>(themePreset) {
+    &gt;&gt;&gt;chrome.history.addUrl({ url: themePreset.previewUrl })&lt;&lt;&lt;;     // SINK CHROME</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_HISTORY_ADD_URL</span>
+        <span class="loc">L35:C4 -&gt; L35:C58</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>(themePreset) {
+    &gt;&gt;&gt;chrome.history.addUrl({ url: themePreset.previewUrl })&lt;&lt;&lt;;     // SINK CHROME</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="PRIVILEGE_ESCALATION" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-PRIVILEGE_ESCALATION">Privilege Escalation</span> <span class="badge sev sev-HIGH">HIGH</span>
+      <span class="pair"><code>WINDOW_CUSTOM_EVENT</code> → <code>CHROME_TABS_CREATE_OPTIONS, CHROME_TABS_CREATE_OPTIONS, CHROME_TABS_EXECUTE</code></span>
+      <span class="badge cross">storage · STORAGE_FLOW[area: sync, key: autoRedirect, sender: content, receiver: background]</span>
+      <span class="loc right">background : L14:C20 -&gt; L14:C30</span>
+    </header>
+    <p class="ruledesc">Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_CUSTOM_EVENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">From storage.sync.set(&#39;autoRedirect&#39;) in content</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L14:C20 -&gt; L14:C36</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+  if (&lt;&lt;&lt;req &amp;&amp; req.kind === </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L18:C19 -&gt; L18:C26</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    })&lt;&lt;&lt;;
+  }
+});
+
+async fun</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L18:C19 -&gt; L18:C33</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    });
+  }
+}&lt;&lt;&lt;);
+
+async function s</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L19:C17 -&gt; L19:C24</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFro&lt;&lt;&lt;mCloud() {
+  const {</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L19:C17 -&gt; L19:C29</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFromClou&lt;&lt;&lt;d() {
+  const { them</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L20:C20 -&gt; L20:C27</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, &lt;&lt;&lt;autoRedirect, themeN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L20:C20 -&gt; L20:C40</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, autoRedirect,&lt;&lt;&lt; themeName } =
+    a</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">STORAGE</span>
+        <span class="loc">L24:C10 -&gt; L28:C6</span> · <span class="remark">STORAGE_FLOW[area: sync, key: autoRedirect, sender: content, receiver: background]</span></div>
+      
+      <pre class="snippet"><code>eName } =
+    await &gt;&gt;&gt;chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L23:C8 -&gt; L28:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>omCloud() {
+  const &gt;&gt;&gt;{ themePreset, autoRedirect, themeName } =
+    await chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C6 -&gt; L30:C18</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>me&quot;,
+    ]);
+
+  if (&gt;&gt;&gt;autoRedirect&lt;&lt;&lt; &amp;&amp; autoRedirect.url</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C22 -&gt; L30:C34</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>if (autoRedirect &amp;&amp; &gt;&gt;&gt;autoRedirect&lt;&lt;&lt;.url) {
+    chrome.t</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L30:C22 -&gt; L30:C38</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>if (autoRedirect &amp;&amp; &gt;&gt;&gt;autoRedirect.url&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C6 -&gt; L30:C38</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>me&quot;,
+    ]);
+
+  if (&gt;&gt;&gt;autoRedirect &amp;&amp; autoRedirect.url&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C6 -&gt; L30:C38</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code>me&quot;,
+    ]);
+
+  if (&gt;&gt;&gt;autoRedirect &amp;&amp; autoRedirect.url&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C6 -&gt; L30:C18</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>me&quot;,
+    ]);
+
+  if (&gt;&gt;&gt;autoRedirect&lt;&lt;&lt; &amp;&amp; autoRedirect.url</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L31:C30 -&gt; L31:C42</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>.tabs.create({ url: &gt;&gt;&gt;autoRedirect&lt;&lt;&lt;.url });            </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L31:C30 -&gt; L31:C46</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>.tabs.create({ url: &gt;&gt;&gt;autoRedirect.url&lt;&lt;&lt; });              //</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L31:C4 -&gt; L31:C49</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>Redirect.url) {
+    &gt;&gt;&gt;chrome.tabs.create({ url: autoRedirect.url })&lt;&lt;&lt;;              // SI</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L38:C20 -&gt; L38:C32</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>  if (Array.isArray(&gt;&gt;&gt;autoRedirect&lt;&lt;&lt;?.rules)) {
+    appl</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L38:C20 -&gt; L38:C39</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>  if (Array.isArray(&gt;&gt;&gt;autoRedirect?.rules&lt;&lt;&lt;)) {
+    applyRedire</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L38:C20 -&gt; L38:C32</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>  if (Array.isArray(&gt;&gt;&gt;autoRedirect&lt;&lt;&lt;?.rules)) {
+    appl</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L38:C20 -&gt; L38:C39</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>  if (Array.isArray(&gt;&gt;&gt;autoRedirect?.rules&lt;&lt;&lt;)) {
+    applyRedire</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C23 -&gt; L39:C35</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> applyRedirectRules(&gt;&gt;&gt;autoRedirect&lt;&lt;&lt;.rules);
+  }
+}
+
+self</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L39:C23 -&gt; L39:C41</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> applyRedirectRules(&gt;&gt;&gt;autoRedirect.rules&lt;&lt;&lt;);
+  }
+}
+
+self.addEv</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L2:C21 -&gt; L2:C26</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> BG_1
+//
+// Flow pat&gt;&gt;&gt;terns&lt;&lt;&lt;:
+//   1. Storage ro</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ITERATE</span>
+        <span class="loc">L2:C7 -&gt; L2:C17</span> · <span class="remark">loop.iteration</span></div>
+      
+      <pre class="snippet"><code>rker
+// Frame: BG_1
+&gt;&gt;&gt;//
+// Flow&lt;&lt;&lt; patterns:
+//   1. S</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L3:C9 -&gt; L3:C13</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>atterns:
+//   1. Sto&gt;&gt;&gt;rage&lt;&lt;&lt; roundtrip: themePre</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L3:C8 -&gt; L3:C13</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code>patterns:
+//   1. St&gt;&gt;&gt;orage&lt;&lt;&lt; roundtrip: themePre</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L3:C9 -&gt; L3:C13</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>atterns:
+//   1. Sto&gt;&gt;&gt;rage&lt;&lt;&lt; roundtrip: themePre</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C30 -&gt; L4:C34</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>t/autoRedirect from &gt;&gt;&gt;cont&lt;&lt;&lt;ent.js (CUSTOM_EVENT</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L4:C30 -&gt; L4:C38</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>t/autoRedirect from &gt;&gt;&gt;content.&lt;&lt;&lt;js (CUSTOM_EVENT sou</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L4:C4 -&gt; L4:C64</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>rage roundtrip: them&gt;&gt;&gt;ePreset/autoRedirect from content.js (CUSTOM_EVENT source)
+/&lt;&lt;&lt;/      land in sync </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C50 -&gt; L4:C54</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>content.js (CUSTOM_E&gt;&gt;&gt;VENT&lt;&lt;&lt; source)
+//      lan</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L4:C50 -&gt; L4:C61</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>content.js (CUSTOM_E&gt;&gt;&gt;VENT source&lt;&lt;&lt;)
+//      land in sy</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C49 -&gt; L4:C61</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code> content.js (CUSTOM_&gt;&gt;&gt;EVENT source&lt;&lt;&lt;)
+//      land in sy</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C48 -&gt; L4:C61</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code>m content.js (CUSTOM&gt;&gt;&gt;_EVENT source&lt;&lt;&lt;)
+//      land in sy</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L4:C4 -&gt; L4:C64</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>rage roundtrip: them&gt;&gt;&gt;ePreset/autoRedirect from content.js (CUSTOM_EVENT source)
+/&lt;&lt;&lt;/      land in sync </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L6:C40 -&gt; L6:C44</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>abs (PRIVILEGE_ESCAL&gt;&gt;&gt;ATIO&lt;&lt;&lt;N)
+//      and adds </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L6:C40 -&gt; L6:C51</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>abs (PRIVILEGE_ESCAL&gt;&gt;&gt;ATION)
+//  &lt;&lt;&lt;    and adds URLs to</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L6:C6 -&gt; L6:C54</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>ackground reads them&gt;&gt;&gt; → opens new tabs (PRIVILEGE_ESCALATION)
+//     &lt;&lt;&lt; and adds URLs to hi</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_TABS_CREATE_OPTIONS</span>
+        <span class="loc">L31:C4 -&gt; L31:C49</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>Redirect.url) {
+    &gt;&gt;&gt;chrome.tabs.create({ url: autoRedirect.url })&lt;&lt;&lt;;              // SI</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_TABS_CREATE_OPTIONS</span>
+        <span class="loc">L4:C4 -&gt; L4:C64</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>rage roundtrip: them&gt;&gt;&gt;ePreset/autoRedirect from content.js (CUSTOM_EVENT source)
+/&lt;&lt;&lt;/      land in sync </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_TABS_EXECUTE</span>
+        <span class="loc">L6:C6 -&gt; L6:C54</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>ackground reads them&gt;&gt;&gt; → opens new tabs (PRIVILEGE_ESCALATION)
+//     &lt;&lt;&lt; and adds URLs to hi</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="UNKNOWN" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-UNCLASSIFIED">UNCLASSIFIED</span> 
+      <span class="pair"><code>WINDOW_CUSTOM_EVENT</code> → <code></code></span>
+      
+      <span class="loc right">background : L14:C20 -&gt; L14:C30</span>
+    </header>
+    
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_CUSTOM_EVENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">From storage.sync.set(&#39;themeName&#39;) in content</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L14:C20 -&gt; L14:C36</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+  if (&lt;&lt;&lt;req &amp;&amp; req.kind === </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L18:C19 -&gt; L18:C26</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    })&lt;&lt;&lt;;
+  }
+});
+
+async fun</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L18:C19 -&gt; L18:C33</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    });
+  }
+}&lt;&lt;&lt;);
+
+async function s</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L19:C17 -&gt; L19:C24</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFro&lt;&lt;&lt;mCloud() {
+  const {</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L19:C17 -&gt; L19:C29</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFromClou&lt;&lt;&lt;d() {
+  const { them</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L20:C20 -&gt; L20:C27</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, &lt;&lt;&lt;autoRedirect, themeN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L20:C20 -&gt; L20:C40</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, autoRedirect,&lt;&lt;&lt; themeName } =
+    a</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">STORAGE</span>
+        <span class="loc">L24:C10 -&gt; L28:C6</span> · <span class="remark">STORAGE_FLOW[area: sync, key: themeName, sender: content, receiver: background]</span></div>
+      
+      <pre class="snippet"><code>eName } =
+    await &gt;&gt;&gt;chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L23:C8 -&gt; L28:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>omCloud() {
+  const &gt;&gt;&gt;{ themePreset, autoRedirect, themeName } =
+    await chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="PRIVILEGE_ESCALATION" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-PRIVILEGE_ESCALATION">Privilege Escalation</span> <span class="badge sev sev-HIGH">HIGH</span>
+      <span class="pair"><code>WINDOW_CUSTOM_EVENT</code> → <code>CHROME_HISTORY_ADD_URL</code></span>
+      <span class="badge cross">storage · STORAGE_FLOW[area: sync, key: themePreset, sender: content, receiver: background]</span>
+      <span class="loc right">background : L14:C20 -&gt; L14:C30</span>
+    </header>
+    <p class="ruledesc">Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_CUSTOM_EVENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">From storage.sync.set(&#39;themePreset&#39;) in content</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L14:C20 -&gt; L14:C36</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+  if (&lt;&lt;&lt;req &amp;&amp; req.kind === </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L18:C19 -&gt; L18:C26</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    })&lt;&lt;&lt;;
+  }
+});
+
+async fun</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L18:C19 -&gt; L18:C33</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    });
+  }
+}&lt;&lt;&lt;);
+
+async function s</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L19:C17 -&gt; L19:C24</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFro&lt;&lt;&lt;mCloud() {
+  const {</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L19:C17 -&gt; L19:C29</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFromClou&lt;&lt;&lt;d() {
+  const { them</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L20:C20 -&gt; L20:C27</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, &lt;&lt;&lt;autoRedirect, themeN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L20:C20 -&gt; L20:C40</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, autoRedirect,&lt;&lt;&lt; themeName } =
+    a</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">STORAGE</span>
+        <span class="loc">L24:C10 -&gt; L28:C6</span> · <span class="remark">STORAGE_FLOW[area: sync, key: themePreset, sender: content, receiver: background]</span></div>
+      
+      <pre class="snippet"><code>eName } =
+    await &gt;&gt;&gt;chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L23:C8 -&gt; L28:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>omCloud() {
+  const &gt;&gt;&gt;{ themePreset, autoRedirect, themeName } =
+    await chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L34:C6 -&gt; L34:C17</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>_OPTIONS
+  }
+
+  if (&gt;&gt;&gt;themePreset&lt;&lt;&lt;) {
+    chrome.histo</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L35:C33 -&gt; L35:C44</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>story.addUrl({ url: &gt;&gt;&gt;themePreset&lt;&lt;&lt;.previewUrl });     </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L35:C33 -&gt; L35:C55</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>story.addUrl({ url: &gt;&gt;&gt;themePreset.previewUrl&lt;&lt;&lt; });     // SINK CHR</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L35:C4 -&gt; L35:C58</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>(themePreset) {
+    &gt;&gt;&gt;chrome.history.addUrl({ url: themePreset.previewUrl })&lt;&lt;&lt;;     // SINK CHROME</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_HISTORY_ADD_URL</span>
+        <span class="loc">L35:C4 -&gt; L35:C58</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>(themePreset) {
+    &gt;&gt;&gt;chrome.history.addUrl({ url: themePreset.previewUrl })&lt;&lt;&lt;;     // SINK CHROME</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="PRIVILEGE_ESCALATION" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-PRIVILEGE_ESCALATION">Privilege Escalation</span> <span class="badge sev sev-HIGH">HIGH</span>
+      <span class="pair"><code>WINDOW_CUSTOM_EVENT</code> → <code>CHROME_TABS_CREATE_OPTIONS, CHROME_TABS_CREATE_OPTIONS, CHROME_TABS_EXECUTE</code></span>
+      <span class="badge cross">storage · STORAGE_FLOW[area: sync, key: autoRedirect, sender: content, receiver: background]</span>
+      <span class="loc right">background : L14:C20 -&gt; L14:C30</span>
+    </header>
+    <p class="ruledesc">Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_CUSTOM_EVENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">From storage.sync.set(&#39;autoRedirect&#39;) in content</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L14:C20 -&gt; L14:C36</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+  if (&lt;&lt;&lt;req &amp;&amp; req.kind === </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L18:C19 -&gt; L18:C26</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    })&lt;&lt;&lt;;
+  }
+});
+
+async fun</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L18:C19 -&gt; L18:C33</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    });
+  }
+}&lt;&lt;&lt;);
+
+async function s</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L19:C17 -&gt; L19:C24</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFro&lt;&lt;&lt;mCloud() {
+  const {</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L19:C17 -&gt; L19:C29</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFromClou&lt;&lt;&lt;d() {
+  const { them</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L20:C20 -&gt; L20:C27</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, &lt;&lt;&lt;autoRedirect, themeN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L20:C20 -&gt; L20:C40</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, autoRedirect,&lt;&lt;&lt; themeName } =
+    a</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">STORAGE</span>
+        <span class="loc">L24:C10 -&gt; L28:C6</span> · <span class="remark">STORAGE_FLOW[area: sync, key: autoRedirect, sender: content, receiver: background]</span></div>
+      
+      <pre class="snippet"><code>eName } =
+    await &gt;&gt;&gt;chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L23:C8 -&gt; L28:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>omCloud() {
+  const &gt;&gt;&gt;{ themePreset, autoRedirect, themeName } =
+    await chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C6 -&gt; L30:C18</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>me&quot;,
+    ]);
+
+  if (&gt;&gt;&gt;autoRedirect&lt;&lt;&lt; &amp;&amp; autoRedirect.url</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C22 -&gt; L30:C34</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>if (autoRedirect &amp;&amp; &gt;&gt;&gt;autoRedirect&lt;&lt;&lt;.url) {
+    chrome.t</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L30:C22 -&gt; L30:C38</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>if (autoRedirect &amp;&amp; &gt;&gt;&gt;autoRedirect.url&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C6 -&gt; L30:C38</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>me&quot;,
+    ]);
+
+  if (&gt;&gt;&gt;autoRedirect &amp;&amp; autoRedirect.url&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C6 -&gt; L30:C38</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code>me&quot;,
+    ]);
+
+  if (&gt;&gt;&gt;autoRedirect &amp;&amp; autoRedirect.url&lt;&lt;&lt;) {
+    chrome.tabs.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L30:C6 -&gt; L30:C18</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>me&quot;,
+    ]);
+
+  if (&gt;&gt;&gt;autoRedirect&lt;&lt;&lt; &amp;&amp; autoRedirect.url</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L31:C30 -&gt; L31:C42</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>.tabs.create({ url: &gt;&gt;&gt;autoRedirect&lt;&lt;&lt;.url });            </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L31:C30 -&gt; L31:C46</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>.tabs.create({ url: &gt;&gt;&gt;autoRedirect.url&lt;&lt;&lt; });              //</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L31:C4 -&gt; L31:C49</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>Redirect.url) {
+    &gt;&gt;&gt;chrome.tabs.create({ url: autoRedirect.url })&lt;&lt;&lt;;              // SI</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L38:C20 -&gt; L38:C32</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>  if (Array.isArray(&gt;&gt;&gt;autoRedirect&lt;&lt;&lt;?.rules)) {
+    appl</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L38:C20 -&gt; L38:C39</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>  if (Array.isArray(&gt;&gt;&gt;autoRedirect?.rules&lt;&lt;&lt;)) {
+    applyRedire</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L38:C20 -&gt; L38:C32</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>  if (Array.isArray(&gt;&gt;&gt;autoRedirect&lt;&lt;&lt;?.rules)) {
+    appl</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L38:C20 -&gt; L38:C39</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>  if (Array.isArray(&gt;&gt;&gt;autoRedirect?.rules&lt;&lt;&lt;)) {
+    applyRedire</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C23 -&gt; L39:C35</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> applyRedirectRules(&gt;&gt;&gt;autoRedirect&lt;&lt;&lt;.rules);
+  }
+}
+
+self</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L39:C23 -&gt; L39:C41</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> applyRedirectRules(&gt;&gt;&gt;autoRedirect.rules&lt;&lt;&lt;);
+  }
+}
+
+self.addEv</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L2:C21 -&gt; L2:C26</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> BG_1
+//
+// Flow pat&gt;&gt;&gt;terns&lt;&lt;&lt;:
+//   1. Storage ro</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ITERATE</span>
+        <span class="loc">L2:C7 -&gt; L2:C17</span> · <span class="remark">loop.iteration</span></div>
+      
+      <pre class="snippet"><code>rker
+// Frame: BG_1
+&gt;&gt;&gt;//
+// Flow&lt;&lt;&lt; patterns:
+//   1. S</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L3:C9 -&gt; L3:C13</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>atterns:
+//   1. Sto&gt;&gt;&gt;rage&lt;&lt;&lt; roundtrip: themePre</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L3:C8 -&gt; L3:C13</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code>patterns:
+//   1. St&gt;&gt;&gt;orage&lt;&lt;&lt; roundtrip: themePre</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L3:C9 -&gt; L3:C13</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>atterns:
+//   1. Sto&gt;&gt;&gt;rage&lt;&lt;&lt; roundtrip: themePre</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C30 -&gt; L4:C34</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>t/autoRedirect from &gt;&gt;&gt;cont&lt;&lt;&lt;ent.js (CUSTOM_EVENT</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L4:C30 -&gt; L4:C38</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>t/autoRedirect from &gt;&gt;&gt;content.&lt;&lt;&lt;js (CUSTOM_EVENT sou</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L4:C4 -&gt; L4:C64</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>rage roundtrip: them&gt;&gt;&gt;ePreset/autoRedirect from content.js (CUSTOM_EVENT source)
+/&lt;&lt;&lt;/      land in sync </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C50 -&gt; L4:C54</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>content.js (CUSTOM_E&gt;&gt;&gt;VENT&lt;&lt;&lt; source)
+//      lan</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L4:C50 -&gt; L4:C61</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>content.js (CUSTOM_E&gt;&gt;&gt;VENT source&lt;&lt;&lt;)
+//      land in sy</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C49 -&gt; L4:C61</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code> content.js (CUSTOM_&gt;&gt;&gt;EVENT source&lt;&lt;&lt;)
+//      land in sy</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C48 -&gt; L4:C61</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code>m content.js (CUSTOM&gt;&gt;&gt;_EVENT source&lt;&lt;&lt;)
+//      land in sy</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L4:C4 -&gt; L4:C64</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>rage roundtrip: them&gt;&gt;&gt;ePreset/autoRedirect from content.js (CUSTOM_EVENT source)
+/&lt;&lt;&lt;/      land in sync </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L6:C40 -&gt; L6:C44</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>abs (PRIVILEGE_ESCAL&gt;&gt;&gt;ATIO&lt;&lt;&lt;N)
+//      and adds </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L6:C40 -&gt; L6:C51</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>abs (PRIVILEGE_ESCAL&gt;&gt;&gt;ATION)
+//  &lt;&lt;&lt;    and adds URLs to</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L6:C6 -&gt; L6:C54</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>ackground reads them&gt;&gt;&gt; → opens new tabs (PRIVILEGE_ESCALATION)
+//     &lt;&lt;&lt; and adds URLs to hi</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_TABS_CREATE_OPTIONS</span>
+        <span class="loc">L31:C4 -&gt; L31:C49</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>Redirect.url) {
+    &gt;&gt;&gt;chrome.tabs.create({ url: autoRedirect.url })&lt;&lt;&lt;;              // SI</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_TABS_CREATE_OPTIONS</span>
+        <span class="loc">L4:C4 -&gt; L4:C64</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>rage roundtrip: them&gt;&gt;&gt;ePreset/autoRedirect from content.js (CUSTOM_EVENT source)
+/&lt;&lt;&lt;/      land in sync </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_TABS_EXECUTE</span>
+        <span class="loc">L6:C6 -&gt; L6:C54</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>ackground reads them&gt;&gt;&gt; → opens new tabs (PRIVILEGE_ESCALATION)
+//     &lt;&lt;&lt; and adds URLs to hi</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="UNKNOWN" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-UNCLASSIFIED">UNCLASSIFIED</span> 
+      <span class="pair"><code>WINDOW_CUSTOM_EVENT</code> → <code></code></span>
+      
+      <span class="loc right">background : L14:C20 -&gt; L14:C30</span>
+    </header>
+    
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_CUSTOM_EVENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">From storage.sync.set(&#39;themeName&#39;) in content</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L14:C20 -&gt; L14:C30</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+&lt;&lt;&lt;  if (req &amp;&amp; req.kin</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L14:C20 -&gt; L14:C36</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>essage.addListener((&gt;&gt;&gt;req) =&gt; {
+  if (&lt;&lt;&lt;req &amp;&amp; req.kind === </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L18:C19 -&gt; L18:C26</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    })&lt;&lt;&lt;;
+  }
+});
+
+async fun</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L18:C19 -&gt; L18:C33</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>
+      url: req.url,&gt;&gt;&gt;
+    });
+  }
+}&lt;&lt;&lt;);
+
+async function s</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L19:C17 -&gt; L19:C24</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFro&lt;&lt;&lt;mCloud() {
+  const {</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L19:C17 -&gt; L19:C29</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>});
+
+async function &gt;&gt;&gt;syncFromClou&lt;&lt;&lt;d() {
+  const { them</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L20:C20 -&gt; L20:C27</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, &lt;&lt;&lt;autoRedirect, themeN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L20:C20 -&gt; L20:C40</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>) {
+  const { themeP&gt;&gt;&gt;reset, autoRedirect,&lt;&lt;&lt; themeName } =
+    a</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L17:C4 -&gt; L21:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>                    &gt;&gt;&gt;               // SINK CHROME_BOOKMARK_CREATE_INFO
+      title: req.title,
+      url: req.url,
+    });
+  }
+});
+
+async function syncFromCloud() {
+  const { themePreset, autoRedirect, themeNa&lt;&lt;&lt;me } =
+    await chr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">STORAGE</span>
+        <span class="loc">L24:C10 -&gt; L28:C6</span> · <span class="remark">STORAGE_FLOW[area: sync, key: themeName, sender: content, receiver: background]</span></div>
+      
+      <pre class="snippet"><code>eName } =
+    await &gt;&gt;&gt;chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L23:C8 -&gt; L28:C6</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>omCloud() {
+  const &gt;&gt;&gt;{ themePreset, autoRedirect, themeName } =
+    await chrome.storage.sync.get([                             // SOURCE PSEUDO_STORAGE
+      &quot;themePreset&quot;,
+      &quot;autoRedirect&quot;,
+      &quot;themeName&quot;,
+    ])&lt;&lt;&lt;;
+
+  if (autoRedirec</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article>
+    </div>
+  </main>
+</div>
+<script>
+
+(function(){
+  var input=document.getElementById('filter');
+  if(!input)return;
+  var issues=Array.prototype.slice.call(document.querySelectorAll('#issues .issue'));
+  function apply(){
+    var q=input.value.trim().toLowerCase();
+    issues.forEach(function(el){
+      var hay=((el.getAttribute('data-file')||'')+' '+(el.getAttribute('data-flowtypes')||'')).toLowerCase();
+      el.style.display=(!q||hay.indexOf(q)>=0)?'':'none';
+    });
+  }
+  input.addEventListener('input',apply);
+  // Clicking a file in the tree filters findings to that file.
+  document.querySelectorAll('.sidebar li.file').forEach(function(li){
+    li.addEventListener('click',function(){
+      input.value=li.getAttribute('data-path')||'';apply();
+      document.getElementById('issues').scrollIntoView({behavior:'smooth'});
+    });
+    li.style.cursor='pointer';
+  });
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExPGuard Report — Careview Extension</title>
+<style>
+
+:root{--bg:#0f1419;--panel:#161b22;--panel2:#1c2330;--line:#2a3240;--fg:#d6dde6;--muted:#8b97a7;--acc:#4ea1ff}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:18px 0 8px}
+small{color:var(--muted);font-weight:400}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.muted{color:var(--muted)}
+.overview{padding:20px 24px;border-bottom:1px solid var(--line);background:var(--panel)}
+.cards{display:flex;gap:12px;margin:14px 0}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px 18px;min-width:90px;text-align:center}
+.card .num{font-size:22px;font-weight:700}.card .lbl{font-size:11px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.meta{display:flex;gap:18px;font-size:12px;margin-top:8px}
+.layout{display:flex;align-items:flex-start}
+.sidebar{width:300px;flex:0 0 300px;padding:16px;border-right:1px solid var(--line);height:calc(100vh - 0px);overflow:auto;position:sticky;top:0}
+.main{flex:1;padding:16px 24px;min-width:0}
+.toolbar{margin-bottom:14px}
+#filter{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--fg)}
+ul.tree{list-style:none;margin:0;padding-left:14px}
+ul.tree>li{margin:2px 0}
+summary.dir{cursor:pointer;user-select:none}
+li.file{display:flex;align-items:center;gap:6px;padding:1px 0}
+li.file .fname{color:var(--fg)}
+li.kind-manifest .fname{color:#ffd479}
+li.kind-html .fname{color:#7ee787}
+li.kind-image .fname,li.kind-other .fname{color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;background:#f85149;display:inline-block}
+.sz{margin-left:auto;font-size:11px;color:var(--muted)}
+table.scripts{width:100%;border-collapse:collapse;font-size:12px}
+table.scripts th,table.scripts td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+.mono{font-family:ui-monospace,monospace;word-break:break-all}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid var(--line);background:var(--panel2);color:var(--fg)}
+.badge.fam-BG{background:#1f6feb33;border-color:#1f6feb}
+.badge.fam-CS{background:#23863633;border-color:#238636}
+.badge.fam-EX{background:#8957e533;border-color:#8957e5}
+.badge.fam-DT{background:#9e6a0333;border-color:#9e6a03}
+.badge.fam-OF{background:#6e768133;border-color:#6e7681}
+.badge.flow{background:#1f6feb22;border-color:#1f6feb}
+.badge.flow-DATA_LEAK,.badge.flow-DOM_DATA_LEAK{background:#9e6a0333;border-color:#d29922}
+.badge.flow-PRIVILEGE_ESCALATION,.badge.flow-CODE_INJECTION{background:#da363322;border-color:#f85149}
+.badge.flow-DOM_XSS,.badge.flow-REQUEST_FORGERY{background:#8957e522;border-color:#a371f7}
+.badge.sev-CRITICAL{background:#da3633;border-color:#f85149;color:#fff}
+.badge.sev-HIGH{background:#bb800933;border-color:#f0883e}
+.badge.sev-MEDIUM{background:#9e6a0322;border-color:#d29922}
+.badge.sev-LOW{background:#6e768122;border-color:#6e7681}
+.badge.cross{background:#1c2b22;border-color:#2ea043}
+.issue{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.issuehead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.issuehead .pair code{background:var(--panel2);padding:1px 6px;border-radius:5px}
+.issuehead .right{margin-left:auto;color:var(--muted);font-size:12px}
+.ruledesc{color:var(--muted);margin:8px 0 4px;font-size:13px}
+ul.timeline{list-style:none;margin:10px 0 0;padding:0;border-left:2px solid var(--line);margin-left:6px}
+li.step{position:relative;padding:4px 0 10px 18px}
+.dotmark{position:absolute;left:-7px;top:6px;width:11px;height:11px;border-radius:50%;border:2px solid var(--bg)}
+.dotmark.src{background:#2ea043}.dotmark.mid{background:#6e7681}.dotmark.sink{background:#f85149}
+.stephead{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.stephead .kind{font-weight:700;font-size:12px}
+.stephead .loc{color:var(--muted);font-size:12px;font-family:ui-monospace,monospace}
+.remark{color:var(--acc);font-size:12px}
+.stepfile{display:block;color:var(--muted);font-size:11px;margin:1px 0}
+pre.snippet{margin:6px 0 0;padding:8px 10px;background:#0b0f14;border:1px solid var(--line);border-radius:6px;overflow:auto;font-size:12px}
+pre.snippet mark.hl{background:#f8514955;color:#ffd7d5;border-radius:3px;padding:0 2px}
+.issuefoot{margin-top:10px;font-size:12px;color:var(--muted)}
+.ok{color:#2ea043;font-size:16px}
+.ellipsis .stepbody{font-style:italic}
+
+</style>
+</head>
+<body>
+<section class="overview">
+    <h1>Careview Extension <small>v1.2</small></h1>
+    <p class="muted"></p>
+    <div class="cards">
+      <div class="card"><div class="num">3</div><div class="lbl">Scripts</div></div>
+      <div class="card"><div class="num">2</div><div class="lbl">Findings</div></div>
+      <div class="card"><div class="num">MV3</div><div class="lbl">Manifest</div></div>
+      <div class="card"><div class="num">35</div><div class="lbl">Duration (ms)</div></div>
+    </div>
+    <div class="chips"><span class="badge flow flow-CODE_INJECTION">Code Injection · 1</span> <span class="badge sev sev-LOW">LOW · 1</span></div>
+    <div class="meta muted">
+      <span>ID: caofmekclcabakldafkjbfkkmcebndal</span>
+      <span>Source: CRX</span>
+      <span>Generated: 2026-06-02T10:33:59.700Z</span>
+    </div>
+  </section>
+<div class="layout">
+  <aside class="sidebar">
+    <h2>Files</h2>
+    <ul class="tree"><li><details open><summary class="dir">📁 _metadata</summary><ul class="tree"><li class="file kind-json" data-path="_metadata/verified_contents.json"><span class="fname">verified_contents.json</span><span class="sz">2.0 KB</span></li></ul></details></li><li class="file kind-other" data-path="background.bin"><span class="fname">background.bin</span><span class="sz">798 B</span></li><li class="file kind-js" data-path="background.js"><span class="fname">background.js</span><span class="sz">1013 B</span></li><li class="file kind-image" data-path="CareviewSign.png"><span class="fname">CareviewSign.png</span><span class="sz">1.5 KB</span></li><li class="file kind-other" data-path="CareviewSign.snk"><span class="fname">CareviewSign.snk</span><span class="sz">596 B</span></li><li class="file kind-js" data-path="chromeExSign.js"><span class="fname">chromeExSign.js</span><span class="sz">777 B</span></li><li class="file kind-js" data-path="content.js"><span class="fname">content.js</span><span class="sz">3.6 KB</span></li><li class="file kind-manifest" data-path="manifest.json"><span class="fname">manifest.json</span><span class="sz">824 B</span></li><li class="file kind-image" data-path="ProjectSign.ico"><span class="fname">ProjectSign.ico</span><span class="sz">2.2 KB</span></li></ul>
+    <h2>Scripts</h2>
+    <table class="scripts">
+    <thead><tr><th>Script</th><th>Frame</th><th>Size</th><th>Analysis</th></tr></thead>
+    <tbody><tr>
+      <td class="mono">background.js</td>
+      <td><span class="badge fam-BG">BG_1</span></td>
+      <td>1013 B</td>
+      <td>2.0 ms</td>
+    </tr><tr>
+      <td class="mono">chromeExSign.js</td>
+      <td><span class="badge fam-UNKNOWN">UNKNOWN</span></td>
+      <td>777 B</td>
+      <td>0.0 ms</td>
+    </tr><tr>
+      <td class="mono">content.js</td>
+      <td><span class="badge fam-CS">CS_1</span></td>
+      <td>3.6 KB</td>
+      <td>11.7 ms</td>
+    </tr></tbody></table>
+  </aside>
+  <main class="main">
+    <div class="toolbar">
+      <input id="filter" type="search" placeholder="Filter findings by file or flow type…" />
+    </div>
+    <div id="issues">
+      <article class="issue" data-flowtypes="UNKNOWN" data-file="content">
+    <header class="issuehead">
+      <span class="badge flow flow-UNCLASSIFIED">UNCLASSIFIED</span> 
+      <span class="pair"><code>ELEMENT_VALUE</code> → <code></code></span>
+      
+      <span class="loc right">content : L74:C42 -&gt; L74:C82</span>
+    </header>
+    
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT_VALUE</span>
+        <span class="loc">L74:C42 -&gt; L74:C82</span> · <span class="remark">txtPath</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>=&quot;./assinaturas/&quot; + &gt;&gt;&gt;document.getElementById(&quot;txtPath&quot;).value&lt;&lt;&lt;;
+	var content = do</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L74:C42 -&gt; L74:C82</span> · <span class="remark">binary-right</span></div>
+      
+      <pre class="snippet"><code>=&quot;./assinaturas/&quot; + &gt;&gt;&gt;document.getElementById(&quot;txtPath&quot;).value&lt;&lt;&lt;;
+	var content = do</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L74:C42 -&gt; L74:C82</span> · <span class="remark">binary-right</span></div>
+      
+      <pre class="snippet"><code>=&quot;./assinaturas/&quot; + &gt;&gt;&gt;document.getElementById(&quot;txtPath&quot;).value&lt;&lt;&lt;;
+	var content = do</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="CODE_INJECTION" data-file="content">
+    <header class="issuehead">
+      <span class="badge flow flow-CODE_INJECTION">Code Injection</span> <span class="badge sev sev-LOW">LOW</span>
+      <span class="pair"><code>ELEMENT_VALUE</code> → <code>TIME_EVAL</code></span>
+      
+      <span class="loc right">content : L82:C1 -&gt; L82:C41</span>
+    </header>
+    <p class="ruledesc">DOM / document content (innerHTML, document.URL, element values, ...) reaching a code-execution sink.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT_VALUE</span>
+        <span class="loc">L82:C1 -&gt; L82:C41</span> · <span class="remark">txtPath</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>/assinaturas/&quot; + 
+	&gt;&gt;&gt;document.getElementById(&quot;txtPath&quot;).value&lt;&lt;&lt; + &quot;?&#39;+new Date().ge</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L82:C1 -&gt; L82:C41</span> · <span class="remark">binary-right</span></div>
+      
+      <pre class="snippet"><code>/assinaturas/&quot; + 
+	&gt;&gt;&gt;document.getElementById(&quot;txtPath&quot;).value&lt;&lt;&lt; + &quot;?&#39;+new Date().ge</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L81:C13 -&gt; L82:C41</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code>one&quot;;
+	setInterval(&gt;&gt;&gt;&quot;document.getElementById(&#39;canvasASS&#39;).src = &#39;./assinaturas/&quot; + 
+	document.getElementById(&quot;txtPath&quot;).value&lt;&lt;&lt; + &quot;?&#39;+new Date().ge</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">TIME_EVAL</span>
+        <span class="loc">L81:C1 -&gt; L82:C77</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>e.display=&quot;none&quot;;
+	&gt;&gt;&gt;setInterval(&quot;document.getElementById(&#39;canvasASS&#39;).src = &#39;./assinaturas/&quot; + 
+	document.getElementById(&quot;txtPath&quot;).value + &quot;?&#39;+new Date().getTime();&quot;, 1900)&lt;&lt;&lt;;
+}
+
+chrome.runti</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article>
+    </div>
+  </main>
+</div>
+<script>
+
+(function(){
+  var input=document.getElementById('filter');
+  if(!input)return;
+  var issues=Array.prototype.slice.call(document.querySelectorAll('#issues .issue'));
+  function apply(){
+    var q=input.value.trim().toLowerCase();
+    issues.forEach(function(el){
+      var hay=((el.getAttribute('data-file')||'')+' '+(el.getAttribute('data-flowtypes')||'')).toLowerCase();
+      el.style.display=(!q||hay.indexOf(q)>=0)?'':'none';
+    });
+  }
+  input.addEventListener('input',apply);
+  // Clicking a file in the tree filters findings to that file.
+  document.querySelectorAll('.sidebar li.file').forEach(function(li){
+    li.addEventListener('click',function(){
+      input.value=li.getAttribute('data-path')||'';apply();
+      document.getElementById('issues').scrollIntoView({behavior:'smooth'});
+    });
+    li.style.cursor='pointer';
+  });
+})();
+
+</script>
+</body>
+</html>

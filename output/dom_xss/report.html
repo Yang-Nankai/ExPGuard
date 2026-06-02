@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExPGuard Report — Quick Translate Sidebar</title>
+<style>
+
+:root{--bg:#0f1419;--panel:#161b22;--panel2:#1c2330;--line:#2a3240;--fg:#d6dde6;--muted:#8b97a7;--acc:#4ea1ff}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:18px 0 8px}
+small{color:var(--muted);font-weight:400}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.muted{color:var(--muted)}
+.overview{padding:20px 24px;border-bottom:1px solid var(--line);background:var(--panel)}
+.cards{display:flex;gap:12px;margin:14px 0}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px 18px;min-width:90px;text-align:center}
+.card .num{font-size:22px;font-weight:700}.card .lbl{font-size:11px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.meta{display:flex;gap:18px;font-size:12px;margin-top:8px}
+.layout{display:flex;align-items:flex-start}
+.sidebar{width:300px;flex:0 0 300px;padding:16px;border-right:1px solid var(--line);height:calc(100vh - 0px);overflow:auto;position:sticky;top:0}
+.main{flex:1;padding:16px 24px;min-width:0}
+.toolbar{margin-bottom:14px}
+#filter{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--fg)}
+ul.tree{list-style:none;margin:0;padding-left:14px}
+ul.tree>li{margin:2px 0}
+summary.dir{cursor:pointer;user-select:none}
+li.file{display:flex;align-items:center;gap:6px;padding:1px 0}
+li.file .fname{color:var(--fg)}
+li.kind-manifest .fname{color:#ffd479}
+li.kind-html .fname{color:#7ee787}
+li.kind-image .fname,li.kind-other .fname{color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;background:#f85149;display:inline-block}
+.sz{margin-left:auto;font-size:11px;color:var(--muted)}
+table.scripts{width:100%;border-collapse:collapse;font-size:12px}
+table.scripts th,table.scripts td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+.mono{font-family:ui-monospace,monospace;word-break:break-all}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid var(--line);background:var(--panel2);color:var(--fg)}
+.badge.fam-BG{background:#1f6feb33;border-color:#1f6feb}
+.badge.fam-CS{background:#23863633;border-color:#238636}
+.badge.fam-EX{background:#8957e533;border-color:#8957e5}
+.badge.fam-DT{background:#9e6a0333;border-color:#9e6a03}
+.badge.fam-OF{background:#6e768133;border-color:#6e7681}
+.badge.flow{background:#1f6feb22;border-color:#1f6feb}
+.badge.flow-DATA_LEAK,.badge.flow-DOM_DATA_LEAK{background:#9e6a0333;border-color:#d29922}
+.badge.flow-PRIVILEGE_ESCALATION,.badge.flow-CODE_INJECTION{background:#da363322;border-color:#f85149}
+.badge.flow-DOM_XSS,.badge.flow-REQUEST_FORGERY{background:#8957e522;border-color:#a371f7}
+.badge.sev-CRITICAL{background:#da3633;border-color:#f85149;color:#fff}
+.badge.sev-HIGH{background:#bb800933;border-color:#f0883e}
+.badge.sev-MEDIUM{background:#9e6a0322;border-color:#d29922}
+.badge.sev-LOW{background:#6e768122;border-color:#6e7681}
+.badge.cross{background:#1c2b22;border-color:#2ea043}
+.issue{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.issuehead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.issuehead .pair code{background:var(--panel2);padding:1px 6px;border-radius:5px}
+.issuehead .right{margin-left:auto;color:var(--muted);font-size:12px}
+.ruledesc{color:var(--muted);margin:8px 0 4px;font-size:13px}
+ul.timeline{list-style:none;margin:10px 0 0;padding:0;border-left:2px solid var(--line);margin-left:6px}
+li.step{position:relative;padding:4px 0 10px 18px}
+.dotmark{position:absolute;left:-7px;top:6px;width:11px;height:11px;border-radius:50%;border:2px solid var(--bg)}
+.dotmark.src{background:#2ea043}.dotmark.mid{background:#6e7681}.dotmark.sink{background:#f85149}
+.stephead{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.stephead .kind{font-weight:700;font-size:12px}
+.stephead .loc{color:var(--muted);font-size:12px;font-family:ui-monospace,monospace}
+.remark{color:var(--acc);font-size:12px}
+.stepfile{display:block;color:var(--muted);font-size:11px;margin:1px 0}
+pre.snippet{margin:6px 0 0;padding:8px 10px;background:#0b0f14;border:1px solid var(--line);border-radius:6px;overflow:auto;font-size:12px}
+pre.snippet mark.hl{background:#f8514955;color:#ffd7d5;border-radius:3px;padding:0 2px}
+.issuefoot{margin-top:10px;font-size:12px;color:var(--muted)}
+.ok{color:#2ea043;font-size:16px}
+.ellipsis .stepbody{font-style:italic}
+
+</style>
+</head>
+<body>
+<section class="overview">
+    <h1>Quick Translate Sidebar <small>v3.0.1</small></h1>
+    <p class="muted">Translates selected text on the page using rules supplied by an in-page widget.</p>
+    <div class="cards">
+      <div class="card"><div class="num">2</div><div class="lbl">Scripts</div></div>
+      <div class="card"><div class="num">4</div><div class="lbl">Findings</div></div>
+      <div class="card"><div class="num">MV3</div><div class="lbl">Manifest</div></div>
+      <div class="card"><div class="num">25</div><div class="lbl">Duration (ms)</div></div>
+    </div>
+    <div class="chips"><span class="badge flow flow-CODE_INJECTION">Code Injection · 1</span> <span class="badge sev sev-CRITICAL">CRITICAL · 1</span></div>
+    <div class="meta muted">
+      <span>ID: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
+      <span>Source: DIR</span>
+      <span>Generated: 2026-06-02T10:32:46.079Z</span>
+    </div>
+  </section>
+<div class="layout">
+  <aside class="sidebar">
+    <h2>Files</h2>
+    <ul class="tree"><li class="file kind-js" data-path="background.js"><span class="fname">background.js</span><span class="sz">1015 B</span></li><li class="file kind-js" data-path="content.js"><span class="fname">content.js</span><span class="sz">1.8 KB</span></li><li class="file kind-manifest" data-path="manifest.json"><span class="fname">manifest.json</span><span class="sz">413 B</span></li></ul>
+    <h2>Scripts</h2>
+    <table class="scripts">
+    <thead><tr><th>Script</th><th>Frame</th><th>Size</th><th>Analysis</th></tr></thead>
+    <tbody><tr>
+      <td class="mono">background.js</td>
+      <td><span class="badge fam-BG">BG_1</span></td>
+      <td>1015 B</td>
+      <td>1.5 ms</td>
+    </tr><tr>
+      <td class="mono">content.js</td>
+      <td><span class="badge fam-CS">CS_1</span></td>
+      <td>1.8 KB</td>
+      <td>6.9 ms</td>
+    </tr></tbody></table>
+  </aside>
+  <main class="main">
+    <div class="toolbar">
+      <input id="filter" type="search" placeholder="Filter findings by file or flow type…" />
+    </div>
+    <div id="issues">
+      <article class="issue" data-flowtypes="UNKNOWN" data-file="content">
+    <header class="issuehead">
+      <span class="badge flow flow-UNCLASSIFIED">UNCLASSIFIED</span> 
+      <span class="pair"><code>DOCUMENT_LOCATION</code> → <code>EVAL</code></span>
+      
+      <span class="loc right">content : L11:C33 -&gt; L11:C40</span>
+    </header>
+    
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">DOCUMENT_LOCATION</span>
+        <span class="loc">L11:C33 -&gt; L11:C40</span> · <span class="remark">location.hash</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code> decodeURIComponent(&gt;&gt;&gt;hashStr&lt;&lt;&lt;);
+eval(decoded);   </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L11:C33 -&gt; L11:C40</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> decodeURIComponent(&gt;&gt;&gt;hashStr&lt;&lt;&lt;);
+eval(decoded);   </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">RETURN</span>
+        <span class="loc">L11:C14 -&gt; L11:C41</span> · <span class="remark">decodeURIComponent</span></div>
+      
+      <pre class="snippet"><code>ATION
+var decoded = &gt;&gt;&gt;decodeURIComponent(hashStr)&lt;&lt;&lt;;
+eval(decoded);    </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L12:C5 -&gt; L12:C12</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>nent(hashStr);
+eval(&gt;&gt;&gt;decoded&lt;&lt;&lt;);                  </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">EVAL</span>
+        <span class="loc">L12:C0 -&gt; L12:C13</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>Component(hashStr);
+&gt;&gt;&gt;eval(decoded)&lt;&lt;&lt;;                   </code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="UNKNOWN" data-file="content">
+    <header class="issuehead">
+      <span class="badge flow flow-UNCLASSIFIED">UNCLASSIFIED</span> 
+      <span class="pair"><code>ELEMENT_VALUE</code> → <code></code></span>
+      
+      <span class="loc right">content : L16:C36 -&gt; L16:C47</span>
+    </header>
+    
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT_VALUE</span>
+        <span class="loc">L16:C36 -&gt; L16:C47</span> · <span class="remark">translate-source</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>&lt;div class=&#39;tr&#39;&gt;&quot; + &gt;&gt;&gt;input.value&lt;&lt;&lt; + &quot;&lt;/div&gt;&quot;;   // SO</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L16:C36 -&gt; L16:C47</span> · <span class="remark">binary-right</span></div>
+      
+      <pre class="snippet"><code>&lt;div class=&#39;tr&#39;&gt;&quot; + &gt;&gt;&gt;input.value&lt;&lt;&lt; + &quot;&lt;/div&gt;&quot;;   // SO</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L16:C15 -&gt; L16:C47</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code>e&quot;);
+var combined = &gt;&gt;&gt;&quot;&lt;div class=&#39;tr&#39;&gt;&quot; + input.value&lt;&lt;&lt; + &quot;&lt;/div&gt;&quot;;   // SO</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L17:C15 -&gt; L17:C23</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>ALUE
+document.write(&gt;&gt;&gt;combined&lt;&lt;&lt;);                  </code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="CODE_INJECTION" data-file="content">
+    <header class="issuehead">
+      <span class="badge flow flow-CODE_INJECTION">Code Injection</span> <span class="badge sev sev-CRITICAL">CRITICAL</span>
+      <span class="pair"><code>WINDOW_MESSAGE_EVENT</code> → <code>TIME_EVAL</code></span>
+      
+      <span class="loc right">content : L21:C6 -&gt; L21:C14</span>
+    </header>
+    <p class="ruledesc">Attacker-controlled data into eval / new Function / setTimeout(string) — code injection.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_MESSAGE_EVENT</span>
+        <span class="loc">L21:C6 -&gt; L21:C14</span> · <span class="remark">window.addEventListener(message)</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>MESSAGE_EVENT
+  if (&gt;&gt;&gt;!ev.data&lt;&lt;&lt;) return;
+  if (ev.d</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L21:C6 -&gt; L21:C14</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code>MESSAGE_EVENT
+  if (&gt;&gt;&gt;!ev.data&lt;&lt;&lt;) return;
+  if (ev.d</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L22:C6 -&gt; L22:C18</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>data) return;
+  if (&gt;&gt;&gt;ev.data.type&lt;&lt;&lt; !== &quot;DEFER_SCRIPT&quot;)</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L22:C6 -&gt; L22:C18</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code>data) return;
+  if (&gt;&gt;&gt;ev.data.type&lt;&lt;&lt; !== &quot;DEFER_SCRIPT&quot;)</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L22:C6 -&gt; L22:C18</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>data) return;
+  if (&gt;&gt;&gt;ev.data.type&lt;&lt;&lt; !== &quot;DEFER_SCRIPT&quot;)</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L22:C6 -&gt; L22:C18</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>data) return;
+  if (&gt;&gt;&gt;ev.data.type&lt;&lt;&lt; !== &quot;DEFER_SCRIPT&quot;)</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L22:C6 -&gt; L22:C18</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code>data) return;
+  if (&gt;&gt;&gt;ev.data.type&lt;&lt;&lt; !== &quot;DEFER_SCRIPT&quot;)</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L23:C13 -&gt; L23:C25</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>eturn;
+  setTimeout(&gt;&gt;&gt;ev.data.code&lt;&lt;&lt;, ev.data.delay || 1</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L23:C27 -&gt; L23:C40</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>meout(ev.data.code, &gt;&gt;&gt;ev.data.delay&lt;&lt;&lt; || 100);   // SINK </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L23:C27 -&gt; L23:C47</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>meout(ev.data.code, &gt;&gt;&gt;ev.data.delay || 100&lt;&lt;&lt;);   // SINK   TIME_</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">TIME_EVAL</span>
+        <span class="loc">L23:C2 -&gt; L23:C48</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>_SCRIPT&quot;) return;
+  &gt;&gt;&gt;setTimeout(ev.data.code, ev.data.delay || 100)&lt;&lt;&lt;;   // SINK   TIME_E</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="UNKNOWN" data-file="content">
+    <header class="issuehead">
+      <span class="badge flow flow-UNCLASSIFIED">UNCLASSIFIED</span> 
+      <span class="pair"><code>WINDOW_CUSTOM_EVENT</code> → <code></code></span>
+      
+      <span class="loc right">content : L29:C12 -&gt; L29:C21</span>
+    </header>
+    
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_CUSTOM_EVENT</span>
+        <span class="loc">L29:C12 -&gt; L29:C21</span> · <span class="remark">window.addEventListener(translateRule)</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>y = &quot;&quot;;
+  if (ev &amp;&amp; &gt;&gt;&gt;ev.detail&lt;&lt;&lt; &amp;&amp; ev.detail.body) </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L29:C12 -&gt; L29:C21</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>y = &quot;&quot;;
+  if (ev &amp;&amp; &gt;&gt;&gt;ev.detail&lt;&lt;&lt; &amp;&amp; ev.detail.body) </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L29:C6 -&gt; L29:C21</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>ar body = &quot;&quot;;
+  if (&gt;&gt;&gt;ev &amp;&amp; ev.detail&lt;&lt;&lt; &amp;&amp; ev.detail.body) </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L29:C6 -&gt; L29:C21</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code>ar body = &quot;&quot;;
+  if (&gt;&gt;&gt;ev &amp;&amp; ev.detail&lt;&lt;&lt; &amp;&amp; ev.detail.body) </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L29:C25 -&gt; L29:C34</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>(ev &amp;&amp; ev.detail &amp;&amp; &gt;&gt;&gt;ev.detail&lt;&lt;&lt;.body) {
+    body = </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L29:C25 -&gt; L29:C39</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>(ev &amp;&amp; ev.detail &amp;&amp; &gt;&gt;&gt;ev.detail.body&lt;&lt;&lt;) {
+    body = ev.de</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L29:C6 -&gt; L29:C39</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>ar body = &quot;&quot;;
+  if (&gt;&gt;&gt;ev &amp;&amp; ev.detail &amp;&amp; ev.detail.body&lt;&lt;&lt;) {
+    body = ev.de</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L29:C6 -&gt; L29:C39</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code>ar body = &quot;&quot;;
+  if (&gt;&gt;&gt;ev &amp;&amp; ev.detail &amp;&amp; ev.detail.body&lt;&lt;&lt;) {
+    body = ev.de</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L29:C12 -&gt; L29:C21</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>y = &quot;&quot;;
+  if (ev &amp;&amp; &gt;&gt;&gt;ev.detail&lt;&lt;&lt; &amp;&amp; ev.detail.body) </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L30:C11 -&gt; L30:C20</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>.body) {
+    body = &gt;&gt;&gt;ev.detail&lt;&lt;&lt;.body;
+  }
+  var rul</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L30:C11 -&gt; L30:C25</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>.body) {
+    body = &gt;&gt;&gt;ev.detail.body&lt;&lt;&lt;;
+  }
+  var rule = n</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L30:C11 -&gt; L30:C20</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>.body) {
+    body = &gt;&gt;&gt;ev.detail&lt;&lt;&lt;.body;
+  }
+  var rul</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L30:C11 -&gt; L30:C25</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>.body) {
+    body = &gt;&gt;&gt;ev.detail.body&lt;&lt;&lt;;
+  }
+  var rule = n</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L32:C34 -&gt; L32:C38</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>ew Function(&quot;text&quot;, &gt;&gt;&gt;body&lt;&lt;&lt;);            // SIN</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article>
+    </div>
+  </main>
+</div>
+<script>
+
+(function(){
+  var input=document.getElementById('filter');
+  if(!input)return;
+  var issues=Array.prototype.slice.call(document.querySelectorAll('#issues .issue'));
+  function apply(){
+    var q=input.value.trim().toLowerCase();
+    issues.forEach(function(el){
+      var hay=((el.getAttribute('data-file')||'')+' '+(el.getAttribute('data-flowtypes')||'')).toLowerCase();
+      el.style.display=(!q||hay.indexOf(q)>=0)?'':'none';
+    });
+  }
+  input.addEventListener('input',apply);
+  // Clicking a file in the tree filters findings to that file.
+  document.querySelectorAll('.sidebar li.file').forEach(function(li){
+    li.addEventListener('click',function(){
+      input.value=li.getAttribute('data-path')||'';apply();
+      document.getElementById('issues').scrollIntoView({behavior:'smooth'});
+    });
+    li.style.cursor='pointer';
+  });
+})();
+
+</script>
+</body>
+</html>
