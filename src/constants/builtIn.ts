@@ -41,6 +41,14 @@ const JS_FUNCTIONS: string[] = [
   "btoa",
   "postMessage",
   "addEventListener",
+  // Scalar casts — wired up with taint-preserving semantics in
+  // builtinSemantics/browser/api.ts. Must be listed here so they are bound
+  // as page-scope locals; otherwise the analyzer falls back to UnknownDef
+  // and silently loses taint through `parseInt(taintedString)`.
+  "parseInt",
+  "parseFloat",
+  "isNaN",
+  "isFinite",
 ];
 
 const LIBRARY_NAMES: string[] = [

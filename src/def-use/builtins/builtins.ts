@@ -909,6 +909,34 @@ const BUILTINS: BuiltinSchema[] = [
     name: "btoa",
     effect: "btoa",
   },
+  // Numeric/string casting built-ins. These appear constantly in extension
+  // code (URL params, querystring parsing, JSON-ish payloads). Without
+  // semantics, a tainted `parseInt(window.location.search.slice(1))` would
+  // silently drop its taint on the cast and downstream sinks would miss it.
+  //
+  // We intentionally skip `Number`/`String`/`Boolean`/`Array` here — they
+  // collide with the constructor/object schemas registered elsewhere; the
+  // safest taint-preserving coverage comes from the four globals below.
+  {
+    type: "function",
+    name: "parseInt",
+    effect: "parseInt",
+  },
+  {
+    type: "function",
+    name: "parseFloat",
+    effect: "parseFloat",
+  },
+  {
+    type: "function",
+    name: "isNaN",
+    effect: "isNaN",
+  },
+  {
+    type: "function",
+    name: "isFinite",
+    effect: "isFinite",
+  },
   {
     type: "function",
     name: "postMessage",

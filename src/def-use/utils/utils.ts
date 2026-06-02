@@ -201,14 +201,81 @@ export function evaluateDefTruth(def: Def | null): BranchTruth {
 
 /**
  * Evaluate the truthiness of an expression in the context of a FlowNode.
+ *
+ * Goes beyond the naive `evaluateDefTruth` by also folding constant
+ * comparisons (`x === "a"`) when both sides resolve to literal Defs.
+ * Constant folding is the difference between actually pruning the wrong
+ * branch of a typical guard and giving up at `UNKNOWN`.
  */
 export function evaluateBranchTruth(cfgNode: FlowNode, expr: any): BranchTruth {
+  if (!expr) return "UNKNOWN";
+
+  // Constant comparisons: a === "x", a !== 0, ...
+  if (expr.type === "BinaryExpression") {
+    const lhs = expressionTypeHandler(cfgNode, expr.left);
+    const rhs = expressionTypeHandler(cfgNode, expr.right);
+    if (Def.isLiteralDef(lhs) && Def.isLiteralDef(rhs)) {
+      const a = lhs.value;
+      const b = rhs.value;
+      switch (expr.operator) {
+        case "===":
+          return a === b ? "TRUE" : "FALSE";
+        case "!==":
+          return a !== b ? "TRUE" : "FALSE";
+        case "==":
+          return a == b ? "TRUE" : "FALSE";
+        case "!=":
+          return a != b ? "TRUE" : "FALSE";
+        case "<":
+          return (a as any) < (b as any) ? "TRUE" : "FALSE";
+        case "<=":
+          return (a as any) <= (b as any) ? "TRUE" : "FALSE";
+        case ">":
+          return (a as any) > (b as any) ? "TRUE" : "FALSE";
+        case ">=":
+          return (a as any) >= (b as any) ? "TRUE" : "FALSE";
+      }
+    }
+  }
+
+  // !literal -> literal
+  if (expr.type === "UnaryExpression" && expr.operator === "!") {
+    const inner = evaluateBranchTruth(cfgNode, expr.argument);
+    if (inner === "TRUE") return "FALSE";
+    if (inner === "FALSE") return "TRUE";
+    return "UNKNOWN";
+  }
+
+  // Logical short-circuit at the predicate level: `if (a && b)`, `if (a || b)`.
+  if (expr.type === "LogicalExpression") {
+    const lt = evaluateBranchTruth(cfgNode, expr.left);
+    if (expr.operator === "&&") {
+      if (lt === "FALSE") return "FALSE";
+      if (lt === "TRUE") return evaluateBranchTruth(cfgNode, expr.right);
+    } else if (expr.operator === "||") {
+      if (lt === "TRUE") return "TRUE";
+      if (lt === "FALSE") return evaluateBranchTruth(cfgNode, expr.right);
+    } else if (expr.operator === "??") {
+      // x ?? y is TRUE iff x is non-null/undefined (truthy or "0", "")
+      // Conservative: fall back to truth of x for everything that isn't
+      // explicitly UNDEFINED/null.
+      if (lt === "TRUE") return "TRUE";
+      if (lt === "FALSE") return evaluateBranchTruth(cfgNode, expr.right);
+    }
+    return "UNKNOWN";
+  }
+
   const def = expressionTypeHandler(cfgNode, expr);
   return evaluateDefTruth(def);
 }
 
 /**
  * Get feasible successor nodes for a branch node based on AST and analysis.
+ *
+ * Returns a non-null list to override the worklist's default behavior:
+ * - [a]    – only successor `a` is reachable; prune the other branch
+ * - []     – the entire successor set is dead (e.g. `while(false)` body)
+ * - null   – cannot determine statically; defer to default propagation
  */
 export function getFeasibleSuccessors(node: FlowNode): FlowNode[] | null {
   const ast: any = node.astNode;
@@ -216,11 +283,18 @@ export function getFeasibleSuccessors(node: FlowNode): FlowNode[] | null {
 
   const parent: any = node.parent;
 
-  if (
-    parent &&
-    ["IfStatement", "ConditionalExpression"].includes(parent.type) &&
-    parent.test === ast
-  ) {
+  // If / Conditional / While / DoWhile test predicates
+  // All four share the same shape: `node.true` enters the loop/then branch,
+  // `node.false` skips it.
+  const TEST_PARENT_TYPES = [
+    "IfStatement",
+    "ConditionalExpression",
+    "WhileStatement",
+    "DoWhileStatement",
+    "ForStatement",
+  ];
+
+  if (parent && TEST_PARENT_TYPES.includes(parent.type) && parent.test === ast) {
     const t = evaluateBranchTruth(node, ast);
     if (t === "TRUE" && node.true) return [node.true];
     if (t === "FALSE" && node.false) return [node.false];
