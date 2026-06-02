@@ -247,6 +247,7 @@ const BUILTINS: BuiltinSchema[] = [
       // constructor: method("XMLHttpRequest.prototype.constructor"),
       open: method("XMLHttpRequest.prototype.open"),
       send: method("XMLHttpRequest.prototype.send"),
+      setRequestHeader: method("XMLHttpRequest.prototype.setRequestHeader"),
     },
   },
   {

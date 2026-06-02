@@ -20,12 +20,16 @@ export function createChromeBuiltinSemantics({
   sourceType,
   createReturnDef,
   sinkArgs = [],
+  remarkFromArgs,
 }: {
   apiName: string;
   callbackIndex?: number;
   sourceType?: SourceType; // optional for action-style
   createReturnDef?: ReturnDefFactory; // optional for action-style
   sinkArgs?: { index: number; sinkType: SinkType, remark?: string }[];
+  // Optional: derive a source `remark` (e.g. the cookie domain / history query)
+  // from the call args so the report shows *what* sensitive data was read.
+  remarkFromArgs?: (args: Def[], astNode: any) => string | undefined;
 }) {
   BuiltInSemantics.register(apiName, (args, callNode, astNode, _thisDef) => {
     // Always mark side effect
@@ -37,6 +41,8 @@ export function createChromeBuiltinSemantics({
         taintManager.checkSink(args[index], sinkType, astNode, remark);
       }
     }
+
+    const sourceRemark = remarkFromArgs ? remarkFromArgs(args, astNode) : undefined;
 
     // ---------- callback-style ----------
     if (
@@ -51,7 +57,13 @@ export function createChromeBuiltinSemantics({
       if (sourceType && createReturnDef) {
         callbackArgDef = createReturnDef(callNode, astNode);
         if (callbackArgDef) {
-          taintManager.createTaintSource(callbackArgDef, sourceType, astNode);
+          taintManager.createTaintSource(
+            callbackArgDef,
+            sourceType,
+            astNode,
+            false,
+            sourceRemark,
+          );
         }
       }
 
@@ -70,7 +82,13 @@ export function createChromeBuiltinSemantics({
     if (sourceType && createReturnDef) {
       const retPromise = defFactory.createPromiseDef(callNode);
       const retDef = createReturnDef(callNode, astNode);
-      taintManager.createTaintSource(retDef, sourceType, astNode);
+      taintManager.createTaintSource(
+        retDef,
+        sourceType,
+        astNode,
+        false,
+        sourceRemark,
+      );
       retPromise.resolve(retDef);
       return retPromise;
     }

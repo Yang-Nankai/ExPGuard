@@ -54,31 +54,35 @@ async function analyze(
 describe("Custom taint rule end-to-end", () => {
   jest.setTimeout(60_000);
 
-  it("default rules: cookies → fetch is NOT reported as DATA_LEAK", async () => {
+  it("default rules: cookies → fetch body IS now reported as DATA_LEAK", async () => {
     const flows = await analyze("data_leak");
     const cookieFetchLeak = flows.find(
       (f) =>
         f.sourceType === "CHROME_COOKIES_INFO" &&
-        (f.sinkType === "FETCH_RESOURCE" || f.sinkType === "FETCH_OPTIONS") &&
+        (f.sinkType === "FETCH_BODY" ||
+          f.sinkType === "FETCH_RESOURCE" ||
+          f.sinkType === "FETCH_OPTIONS") &&
         f.flowType === "DATA_LEAK",
     );
-    expect(cookieFetchLeak).toBeUndefined();
+    expect(cookieFetchLeak).toBeTruthy();
+    expect(cookieFetchLeak!.ruleId).toBe("sensitive-data-network-send");
   });
 
-  it("custom rule: cookies → fetch surfaces as DATA_LEAK without losing other flows", async () => {
+  it("custom suppress rule can turn the sensitive-data-network-send flow off", async () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "epg-custom-rules-"));
     const rulesPath = path.join(tmp, "rules.json");
     fs.writeFileSync(
       rulesPath,
       JSON.stringify({
         version: 1,
-        rules: [
+        rules: [],
+        suppress: [
           {
-            id: "sensitive-data-network-send",
-            description: "Cookies / bookmarks / history exfiltrated via network",
+            id: "user-suppress-cookie-network",
+            description: "This deployment treats cookies → network as benign.",
             flowType: "DATA_LEAK",
             match: {
-              sourceCapability: "SENSITIVE_DATA",
+              sourceType: "CHROME_COOKIES_INFO",
               sinkCapability: "NETWORK_SEND",
             },
           },
@@ -89,16 +93,18 @@ describe("Custom taint rule end-to-end", () => {
 
     const flows = await analyze("data_leak", rulesPath);
 
+    // The cookie → fetch flow is now suppressed by the user rule.
     const cookieFetchLeak = flows.find(
       (f) =>
         f.sourceType === "CHROME_COOKIES_INFO" &&
-        (f.sinkType === "FETCH_RESOURCE" || f.sinkType === "FETCH_OPTIONS") &&
-        f.flowType === "DATA_LEAK",
+        f.flowType === "DATA_LEAK" &&
+        (f.sinkType === "FETCH_BODY" ||
+          f.sinkType === "FETCH_RESOURCE" ||
+          f.sinkType === "FETCH_OPTIONS"),
     );
-    expect(cookieFetchLeak).toBeTruthy();
-    expect(cookieFetchLeak!.ruleId).toBe("sensitive-data-network-send");
+    expect(cookieFetchLeak).toBeUndefined();
 
-    // Pre-existing flows are still there (the rule is additive, not replacing).
+    // Other DATA_LEAK flows (history → external message) are untouched.
     const externalLeak = flows.find(
       (f) =>
         f.flowType === "DATA_LEAK" &&

@@ -68,8 +68,26 @@ BuiltInSemantics.register("fetch", (args, callNode, astNode) => {
   }
 
   // fetch(url, init)
+  //
+  // Split the init object so a tainted *body* (exfiltration) is reported
+  // separately from a tainted *header* (often benign auth — a cookie sent as
+  // the Cookie header). The rule engine suppresses SENSITIVE_DATA → headers
+  // for DATA_LEAK while still flagging body/URL leaks.
   if (initDef) {
-    taintManager.checkSink(initDef, "FETCH_OPTIONS", astNode, url);
+    if (Def.isObjectDef(initDef)) {
+      const headersDef = initDef.lookupProperty("headers");
+      if (headersDef) {
+        checkStructuredSink(headersDef, "FETCH_HEADERS", astNode, url);
+      }
+      for (const [key, value] of initDef.props) {
+        if (key === "headers") continue;
+        checkStructuredSink(value, "FETCH_BODY", astNode, url);
+      }
+    } else {
+      // init isn't a literal object we can introspect — fall back to the
+      // coarse single-sink behavior.
+      taintManager.checkSink(initDef, "FETCH_OPTIONS", astNode, url);
+    }
   }
 
   // Create response taint
@@ -149,6 +167,22 @@ BuiltInSemantics.register(
         undefined,
         inferUrlTaintControl(urlArgNode),
       );
+    }
+
+    return undefined;
+  },
+);
+
+
+// --------------------- XMLHttpRequest.prototype.setRequestHeader -------------------
+BuiltInSemantics.register(
+  "XMLHttpRequest.prototype.setRequestHeader",
+  (args, _callNode, astNode) => {
+    // xhr.setRequestHeader(name, value) — value is the header content.
+    const [, valueDef] = args;
+
+    if (valueDef) {
+      taintManager.checkSink(valueDef, "XML_HTTP_REQUEST_SETHEADER", astNode);
     }
 
     return undefined;
