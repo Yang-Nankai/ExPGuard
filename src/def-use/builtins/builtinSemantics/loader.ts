@@ -32,6 +32,9 @@ import "./library/base64";
 import "./library/cryptoJS";
 import "./library/jquery";
 import "./library/lodash";
+import "./library/react";
+import "./library/vue";
+import "./library/angular";
 
 
 // ======  chrome =======

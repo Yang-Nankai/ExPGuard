@@ -1143,6 +1143,59 @@ const BUILTINS: BuiltinSchema[] = [
       decode: method("base64.decode"),
     },
   },
+  // ======================================================
+  // Front-end frameworks (React / Vue / Angular)
+  // ------------------------------------------------------
+  // Only the taint-relevant HTML-injection surface is modeled. The frameworks'
+  // own vendor files stay `ignore`d (see constants/library.ts); these schemas
+  // make framework calls in *user* code resolve to modeled semantics.
+  // ======================================================
+  {
+    type: "object",
+    name: "React",
+    props: {
+      createElement: method("React.createElement"),
+    },
+  },
+  {
+    type: "object",
+    name: "ReactDOM",
+    props: {
+      render: method("ReactDOM.render"),
+    },
+  },
+  {
+    type: "function",
+    name: "Vue",
+    effect: "Vue.fn",
+    props: {
+      compile: method("Vue.compile"),
+      createApp: method("Vue.createApp"),
+    },
+  },
+  {
+    type: "object",
+    name: "$sce",
+    props: {
+      trustAsHtml: method("$sce.trustAs"),
+      trustAsUrl: method("$sce.trustAs"),
+      trustAsResourceUrl: method("$sce.trustAs"),
+    },
+  },
+  {
+    type: "constructor",
+    name: "DomSanitizer",
+    proto: "Function",
+    prototypeName: "DomSanitizer.prototype",
+    staticMethods: {},
+    prototypeMethods: {
+      bypassSecurityTrustHtml: method("angular.bypassSecurity"),
+      bypassSecurityTrustUrl: method("angular.bypassSecurity"),
+      bypassSecurityTrustResourceUrl: method("angular.bypassSecurity"),
+      bypassSecurityTrustStyle: method("angular.bypassSecurity"),
+      bypassSecurityTrustScript: method("angular.bypassSecurity"),
+    },
+  },
 ];
 
 export default BUILTINS;

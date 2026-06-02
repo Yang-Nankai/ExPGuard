@@ -7,14 +7,22 @@ import { Errors } from "../utils/errorCode";
 import { exportAnalyzer } from "./analyzers/exportAnalyzer";
 import { interAnalyzer } from "./analyzers/interProceduralAnalyzer";
 import { featureModelAnalyzer } from "./analyzers/featureAnalyzer";
-import { detectLibraryByFilename } from "../constants/library";
+import { detectLibraryByContent, detectLibraryByFilename } from "../constants/library";
 import config from "../config";
 
 // File Level Analyzer
 class DefUseAnalyzer {
   buildInterProceduralModelsPDG(scopeTree: ScopeTree): void {
     const scriptKey = scopeTree.script?.key;
-    const libRule = scriptKey ? detectLibraryByFilename(scriptKey) : null;
+
+    // Identify third-party libraries: first by filename, then (for bundled /
+    // inlined frameworks that filename can't reveal) by content signature.
+    let libRule = scriptKey ? detectLibraryByFilename(scriptKey) : null;
+    if (!libRule) {
+      const code = scopeTree.script?.getCode?.();
+      if (code) libRule = detectLibraryByContent(code);
+    }
+
     const isLibrary = Boolean(libRule);
     const shouldAnalyze = !isLibrary || !libRule?.ignore;
 

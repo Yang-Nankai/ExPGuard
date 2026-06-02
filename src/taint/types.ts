@@ -152,10 +152,20 @@ export type SinkType =
   | "JQUERY_ELEMENT_VAL_SET"
   | "JQUERY_ELEMENT_TEXT_SET"
   | "JQUERY_ELEMENT_HTML_SET"
+  // Generic DOM innerHTML/outerHTML write. Reserved for the member-assignment
+  // sink (`el.innerHTML = x`) follow-up; modeled frameworks reuse it where a
+  // raw DOM property write is the most faithful representation.
+  | "DOM_INNER_HTML"
+  // Front-end framework HTML-injection sinks. These are the call-based forms
+  // that survive bundling/compilation, so they fire even when the framework
+  // itself is a minified vendor file.
+  | "REACT_DANGEROUS_HTML"     // React dangerouslySetInnerHTML.__html (incl. JSX)
+  | "VUE_V_HTML"               // Vue v-html / template / render innerHTML
+  | "VUE_COMPILE"              // Vue.compile(tainted) — runtime template codegen
+  | "ANGULAR_BYPASS_SECURITY"  // DomSanitizer.bypassSecurityTrust* / $sce.trustAs*
   // TODO: Need to finish this in future
   // | "DOCUMENT_VAL_SET"
   // | "DOCUMENT_TEXT_SET"
-  // | "DOCUMENT_HTML_SET"  
   | "DOCUMENT_WRITE"
   | "DOCUMENT_EXECCOMMAND"
   // Chrome Action

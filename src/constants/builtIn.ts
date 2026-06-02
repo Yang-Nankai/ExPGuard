@@ -59,6 +59,14 @@ const LIBRARY_NAMES: string[] = [
   "axios",
   "CryptoJS",
   "base64",
+  // Front-end frameworks. Modeled in builtinSemantics/library/{react,vue,angular}.ts.
+  // Listed here so calls like `React.createElement(...)` / `new Vue({...})` /
+  // `$sce.trustAsHtml(...)` in *user* code bind to the modeled builtin instead
+  // of falling back to UnknownDef and dropping taint.
+  "React",
+  "ReactDOM",
+  "Vue",
+  "$sce",
 ];
 
 // Extension objects

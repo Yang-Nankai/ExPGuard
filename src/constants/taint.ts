@@ -116,6 +116,8 @@ export const CODE_SINKS: SinkType[] = [
   "EVAL",
   "TIME_EVAL",
   "JQUERY_GLOBAL_EVAL",
+  // Vue.compile turns a string into a render function — runtime codegen.
+  "VUE_COMPILE",
 ];
 
 // Network send
@@ -160,6 +162,11 @@ export const DOM_SINKS: SinkType[] = [
   "JQUERY_ELEMENT_HTML_SET",
   "DOCUMENT_WRITE",
   "DOCUMENT_EXECCOMMAND",
+  // Generic + framework HTML-injection sinks.
+  "DOM_INNER_HTML",
+  "REACT_DANGEROUS_HTML",
+  "VUE_V_HTML",
+  "ANGULAR_BYPASS_SECURITY",
 ];
 
 // Storage write

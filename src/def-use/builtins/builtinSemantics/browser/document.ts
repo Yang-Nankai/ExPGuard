@@ -35,7 +35,6 @@ const ELEMENT_PROPERTIES = [
   {
     name: "innerHTML",
     source: "ELEMENT_INNER_HTML",
-    sink: "DOCUMENT_HTML_SET",
   },
   {
     name: "outerHTML",
