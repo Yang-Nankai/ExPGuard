@@ -71,6 +71,34 @@ describe("TaintRuleEngine", () => {
     expect(engine.getFlowTypes("NAVIGATOR_USER_AGENT", "EVAL")).toEqual([]);
   });
 
+  it("default matrix: SENSITIVE_DATA / SYSTEM_INFO × NETWORK_SEND → DATA_LEAK", () => {
+    const engine = new TaintRuleEngine();
+    // Cookie (SENSITIVE_DATA) → fetch body.
+    expect(
+      engine.getFlowTypes("CHROME_COOKIES_INFO", "FETCH_BODY"),
+    ).toContain("DATA_LEAK");
+    // chrome.system.cpu (SYSTEM_INFO) → fetch body — newly covered.
+    expect(engine.getFlowTypes("CHROME_SYSTEM_CPU", "FETCH_BODY")).toContain(
+      "DATA_LEAK",
+    );
+    // navigator.* is SYSTEM_INFO too, but its DATA_LEAK is carved out.
+    expect(engine.getFlowTypes("NAVIGATOR_USER_AGENT", "FETCH_BODY")).toEqual(
+      [],
+    );
+  });
+
+  it("default matrix: sensitive/system data in a request HEADER is suppressed", () => {
+    const engine = new TaintRuleEngine();
+    for (const headerSink of [
+      "FETCH_HEADERS",
+      "AXIOS_HEADERS",
+      "XML_HTTP_REQUEST_SETHEADER",
+    ] as const) {
+      expect(engine.getFlowTypes("CHROME_COOKIES_INFO", headerSink)).toEqual([]);
+      expect(engine.getFlowTypes("CHROME_SYSTEM_CPU", headerSink)).toEqual([]);
+    }
+  });
+
   it("native message endpoints are suppressed across the board", () => {
     const engine = new TaintRuleEngine();
     expect(

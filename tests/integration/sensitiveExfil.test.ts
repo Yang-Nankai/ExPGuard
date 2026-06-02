@@ -99,4 +99,75 @@ describe("Sensitive data exfiltration (DATA_LEAK via network)", () => {
     );
     expect(leak).toBeUndefined();
   });
+
+  it("cookie → axios data (body) is reported as DATA_LEAK", async () => {
+    const flows = await analyzeFixture("sensitive_exfil_axios_body");
+    const leak = flows.find(
+      (f) =>
+        f.sourceType === "CHROME_COOKIES_INFO" &&
+        f.sinkType === "AXIOS_DATA" &&
+        f.flowType === "DATA_LEAK",
+    );
+    expect(leak).toBeTruthy();
+  });
+
+  it("cookie → axios headers is suppressed (header suppression spans axios)", async () => {
+    const flows = await analyzeFixture("sensitive_exfil_axios_header");
+    const leak = flows.find(
+      (f) =>
+        f.sourceType === "CHROME_COOKIES_INFO" && f.flowType === "DATA_LEAK",
+    );
+    expect(leak).toBeUndefined();
+  });
+
+  it("cookie → XHR send body is reported (body leak, not a header)", async () => {
+    const flows = await analyzeFixture("sensitive_exfil_xhr_body");
+    const leak = flows.find(
+      (f) =>
+        f.sourceType === "CHROME_COOKIES_INFO" &&
+        f.sinkType === "XML_HTTP_REQUEST_SEND" &&
+        f.flowType === "DATA_LEAK",
+    );
+    expect(leak).toBeTruthy();
+  });
+
+  it("cookie → fetch URL (query string) is reported (URL leak, not a header)", async () => {
+    const flows = await analyzeFixture("sensitive_exfil_cookie_url");
+    const leak = flows.find(
+      (f) =>
+        f.sourceType === "CHROME_COOKIES_INFO" &&
+        f.sinkType === "FETCH_RESOURCE" &&
+        f.flowType === "DATA_LEAK",
+    );
+    expect(leak).toBeTruthy();
+  });
+
+  it("identity auth token → fetch body is reported and tagged", async () => {
+    const flows = await analyzeFixture("sensitive_exfil_identity_token");
+    const leaks = flows.filter(
+      (f) =>
+        f.sourceType === "CHROME_IDENTITY_TOKEN" &&
+        f.sinkType === "FETCH_BODY" &&
+        f.flowType === "DATA_LEAK",
+    );
+    expect(leaks.length).toBeGreaterThan(0);
+    const tagged = leaks.some((f) =>
+      (f.sourceRemark ?? "").includes("identity.authToken"),
+    );
+    expect(tagged).toBe(true);
+  });
+
+  it("system.cpu fingerprint → fetch body is reported as DATA_LEAK and tagged", async () => {
+    const flows = await analyzeFixture("sensitive_exfil_system_cpu");
+    const leaks = flows.filter(
+      (f) =>
+        f.sourceType === "CHROME_SYSTEM_CPU" &&
+        f.sinkType === "FETCH_BODY" &&
+        f.flowType === "DATA_LEAK",
+    );
+    expect(leaks.length).toBeGreaterThan(0);
+    expect(leaks.some((f) => (f.sourceRemark ?? "").includes("system.cpu"))).toBe(
+      true,
+    );
+  });
 });
