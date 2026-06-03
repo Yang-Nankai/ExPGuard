@@ -6,7 +6,6 @@ import { taintManager, printTaintReportsCLI, renderHtmlReport, collectFileTree }
 import { computeCoverage, formatCoveragePct } from "./coverage/coverage";
 import { scopeController } from "./scope/scopeCtrl";
 import { taintRuleEngine } from "./taint/ruleEngine";
-import { resetAllIdGenerators } from "./utils/uuid";
 import config from "./config";
 import logger, { setLogFile } from "./utils/logger";
 import { interAnalyzer } from "./def-use/analyzers/interProceduralAnalyzer";
@@ -16,22 +15,12 @@ import { Timer } from "./utils/timer";
 type TaskStatus = "success" | "error";
 
 /**
- * Reset all analysis-global singleton state so a fresh extension can be analyzed
- * in the same process without contamination from the previous run. This is the
- * prerequisite for batch mode — without it, taint ids, scope trees and the rule
- * engine leak across extensions.
+ * Structured outcome of a single analysis. Each analysis runs in its own
+ * process (the CLI is one-extension-per-invocation; batch mode spawns one
+ * subprocess per extension via scripts/batch_analyze.py), so there is no
+ * in-process state to reset between runs — module-level singletons start
+ * pristine in every fresh process.
  */
-export function resetAnalysisState(): void {
-  taintManager.resetAll();
-  scopeController.clear();
-  interAnalyzer.reset();
-  resetAllIdGenerators();
-  // Restore the bundled defaults; a per-run --taint-rules layer is re-applied
-  // at the start of runSingleTask.
-  taintRuleEngine.loadDefaults();
-}
-
-/** Structured outcome of a single analysis, returned for batch aggregation. */
 export interface RunResult {
   extensionId?: string;
   extensionVersion?: string;

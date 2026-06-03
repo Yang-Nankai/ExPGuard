@@ -36,11 +36,16 @@ npm install
 3. **Build the project:**
 
 ```bash
-npx tsc
-# or simply `tsc` if TypeScript is globally installed
+npm run build
+# = tsc + scripts/copy-assets.js (copies runtime assets that tsc does not emit:
+#   the default taint rules and the src/transformation JS libraries) into dist/
 ```
 
-**Note: ** Note that if this is your first time compiling, please copy the entire src/transformation folder to the dist/ folder and add the relevant JS library code to prevent runtime failure.
+> Use `npm run build` rather than a bare `tsc`. `tsc` only emits the compiled
+> `.js`; the analyzer also needs `src/taint/rules/default-rules.json` and the
+> `src/transformation/**` JS libraries copied into `dist/`. `npm run build`
+> does this automatically — running `tsc` alone leaves the default rule set
+> missing and every analysis silently reports zero findings.
 
 
 ## Usage
@@ -79,6 +84,49 @@ node dist/main.js analyze --type CRX --input ./samples/code_injection/example.cr
 3. Analyze CWS online extension:
 ```bash
 node dist/main.js analyze --type WEB --input=https://chromewebstore.google.com/detail/sponsorblock-for-youtube/mnjggcdmjocbbbhaepdhchncahnbgone --out=./output/cws_example --id=mnjggcdmjocbbbhaepdhchncahnbgone --version=6.1.5
+```
+
+## Batch analysis
+
+To analyze many extensions, use the Python orchestrator
+[`scripts/batch_analyze.py`](./scripts/batch_analyze.py). It drives a thread
+pool that spawns **one isolated `node dist/main.js analyze` subprocess per
+extension**. Process isolation is deliberate: the analyzer keeps ~30
+module-level singletons (taint manager, scope controller, factories, …), so
+running multiple extensions inside one Node process would leak taint state
+across them. A fresh OS process per extension starts with pristine state, so
+results can never cross-contaminate — and no in-process reset is needed.
+
+The orchestrator is stdlib-only (no `pip install`). Build first, then run:
+
+```bash
+npm run build
+python3 scripts/batch_analyze.py --input <manifest.json|dir> [options]
+# or: npm run batch -- --input <manifest.json|dir> [options]
+```
+
+**`--input`** accepts either:
+
+- a JSON manifest — `{"extensions": [{"type": "DIR|CRX|WEB", "input": "<path|url>", "id"?: "...", "version"?: "..."}, ...]}` (a bare top-level array also works), or
+- a directory — each immediate child that is an unpacked extension (has a `manifest.json`) or a `*.crx` file becomes one job.
+
+**Options**:
+
+- `--out <dir>`: root output directory; each extension writes to `<out>/<NNN_slug>/`. (Default: `./results/batch`)
+- `--jobs <N>`: number of concurrent worker subprocesses. (Default: CPU count)
+- `--html`: emit a `report.html` for every extension.
+- `--taint-rules <path>`: custom taint rule file applied to every extension.
+- `--timeout <seconds>`: per-extension timeout.
+- `--feishu-webhook <url>` / `--feishu-secret <secret>`: push live progress + summary cards to a Feishu (Lark) custom bot (also read from `EPG_FEISHU_WEBHOOK` / `EPG_FEISHU_SECRET`).
+- `--progress-every <N>`: send a Feishu progress card every N completed extensions. (Default: 1)
+
+A machine-readable `batch-summary.json` (per-extension status, findings, flow-type
+counts, coverage) is written to `--out`, and the process exits non-zero if any
+extension errored, so CI can gate on it.
+
+```bash
+# Analyze every unpacked extension under ./corpus, 8 at a time, with HTML reports.
+python3 scripts/batch_analyze.py --input ./corpus --out ./results/batch --jobs 8 --html
 ```
 
 ## Documentation
