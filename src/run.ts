@@ -6,6 +6,7 @@ import { taintManager, printTaintReportsCLI, renderHtmlReport, collectFileTree }
 import { computeCoverage, formatCoveragePct } from "./coverage/coverage";
 import { scopeController } from "./scope/scopeCtrl";
 import { taintRuleEngine } from "./taint/ruleEngine";
+import { resetAllIdGenerators } from "./utils/uuid";
 import config from "./config";
 import logger, { setLogFile } from "./utils/logger";
 import { interAnalyzer } from "./def-use/analyzers/interProceduralAnalyzer";
@@ -13,6 +14,43 @@ import { cleanupArtifacts } from "./utils/cleanup";
 import { Timer } from "./utils/timer";
 
 type TaskStatus = "success" | "error";
+
+/**
+ * Reset all analysis-global singleton state so a fresh extension can be analyzed
+ * in the same process without contamination from the previous run. This is the
+ * prerequisite for batch mode — without it, taint ids, scope trees and the rule
+ * engine leak across extensions.
+ */
+export function resetAnalysisState(): void {
+  taintManager.resetAll();
+  scopeController.clear();
+  interAnalyzer.reset();
+  resetAllIdGenerators();
+  // Restore the bundled defaults; a per-run --taint-rules layer is re-applied
+  // at the start of runSingleTask.
+  taintRuleEngine.loadDefaults();
+}
+
+/** Structured outcome of a single analysis, returned for batch aggregation. */
+export interface RunResult {
+  extensionId?: string;
+  extensionVersion?: string;
+  sourceType: ExtensionSourceType;
+  input: string;
+  outputDir: string;
+  status: TaskStatus;
+  durationMs: number;
+  totalFiles: number;
+  /** Number of taint flows detected. */
+  findings: number;
+  /** Per-flowType finding counts. */
+  flowTypeCounts: Record<string, number>;
+  /** Node coverage ratio 0..1, if computed. */
+  nodeCoverage?: number;
+  scopeCoverage?: number;
+  errorType?: string;
+  errorMessage?: string;
+}
 
 interface RunOptions {
   sourceType: ExtensionSourceType;
@@ -64,7 +102,7 @@ async function safeWriteFile(
   }
 }
 
-export async function runSingleTask(opts: RunOptions) {
+export async function runSingleTask(opts: RunOptions): Promise<RunResult> {
   const outputDir = opts.outputDir;
 
   await fs.mkdir(outputDir, { recursive: true });
@@ -90,6 +128,7 @@ export async function runSingleTask(opts: RunOptions) {
 
   let status: TaskStatus = "success";
   let taskError: TaskError | undefined;
+  let result: RunResult;
 
   try {
     await epgModelBuilder.analyze({
@@ -193,5 +232,30 @@ export async function runSingleTask(opts: RunOptions) {
     await cleanupArtifacts(outputDir, summary);
 
     logger.info(`Analysis finished with status=${status}`);
+
+    // Aggregate a structured result for the caller (batch mode).
+    const flows: any[] = (baseSummary as any).flows ?? [];
+    const flowTypeCounts: Record<string, number> = {};
+    for (const f of flows) {
+      flowTypeCounts[f.flowType] = (flowTypeCounts[f.flowType] ?? 0) + 1;
+    }
+    result = {
+      extensionId: opts.extensionId,
+      extensionVersion: opts.extensionVersion,
+      sourceType: opts.sourceType,
+      input: opts.input,
+      outputDir,
+      status,
+      durationMs: timer.getDurationMs(),
+      totalFiles: fileStats.length,
+      findings: flows.length,
+      flowTypeCounts,
+      nodeCoverage: coverage?.nodeCoverage,
+      scopeCoverage: coverage?.scopeCoverage,
+      errorType: taskError?.type,
+      errorMessage: taskError?.message,
+    };
   }
+
+  return result;
 }
