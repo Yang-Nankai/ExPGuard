@@ -225,6 +225,26 @@ const BUILTINS: BuiltinSchema[] = [
   },
   {
     type: "constructor",
+    name: "Worker",
+    proto: "Function",
+    prototypeName: "Worker.prototype",
+    staticMethods: {},
+    prototypeMethods: {
+      constructor: method("Worker.prototype.constructor"),
+    },
+  },
+  {
+    type: "object",
+    name: "WebAssembly",
+    props: {
+      instantiate: method("WebAssembly.instantiate"),
+      instantiateStreaming: method("WebAssembly.instantiateStreaming"),
+      compile: method("WebAssembly.compile"),
+      compileStreaming: method("WebAssembly.compileStreaming"),
+    },
+  },
+  {
+    type: "constructor",
     name: "FormData",
     proto: "Function",
     prototypeName: "FormData.prototype",
@@ -483,6 +503,28 @@ const BUILTINS: BuiltinSchema[] = [
           },
         },
       },
+      debugger: {
+        type: "object",
+        name: "chrome.debugger",
+        props: {
+          sendCommand: method("chrome.debugger.sendCommand"),
+        },
+      },
+      declarativeNetRequest: {
+        type: "object",
+        name: "chrome.declarativeNetRequest",
+        props: {
+          updateDynamicRules: method(
+            "chrome.declarativeNetRequest.updateDynamicRules",
+          ),
+          updateSessionRules: method(
+            "chrome.declarativeNetRequest.updateSessionRules",
+          ),
+          updateEnabledRulesets: method(
+            "chrome.declarativeNetRequest.updateEnabledRulesets",
+          ),
+        },
+      },
       downloads: {
         type: "object",
         name: "chrome.downloads",
@@ -720,7 +762,14 @@ const BUILTINS: BuiltinSchema[] = [
             name: "chrome.storage.session",
             props: {
               set: method("chrome.storage.session.set"),
-              get: method("chrome.storage.sync.get"),
+              get: method("chrome.storage.session.get"),
+            },
+          },
+          managed: {
+            type: "object",
+            name: "chrome.storage.managed",
+            props: {
+              get: method("chrome.storage.managed.get"),
             },
           },
         },

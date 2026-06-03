@@ -23,6 +23,7 @@ import "./browser/timer";
 import "./browser/url";
 import "./browser/event";
 import "./browser/document";
+import "./browser/code";
 
 
 
@@ -44,7 +45,9 @@ import "./chrome/bookmarks";
 import "./chrome/browsingData";
 import "./chrome/contentSettings";
 import "./chrome/cookies";
+import "./chrome/debugger";
 import "./chrome/declarativeContent";
+import "./chrome/declarativeNetRequest";
 import "./chrome/devtools";
 import "./chrome/downloads";
 import "./chrome/fontSettings";

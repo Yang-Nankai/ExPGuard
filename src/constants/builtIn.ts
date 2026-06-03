@@ -18,6 +18,8 @@ const JS_OBJECTS: string[] = [
   "Uint8Array",
   "XMLHttpRequest",
   "WebSocket",
+  "Worker",
+  "WebAssembly",
   "localStorage",
   "sessionStorage",
   "document",
