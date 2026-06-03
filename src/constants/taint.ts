@@ -42,6 +42,7 @@ export const SENSITIVE_SOURCES: SourceType[] = [
   "CHROME_PAGECAPTURE_MHTML",
   "CHROME_IDENTITY_TOKEN",
   "CHROME_IDENTITY_PROFILE",
+  "CHROME_MANAGED_STORAGE",
 
   "CHROME_BOOKMARKS_ONCREATED",
   "CHROME_COOKIES_ONCHANGED",
@@ -118,6 +119,11 @@ export const CODE_SINKS: SinkType[] = [
   "JQUERY_GLOBAL_EVAL",
   // Vue.compile turns a string into a render function — runtime codegen.
   "VUE_COMPILE",
+  // Implicit code-execution surfaces.
+  "WASM_INSTANTIATE",
+  "WORKER_URL",
+  // chrome.debugger Runtime.evaluate runs an arbitrary expression in the page.
+  "CHROME_DEBUGGER_COMMAND",
 ];
 
 // Network send
@@ -217,6 +223,7 @@ export const PRIVILEGED_SINKS: SinkType[] = [
   "CHROME_CONTENTSETTINGS_CLEAR",
   "CHROME_DECLARATIVECONTENT_RULES",
   "CHROME_DECLARATIVECONTENT_RULE_IDS",
+  "CHROME_DECLARATIVENETREQUEST_RULES",
   "CHROME_DOWNLOADS_REMOVE_ID",
   "CHROME_DOWNLOADS_OPTIONS",
   "CHROME_FONTSETTINGS_SET_OPTIONS",

@@ -3,6 +3,8 @@ import fs from "fs/promises";
 import { epgModelBuilder } from "./epgmodelbuilder";
 import { ExtensionSourceType } from "./extension/extensionLoader";
 import { taintManager, printTaintReportsCLI, renderHtmlReport, collectFileTree } from "./taint";
+import { computeCoverage, formatCoveragePct } from "./coverage/coverage";
+import { scopeController } from "./scope/scopeCtrl";
 import { taintRuleEngine } from "./taint/ruleEngine";
 import config from "./config";
 import logger, { setLogFile } from "./utils/logger";
@@ -121,6 +123,23 @@ export async function runSingleTask(opts: RunOptions) {
    }
 
     const baseSummary = taintManager.getGlobalSummary?.() ?? {};
+
+    // Analysis coverage: how much of the extension's code the analyzer reached.
+    // Computed from the in-memory scope trees / CFGs before any teardown.
+    let coverage: ReturnType<typeof computeCoverage> | undefined;
+    try {
+      coverage = computeCoverage(scopeController.pageScopeTrees);
+      logger.info(
+        `[COVERAGE] node=${formatCoveragePct(coverage.nodeCoverage)} ` +
+          `(${coverage.coveredNodes}/${coverage.totalNodes}) ` +
+          `scope=${formatCoveragePct(coverage.scopeCoverage)} ` +
+          `(${coverage.coveredScopes}/${coverage.totalScopes}) ` +
+          `scripts=${coverage.analyzedScripts}`,
+      );
+    } catch (err) {
+      logger.error(`[COVERAGE] Failed to compute coverage: ${String(err)}`);
+    }
+
     const summary = {
       extensionId: opts.extensionId,
       extensionVersion: opts.extensionVersion,
@@ -131,6 +150,7 @@ export async function runSingleTask(opts: RunOptions) {
       totalFiles: fileStats.length,
       totalSize: fileStats.reduce((acc, f) => acc + f.size, 0),
       cacheStats: interAnalyzer.getCacheReport?.(),
+      coverage,
       errorType: taskError?.type,
       errorMessage: taskError?.message,
       ...baseSummary,
@@ -160,6 +180,7 @@ export async function runSingleTask(opts: RunOptions) {
           scripts: fileStats,
           reports: taintManager.generateGlobalReport({ includeCode: true }),
           flows: (baseSummary as any).flows ?? [],
+          coverage,
         });
         await safeWriteFile(path.join(outputDir, "report.html"), html);
         logger.info(`[HTML-REPORT] wrote ${path.join(outputDir, "report.html")}`);

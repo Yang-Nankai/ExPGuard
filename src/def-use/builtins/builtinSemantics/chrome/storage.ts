@@ -168,3 +168,35 @@ function registerStorageGet(area: "local" | "sync" | "session") {
 registerStorageGet("local");
 registerStorageGet("sync");
 registerStorageGet("session");
+
+// --------------------- chrome.storage.managed.get ---------------------
+// `managed` is read-only enterprise-policy data. Unlike local/sync/session it
+// is not an extension-controlled Set↔Get bridge — it is a sensitive *source*
+// (high-integrity, admin-provisioned). Model get() as minting a
+// CHROME_MANAGED_STORAGE taint source rather than a storage round-trip.
+BuiltInSemantics.register(
+  "chrome.storage.managed.get",
+  (args, callNode, astNode) => {
+    interAnalyzer.setCurrentSideEffects();
+
+    const [, callback] = args;
+    const result = defFactory.createObjectDef(callNode);
+
+    taintManager.createTaintSource(
+      result,
+      "CHROME_MANAGED_STORAGE",
+      astNode,
+      false,
+      "storage.managed",
+    );
+
+    // Callback style
+    if (Def.isFunctionDef(callback)) {
+      interAnalyzer.analyze(callNode, callback, [result], null, astNode);
+      return undefined;
+    }
+
+    // Promise style
+    return defFactory.createPromiseDef(callNode, result);
+  },
+);

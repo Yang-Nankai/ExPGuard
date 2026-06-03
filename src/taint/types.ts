@@ -38,6 +38,8 @@ export type SourceType =
   // IDENTITY
   | "CHROME_IDENTITY_TOKEN"
   | "CHROME_IDENTITY_PROFILE"
+  // MANAGED STORAGE (enterprise-policy data — sensitive, high-integrity)
+  | "CHROME_MANAGED_STORAGE"
   // NAVIGATOR
   | "NAVIGAROR_GEOLOCATION"
   | "NAVIGATOR_CLIPBOARD"
@@ -123,6 +125,10 @@ export type SinkType =
   | "NEW_FUNCTION"
   | "EVAL"
   | "TIME_EVAL"
+  // Implicit / privileged code-execution surfaces beyond eval().
+  | "WASM_INSTANTIATE"          // WebAssembly.instantiate(tainted buffer) — runs code
+  | "WORKER_URL"               // new Worker(taintedUrl) / Blob-URL worker bootstrap
+  | "CHROME_DEBUGGER_COMMAND"   // chrome.debugger.sendCommand(..,"Runtime.evaluate",{expression})
   | "FETCH_RESOURCE"
   | "FETCH_OPTIONS"
   // Granular fetch init sinks. The init object is split so that data placed in
@@ -245,6 +251,8 @@ export type SinkType =
   // Chrome Tabs
   | "CHROME_TABS_CREATE_OPTIONS"
   | "CHROME_TABS_EXECUTE"
+  // Chrome DeclarativeNetRequest — dynamic request rewriting (privileged).
+  | "CHROME_DECLARATIVENETREQUEST_RULES"
   // Chrome Window
   | "CHROME_WINDOWS_UPDATE_OPTIONS"
   | "CHROME_WINDOWS_CREATE_OPTIONS"

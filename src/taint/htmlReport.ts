@@ -56,6 +56,8 @@ export interface HtmlReportInput {
   scripts: any[];
   reports: any[];
   flows: any[];
+  /** Optional analysis-coverage summary (from computeCoverage). */
+  coverage?: any;
 }
 
 /* =========================================================================
@@ -267,20 +269,39 @@ function renderFileTree(nodes: FileNode[], taintedFiles: Set<string>): string {
   return renderNodes(nodes);
 }
 
-function renderScriptsTable(scripts: any[]): string {
+function renderScriptsTable(scripts: any[], coverage?: any): string {
   if (!scripts || !scripts.length) return "";
+
+  // Index per-script coverage so each row can show its node coverage. The
+  // scripts summary keys on relativePath (e.g. "bg/index.js") while coverage
+  // keys on the script key (often extension-less, e.g. "bg/index"); match by
+  // normalizing both to a no-extension form.
+  const covByKey = new Map<string, any>();
+  const norm = (k: string) => String(k).replace(/\.[cm]?js$/i, "");
+  for (const c of coverage?.scripts ?? []) {
+    covByKey.set(norm(c.file), c);
+  }
+
+  const hasCov = covByKey.size > 0;
   let rows = "";
   for (const s of scripts) {
     const fam = frameFamily(s.frame);
+    const c = covByKey.get(norm(s.file));
+    const covCell = hasCov
+      ? `<td>${
+          c ? `${(c.nodeCoverage * 100).toFixed(0)}%` : "—"
+        }</td>`
+      : "";
     rows += `<tr>
       <td class="mono">${escapeHtml(s.file)}</td>
       <td><span class="badge fam-${fam}">${escapeHtml(s.frame ?? "—")}</span></td>
       <td>${formatBytes(s.size)}</td>
-      <td>${s.durationMs != null ? `${Number(s.durationMs).toFixed(1)} ms` : "—"}</td>
+      ${covCell}
     </tr>`;
   }
+  const covHead = hasCov ? "<th>Coverage</th>" : "";
   return `<table class="scripts">
-    <thead><tr><th>Script</th><th>Frame</th><th>Size</th><th>Analysis</th></tr></thead>
+    <thead><tr><th>Script</th><th>Frame</th><th>Size</th>${covHead}</tr></thead>
     <tbody>${rows}</tbody></table>`;
 }
 
@@ -436,6 +457,7 @@ function renderIssue(issue: any, report: any, flowIdx: Map<string, any[]>): stri
 function renderOverview(input: HtmlReportInput, totalIssues: number): string {
   const m = input.manifest ?? {};
   const meta = input.meta ?? {};
+  const cov = input.coverage;
 
   const flowCounts: Record<string, number> = {};
   const sevCounts: Record<string, number> = {};
@@ -463,6 +485,16 @@ function renderOverview(input: HtmlReportInput, totalIssues: number): string {
 
   const fileCount = (input.scripts ?? []).length;
 
+  const covPct =
+    cov && typeof cov.nodeCoverage === "number"
+      ? `${(cov.nodeCoverage * 100).toFixed(1)}%`
+      : "—";
+  const covCard = cov
+    ? `<div class="card cov"><div class="num">${escapeHtml(
+        covPct,
+      )}</div><div class="lbl">Code coverage</div></div>`
+    : "";
+
   return `<section class="overview">
     <h1>${escapeHtml(m.name ?? "Chrome Extension")} <small>v${escapeHtml(
       m.version ?? meta.extensionVersion ?? "?",
@@ -471,6 +503,7 @@ function renderOverview(input: HtmlReportInput, totalIssues: number): string {
     <div class="cards">
       <div class="card"><div class="num">${escapeHtml(fileCount)}</div><div class="lbl">Scripts</div></div>
       <div class="card"><div class="num">${escapeHtml(totalIssues)}</div><div class="lbl">Findings</div></div>
+      ${covCard}
       <div class="card"><div class="num">MV${escapeHtml(
         m.manifest_version ?? "?",
       )}</div><div class="lbl">Manifest</div></div>
@@ -516,7 +549,7 @@ export function renderHtmlReport(input: HtmlReportInput): string {
 
   const overview = renderOverview(input, totalIssues);
   const tree = renderFileTree(input.files ?? [], taintedFiles);
-  const scriptsTable = renderScriptsTable(input.scripts ?? []);
+  const scriptsTable = renderScriptsTable(input.scripts ?? [], input.coverage);
 
   return `<!doctype html>
 <html lang="en">
