@@ -52,7 +52,7 @@ from feishu import (  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_MAIN_JS = REPO_ROOT / "dist" / "main.js"
-_VALID_TYPES = {"CRX", "DIR", "WEB"}
+_VALID_TYPES = {"CRX", "DIR", "WEB", "XPI"}
 
 
 @dataclass
@@ -130,8 +130,22 @@ def _jobs_from_directory(directory: Path) -> List[BatchJob]:
         if entry.is_dir():
             if (entry / "manifest.json").exists():
                 jobs.append(BatchJob(source_type="DIR", input=str(entry)))
+            else:
+                # Nested layouts (e.g. the Firefox corpus stores each add-on as
+                # {id}/{version}/{id}.{version}.xpi). Pick up any .xpi/.crx
+                # packages found underneath.
+                for pkg in sorted(entry.rglob("*")):
+                    if not pkg.is_file():
+                        continue
+                    suffix = pkg.suffix.lower()
+                    if suffix == ".xpi":
+                        jobs.append(BatchJob(source_type="XPI", input=str(pkg)))
+                    elif suffix == ".crx":
+                        jobs.append(BatchJob(source_type="CRX", input=str(pkg)))
         elif entry.is_file() and entry.suffix.lower() == ".crx":
             jobs.append(BatchJob(source_type="CRX", input=str(entry)))
+        elif entry.is_file() and entry.suffix.lower() == ".xpi":
+            jobs.append(BatchJob(source_type="XPI", input=str(entry)))
     return jobs
 
 
@@ -150,7 +164,7 @@ def resolve_jobs(input_path: str) -> List[BatchJob]:
 
 
 def slug_for(job: BatchJob, index: int) -> str:
-    base = job.extension_id or re.sub(r"\.(crx|zip)$", "", Path(job.input).name, flags=re.I) or "ext"
+    base = job.extension_id or re.sub(r"\.(crx|xpi|zip)$", "", Path(job.input).name, flags=re.I) or "ext"
     safe = re.sub(r"[^a-zA-Z0-9._-]", "_", base)[:64]
     return f"{index + 1:03d}_{safe}"
 

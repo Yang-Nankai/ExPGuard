@@ -12,8 +12,8 @@ program
 
 program
   .command("analyze")
-  .requiredOption("--type <type>", "CRX | DIR | WEB")
-  .requiredOption("--input <path>", "CRX file path or directory path or web url")
+  .requiredOption("--type <type>", "CRX | DIR | WEB | XPI")
+  .requiredOption("--input <path>", "CRX/XPI file path or directory path or web url")
   .option("--out <dir>", "output directory", "./results")
   .option("--id <extensionId>", "extension id")
   .option(
@@ -28,8 +28,8 @@ program
   .action(async (opts) => {
     const sourceType = opts.type.toUpperCase();
 
-    if (!["CRX", "DIR", "WEB"].includes(sourceType)) {
-      console.error("Invalid --type, must be CRX | DIR | WEB");
+    if (!["CRX", "DIR", "WEB", "XPI"].includes(sourceType)) {
+      console.error("Invalid --type, must be CRX | DIR | WEB | XPI");
       process.exit(1);
     }
 

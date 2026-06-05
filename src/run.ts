@@ -137,6 +137,12 @@ export async function runSingleTask(opts: RunOptions): Promise<RunResult> {
     timer.stop();
     const fileStats: any[] = epgModelBuilder.extensionContext?.getScriptsSummary() ?? [];
 
+    // Effective extension ID. For XPI the ID is derived from the manifest's
+    // gecko settings inside the loader, so prefer the resolved context ID over
+    // the (possibly undefined) CLI-supplied one.
+    const effectiveId =
+      epgModelBuilder.extensionContext?.id ?? opts.extensionId;
+
    try {
      const report = printTaintReportsCLI(
        taintManager.generateGlobalReport(),
@@ -169,7 +175,7 @@ export async function runSingleTask(opts: RunOptions): Promise<RunResult> {
     }
 
     const summary = {
-      extensionId: opts.extensionId,
+      extensionId: effectiveId,
       extensionVersion: opts.extensionVersion,
       sourceType: opts.sourceType,
       status,
@@ -197,7 +203,7 @@ export async function runSingleTask(opts: RunOptions): Promise<RunResult> {
         const ctx = epgModelBuilder.extensionContext;
         const html = renderHtmlReport({
           meta: {
-            extensionId: opts.extensionId,
+            extensionId: effectiveId,
             extensionVersion: opts.extensionVersion,
             sourceType: opts.sourceType,
             generatedAt: new Date().toISOString(),
@@ -229,7 +235,7 @@ export async function runSingleTask(opts: RunOptions): Promise<RunResult> {
       flowTypeCounts[f.flowType] = (flowTypeCounts[f.flowType] ?? 0) + 1;
     }
     result = {
-      extensionId: opts.extensionId,
+      extensionId: effectiveId,
       extensionVersion: opts.extensionVersion,
       sourceType: opts.sourceType,
       input: opts.input,

@@ -1,7 +1,7 @@
 # ExPGuard: Extension Privilege Guard
 
 
-ExPGuard is a comprehensive static analysis framework built for Chrome Extensions to detect privacy leaks and security vulnerabilities. By building precise execution models and analyzing data flows, ExPGuard tracks sensitive information propagation across extension scripts and pages.
+ExPGuard is a comprehensive static analysis framework built for Chrome **and Firefox** extensions to detect privacy leaks and security vulnerabilities. By building precise execution models and analyzing data flows, ExPGuard tracks sensitive information propagation across extension scripts and pages. Firefox add-ons (`.xpi`) are supported with the same detection engine: the `browser.*` WebExtension namespace is modeled as an alias of `chrome.*`, so source/sink coverage is identical across both browsers.
 
 ## Features
 
@@ -62,28 +62,33 @@ node dist/main.js analyze --type <CRX|DIR|WEB> --input <path> [options]
 
 **Options**:
 
-- --type \<type\>: (Required) The format of the input extension. Valid options are CRX (packaged extension), DIR (unpacked extension directory), and WEB (Chrome Web Store online extension).
-- --input \<path\>: (Required) Path to the target extension (.crx file, local directory path, or URL).
+- --type \<type\>: (Required) The format of the input extension. Valid options are CRX (packaged Chrome extension), DIR (unpacked extension directory), WEB (Chrome Web Store online extension), and XPI (packaged Firefox add-on).
+- --input \<path\>: (Required) Path to the target extension (.crx / .xpi file, local directory path, or URL).
 - --out \<dir\>: Directory where the analysis results will be saved. (Default: results)
-- --id \<extensionId\>: Limit analysis or explicitly pass the custom extension ID.
-- --version \<version\>: Specify the extension version.
+- --id \<extensionId\>: Explicitly pass the extension ID. Accepts a Chrome ID (`[a-p]{32}`) or a Firefox ID (GUID / email style). Optional for XPI — if omitted, the gecko ID is auto-derived from the manifest's `browser_specific_settings.gecko.id` / `applications.gecko.id`.
 
 **Examples:**
 
 1. Analyze an unpacked extension directory:
 
 ```bash
-node dist/main.js analyze --type=DIR --input=./samples/privilege_execution/ --out=./output/privilege_execution --id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --version=1.0
+node dist/main.js analyze --type=DIR --input=./samples/privilege_execution/ --out=./output/privilege_execution --id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 ```
 
 2. Analyze a packaged CRX file:
 ```bash
-node dist/main.js analyze --type CRX --input ./samples/code_injection/example.crx --out=./output/code_injection --id=caofmekclcabakldafkjbfkkmcebndal --version=1.2
+node dist/main.js analyze --type CRX --input ./samples/code_injection/example.crx --out=./output/code_injection --id=caofmekclcabakldafkjbfkkmcebndal
 ```
 
 3. Analyze CWS online extension:
 ```bash
-node dist/main.js analyze --type WEB --input=https://chromewebstore.google.com/detail/sponsorblock-for-youtube/mnjggcdmjocbbbhaepdhchncahnbgone --out=./output/cws_example --id=mnjggcdmjocbbbhaepdhchncahnbgone --version=6.1.5
+node dist/main.js analyze --type WEB --input=https://chromewebstore.google.com/detail/sponsorblock-for-youtube/mnjggcdmjocbbbhaepdhchncahnbgone --out=./output/cws_example --id=mnjggcdmjocbbbhaepdhchncahnbgone
+```
+
+4. Analyze a packaged Firefox add-on (`.xpi`). The `--id` is optional — it is
+   auto-derived from the manifest's gecko settings:
+```bash
+node dist/main.js analyze --type XPI --input ./path/to/addon.xpi --out=./output/firefox_addon
 ```
 
 ## Batch analysis

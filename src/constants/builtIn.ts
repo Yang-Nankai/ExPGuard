@@ -71,8 +71,11 @@ const LIBRARY_NAMES: string[] = [
   "$sce",
 ];
 
-// Extension objects
-const EXTENSION_OBJECTS: string[] = ["chrome"];
+// Extension objects. `browser` is the Firefox WebExtension namespace; it is
+// registered as an alias of the `chrome` builtin Def tree (see builtins.ts),
+// so binding it here lets Firefox content/background/page scopes resolve
+// `browser.*` calls to the same modeled semantics as `chrome.*`.
+const EXTENSION_OBJECTS: string[] = ["chrome", "browser"];
 
 export const PAGE_BUILTINS: string[] = [
   ...GLOBAL_OBJECTS,

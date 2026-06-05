@@ -284,6 +284,11 @@ const BUILTINS: BuiltinSchema[] = [
   {
     type: "object",
     name: "chrome",
+    // Firefox WebExtensions expose the same API surface under the `browser.*`
+    // namespace (heavily used alongside `chrome.*` in real add-ons). Aliasing
+    // it to the very same Def tree means every chrome.* semantic handler fires
+    // for browser.* too — no handler duplication, identical taint results.
+    alias: "browser",
     props: {
       action: {
         type: "object",
