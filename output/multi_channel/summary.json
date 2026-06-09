@@ -1,0 +1,247 @@
+{
+  "extensionId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "sourceType": "DIR",
+  "status": "success",
+  "duration": 0.029,
+  "files": [
+    {
+      "file": "background.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 3212,
+      "durationMs": 3.2507909999999356
+    },
+    {
+      "file": "content.js",
+      "frame": "CS_1",
+      "frameTags": [
+        "CS_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "*://*.devhub.example/*"
+            ]
+          }
+        }
+      ],
+      "size": 846,
+      "durationMs": 5.648292000000083
+    },
+    {
+      "file": "helper.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 878,
+      "durationMs": 1.1459580000000642
+    },
+    {
+      "file": "uploader.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 374,
+      "durationMs": 1.1953750000000127
+    }
+  ],
+  "totalFiles": 4,
+  "totalSize": 5310,
+  "cacheStats": {
+    "totalCalls": 0,
+    "hits": 0,
+    "misses": 0,
+    "evictions": 0,
+    "hitRate": 0,
+    "cacheSize": 0,
+    "maxEntries": 4096
+  },
+  "hasFlows": true,
+  "flows": [
+    {
+      "flowType": "DATA_LEAK",
+      "ruleId": "sensitive-data-message-egress",
+      "ruleDescription": "User-permission-gated data (bookmarks, history, cookies, identity, ...) leaving via a cross-extension or window message channel.",
+      "sourceType": "CHROME_IDENTITY_TOKEN",
+      "sourceRemark": "identity.authToken",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L28:C27 -> L28:C32",
+      "sinkType": "CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE",
+      "sinkRemark": "chrome.runtime.onConnectExternal.addListener[postMessage]",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L28:C8 -> L28:C35",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "CRITICAL",
+      "severityReason": "`externally_connectable.ids` contains `*`, allowing any extension to connect.",
+      "severityEvidence": [
+        "*"
+      ],
+      "sourceCode": " port.postMessage({ >>>token<<< });                ",
+      "sinkCode": "NTITY_TOKEN\n        >>>port.postMessage({ token })<<<;                   "
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "attacker-input-privileged-operation",
+      "ruleDescription": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+      "sourceType": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+      "sourceRemark": "chrome.runtime.onConnectExternal.addListener[onMessage]",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L24:C9 -> L24:C12",
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L49:C6 -> L49:C62",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "CRITICAL",
+      "severityReason": "`externally_connectable.ids` contains `*`, allowing any extension to connect.",
+      "severityEvidence": [
+        "*"
+      ],
+      "sourceCode": "_ONMESSAGE\n    if (!>>>msg<<<) return;\n\n    if (m",
+      "sinkCode": " msg.tabId) {\n      >>>chrome.tabs.executeScript(msg.tabId, { code: msg.code })<<<;   // SINK CHROME_T"
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "window.addEventListener(message)",
+      "sourceFile": "content",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "*://*.devhub.example/*"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "*://*.devhub.example/*"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L56:C2 -> L62:C4",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "[Unknown URL]",
+      "sinkUrlTaintControl": "FULL",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L7:C8 -> L10:C4",
+      "ctx": "background",
+      "messagePassing": true,
+      "channel": "runtime.connect.sender.message[content->background]",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "HIGH",
+      "severityReason": "Wildcard subdomain matching is allowed.",
+      "severityEvidence": [
+        "*://*.devhub.example/*"
+      ],
+      "sourceCode": "tener((port) => {\n  >>>port.onMessage.addListener((msg) => {                           // SOURCE PSEUDO_MESSAGE → resolves to WINDOW_MESSAGE_EVENT via content\n    if (msg && msg.kind === \"GRAB_MHTML\" && msg.tabId) {\n      chrome.pageCapture.saveAsMHTML({ tabId: msg.tabId }, (blob) => {  // SOURCE CHROME_PAGECAPTURE_MHTML\n        uploadMhtml(msg.uploadUrl, blob);\n      });\n    }\n  })<<<;\n});\n\n// Helper scr",
+      "sinkCode": "runtime.onConnect.ad>>>dListener                         (incoming port)\n//   - chrome.identity.getAuthToken                                 (SENSITIVE_DATA source)\n//   - chrome.pageCaptu<<<re.saveAsMHTML      "
+    },
+    {
+      "flowType": "DATA_LEAK",
+      "ruleId": "sensitive-data-network-send",
+      "ruleDescription": "User-permission-gated data (cookies, history, bookmarks, identity, downloads, ...) exfiltrated via an outbound network request (fetch / XHR / axios / WebSocket). The flagship data-leak pattern. Benign auth-header use is filtered by suppress-sensitive-data-request-headers below.",
+      "sourceType": "CHROME_PAGECAPTURE_MHTML",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L59:C35 -> L59:C39",
+      "sinkType": "FETCH_BODY",
+      "sinkRemark": "[Unknown URL]",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L7:C8 -> L10:C4",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "UNKNOWN",
+      "severity": "LOW",
+      "severityReason": "Unable to locate content_scripts or externally_connectable constraints.",
+      "severityEvidence": [],
+      "sourceCode": "html(msg.uploadUrl, >>>blob<<<);\n      });\n    }\n ",
+      "sinkCode": "runtime.onConnect.ad>>>dListener                         (incoming port)\n//   - chrome.identity.getAuthToken                                 (SENSITIVE_DATA source)\n//   - chrome.pageCaptu<<<re.saveAsMHTML      "
+    }
+  ]
+}

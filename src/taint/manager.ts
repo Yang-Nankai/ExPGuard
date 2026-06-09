@@ -20,7 +20,7 @@ import config, { DEFAULT_REPORT_OPTIONS, ReportOptions } from "../config";
 import { Errors } from "../utils/errorCode";
 import { ExtensionScript } from "../extension/extensionScript";
 import {
-  getFlowType,
+  getFlowMatches,
   shouldFilterSourceByFrame,
   shouldIncludeScriptInPolicy,
 } from "./policy";
@@ -1317,6 +1317,12 @@ export class TaintManager {
     const flowSet = new Set<string>();
     const flowObjs: any[] = [];
 
+    // Build a global defId → context index ONCE per report run. The old
+    // `_findContextByDefId` walked every context for every sink, which is
+    // O(N·M) and was the hottest cross-context lookup. The index reduces
+    // it to O(1) per query at the cost of a single linear pass here.
+    const defOwnerIndex = this._buildDefOwnerIndex();
+
     for (const ctx of this._contexts.values()) {
       if (!shouldIncludeScriptInPolicy(ctx.filename)) continue;
 
@@ -1326,33 +1332,64 @@ export class TaintManager {
       // per context formatter to speed up
       const fmt = this._makeLocFormatter();
 
+      // Pre-index sources by taintId so we can look them up in O(1) instead
+      // of scanning the source array for every sink in this context.
+      const sourceByTaint = new Map<number, (typeof ctx.sources)[number]>();
+      for (const s of ctx.sources) sourceByTaint.set(s.taintId, s);
+
+      // Pre-index the source-AST-node for each taintId. We previously paid an
+      // O(paths) `find` per (sink, match) pair. Pick the *first* path entry
+      // for each taintId by simple iteration.
+      const sourceAstByTaint = new Map<number, Node>();
+      for (const p of ctx.paths) {
+        if (!sourceAstByTaint.has(p.taintId)) {
+          sourceAstByTaint.set(p.taintId, p.astNode);
+        }
+      }
+
+      // Pre-index message/storage edges per taintId so the per-sink loop
+      // doesn't have to scan ctx.paths twice for every emission.
+      const messageByTaint = new Map<number, (typeof ctx.paths)[number]>();
+      const storageByTaint = new Map<number, (typeof ctx.paths)[number]>();
+      for (const p of ctx.paths) {
+        if (p.PropagateType === "MESSAGE" && !messageByTaint.has(p.taintId)) {
+          messageByTaint.set(p.taintId, p);
+        }
+        if (p.PropagateType === "STORAGE" && !storageByTaint.has(p.taintId)) {
+          storageByTaint.set(p.taintId, p);
+        }
+      }
+
       for (const sink of ctx.sinks) {
         const taintId = sink.taintId;
 
-        const source = ctx.sources.find((s) => s.taintId === taintId);
+        const source = sourceByTaint.get(taintId);
         if (!source || source.isPseudo) continue;
 
-        const flowType = getFlowType(source.sourceType, sink.sinkType);
+        // The rule engine may return multiple FlowTypes for the same
+        // (source, sink) pair — e.g. cookies → fetch.body matching both a
+        // SENSITIVE_DATA → MESSAGE_RESPONSE rule and a NETWORK_SEND rule.
+        // We emit one summary record per matched FlowType so analysts can
+        // triage them as distinct findings.
+        const matches = getFlowMatches(source.sourceType, sink.sinkType);
+        if (matches.length === 0) continue;
 
-        if (!flowType) continue;
-
-        const sourceNode =
-          ctx.paths.find((p) => p.taintId === taintId)?.astNode ?? sink.astNode;
+        const sourceNode = sourceAstByTaint.get(taintId) ?? sink.astNode;
 
         const sourceLoc = sourceNode ? fmt(sourceNode) : "[unknown]";
         const sinkLoc = fmt(sink.astNode);
 
-        const key = `${source.sourceType}|${ctx.filename}|${sourceLoc}|${sink.sinkType}|${sinkLoc}|${sink.remark ?? ""}|${sink.urlTaintControl ?? ""}`;
+        for (const match of matches) {
+          const flowType = match.flowType;
+          // Dedup key now includes flowType so the same source/sink pair can
+          // surface under multiple categories without being collapsed.
+          const key = `${flowType}|${source.sourceType}|${ctx.filename}|${sourceLoc}|${sink.sinkType}|${sinkLoc}|${sink.remark ?? ""}|${sink.urlTaintControl ?? ""}`;
 
-        if (!flowSet.has(key)) {
+          if (flowSet.has(key)) continue;
           flowSet.add(key);
-          const message = ctx.paths.find(
-            (p) => p.taintId === taintId && p.PropagateType === "MESSAGE",
-          );
 
-          const storage = ctx.paths.find(
-            (p) => p.taintId === taintId && p.PropagateType === "STORAGE",
-          );
+          const message = messageByTaint.get(taintId);
+          const storage = storageByTaint.get(taintId);
 
           // Only backtrack source context for cross-context flows.
           // For local in-context flows, forcing originDefId lookup may hit
@@ -1360,7 +1397,7 @@ export class TaintManager {
           const hasCrossContextHop = !!message || !!storage;
           const sourceCtx =
             hasCrossContextHop && source.originDefId
-              ? this._findContextByDefId(source.originDefId, ctx)
+              ? defOwnerIndex.get(source.originDefId) ?? ctx
               : ctx;
 
           const sourceFile = sourceCtx?.filename ?? ctx.filename;
@@ -1399,6 +1436,8 @@ export class TaintManager {
 
           const flowObj: any = {
             flowType,
+            ruleId: match.ruleId,
+            ruleDescription: match.ruleDescription,
             sourceType: source.sourceType,
             sourceRemark: source.remark,
             sourceFile,
@@ -1468,6 +1507,23 @@ export class TaintManager {
   }
 
   /**
+   * Reverse-index every (defId → TaintContext that holds it) used by the
+   * report phase to backtrack a flow to its originating frame. Built once
+   * per report run.
+   */
+  private _buildDefOwnerIndex(): Map<number, TaintContext> {
+    const idx = new Map<number, TaintContext>();
+    for (const ctx of this._contexts.values()) {
+      for (const defId of ctx.defToTaintIds.keys()) {
+        // First-writer-wins: the source context (where the original tainted
+        // def was minted) is what _findContextByDefId previously preferred.
+        if (!idx.has(defId)) idx.set(defId, ctx);
+      }
+    }
+    return idx;
+  }
+
+  /**
    * Global summary (JSON format)
    */
   getGlobalSummary(opts?: ReportOptions) {
@@ -1508,16 +1564,6 @@ export class TaintManager {
     ctx.defToTaintIds.get(defId)!.add(taintId);
     ctx.knownTaintIds.add(taintId);
     def.markTaintedFlag();
-  }
-
-  private _findContextByDefId(
-    defId: number,
-    toCtx: TaintContext,
-  ): TaintContext {
-    for (const ctx of this._contexts.values()) {
-      if (ctx.defToTaintIds.has(defId) && ctx !== toCtx) return ctx;
-    }
-    return toCtx;
   }
 
   /* =======================

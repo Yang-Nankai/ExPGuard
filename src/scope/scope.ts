@@ -8,6 +8,9 @@ import Def from "../def-use/types/def";
 import PageScope from "./pageScope";
 import FunctionScope from "./functionScope";
 import { Errors } from "../utils/errorCode";
+import { CFGResult } from "../cfg/cfgResult";
+import { cfgValidator } from "../cfg/cfgValidator";
+import { FeatureModelSemantic } from "../def-use/features/features";
 
 /**
  * Scope
@@ -29,6 +32,9 @@ class Scope {
   private _lastReachIns: Map<string, Def>;
   private _builtInObjects: string[] = [];
   protected _isFunctionExpressionNameScope: boolean = false;
+  private _graph: CFGResult | null = null;
+  private _hasTaintAnalyzed: boolean = false;
+  private _featureSemantic: FeatureModelSemantic | undefined;
 
   static readonly NAME_EXTENSION = "$EXTENSION";
   static readonly NAME_PAGE_PREFIX = "$PAGE";
@@ -585,6 +591,54 @@ class Scope {
 
     visit(this);
     return result;
+  }
+
+  /**
+   * CFG attached to this scope (only meaningful for CFG-eligible scopes).
+   * Setting an invalid CFG is silently ignored to preserve the previous
+   * Model.graph semantics that callers relied on.
+   */
+  get graph(): CFGResult | null {
+    return this._graph;
+  }
+
+  set graph(graph: CFGResult | null) {
+    if (graph === null) {
+      this._graph = null;
+      return;
+    }
+    if (cfgValidator.isValidCFG(graph)) {
+      this._graph = graph;
+    }
+  }
+
+  /**
+   * Flag tracking whether this scope's reaching-definition / taint pass
+   * has executed. Used to deduplicate work in the coverage phase.
+   */
+  get hasTaintAnalyzed(): boolean {
+    return this._hasTaintAnalyzed;
+  }
+
+  set hasTaintAnalyzed(value: boolean) {
+    this._hasTaintAnalyzed = value;
+  }
+
+  /**
+   * Optional helper-function summary. When present, the inter-procedural
+   * analyzer dispatches directly into this semantic instead of stepping
+   * through the callee's CFG.
+   */
+  get featureSemantic(): FeatureModelSemantic | undefined {
+    return this._featureSemantic;
+  }
+
+  set featureSemantic(value: FeatureModelSemantic | undefined) {
+    this._featureSemantic = value;
+  }
+
+  isFeatureModel(): boolean {
+    return !!this._featureSemantic;
   }
 }
 

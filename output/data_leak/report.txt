@@ -1,0 +1,364 @@
+══════════════════════════════════════════════
+TAINT REPORT  util
+FRAME        BG_1
+══════════════════════════════════════════════
+
+✓ No issues in this file.
+Summary:
+  File            : util
+  Issues          : 0
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+TAINT REPORT  content
+FRAME        CS_1
+CONSTRAINT   {"matches":["https://*.shop.example/*"]}
+══════════════════════════════════════════════
+
+[!] Issue #1
+ ├─ Source     : DOCUMENT_LOCATION
+ ├─ Remark     : location.href
+ │  Location   : L10:C8 -> L14:C3
+ │  File       : content
+ │  Frame      : CS_1
+ │  Constraint : {"matches":["https://*.shop.example/*"]}
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L10:C8 -> L14:C3 (object.setProperty)
+ │   ASSIGN     @ L17:C8 -> L17:C25 (logical-left)
+ │   ELEMENT    @ L17:C27 -> L17:C46 (implicit.add)
+ │   ELEMENT    @ L17:C38 -> L17:C46 (member-element-container)
+ │   ELEMENT    @ L15:C8 -> L15:C16 (object.setProperty)
+ │   ELEMENT    @ L17:C27 -> L17:C46 (implicit.add)
+ │   ELEMENT    @ L17:C38 -> L17:C46 (member-element-container)
+ │   ELEMENT    @ L18:C2 -> L20:C4 (object.setProperty)
+ │   (total steps: 8)
+ │
+ ├─ Sink(s):
+ │   - CHROME_LOCAL_STORAGE @ L18:C2 -> L20:C4 (profile)  [file: content]
+ │     frame: CS_1
+ │     constraint: {"matches":["https://*.shop.example/*"]}
+ │
+ └─ Sanitized : NO
+
+[!] Issue #2
+ ├─ Source     : DOCUMENT_LOCATION
+ ├─ Remark     : location.hostname
+ │  Location   : L31:C17 -> L31:C55
+ │  File       : content
+ │  Frame      : CS_1
+ │  Constraint : {"matches":["https://*.shop.example/*"]}
+ │
+ ├─ Propagation:
+ │   ASSIGN     @ L31:C17 -> L31:C55 (logical-right)
+ │   ASSIGN     @ L35:C4 -> L35:C10 (identifier)
+ │   ELEMENT    @ L33:C2 -> L36:C4 (object.setProperty)
+ │   (total steps: 3)
+ │
+ ├─ Sink(s):
+ │
+ └─ Sanitized : NO
+
+[!] Issue #3
+ ├─ Source     : DOCUMENT_COOKIE
+ ├─ Remark     : document.cookie
+ │  Location   : L10:C8 -> L14:C3
+ │  File       : content
+ │  Frame      : CS_1
+ │  Constraint : {"matches":["https://*.shop.example/*"]}
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L10:C8 -> L14:C3 (object.setProperty)
+ │   ASSIGN     @ L17:C8 -> L17:C25 (logical-left)
+ │   ELEMENT    @ L17:C27 -> L17:C46 (implicit.add)
+ │   ELEMENT    @ L17:C38 -> L17:C46 (member-element-container)
+ │   ELEMENT    @ L15:C8 -> L15:C16 (object.setProperty)
+ │   ELEMENT    @ L17:C27 -> L17:C46 (implicit.add)
+ │   ELEMENT    @ L17:C38 -> L17:C46 (member-element-container)
+ │   ELEMENT    @ L18:C2 -> L20:C4 (object.setProperty)
+ │   (total steps: 8)
+ │
+ ├─ Sink(s):
+ │   - CHROME_LOCAL_STORAGE @ L18:C2 -> L20:C4 (profile)  [file: content]
+ │     frame: CS_1
+ │     constraint: {"matches":["https://*.shop.example/*"]}
+ │
+ └─ Sanitized : NO
+
+[!] Issue #4
+ ├─ Source     : DOCUMENT_TITLE
+ ├─ Remark     : document.title
+ │  Location   : L10:C8 -> L14:C3
+ │  File       : content
+ │  Frame      : CS_1
+ │  Constraint : {"matches":["https://*.shop.example/*"]}
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L10:C8 -> L14:C3 (object.setProperty)
+ │   ASSIGN     @ L17:C8 -> L17:C25 (logical-left)
+ │   ELEMENT    @ L17:C27 -> L17:C46 (implicit.add)
+ │   ELEMENT    @ L17:C38 -> L17:C46 (member-element-container)
+ │   ELEMENT    @ L15:C8 -> L15:C16 (object.setProperty)
+ │   ELEMENT    @ L17:C27 -> L17:C46 (implicit.add)
+ │   ELEMENT    @ L17:C38 -> L17:C46 (member-element-container)
+ │   ELEMENT    @ L18:C2 -> L20:C4 (object.setProperty)
+ │   (total steps: 8)
+ │
+ ├─ Sink(s):
+ │   - CHROME_LOCAL_STORAGE @ L18:C2 -> L20:C4 (profile)  [file: content]
+ │     frame: CS_1
+ │     constraint: {"matches":["https://*.shop.example/*"]}
+ │
+ └─ Sanitized : NO
+
+[!] Issue #5
+ ├─ Source     : WINDOW_MESSAGE_EVENT
+ ├─ Remark     : window.addEventListener(message)
+ │  Location   : L29:C6 -> L29:C17
+ │  File       : content
+ │  Frame      : CS_1
+ │  Constraint : {"matches":["https://*.shop.example/*"]}
+ │
+ ├─ Propagation:
+ │   ASSIGN     @ L29:C6 -> L29:C17 (unary)
+ │   ELEMENT    @ L29:C21 -> L29:C36 (member-element)
+ │   ASSIGN     @ L29:C21 -> L29:C36 (binary-left)
+ │   ASSIGN     @ L29:C6 -> L29:C62 (logical-left)
+ │   ASSIGN     @ L29:C6 -> L29:C62 (logical-right)
+ │   ELEMENT    @ L31:C17 -> L31:C34 (member-element)
+ │   ASSIGN     @ L31:C17 -> L31:C55 (logical-left)
+ │   ASSIGN     @ L35:C4 -> L35:C10 (identifier)
+ │   ELEMENT    @ L33:C2 -> L36:C4 (object.setProperty)
+ │   (total steps: 9)
+ │
+ ├─ Sink(s):
+ │
+ └─ Sanitized : NO
+
+Summary:
+  File            : content
+  Issues          : 5
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+TAINT REPORT  reporter
+FRAME        BG_1
+══════════════════════════════════════════════
+
+✓ No issues in this file.
+Summary:
+  File            : reporter
+  Issues          : 0
+══════════════════════════════════════════════
+
+══════════════════════════════════════════════
+TAINT REPORT  background
+FRAME        BG_1
+══════════════════════════════════════════════
+
+[!] Issue #1
+ ├─ Source     : CHROME_ONMESSAGEEXTERNAL_MESSAGE
+ ├─ Remark     : chrome.runtime.onMessageExternal.addListener[message]
+ │  Location   : L28:C6 -> L28:C9
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   ASSIGN     @ L28:C6 -> L28:C9 (identifier)
+ │   ASSIGN     @ L28:C13 -> L28:C16 (identifier)
+ │   ELEMENT    @ L28:C13 -> L28:C21 (member-element)
+ │   ASSIGN     @ L28:C13 -> L28:C21 (binary-left)
+ │   ASSIGN     @ L28:C6 -> L28:C38 (logical-left)
+ │   ASSIGN     @ L28:C6 -> L28:C38 (logical-right)
+ │   ASSIGN     @ L28:C6 -> L28:C9 (identifier)
+ │   ASSIGN     @ L30:C14 -> L30:C17 (identifier)
+ │   ELEMENT    @ L30:C14 -> L30:C23 (member-element)
+ │   ASSIGN     @ L30:C14 -> L30:C29 (logical-left)
+ │   ELEMENT    @ L29:C4 -> L34:C5 (object.setProperty)
+ │   ASSIGN     @ L40:C6 -> L40:C9 (identifier)
+ │   ASSIGN     @ L40:C13 -> L40:C16 (identifier)
+ │   ELEMENT    @ L40:C13 -> L40:C21 (member-element)
+ │   ASSIGN     @ L40:C13 -> L40:C21 (binary-left)
+ │   ASSIGN     @ L40:C6 -> L40:C35 (logical-left)
+ │   ASSIGN     @ L40:C6 -> L40:C35 (logical-right)
+ │   ASSIGN     @ L40:C6 -> L40:C66 (logical-left)
+ │   ASSIGN     @ L40:C6 -> L40:C9 (identifier)
+ │   ASSIGN     @ L41:C33 -> L41:C36 (identifier)
+ │   ELEMENT    @ L41:C33 -> L41:C40 (member-element)
+ │   ELEMENT    @ L41:C4 -> L41:C43 (object.setProperty)
+ │   ASSIGN     @ L40:C6 -> L40:C9 (identifier)
+ │   ASSIGN     @ L40:C13 -> L40:C16 (identifier)
+ │   ELEMENT    @ L40:C13 -> L40:C21 (member-element)
+ │   ASSIGN     @ L40:C13 -> L40:C21 (binary-left)
+ │   ASSIGN     @ L40:C6 -> L40:C35 (logical-left)
+ │   ASSIGN     @ L40:C6 -> L40:C35 (logical-right)
+ │   ASSIGN     @ L40:C6 -> L40:C66 (logical-left)
+ │   ASSIGN     @ L40:C6 -> L40:C9 (identifier)
+ │   ASSIGN     @ L41:C33 -> L41:C36 (identifier)
+ │   ELEMENT    @ L41:C33 -> L41:C40 (member-element)
+ │   ELEMENT    @ L41:C4 -> L41:C43 (object.setProperty)
+ │   (total steps: 33)
+ │
+ ├─ Sink(s):
+ │   - CHROME_HISTORY_ADD_URL @ L41:C4 -> L41:C43  [file: background]
+ │     frame: BG_1
+ │   - CHROME_HISTORY_ADD_URL @ L41:C4 -> L41:C43  [file: background]
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+[!] Issue #2
+ ├─ Source     : CHROME_HISTORY_INFO
+ ├─ Remark     : 
+ │  Location   : L29:C4 -> L34:C5
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L29:C4 -> L34:C5 (object.setProperty)
+ │   ELEMENT    @ L32:C8 -> L32:C43 (object.setProperty)
+ │   (total steps: 2)
+ │
+ ├─ Sink(s):
+ │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L32:C8 -> L32:C43 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+[!] Issue #3
+ ├─ Source     : CHROME_HISTORY_INFO
+ ├─ Remark     : history.search
+ │  Location   : L32:C8 -> L32:C43
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L32:C8 -> L32:C43 (object.setProperty)
+ │   (total steps: 1)
+ │
+ ├─ Sink(s):
+ │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L32:C8 -> L32:C43 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+[!] Issue #4
+ ├─ Source     : WINDOW_MESSAGE_EVENT
+ ├─ Remark     : window.addEventListener(message)
+ │  Location   : L69:C0 -> L76:C2
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   MESSAGE    @ L69:C0 -> L76:C2 (runtime.single.sender.message[content->background])
+ │   ELEMENT    @ L70:C13 -> L70:C21 (member-element-container)
+ │   ASSIGN     @ L70:C13 -> L70:C21 (binary-left)
+ │   ASSIGN     @ L70:C6 -> L70:C41 (logical-left)
+ │   ASSIGN     @ L70:C6 -> L70:C41 (logical-right)
+ │   ELEMENT    @ L73:C13 -> L73:C21 (member-element-container)
+ │   ASSIGN     @ L73:C13 -> L73:C21 (binary-left)
+ │   ASSIGN     @ L73:C6 -> L73:C42 (logical-left)
+ │   ASSIGN     @ L73:C6 -> L73:C42 (logical-right)
+ │   ASSIGN     @ L73:C6 -> L73:C76 (logical-left)
+ │   ELEMENT    @ L74:C27 -> L74:C37 (member-element-container)
+ │   ASSIGN     @ L20:C39 -> L20:C45 (identifier)
+ │   ASSIGN     @ L6:C28 -> L6:C34 (identifier)
+ │   ELEMENT    @ L6:C4 -> L14:C6 (object.setProperty)
+ │   ASSIGN     @ L21:C49 -> L21:C55 (identifier)
+ │   ASSIGN     @ L21:C49 -> L21:C55 (binary-right)
+ │   ASSIGN     @ L22:C20 -> L22:C23 (identifier)
+ │   ASSIGN     @ L19:C31 -> L19:C34 (identifier)
+ │   ASSIGN     @ L70:C13 -> L70:C21 (binary-left)
+ │   ASSIGN     @ L70:C6 -> L70:C41 (logical-left)
+ │   ASSIGN     @ L70:C6 -> L70:C41 (logical-right)
+ │   ASSIGN     @ L73:C13 -> L73:C21 (binary-left)
+ │   ASSIGN     @ L73:C6 -> L73:C42 (logical-left)
+ │   ASSIGN     @ L73:C6 -> L73:C42 (logical-right)
+ │   ASSIGN     @ L73:C6 -> L73:C76 (logical-left)
+ │   ASSIGN     @ L20:C39 -> L20:C45 (identifier)
+ │   ASSIGN     @ L6:C28 -> L6:C34 (identifier)
+ │   ELEMENT    @ L6:C4 -> L14:C6 (object.setProperty)
+ │   ASSIGN     @ L21:C49 -> L21:C55 (identifier)
+ │   ASSIGN     @ L21:C49 -> L21:C55 (binary-right)
+ │   ASSIGN     @ L22:C20 -> L22:C23 (identifier)
+ │   ASSIGN     @ L19:C31 -> L19:C34 (identifier)
+ │   (total steps: 32)
+ │
+ ├─ Sink(s):
+ │   - FETCH_RESOURCE @ L19:C25 -> L23:C4 ([Unknown URL])  [file: background]
+ │     url-control: FULL
+ │     frame: BG_1
+ │   - FETCH_RESOURCE @ L19:C25 -> L23:C4 ([Unknown URL])  [file: background]
+ │     url-control: FULL
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+[!] Issue #5
+ ├─ Source     : CHROME_COOKIES_INFO
+ ├─ Remark     : 
+ │  Location   : L6:C4 -> L14:C6
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L6:C4 -> L14:C6 (object.setProperty)
+ │   ELEMENT    @ L8:C24 -> L8:C35 (member-element-container)
+ │   ELEMENT    @ L19:C8 -> L23:C4 (object.setProperty)
+ │   RETURN     @ L22:C10 -> L22:C56 (json.stringify)
+ │   ELEMENT    @ L19:C8 -> L23:C4 (object.setProperty)
+ │   ELEMENT    @ L6:C4 -> L14:C6 (object.setProperty)
+ │   ELEMENT    @ L8:C24 -> L8:C35 (member-element-container)
+ │   ELEMENT    @ L19:C8 -> L23:C4 (object.setProperty)
+ │   RETURN     @ L22:C10 -> L22:C56 (json.stringify)
+ │   ELEMENT    @ L19:C8 -> L23:C4 (object.setProperty)
+ │   (total steps: 10)
+ │
+ ├─ Sink(s):
+ │   - FETCH_BODY @ L19:C25 -> L23:C4 ([Unknown URL])  [file: background]
+ │     frame: BG_1
+ │   - FETCH_BODY @ L19:C25 -> L23:C4 ([Unknown URL])  [file: background]
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+[!] Issue #6
+ ├─ Source     : DOCUMENT_LOCATION
+ ├─ Remark     : location.hostname
+ │  Location   : L69:C0 -> L76:C2
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   MESSAGE    @ L69:C0 -> L76:C2 (runtime.single.sender.message[content->background])
+ │   ELEMENT    @ L70:C13 -> L70:C21 (member-element-container)
+ │   ASSIGN     @ L70:C13 -> L70:C21 (binary-left)
+ │   ASSIGN     @ L70:C6 -> L70:C41 (logical-left)
+ │   ASSIGN     @ L70:C6 -> L70:C41 (logical-right)
+ │   ELEMENT    @ L73:C13 -> L73:C21 (member-element-container)
+ │   ASSIGN     @ L73:C13 -> L73:C21 (binary-left)
+ │   ASSIGN     @ L73:C6 -> L73:C42 (logical-left)
+ │   ASSIGN     @ L73:C6 -> L73:C42 (logical-right)
+ │   ASSIGN     @ L73:C6 -> L73:C76 (logical-left)
+ │   ELEMENT    @ L74:C27 -> L74:C37 (member-element-container)
+ │   ASSIGN     @ L20:C39 -> L20:C45 (identifier)
+ │   ASSIGN     @ L6:C28 -> L6:C34 (identifier)
+ │   ELEMENT    @ L6:C4 -> L14:C6 (object.setProperty)
+ │   ASSIGN     @ L21:C49 -> L21:C55 (identifier)
+ │   ASSIGN     @ L21:C49 -> L21:C55 (binary-right)
+ │   ASSIGN     @ L22:C20 -> L22:C23 (identifier)
+ │   ASSIGN     @ L19:C31 -> L19:C34 (identifier)
+ │   (total steps: 18)
+ │
+ ├─ Sink(s):
+ │   - FETCH_RESOURCE @ L19:C25 -> L23:C4 ([Unknown URL])  [file: background]
+ │     url-control: FULL
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+Summary:
+  File            : background
+  Issues          : 6
+══════════════════════════════════════════════
+

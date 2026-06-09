@@ -1,7 +1,15 @@
 import { SourceType, SinkType } from "./types";
 import { FrameConstraint, scriptUsageTracker } from "../extension/scriptUsageTracker";
 
-type ConstraintKind = "EXTERNALLY_CONNECTABLE" | "CONTENT_SCRIPT_MATCHES" | "UNKNOWN";
+type ConstraintKind =
+  | "EXTERNALLY_CONNECTABLE"
+  | "CONTENT_SCRIPT_MATCHES"
+  // Source originates from an extension UI surface (popup, options, side panel,
+  // devtools, override pages, offscreen). These pages do not have
+  // content_scripts.matches — their attack surface is governed by who can open
+  // them (the user, in most cases) and what messages they accept.
+  | "EXTENSION_UI_PAGE"
+  | "UNKNOWN";
 
 export type SeverityLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
@@ -235,6 +243,15 @@ function isContentScriptWebAttackSurface(
   return WEB_ATTACK_SOURCES.includes(sourceType) && sourceFrame.startsWith("CS_");
 }
 
+function isExtensionUiWebAttackSurface(
+  sourceType: SourceType,
+  sourceFrame: string,
+): boolean {
+  if (!WEB_ATTACK_SOURCES.includes(sourceType)) return false;
+  const family = scriptUsageTracker.getFrameFamily(sourceFrame);
+  return family === "EX" || family === "DT" || family === "OF";
+}
+
 export function analyzeFlowConstraintSeverity(input: {
   sourceType: SourceType;
   sinkType: SinkType;
@@ -265,6 +282,22 @@ export function analyzeFlowConstraintSeverity(input: {
       severity: best.level,
       severityReason: best.reason,
       severityEvidence: best.evidence,
+    };
+  }
+
+  if (isExtensionUiWebAttackSurface(sourceType, sourceFrame)) {
+    // Popups / options / side panels / devtools / offscreen documents accept
+    // postMessage / custom events too, but they have no manifest-level URL
+    // constraint to evaluate. Mark them MEDIUM by default: they are reachable
+    // only from inside the extension permissions context (high impact if
+    // exploitable), but the actor must already control a posted message in
+    // that context (which usually requires another foothold).
+    return {
+      constraintKind: "EXTENSION_UI_PAGE",
+      severity: "MEDIUM",
+      severityReason:
+        "Source originates from an extension UI surface (popup/options/side_panel/devtools/offscreen); no manifest URL constraint applies.",
+      severityEvidence: [sourceFrame],
     };
   }
 

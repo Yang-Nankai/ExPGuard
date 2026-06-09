@@ -2,7 +2,11 @@ import path from "path";
 import fs from "fs/promises";
 import { epgModelBuilder } from "./epgmodelbuilder";
 import { ExtensionSourceType } from "./extension/extensionLoader";
-import { taintManager, printTaintReportsCLI } from "./taint";
+import { taintManager, printTaintReportsCLI, renderHtmlReport, collectFileTree } from "./taint";
+import { computeCoverage, formatCoveragePct } from "./coverage/coverage";
+import { scopeController } from "./scope/scopeCtrl";
+import { taintRuleEngine } from "./taint/ruleEngine";
+import config from "./config";
 import logger, { setLogFile } from "./utils/logger";
 import { interAnalyzer } from "./def-use/analyzers/interProceduralAnalyzer";
 import { cleanupArtifacts } from "./utils/cleanup";
@@ -10,12 +14,51 @@ import { Timer } from "./utils/timer";
 
 type TaskStatus = "success" | "error";
 
+/**
+ * Structured outcome of a single analysis. Each analysis runs in its own
+ * process (the CLI is one-extension-per-invocation; batch mode spawns one
+ * subprocess per extension via scripts/batch_analyze.py), so there is no
+ * in-process state to reset between runs — module-level singletons start
+ * pristine in every fresh process.
+ */
+export interface RunResult {
+  extensionId?: string;
+  extensionVersion?: string;
+  sourceType: ExtensionSourceType;
+  input: string;
+  outputDir: string;
+  status: TaskStatus;
+  durationMs: number;
+  totalFiles: number;
+  /** Number of taint flows detected. */
+  findings: number;
+  /** Per-flowType finding counts. */
+  flowTypeCounts: Record<string, number>;
+  /** Node coverage ratio 0..1, if computed. */
+  nodeCoverage?: number;
+  scopeCoverage?: number;
+  errorType?: string;
+  errorMessage?: string;
+}
+
 interface RunOptions {
   sourceType: ExtensionSourceType;
   input: string;
   outputDir: string;
   extensionId?: string;
   extensionVersion?: string;
+  /**
+   * Optional path to a custom taint-rule file. Overrides
+   * `config.taintRulesPath` for this run only. The engine layers the file
+   * on top of the bundled defaults — it does not replace them.
+   */
+  taintRulesPath?: string;
+
+  /**
+   * When true, also write a self-contained `report.html` to the output
+   * directory. Overrides `config.emitHtmlReport` for this run only.
+   */
+  emitHtml?: boolean;
 }
 
 interface TaskError {
@@ -48,17 +91,33 @@ async function safeWriteFile(
   }
 }
 
-export async function runSingleTask(opts: RunOptions) {
+export async function runSingleTask(opts: RunOptions): Promise<RunResult> {
   const outputDir = opts.outputDir;
 
   await fs.mkdir(outputDir, { recursive: true });
   setLogFile(path.join(outputDir, "analysis.log"));
+
+  // Load any user-supplied taint rules before analysis starts. The CLI flag
+  // takes precedence over `config.taintRulesPath`; pass `--taint-rules ""`
+  // to skip both. Failures here are logged and the analyzer falls back to
+  // the bundled default ruleset.
+  const rulesPath = opts.taintRulesPath ?? config.taintRulesPath;
+  if (rulesPath) {
+    try {
+      taintRuleEngine.loadFromFile(rulesPath);
+    } catch (err) {
+      logger.error(
+        `[TAINT-RULES] Failed to load ${rulesPath}, falling back to defaults: ${String(err)}`,
+      );
+    }
+  }
 
   const timer = new Timer("EPG Run Analysis Task");
   timer.start();
 
   let status: TaskStatus = "success";
   let taskError: TaskError | undefined;
+  let result: RunResult;
 
   try {
     await epgModelBuilder.analyze({
@@ -78,6 +137,12 @@ export async function runSingleTask(opts: RunOptions) {
     timer.stop();
     const fileStats: any[] = epgModelBuilder.extensionContext?.getScriptsSummary() ?? [];
 
+    // Effective extension ID. For XPI the ID is derived from the manifest's
+    // gecko settings inside the loader, so prefer the resolved context ID over
+    // the (possibly undefined) CLI-supplied one.
+    const effectiveId =
+      epgModelBuilder.extensionContext?.id ?? opts.extensionId;
+
    try {
      const report = printTaintReportsCLI(
        taintManager.generateGlobalReport(),
@@ -92,8 +157,25 @@ export async function runSingleTask(opts: RunOptions) {
    }
 
     const baseSummary = taintManager.getGlobalSummary?.() ?? {};
+
+    // Analysis coverage: how much of the extension's code the analyzer reached.
+    // Computed from the in-memory scope trees / CFGs before any teardown.
+    let coverage: ReturnType<typeof computeCoverage> | undefined;
+    try {
+      coverage = computeCoverage(scopeController.pageScopeTrees);
+      logger.info(
+        `[COVERAGE] node=${formatCoveragePct(coverage.nodeCoverage)} ` +
+          `(${coverage.coveredNodes}/${coverage.totalNodes}) ` +
+          `scope=${formatCoveragePct(coverage.scopeCoverage)} ` +
+          `(${coverage.coveredScopes}/${coverage.totalScopes}) ` +
+          `scripts=${coverage.analyzedScripts}`,
+      );
+    } catch (err) {
+      logger.error(`[COVERAGE] Failed to compute coverage: ${String(err)}`);
+    }
+
     const summary = {
-      extensionId: opts.extensionId,
+      extensionId: effectiveId,
       extensionVersion: opts.extensionVersion,
       sourceType: opts.sourceType,
       status,
@@ -102,6 +184,7 @@ export async function runSingleTask(opts: RunOptions) {
       totalFiles: fileStats.length,
       totalSize: fileStats.reduce((acc, f) => acc + f.size, 0),
       cacheStats: interAnalyzer.getCacheReport?.(),
+      coverage,
       errorType: taskError?.type,
       errorMessage: taskError?.message,
       ...baseSummary,
@@ -112,9 +195,62 @@ export async function runSingleTask(opts: RunOptions) {
       JSON.stringify(summary, null, 2),
     );
 
+    // Optional self-contained HTML report. Must run BEFORE cleanupArtifacts(),
+    // which deletes the unpacked/ dir we read code snippets and the file tree
+    // from. Failures here are logged and never abort the run.
+    if ((opts.emitHtml ?? config.emitHtmlReport) && status !== "error") {
+      try {
+        const ctx = epgModelBuilder.extensionContext;
+        const html = renderHtmlReport({
+          meta: {
+            extensionId: effectiveId,
+            extensionVersion: opts.extensionVersion,
+            sourceType: opts.sourceType,
+            generatedAt: new Date().toISOString(),
+            durationMs: timer.getDurationMs(),
+          } as any,
+          manifest: ctx?.manifest ?? {},
+          files: ctx ? collectFileTree(ctx.baseDir) : [],
+          scripts: fileStats,
+          reports: taintManager.generateGlobalReport({ includeCode: true }),
+          flows: (baseSummary as any).flows ?? [],
+          coverage,
+        });
+        await safeWriteFile(path.join(outputDir, "report.html"), html);
+        logger.info(`[HTML-REPORT] wrote ${path.join(outputDir, "report.html")}`);
+      } catch (err) {
+        logger.error(`[HTML-REPORT] Failed to generate report.html: ${String(err)}`);
+      }
+    }
+
     // cleanup
     await cleanupArtifacts(outputDir, summary);
 
     logger.info(`Analysis finished with status=${status}`);
+
+    // Aggregate a structured result for the caller (batch mode).
+    const flows: any[] = (baseSummary as any).flows ?? [];
+    const flowTypeCounts: Record<string, number> = {};
+    for (const f of flows) {
+      flowTypeCounts[f.flowType] = (flowTypeCounts[f.flowType] ?? 0) + 1;
+    }
+    result = {
+      extensionId: effectiveId,
+      extensionVersion: opts.extensionVersion,
+      sourceType: opts.sourceType,
+      input: opts.input,
+      outputDir,
+      status,
+      durationMs: timer.getDurationMs(),
+      totalFiles: fileStats.length,
+      findings: flows.length,
+      flowTypeCounts,
+      nodeCoverage: coverage?.nodeCoverage,
+      scopeCoverage: coverage?.scopeCoverage,
+      errorType: taskError?.type,
+      errorMessage: taskError?.message,
+    };
   }
+
+  return result;
 }

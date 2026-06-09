@@ -8,6 +8,9 @@ import logger from "../utils/logger";
 import { extractPatternNames } from "../ast/patternVisitor";
 import { ExtensionScript } from "../extension/extensionScript";
 import PageScope from "./pageScope";
+import { cfgBuilder } from "../cfg/cfgBuilder";
+import { cfgValidator } from "../cfg/cfgValidator";
+import { CFGResult } from "../cfg/cfgResult";
 
 /**
  * ScopeTree inside a page
@@ -596,6 +599,86 @@ class ScopeTree {
    */
   getCFGEligibleScopes(): Scope[] {
     return this.scopes.filter((scope) => Scope.isCFGEligibleScope(scope));
+  }
+
+  /**
+   * Build intra-procedural CFG for every CFG-eligible scope in this tree.
+   * Each CFG is attached to its owning Scope (`scope.graph`); flow nodes are
+   * back-linked to their scope/scopeTree for downstream analyses.
+   */
+  buildIntraProceduralCFGs(): void {
+    for (const scope of this.getCFGEligibleScopes()) {
+      this._buildCFGForScope(scope);
+    }
+  }
+
+  /**
+   * Build a CFG for a single scope and bind every FlowNode back to its
+   * containing scope and this scope tree. Invalid CFGs are dropped with a
+   * warning to keep downstream analyses safe.
+   */
+  private _buildCFGForScope(scope: Scope): void {
+    try {
+      const astNode = scope.ast as any;
+      if (!astNode) {
+        scope.graph = null;
+        return;
+      }
+
+      const graph = Scope.isFunctionScope(scope)
+        ? cfgBuilder.getCFG(astNode.body)
+        : cfgBuilder.getCFG(astNode);
+
+      if (!graph || !cfgValidator.isValidCFG(graph)) {
+        logger.warn(`Invalid CFG for scope: ${scope.name}`);
+        scope.graph = null;
+        return;
+      }
+
+      scope.graph = graph;
+      this._bindGraphNodesToScopes(graph, scope);
+    } catch (err) {
+      logger.error(
+        `Failed to build CFG for scope "${scope.name}": ${String(err)}`,
+      );
+      scope.graph = null;
+    }
+  }
+
+  /**
+   * Resolve every FlowNode's owning scope using the AST range index, falling
+   * back to `defaultScope` when a node has no range or no narrower match.
+   */
+  private _bindGraphNodesToScopes(
+    graph: CFGResult,
+    defaultScope: Scope,
+  ): void {
+    for (const node of graph.allNodes) {
+      const range = node.astNode?.range;
+      node.scope = range
+        ? this.getNodeScopeByRangeOptimized(range) ?? defaultScope
+        : defaultScope;
+      node.scopeTree = this;
+    }
+  }
+
+  /**
+   * Lookup the CFG-eligible scope whose `mainlyRelatedScope` equals `scope`.
+   * In the new model, every CFG is owned by its scope directly, so this just
+   * checks the scope itself.
+   */
+  getCFGScope(scope: Scope): Scope | null {
+    if (!Scope.isScope(scope)) return null;
+    if (!Scope.isCFGEligibleScope(scope)) return null;
+    return this._scopes.includes(scope) ? scope : null;
+  }
+
+  /**
+   * Iterate the CFG-bearing scopes (the equivalent of the former
+   * `pageModels.intraProceduralModels`).
+   */
+  get cfgBearingScopes(): Scope[] {
+    return this.getCFGEligibleScopes();
   }
 
   get root() {

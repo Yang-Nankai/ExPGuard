@@ -1,9 +1,8 @@
 import { BaseNode, CatchClause, ForInStatement, SwitchCase } from "estree";
 import { ConnectionType, FlowNode } from "../flownode/flownode";
-import PageModels from "../model/pageModels";
+import ScopeTree from "../scope/scopeTree";
+import Scope from "../scope/scope";
 import Set from "../utils/set";
-import Var from "../def-use/types/var";
-import DUPair from "../def-use/types/duPair";
 
 export interface DotOptions {
   counter?: number;
@@ -47,15 +46,13 @@ const EDGE_STYLES: Record<ConnectionType, string> = {
 };
 
 /**
- * Generate a complete DOT graph for all page models
+ * Generate a complete DOT graph for all CFG-bearing scopes in a ScopeTree
  */
 export default function generateDot(
-  pageModels: PageModels,
+  scopeTree: ScopeTree,
   options: DotOptions = {},
 ): string {
   const output: string[] = [];
-
-  /* ================= Graph Header ================= */
 
   output.push(`digraph FullGraph {`);
   output.push(`  rankdir=TB;`);
@@ -71,56 +68,38 @@ export default function generateDot(
     `  edge [fontname="Consolas", fontsize=12, fontcolor="#424242", arrowsize=0.8];`,
   );
 
-  /* ================= Edge Deduplication ================= */
-
   const edgeSet = new Set<string>();
 
   const addEdge = (src: string, dst: string, attributes: string) => {
     edgeSet.add(`${src} -> ${dst} [${attributes}];`);
   };
 
-  /* ================= Node → Scope Mapping ================= */
+  const cfgScopes = scopeTree
+    .getCFGEligibleScopes()
+    .filter((s) => Boolean(s.graph));
 
+  // Map every flow node to its owning scope name (first writer wins)
   const nodeScopeMap = new Map<number, string>();
-
-  pageModels.intraProceduralModels.forEach((model) => {
-    const scopeName = model.mainlyRelatedScope?.name || "Anonymous Scope";
-    model.graph?.allNodes?.forEach((node) => {
-      nodeScopeMap.set(node.cfgId!, scopeName);
-    });
-  });
-
-  pageModels.interProceduralModels.forEach((model) => {
-    const scopeName = model.mainlyRelatedScope?.name || "Anonymous Scope";
-    model.graph?.allNodes?.forEach((node) => {
-      if (!nodeScopeMap.has(node.cfgId!)) {
-        nodeScopeMap.set(node.cfgId!, scopeName);
+  cfgScopes.forEach((scope) => {
+    const scopeName = scope.name || "Anonymous Scope";
+    scope.graph?.allNodes?.forEach((node) => {
+      if (node.cfgId !== undefined && !nodeScopeMap.has(node.cfgId)) {
+        nodeScopeMap.set(node.cfgId, scopeName);
       }
     });
   });
 
-  /* ================= Group Nodes by Scope ================= */
-
+  // Group nodes by scope
   const scopeToNodes = new Map<string, FlowNode[]>();
-  const allNodes: FlowNode[] = [];
-
-  pageModels.intraProceduralModels.forEach((model) => {
-    model.graph?.allNodes && allNodes.push(...model.graph.allNodes);
+  cfgScopes.forEach((scope) => {
+    scope.graph?.allNodes?.forEach((node) => {
+      const scopeName = nodeScopeMap.get(node.cfgId!) || "Global";
+      if (!scopeToNodes.has(scopeName)) {
+        scopeToNodes.set(scopeName, []);
+      }
+      scopeToNodes.get(scopeName)!.push(node);
+    });
   });
-
-  pageModels.interProceduralModels.forEach((model) => {
-    model.graph?.allNodes && allNodes.push(...model.graph.allNodes);
-  });
-
-  allNodes.forEach((node) => {
-    const scopeName = nodeScopeMap.get(node.cfgId!) || "Global";
-    if (!scopeToNodes.has(scopeName)) {
-      scopeToNodes.set(scopeName, []);
-    }
-    scopeToNodes.get(scopeName)!.push(node);
-  });
-
-  /* ================= Generate Subgraphs ================= */
 
   let clusterIndex = 0;
 
@@ -141,9 +120,7 @@ export default function generateDot(
           fillcolor: "#FFFFFF",
         };
 
-      const label = sanitizeString(
-        getNodeLabel(node, options.source),
-      );
+      const label = sanitizeString(getNodeLabel(node, options.source));
 
       output.push(
         `    n${node.cfgId} [label="${label}", shape="${style.shape}", style="${style.style}", fillcolor="${style.fillcolor}"];`,
@@ -153,65 +130,24 @@ export default function generateDot(
     output.push(`  }`);
   });
 
-  /* ================= Control Flow Edges ================= */
-
-  const processModelEdges = (model: any) => {
-    model.graph?.allNodes?.forEach((node: FlowNode) => {
+  // Control-flow edges
+  cfgScopes.forEach((scope) => {
+    scope.graph?.allNodes?.forEach((node: FlowNode) => {
       FlowNode.CONNECTION_TYPES.forEach((type) => {
-        const targets = node.typeTable[type]
-          ? [node.typeTable[type]]
-          : [];
-
-        targets.forEach((target) => {
-          if (target?.cfgId !== undefined) {
-            const attrs =
-              EDGE_STYLES[type] ||
-              'color="#9E9E9E", fontsize=12';
-            addEdge(`n${node.cfgId}`, `n${target.cfgId}`, attrs);
-          }
-        });
-      });
-    });
-  };
-
-  pageModels.intraProceduralModels.forEach(processModelEdges);
-  pageModels.interProceduralModels.forEach(processModelEdges);
-
-  /* ================= Def-Use Data Flow Edges ================= */
-
-  const addDUEdges = (dupairsMap: Map<Var, Set<DUPair>>) => {
-    dupairsMap.forEach((pairs, variable) => {
-      pairs.values().forEach((pair) => {
-        if (
-          pair.first?.cfgId !== undefined &&
-          pair.second?.cfgId !== undefined
-        ) {
-          addEdge(
-            `n${pair.first.cfgId}`,
-            `n${pair.second.cfgId}`,
-            `color="#43A047", style="dashed", penwidth=1.5, fontsize=12, fontcolor="#1B5E20", label="DU: ${sanitizeString(variable.name)}"`,
-          );
+        const target = node.typeTable[type];
+        if (target?.cfgId !== undefined) {
+          const attrs = EDGE_STYLES[type] || 'color="#9E9E9E", fontsize=12';
+          addEdge(`n${node.cfgId}`, `n${target.cfgId}`, attrs);
         }
       });
     });
-  };
-
-  pageModels.intraProceduralModels.forEach((m) =>
-    addDUEdges(m.dupairs),
-  );
-  pageModels.interProceduralModels.forEach((m) =>
-    addDUEdges(m.dupairs),
-  );
-
-  /* ================= Final Output ================= */
+  });
 
   output.push(...Array.from(edgeSet));
   output.push(`}`);
 
   return output.join("\n");
 }
-
-/* ================= Utility Functions ================= */
 
 function getNodeLabel(node: FlowNode, source?: string): string {
   if (node.label) return node.label;

@@ -512,6 +512,20 @@ function handleMemberExpression(cfgNode: FlowNode, node: any) {
         "ELEMENT",
         "member-element",
       );
+  } else if (objectDef.isTainted && objectDef.uniqueId !== resultDef.uniqueId) {
+    // Container taint: if the *container* is tainted (e.g. an object built
+    // out of a tainted JSON.parse result, or a tainted array), reading any
+    // property of it must carry the container's taint forward. Without this
+    // step, a downstream sink on `obj.field` after `obj = JSON.parse(x)`
+    // would be missed because `field` was sealed as a fresh UnknownDef
+    // during parse and never linked back to `x`.
+    tm.propagateTaint(
+      objectDef,
+      resultDef,
+      node,
+      "ELEMENT",
+      "member-element-container",
+    );
   }
 
   /**

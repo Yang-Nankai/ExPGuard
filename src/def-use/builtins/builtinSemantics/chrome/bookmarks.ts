@@ -1,16 +1,21 @@
 import { createChromeBuiltinSemantics, createChromeEventListenerSemantics } from "./utils";
-import { defFactory, FlowNode } from "../index";
+import { defFactory, FlowNode, extractConfigLiteral, literalOuter } from "../index";
 import { createArrayInstanceTaint } from "../utils";
 
 // --------------------- chrome.bookmarks -------------------
 
-// Existing read-style APIs
+// Existing read-style APIs. Tag with the query / id read where available.
 ["get", "getChildren", "getRecent", "getSubTree", "search"].forEach((name) =>
   createChromeBuiltinSemantics({
     apiName: `chrome.bookmarks.${name}`,
     callbackIndex: 1,
     sourceType: "CHROME_BOOKMARK_INFO",
     createReturnDef: (callNode, astNode) => createArrayInstanceTaint(callNode, astNode, "CHROME_BOOKMARK_INFO"),
+    remarkFromArgs: (args) => {
+      // search({query}) / search("text") / get(id)
+      const q = extractConfigLiteral(args[0], ["query"]) ?? literalOuter(args[0]);
+      return q !== undefined ? `bookmarks.${name}('${q}')` : `bookmarks.${name}`;
+    },
   }),
 );
 
@@ -19,6 +24,7 @@ createChromeBuiltinSemantics({
   callbackIndex: 0,
   sourceType: "CHROME_BOOKMARK_INFO",
   createReturnDef: (callNode, astNode) => createArrayInstanceTaint(callNode, astNode, "CHROME_BOOKMARK_INFO"),
+  remarkFromArgs: () => "bookmarks.getTree",
 });
 
 // --------------------- write-style APIs -------------------

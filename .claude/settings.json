@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Edit(./samples/**)",
+      "Write(./samples/**)",
+      "Edit(./dist/**)",
+      "Write(./dist/**)"
+    ],
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(npm test:*)",
+      "Bash(node dist/main.js:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | grep -E '^.*/src/.*\\.ts$' >/dev/null && (cd \"$CLAUDE_PROJECT_DIR\" && npx tsc --noEmit 2>&1 | tail -40) || true"
+          }
+        ]
+      }
+    ]
+  }
+}

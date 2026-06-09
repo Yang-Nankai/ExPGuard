@@ -2,7 +2,7 @@ import {
   createChromeBuiltinSemantics,
   createChromeEventListenerSemantics,
 } from "./utils";
-import { defFactory } from "../index";
+import { defFactory, extractConfigLiteral } from "../index";
 import { createArrayInstanceTaint } from "../utils";
 
 // --------------------- chrome.history -------------------
@@ -14,6 +14,10 @@ createChromeBuiltinSemantics({
   sourceType: "CHROME_HISTORY_INFO",
   createReturnDef: (callNode, astNode) =>
     createArrayInstanceTaint(callNode, astNode, "CHROME_HISTORY_INFO"),
+  remarkFromArgs: (args) => {
+    const q = extractConfigLiteral(args[0], ["text"]);
+    return q !== undefined ? `history.search('${q}')` : "history.search";
+  },
 });
 
 // chrome.history.getVisits
@@ -23,6 +27,10 @@ createChromeBuiltinSemantics({
   sourceType: "CHROME_HISTORY_INFO",
   createReturnDef: (callNode, astNode) =>
     createArrayInstanceTaint(callNode, astNode, "CHROME_HISTORY_INFO"),
+  remarkFromArgs: (args) => {
+    const u = extractConfigLiteral(args[0], ["url"]);
+    return u ? `history.getVisits(${u})` : "history.getVisits";
+  },
 });
 
 // chrome.history.addUrl

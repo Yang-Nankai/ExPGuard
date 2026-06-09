@@ -8,6 +8,24 @@ import {
 
 /**
  * ======================================================
+ * Function constructor: new Function(...args, body)
+ * ======================================================
+ */
+BuiltInSemantics.register(
+  "Function",
+  (args, _callNode, astNode, _thisDef) => {
+    // new Function(arg1, arg2, ..., body)
+    // The last argument is the function body (code to execute)
+    if (args.length > 0) {
+      const bodyDef = args[args.length - 1];
+      taintManager.checkSink(bodyDef, "NEW_FUNCTION", astNode);
+    }
+    return undefined;
+  },
+);
+
+/**
+ * ======================================================
  * Function.prototype.constructor(code)
  * ======================================================
  */
@@ -15,8 +33,10 @@ BuiltInSemantics.register(
   "Function.prototype.constructor",
   (args, _callNode, astNode, _thisDef) => {
     // NOTE: Creating new Function dynamically is unsafe
-    const [codeDef] = args;
-    taintManager.checkSink(codeDef, "NEW_FUNCTION", astNode);
+    if (args.length > 0) {
+      const bodyDef = args[args.length - 1];
+      taintManager.checkSink(bodyDef, "NEW_FUNCTION", astNode);
+    }
     return undefined;
   },
 );

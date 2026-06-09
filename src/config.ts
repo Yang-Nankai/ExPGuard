@@ -116,6 +116,21 @@ export interface AppConfig {
   /** Taint analysis report configuration */
   taintReportOptions: ReportOptions;
 
+  /**
+   * When true, additionally emit a self-contained `report.html` (folder tree +
+   * per-finding propagation timeline) alongside the text report. The CLI
+   * `--html` flag overrides this per run.
+   */
+  emitHtmlReport: boolean;
+
+  /**
+   * Optional path to a user-supplied taint rule file (.json or .ts/.js).
+   * When set, the rule engine layers these rules on top of the defaults at
+   * startup. Use it to add new (source, sink) → FlowType mappings or to
+   * suppress noisy categories without editing the engine.
+   */
+  taintRulesPath?: string;
+
   // Allow additional properties
   coverageAnalysis: boolean;
 }
@@ -186,6 +201,8 @@ const config: AppConfig = {
     tailCount: 50,
     maxFlowPerIssue: 100,
   },
+
+  emitHtmlReport: false,
 
   // TODO: 存在一点问题，对事件处理不完全，导致有些漏洞可能被遗漏(不过这些事件需要用户去触发才行肯定是)
   coverageAnalysis: false,  // false

@@ -50,6 +50,12 @@ export class FlowNode {
   private _col?: number;
   private _scope: Scope | null = null;
   private _scopeTree: ScopeTree | null = null;
+  // Set to true once the worklist proves this node is reachable along at
+  // least one feasible path from the function/page entry. Path-sensitive
+  // taint propagation gates its transfer function on this flag — a node
+  // that is provably in a dead branch (e.g. inside `if (false) { ... }`)
+  // never propagates def updates into the live DAG.
+  private _reachable: boolean = false;
   private readonly _typeTable: TypeTable;
 
   constructor(
@@ -217,6 +223,18 @@ export class FlowNode {
 
   set scopeTree(scopeTreeWrapper) {
     this._scopeTree = scopeTreeWrapper;
+  }
+
+  get reachable() {
+    return this._reachable;
+  }
+
+  markReachable() {
+    this._reachable = true;
+  }
+
+  clearReachable() {
+    this._reachable = false;
   }
 
   get typeTable() {

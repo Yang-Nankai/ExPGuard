@@ -1,0 +1,1739 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExPGuard Report — Devtools Co-pilot</title>
+<style>
+
+:root{--bg:#0f1419;--panel:#161b22;--panel2:#1c2330;--line:#2a3240;--fg:#d6dde6;--muted:#8b97a7;--acc:#4ea1ff}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:18px 0 8px}
+small{color:var(--muted);font-weight:400}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.muted{color:var(--muted)}
+.overview{padding:20px 24px;border-bottom:1px solid var(--line);background:var(--panel)}
+.cards{display:flex;gap:12px;margin:14px 0}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px 18px;min-width:90px;text-align:center}
+.card .num{font-size:22px;font-weight:700}.card .lbl{font-size:11px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.meta{display:flex;gap:18px;font-size:12px;margin-top:8px}
+.layout{display:flex;align-items:flex-start}
+.sidebar{width:300px;flex:0 0 300px;padding:16px;border-right:1px solid var(--line);height:calc(100vh - 0px);overflow:auto;position:sticky;top:0}
+.main{flex:1;padding:16px 24px;min-width:0}
+.toolbar{margin-bottom:14px}
+#filter{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--fg)}
+ul.tree{list-style:none;margin:0;padding-left:14px}
+ul.tree>li{margin:2px 0}
+summary.dir{cursor:pointer;user-select:none}
+li.file{display:flex;align-items:center;gap:6px;padding:1px 0}
+li.file .fname{color:var(--fg)}
+li.kind-manifest .fname{color:#ffd479}
+li.kind-html .fname{color:#7ee787}
+li.kind-image .fname,li.kind-other .fname{color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;background:#f85149;display:inline-block}
+.sz{margin-left:auto;font-size:11px;color:var(--muted)}
+table.scripts{width:100%;border-collapse:collapse;font-size:12px}
+table.scripts th,table.scripts td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+.mono{font-family:ui-monospace,monospace;word-break:break-all}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid var(--line);background:var(--panel2);color:var(--fg)}
+.badge.fam-BG{background:#1f6feb33;border-color:#1f6feb}
+.badge.fam-CS{background:#23863633;border-color:#238636}
+.badge.fam-EX{background:#8957e533;border-color:#8957e5}
+.badge.fam-DT{background:#9e6a0333;border-color:#9e6a03}
+.badge.fam-OF{background:#6e768133;border-color:#6e7681}
+.badge.flow{background:#1f6feb22;border-color:#1f6feb}
+.badge.flow-DATA_LEAK,.badge.flow-DOM_DATA_LEAK{background:#9e6a0333;border-color:#d29922}
+.badge.flow-PRIVILEGE_ESCALATION,.badge.flow-CODE_INJECTION{background:#da363322;border-color:#f85149}
+.badge.flow-DOM_XSS,.badge.flow-REQUEST_FORGERY{background:#8957e522;border-color:#a371f7}
+.badge.sev-CRITICAL{background:#da3633;border-color:#f85149;color:#fff}
+.badge.sev-HIGH{background:#bb800933;border-color:#f0883e}
+.badge.sev-MEDIUM{background:#9e6a0322;border-color:#d29922}
+.badge.sev-LOW{background:#6e768122;border-color:#6e7681}
+.badge.cross{background:#1c2b22;border-color:#2ea043}
+.issue{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.issuehead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.issuehead .pair code{background:var(--panel2);padding:1px 6px;border-radius:5px}
+.issuehead .right{margin-left:auto;color:var(--muted);font-size:12px}
+.ruledesc{color:var(--muted);margin:8px 0 4px;font-size:13px}
+ul.timeline{list-style:none;margin:10px 0 0;padding:0;border-left:2px solid var(--line);margin-left:6px}
+li.step{position:relative;padding:4px 0 10px 18px}
+.dotmark{position:absolute;left:-7px;top:6px;width:11px;height:11px;border-radius:50%;border:2px solid var(--bg)}
+.dotmark.src{background:#2ea043}.dotmark.mid{background:#6e7681}.dotmark.sink{background:#f85149}
+.stephead{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.stephead .kind{font-weight:700;font-size:12px}
+.stephead .loc{color:var(--muted);font-size:12px;font-family:ui-monospace,monospace}
+.remark{color:var(--acc);font-size:12px}
+.stepfile{display:block;color:var(--muted);font-size:11px;margin:1px 0}
+pre.snippet{margin:6px 0 0;padding:8px 10px;background:#0b0f14;border:1px solid var(--line);border-radius:6px;overflow:auto;font-size:12px}
+pre.snippet mark.hl{background:#f8514955;color:#ffd7d5;border-radius:3px;padding:0 2px}
+.issuefoot{margin-top:10px;font-size:12px;color:var(--muted)}
+.ok{color:#2ea043;font-size:16px}
+.ellipsis .stepbody{font-style:italic}
+
+</style>
+</head>
+<body>
+<section class="overview">
+    <h1>Devtools Co-pilot <small>v1.4.0</small></h1>
+    <p class="muted">Co-ordinates devtools-like helpers across multiple frames via runtime ports and pageCapture.</p>
+    <div class="cards">
+      <div class="card"><div class="num">4</div><div class="lbl">Scripts</div></div>
+      <div class="card"><div class="num">5</div><div class="lbl">Findings</div></div>
+      <div class="card"><div class="num">MV3</div><div class="lbl">Manifest</div></div>
+      <div class="card"><div class="num">29</div><div class="lbl">Duration (ms)</div></div>
+    </div>
+    <div class="chips"><span class="badge flow flow-DATA_LEAK">Data Leak · 2</span> <span class="badge flow flow-PRIVILEGE_ESCALATION">Privilege Escalation · 1</span> <span class="badge flow flow-REQUEST_FORGERY">Request Forgery · 1</span> <span class="badge sev sev-CRITICAL">CRITICAL · 2</span> <span class="badge sev sev-HIGH">HIGH · 1</span> <span class="badge sev sev-LOW">LOW · 1</span></div>
+    <div class="meta muted">
+      <span>ID: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
+      <span>Source: DIR</span>
+      <span>Generated: 2026-06-02T10:32:56.513Z</span>
+    </div>
+  </section>
+<div class="layout">
+  <aside class="sidebar">
+    <h2>Files</h2>
+    <ul class="tree"><li class="file kind-js" data-path="background.js"><span class="fname">background.js</span><span class="sz">3.1 KB</span></li><li class="file kind-js" data-path="content.js"><span class="fname">content.js</span><span class="sz">846 B</span></li><li class="file kind-js" data-path="helper.js"><span class="fname">helper.js</span><span class="sz">878 B</span></li><li class="file kind-manifest" data-path="manifest.json"><span class="fname">manifest.json</span><span class="sz">557 B</span></li><li class="file kind-js" data-path="uploader.js"><span class="fname">uploader.js</span><span class="sz">374 B</span></li></ul>
+    <h2>Scripts</h2>
+    <table class="scripts">
+    <thead><tr><th>Script</th><th>Frame</th><th>Size</th><th>Analysis</th></tr></thead>
+    <tbody><tr>
+      <td class="mono">background.js</td>
+      <td><span class="badge fam-BG">BG_1</span></td>
+      <td>3.1 KB</td>
+      <td>3.3 ms</td>
+    </tr><tr>
+      <td class="mono">content.js</td>
+      <td><span class="badge fam-CS">CS_1</span></td>
+      <td>846 B</td>
+      <td>5.6 ms</td>
+    </tr><tr>
+      <td class="mono">helper.js</td>
+      <td><span class="badge fam-BG">BG_1</span></td>
+      <td>878 B</td>
+      <td>1.1 ms</td>
+    </tr><tr>
+      <td class="mono">uploader.js</td>
+      <td><span class="badge fam-BG">BG_1</span></td>
+      <td>374 B</td>
+      <td>1.2 ms</td>
+    </tr></tbody></table>
+  </aside>
+  <main class="main">
+    <div class="toolbar">
+      <input id="filter" type="search" placeholder="Filter findings by file or flow type…" />
+    </div>
+    <div id="issues">
+      <article class="issue" data-flowtypes="UNKNOWN" data-file="content">
+    <header class="issuehead">
+      <span class="badge flow flow-UNCLASSIFIED">UNCLASSIFIED</span> 
+      <span class="pair"><code>WINDOW_MESSAGE_EVENT</code> → <code></code></span>
+      
+      <span class="loc right">content : L8:C6 -&gt; L8:C17</span>
+    </header>
+    
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_MESSAGE_EVENT</span>
+        <span class="loc">L8:C6 -&gt; L8:C17</span> · <span class="remark">window.addEventListener(message)</span></div>
+      <span class="stepfile">content</span>
+      <pre class="snippet"><code>MESSAGE_EVENT
+  if (&gt;&gt;&gt;!event.data&lt;&lt;&lt; || event.data.from </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L8:C6 -&gt; L8:C17</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code>MESSAGE_EVENT
+  if (&gt;&gt;&gt;!event.data&lt;&lt;&lt; || event.data.from </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L8:C21 -&gt; L8:C36</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> if (!event.data || &gt;&gt;&gt;event.data.from&lt;&lt;&lt; !== &quot;devhub-widget&quot;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L8:C21 -&gt; L8:C36</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code> if (!event.data || &gt;&gt;&gt;event.data.from&lt;&lt;&lt; !== &quot;devhub-widget&quot;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L8:C6 -&gt; L8:C56</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>MESSAGE_EVENT
+  if (&gt;&gt;&gt;!event.data || event.data.from !== &quot;devhub-widget&quot;&lt;&lt;&lt;) return;
+
+  port.po</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L8:C6 -&gt; L8:C56</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code>MESSAGE_EVENT
+  if (&gt;&gt;&gt;!event.data || event.data.from !== &quot;devhub-widget&quot;&lt;&lt;&lt;) return;
+
+  port.po</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L12:C11 -&gt; L12:C27</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>_MHTML&quot;,
+    tabId: &gt;&gt;&gt;event.data.tabId&lt;&lt;&lt;,
+    uploadUrl: eve</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L10:C2 -&gt; L14:C4</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>widget&quot;) return;
+
+  &gt;&gt;&gt;port.postMessage({
+    kind: &quot;GRAB_MHTML&quot;,
+    tabId: event.data.tabId,
+    uploadUrl: event.data.uploadUrl,
+  })&lt;&lt;&lt;;
+});
+
+port.onMessag</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L13:C15 -&gt; L13:C35</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>bId,
+    uploadUrl: &gt;&gt;&gt;event.data.uploadUrl&lt;&lt;&lt;,
+  });
+});
+
+port.on</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L10:C2 -&gt; L14:C4</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>widget&quot;) return;
+
+  &gt;&gt;&gt;port.postMessage({
+    kind: &quot;GRAB_MHTML&quot;,
+    tabId: event.data.tabId,
+    uploadUrl: event.data.uploadUrl,
+  })&lt;&lt;&lt;;
+});
+
+port.onMessag</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="PRIVILEGE_ESCALATION" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-PRIVILEGE_ESCALATION">Privilege Escalation</span> <span class="badge sev sev-CRITICAL">CRITICAL</span>
+      <span class="pair"><code>CHROME_ONCONNECTEXTERNAL_ONMESSAGE</code> → <code>CHROME_TABS_EXECUTE</code></span>
+      
+      <span class="loc right">background : L24:C9 -&gt; L24:C12</span>
+    </header>
+    <p class="ruledesc">Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_ONCONNECTEXTERNAL_ONMESSAGE</span>
+        <span class="loc">L24:C9 -&gt; L24:C12</span> · <span class="remark">chrome.runtime.onConnectExternal.addListener[onMessage]</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>_ONMESSAGE
+    if (!&gt;&gt;&gt;msg&lt;&lt;&lt;) return;
+
+    if (m</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L24:C9 -&gt; L24:C12</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>_ONMESSAGE
+    if (!&gt;&gt;&gt;msg&lt;&lt;&lt;) return;
+
+    if (m</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L24:C8 -&gt; L24:C12</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code>L_ONMESSAGE
+    if (&gt;&gt;&gt;!msg&lt;&lt;&lt;) return;
+
+    if (m</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L24:C9 -&gt; L24:C12</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>_ONMESSAGE
+    if (!&gt;&gt;&gt;msg&lt;&lt;&lt;) return;
+
+    if (m</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L26:C8 -&gt; L26:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>g) return;
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;PROBE_TOK</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L26:C8 -&gt; L26:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>g) return;
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;PROBE_TOKEN&quot;) </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L26:C8 -&gt; L26:C16</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code>g) return;
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;PROBE_TOKEN&quot;) </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L26:C8 -&gt; L26:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>g) return;
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;PROBE_TOK</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L26:C8 -&gt; L26:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>g) return;
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;PROBE_TOKEN&quot;) </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L26:C8 -&gt; L26:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>g) return;
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;PROBE_TOK</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L26:C8 -&gt; L26:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>g) return;
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;PROBE_TOKEN&quot;) </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L26:C8 -&gt; L26:C16</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code>g) return;
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;PROBE_TOKEN&quot;) </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L33:C8 -&gt; L33:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;INJECT_FN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L33:C8 -&gt; L33:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FN&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L33:C8 -&gt; L33:C16</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FN&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L33:C8 -&gt; L33:C64</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg.kind === &quot;INJECT_FN&quot; &amp;&amp; typeof msg.body === &quot;string&quot;&lt;&lt;&lt;) {
+      // Functio</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L33:C8 -&gt; L33:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;INJECT_FN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L33:C8 -&gt; L33:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FN&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L33:C8 -&gt; L33:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;INJECT_FN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L33:C8 -&gt; L33:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FN&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L33:C8 -&gt; L33:C16</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FN&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L35:C37 -&gt; L35:C40</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>new Function(&quot;ctx&quot;, &gt;&gt;&gt;msg&lt;&lt;&lt;.body);             </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L35:C37 -&gt; L35:C45</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>new Function(&quot;ctx&quot;, &gt;&gt;&gt;msg.body&lt;&lt;&lt;);                  </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;INJECT_FI</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L39:C8 -&gt; L39:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FILE&quot; &amp;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C16</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FILE&quot; &amp;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C38 -&gt; L39:C41</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>== &quot;INJECT_FILE&quot; &amp;&amp; &gt;&gt;&gt;msg&lt;&lt;&lt;.tabId &amp;&amp; msg.file) </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L39:C38 -&gt; L39:C47</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>== &quot;INJECT_FILE&quot; &amp;&amp; &gt;&gt;&gt;msg.tabId&lt;&lt;&lt; &amp;&amp; msg.file) {
+    </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C47</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind === &quot;INJECT_FILE&quot; &amp;&amp; msg.tabId&lt;&lt;&lt; &amp;&amp; msg.file) {
+    </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C47</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind === &quot;INJECT_FILE&quot; &amp;&amp; msg.tabId&lt;&lt;&lt; &amp;&amp; msg.file) {
+    </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C51 -&gt; L39:C54</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>LE&quot; &amp;&amp; msg.tabId &amp;&amp; &gt;&gt;&gt;msg&lt;&lt;&lt;.file) {
+      // ch</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L39:C51 -&gt; L39:C59</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>LE&quot; &amp;&amp; msg.tabId &amp;&amp; &gt;&gt;&gt;msg.file&lt;&lt;&lt;) {
+      // chrome.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C59</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind === &quot;INJECT_FILE&quot; &amp;&amp; msg.tabId &amp;&amp; msg.file&lt;&lt;&lt;) {
+      // chrome.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C59</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind === &quot;INJECT_FILE&quot; &amp;&amp; msg.tabId &amp;&amp; msg.file&lt;&lt;&lt;) {
+      // chrome.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;INJECT_FI</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L39:C8 -&gt; L39:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FILE&quot; &amp;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;INJECT_FI</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L39:C8 -&gt; L39:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FILE&quot; &amp;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C16</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FILE&quot; &amp;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L33:C8 -&gt; L33:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;INJECT_FN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L33:C8 -&gt; L33:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FN&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L33:C8 -&gt; L33:C16</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FN&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L33:C8 -&gt; L33:C64</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg.kind === &quot;INJECT_FN&quot; &amp;&amp; typeof msg.body === &quot;string&quot;&lt;&lt;&lt;) {
+      // Functio</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L33:C8 -&gt; L33:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;INJECT_FN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L33:C8 -&gt; L33:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FN&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L33:C8 -&gt; L33:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;INJECT_FN</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L33:C8 -&gt; L33:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FN&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L33:C8 -&gt; L33:C16</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code>urn;
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FN&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L36:C18 -&gt; L36:C21</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>N
+      fn({ tabId: &gt;&gt;&gt;msg&lt;&lt;&lt;.tabId });
+    }
+
+  </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L36:C18 -&gt; L36:C27</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>N
+      fn({ tabId: &gt;&gt;&gt;msg.tabId&lt;&lt;&lt; });
+    }
+
+    if (</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L36:C6 -&gt; L36:C30</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code> NEW_FUNCTION
+      &gt;&gt;&gt;fn({ tabId: msg.tabId })&lt;&lt;&lt;;
+    }
+
+    if (msg</code></pre>
+    </div>
+  </li><li class="step ellipsis"><span class="dotmark mid"></span><div class="stepbody muted">…</div></li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L36:C6 -&gt; L36:C30</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code> NEW_FUNCTION
+      &gt;&gt;&gt;fn({ tabId: msg.tabId })&lt;&lt;&lt;;
+    }
+
+    if (msg</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L43:C25 -&gt; L43:C28</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>   target: { tabId: &gt;&gt;&gt;msg&lt;&lt;&lt;.tabId },
+        fi</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L43:C25 -&gt; L43:C34</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>   target: { tabId: &gt;&gt;&gt;msg.tabId&lt;&lt;&lt; },
+        files: [</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L42:C6 -&gt; L45:C8</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code> that script.
+      &gt;&gt;&gt;chrome.scripting.executeScript({
+        target: { tabId: msg.tabId },
+        files: [msg.file],
+      })&lt;&lt;&lt;;
+    }
+
+    if (msg</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L42:C6 -&gt; L45:C8</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code> that script.
+      &gt;&gt;&gt;chrome.scripting.executeScript({
+        target: { tabId: msg.tabId },
+        files: [msg.file],
+      })&lt;&lt;&lt;;
+    }
+
+    if (msg</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L44:C16 -&gt; L44:C19</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> },
+        files: [&gt;&gt;&gt;msg&lt;&lt;&lt;.file],
+      });
+  </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L44:C16 -&gt; L44:C24</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> },
+        files: [&gt;&gt;&gt;msg.file&lt;&lt;&lt;],
+      });
+    }
+
+</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L42:C6 -&gt; L45:C8</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code> that script.
+      &gt;&gt;&gt;chrome.scripting.executeScript({
+        target: { tabId: msg.tabId },
+        files: [msg.file],
+      })&lt;&lt;&lt;;
+    }
+
+    if (msg</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L42:C6 -&gt; L45:C8</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code> that script.
+      &gt;&gt;&gt;chrome.scripting.executeScript({
+        target: { tabId: msg.tabId },
+        files: [msg.file],
+      })&lt;&lt;&lt;;
+    }
+
+    if (msg</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;INJECT_FI</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L39:C8 -&gt; L39:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FILE&quot; &amp;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C16</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FILE&quot; &amp;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C38 -&gt; L39:C41</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>== &quot;INJECT_FILE&quot; &amp;&amp; &gt;&gt;&gt;msg&lt;&lt;&lt;.tabId &amp;&amp; msg.file) </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L39:C38 -&gt; L39:C47</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>== &quot;INJECT_FILE&quot; &amp;&amp; &gt;&gt;&gt;msg.tabId&lt;&lt;&lt; &amp;&amp; msg.file) {
+    </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C47</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind === &quot;INJECT_FILE&quot; &amp;&amp; msg.tabId&lt;&lt;&lt; &amp;&amp; msg.file) {
+    </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C47</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind === &quot;INJECT_FILE&quot; &amp;&amp; msg.tabId&lt;&lt;&lt; &amp;&amp; msg.file) {
+    </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C51 -&gt; L39:C54</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>LE&quot; &amp;&amp; msg.tabId &amp;&amp; &gt;&gt;&gt;msg&lt;&lt;&lt;.file) {
+      // ch</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L39:C51 -&gt; L39:C59</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>LE&quot; &amp;&amp; msg.tabId &amp;&amp; &gt;&gt;&gt;msg.file&lt;&lt;&lt;) {
+      // chrome.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C59</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind === &quot;INJECT_FILE&quot; &amp;&amp; msg.tabId &amp;&amp; msg.file&lt;&lt;&lt;) {
+      // chrome.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C59</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind === &quot;INJECT_FILE&quot; &amp;&amp; msg.tabId &amp;&amp; msg.file&lt;&lt;&lt;) {
+      // chrome.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;INJECT_FI</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L39:C8 -&gt; L39:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FILE&quot; &amp;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;INJECT_FI</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L39:C8 -&gt; L39:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FILE&quot; &amp;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L39:C8 -&gt; L39:C16</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;INJECT_FILE&quot; &amp;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L43:C25 -&gt; L43:C28</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>   target: { tabId: &gt;&gt;&gt;msg&lt;&lt;&lt;.tabId },
+        fi</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L43:C25 -&gt; L43:C34</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>   target: { tabId: &gt;&gt;&gt;msg.tabId&lt;&lt;&lt; },
+        files: [</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L42:C6 -&gt; L45:C8</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code> that script.
+      &gt;&gt;&gt;chrome.scripting.executeScript({
+        target: { tabId: msg.tabId },
+        files: [msg.file],
+      })&lt;&lt;&lt;;
+    }
+
+    if (msg</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L42:C6 -&gt; L45:C8</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code> that script.
+      &gt;&gt;&gt;chrome.scripting.executeScript({
+        target: { tabId: msg.tabId },
+        files: [msg.file],
+      })&lt;&lt;&lt;;
+    }
+
+    if (msg</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L44:C16 -&gt; L44:C19</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> },
+        files: [&gt;&gt;&gt;msg&lt;&lt;&lt;.file],
+      });
+  </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L44:C16 -&gt; L44:C24</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> },
+        files: [&gt;&gt;&gt;msg.file&lt;&lt;&lt;],
+      });
+    }
+
+</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L42:C6 -&gt; L45:C8</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code> that script.
+      &gt;&gt;&gt;chrome.scripting.executeScript({
+        target: { tabId: msg.tabId },
+        files: [msg.file],
+      })&lt;&lt;&lt;;
+    }
+
+    if (msg</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L42:C6 -&gt; L45:C8</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code> that script.
+      &gt;&gt;&gt;chrome.scripting.executeScript({
+        target: { tabId: msg.tabId },
+        files: [msg.file],
+      })&lt;&lt;&lt;;
+    }
+
+    if (msg</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L48:C8 -&gt; L48:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;EVAL_TABS</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L48:C8 -&gt; L48:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;EVAL_TABS&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L48:C8 -&gt; L48:C16</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;EVAL_TABS&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L48:C36 -&gt; L48:C39</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> === &quot;EVAL_TABS&quot; &amp;&amp; &gt;&gt;&gt;msg&lt;&lt;&lt;.tabId) {
+      chro</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L48:C36 -&gt; L48:C45</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> === &quot;EVAL_TABS&quot; &amp;&amp; &gt;&gt;&gt;msg.tabId&lt;&lt;&lt;) {
+      chrome.tab</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L48:C8 -&gt; L48:C45</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind === &quot;EVAL_TABS&quot; &amp;&amp; msg.tabId&lt;&lt;&lt;) {
+      chrome.tab</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L48:C8 -&gt; L48:C45</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind === &quot;EVAL_TABS&quot; &amp;&amp; msg.tabId&lt;&lt;&lt;) {
+      chrome.tab</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L48:C8 -&gt; L48:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;EVAL_TABS</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L48:C8 -&gt; L48:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;EVAL_TABS&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L48:C8 -&gt; L48:C11</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg&lt;&lt;&lt;.kind === &quot;EVAL_TABS</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L48:C8 -&gt; L48:C16</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;EVAL_TABS&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L48:C8 -&gt; L48:C16</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code> });
+    }
+
+    if (&gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;EVAL_TABS&quot; &amp;&amp; </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L49:C32 -&gt; L49:C35</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>.tabs.executeScript(&gt;&gt;&gt;msg&lt;&lt;&lt;.tabId, { code: msg.</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L49:C32 -&gt; L49:C41</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>.tabs.executeScript(&gt;&gt;&gt;msg.tabId&lt;&lt;&lt;, { code: msg.code }</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L49:C51 -&gt; L49:C54</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>(msg.tabId, { code: &gt;&gt;&gt;msg&lt;&lt;&lt;.code });   // SINK </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L49:C51 -&gt; L49:C59</span> · <span class="remark">member-element</span></div>
+      
+      <pre class="snippet"><code>(msg.tabId, { code: &gt;&gt;&gt;msg.code&lt;&lt;&lt; });   // SINK CHROM</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L49:C6 -&gt; L49:C62</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code> msg.tabId) {
+      &gt;&gt;&gt;chrome.tabs.executeScript(msg.tabId, { code: msg.code })&lt;&lt;&lt;;   // SINK CHROME_T</code></pre>
+    </div>
+  </li><li class="step ellipsis"><span class="dotmark mid"></span><div class="stepbody muted">… 28 steps omitted (total 128)</div></li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_TABS_EXECUTE</span>
+        <span class="loc">L49:C6 -&gt; L49:C62</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code> msg.tabId) {
+      &gt;&gt;&gt;chrome.tabs.executeScript(msg.tabId, { code: msg.code })&lt;&lt;&lt;;   // SINK CHROME_T</code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="DATA_LEAK" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-DATA_LEAK">Data Leak</span> <span class="badge sev sev-CRITICAL">CRITICAL</span>
+      <span class="pair"><code>CHROME_IDENTITY_TOKEN</code> → <code>CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE</code></span>
+      
+      <span class="loc right">background : L28:C27 -&gt; L28:C32</span>
+    </header>
+    <p class="ruledesc">User-permission-gated data (bookmarks, history, cookies, identity, ...) leaving via a cross-extension or window message channel.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_IDENTITY_TOKEN</span>
+        <span class="loc">L28:C27 -&gt; L28:C32</span> · <span class="remark">identity.authToken</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code> port.postMessage({ &gt;&gt;&gt;token&lt;&lt;&lt; });                </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L28:C27 -&gt; L28:C32</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> port.postMessage({ &gt;&gt;&gt;token&lt;&lt;&lt; });                </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L28:C8 -&gt; L28:C35</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>NTITY_TOKEN
+        &gt;&gt;&gt;port.postMessage({ token })&lt;&lt;&lt;;                   </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE</span>
+        <span class="loc">L28:C8 -&gt; L28:C35</span> · <span class="remark">chrome.runtime.onConnectExternal.addListener[postMessage]</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>NTITY_TOKEN
+        &gt;&gt;&gt;port.postMessage({ token })&lt;&lt;&lt;;                   </code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="REQUEST_FORGERY" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-REQUEST_FORGERY">Request Forgery</span> <span class="badge sev sev-HIGH">HIGH</span>
+      <span class="pair"><code>WINDOW_MESSAGE_EVENT</code> → <code>FETCH_RESOURCE</code></span>
+      <span class="badge cross">message · runtime.connect.sender.message[content-&gt;background]</span>
+      <span class="loc right">background : L56:C2 -&gt; L62:C4</span>
+    </header>
+    <p class="ruledesc">Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">WINDOW_MESSAGE_EVENT</span>
+        <span class="loc">L56:C2 -&gt; L62:C4</span> · <span class="remark">window.addEventListener(message)</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>tener((port) =&gt; {
+  &gt;&gt;&gt;port.onMessage.addListener((msg) =&gt; {                           // SOURCE PSEUDO_MESSAGE → resolves to WINDOW_MESSAGE_EVENT via content
+    if (msg &amp;&amp; msg.kind === &quot;GRAB_MHTML&quot; &amp;&amp; msg.tabId) {
+      chrome.pageCapture.saveAsMHTML({ tabId: msg.tabId }, (blob) =&gt; {  // SOURCE CHROME_PAGECAPTURE_MHTML
+        uploadMhtml(msg.uploadUrl, blob);
+      });
+    }
+  })&lt;&lt;&lt;;
+});
+
+// Helper scr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">MESSAGE</span>
+        <span class="loc">L56:C2 -&gt; L62:C4</span> · <span class="remark">runtime.connect.sender.message[content-&gt;background]</span></div>
+      
+      <pre class="snippet"><code>tener((port) =&gt; {
+  &gt;&gt;&gt;port.onMessage.addListener((msg) =&gt; {                           // SOURCE PSEUDO_MESSAGE → resolves to WINDOW_MESSAGE_EVENT via content
+    if (msg &amp;&amp; msg.kind === &quot;GRAB_MHTML&quot; &amp;&amp; msg.tabId) {
+      chrome.pageCapture.saveAsMHTML({ tabId: msg.tabId }, (blob) =&gt; {  // SOURCE CHROME_PAGECAPTURE_MHTML
+        uploadMhtml(msg.uploadUrl, blob);
+      });
+    }
+  })&lt;&lt;&lt;;
+});
+
+// Helper scr</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L57:C15 -&gt; L57:C23</span> · <span class="remark">member-element-container</span></div>
+      
+      <pre class="snippet"><code>tent
+    if (msg &amp;&amp; &gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;GRAB_MHTML&quot; &amp;&amp;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L57:C15 -&gt; L57:C23</span> · <span class="remark">binary-left</span></div>
+      
+      <pre class="snippet"><code>tent
+    if (msg &amp;&amp; &gt;&gt;&gt;msg.kind&lt;&lt;&lt; === &quot;GRAB_MHTML&quot; &amp;&amp;</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L57:C8 -&gt; L57:C40</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>via content
+    if (&gt;&gt;&gt;msg &amp;&amp; msg.kind === &quot;GRAB_MHTML&quot;&lt;&lt;&lt; &amp;&amp; msg.tabId) {
+   </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L57:C8 -&gt; L57:C40</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code>via content
+    if (&gt;&gt;&gt;msg &amp;&amp; msg.kind === &quot;GRAB_MHTML&quot;&lt;&lt;&lt; &amp;&amp; msg.tabId) {
+   </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L57:C44 -&gt; L57:C53</span> · <span class="remark">member-element-container</span></div>
+      
+      <pre class="snippet"><code>=== &quot;GRAB_MHTML&quot; &amp;&amp; &gt;&gt;&gt;msg.tabId&lt;&lt;&lt;) {
+      chrome.pag</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L57:C8 -&gt; L57:C53</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>via content
+    if (&gt;&gt;&gt;msg &amp;&amp; msg.kind === &quot;GRAB_MHTML&quot; &amp;&amp; msg.tabId&lt;&lt;&lt;) {
+      chrome.pag</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L57:C8 -&gt; L57:C53</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code>via content
+    if (&gt;&gt;&gt;msg &amp;&amp; msg.kind === &quot;GRAB_MHTML&quot; &amp;&amp; msg.tabId&lt;&lt;&lt;) {
+      chrome.pag</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L58:C46 -&gt; L58:C55</span> · <span class="remark">member-element-container</span></div>
+      
+      <pre class="snippet"><code>aveAsMHTML({ tabId: &gt;&gt;&gt;msg.tabId&lt;&lt;&lt; }, (blob) =&gt; {  // </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L58:C6 -&gt; L60:C8</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code> msg.tabId) {
+      &gt;&gt;&gt;chrome.pageCapture.saveAsMHTML({ tabId: msg.tabId }, (blob) =&gt; {  // SOURCE CHROME_PAGECAPTURE_MHTML
+        uploadMhtml(msg.uploadUrl, blob);
+      })&lt;&lt;&lt;;
+    }
+  });
+});
+
+/</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L59:C20 -&gt; L59:C33</span> · <span class="remark">member-element-container</span></div>
+      
+      <pre class="snippet"><code>        uploadMhtml(&gt;&gt;&gt;msg.uploadUrl&lt;&lt;&lt;, blob);
+      });
+ </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C7 -&gt; L4:C10</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> chrome.runtime.conn&gt;&gt;&gt;ect&lt;&lt;&lt; / port.onMessage / </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C6 -&gt; L4:C10</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code>- chrome.runtime.con&gt;&gt;&gt;nect&lt;&lt;&lt; / port.onMessage / </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C6 -&gt; L4:C19</span> · <span class="remark">logical-left</span></div>
+      
+      <pre class="snippet"><code>- chrome.runtime.con&gt;&gt;&gt;nect / port.o&lt;&lt;&lt;nMessage / port.post</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C7 -&gt; L4:C10</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code> chrome.runtime.conn&gt;&gt;&gt;ect&lt;&lt;&lt; / port.onMessage / </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L7:C14 -&gt; L7:C17</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>e.onConnect.addListe&gt;&gt;&gt;ner&lt;&lt;&lt;                    </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">FETCH_RESOURCE</span>
+        <span class="loc">L7:C8 -&gt; L10:C4</span> · <span class="remark">[Unknown URL]</span><span class="badge cross">url:FULL</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>runtime.onConnect.ad&gt;&gt;&gt;dListener                         (incoming port)
+//   - chrome.identity.getAuthToken                                 (SENSITIVE_DATA source)
+//   - chrome.pageCaptu&lt;&lt;&lt;re.saveAsMHTML      </code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article><article class="issue" data-flowtypes="DATA_LEAK" data-file="background">
+    <header class="issuehead">
+      <span class="badge flow flow-DATA_LEAK">Data Leak</span> <span class="badge sev sev-LOW">LOW</span>
+      <span class="pair"><code>CHROME_PAGECAPTURE_MHTML</code> → <code>FETCH_BODY</code></span>
+      
+      <span class="loc right">background : L59:C35 -&gt; L59:C39</span>
+    </header>
+    <p class="ruledesc">User-permission-gated data (cookies, history, bookmarks, identity, downloads, ...) exfiltrated via an outbound network request (fetch / XHR / axios / WebSocket). The flagship data-leak pattern. Benign auth-header use is filtered by suppress-sensitive-data-request-headers below.</p>
+    <ul class="timeline"><li class="step">
+    <span class="dotmark src"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">CHROME_PAGECAPTURE_MHTML</span>
+        <span class="loc">L59:C35 -&gt; L59:C39</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>html(msg.uploadUrl, &gt;&gt;&gt;blob&lt;&lt;&lt;);
+      });
+    }
+ </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L59:C35 -&gt; L59:C39</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>html(msg.uploadUrl, &gt;&gt;&gt;blob&lt;&lt;&lt;);
+      });
+    }
+ </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C15 -&gt; L4:C19</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>runtime.connect / po&gt;&gt;&gt;rt.o&lt;&lt;&lt;nMessage / port.post</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C14 -&gt; L4:C19</span> · <span class="remark">unary</span></div>
+      
+      <pre class="snippet"><code>.runtime.connect / p&gt;&gt;&gt;ort.o&lt;&lt;&lt;nMessage / port.post</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L4:C6 -&gt; L4:C19</span> · <span class="remark">logical-right</span></div>
+      
+      <pre class="snippet"><code>- chrome.runtime.con&gt;&gt;&gt;nect / port.o&lt;&lt;&lt;nMessage / port.post</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ASSIGN</span>
+        <span class="loc">L6:C20 -&gt; L6:C24</span> · <span class="remark">identifier</span></div>
+      
+      <pre class="snippet"><code>runtime.connect.*)
+/&gt;&gt;&gt;/   &lt;&lt;&lt;- chrome.runtime.onC</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L5:C8 -&gt; L5:C27</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>.onMessage / port.po&gt;&gt;&gt;stMessage  (CHANNEL&lt;&lt;&lt;: runtime.connect.*)</code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark mid"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">ELEMENT</span>
+        <span class="loc">L7:C2 -&gt; L10:C4</span> · <span class="remark">object.setProperty</span></div>
+      
+      <pre class="snippet"><code>hrome.runtime.onConn&gt;&gt;&gt;ect.addListener                         (incoming port)
+//   - chrome.identity.getAuthToken                                 (SENSITIVE_DATA source)
+//   - chrome.pageCaptu&lt;&lt;&lt;re.saveAsMHTML      </code></pre>
+    </div>
+  </li><li class="step">
+    <span class="dotmark sink"></span>
+    <div class="stepbody">
+      <div class="stephead"><span class="kind">FETCH_BODY</span>
+        <span class="loc">L7:C8 -&gt; L10:C4</span> · <span class="remark">[Unknown URL]</span></div>
+      <span class="stepfile">background</span>
+      <pre class="snippet"><code>runtime.onConnect.ad&gt;&gt;&gt;dListener                         (incoming port)
+//   - chrome.identity.getAuthToken                                 (SENSITIVE_DATA source)
+//   - chrome.pageCaptu&lt;&lt;&lt;re.saveAsMHTML      </code></pre>
+    </div>
+  </li></ul>
+    <footer class="issuefoot">Sanitized: <b>NO</b></footer>
+  </article>
+    </div>
+  </main>
+</div>
+<script>
+
+(function(){
+  var input=document.getElementById('filter');
+  if(!input)return;
+  var issues=Array.prototype.slice.call(document.querySelectorAll('#issues .issue'));
+  function apply(){
+    var q=input.value.trim().toLowerCase();
+    issues.forEach(function(el){
+      var hay=((el.getAttribute('data-file')||'')+' '+(el.getAttribute('data-flowtypes')||'')).toLowerCase();
+      el.style.display=(!q||hay.indexOf(q)>=0)?'':'none';
+    });
+  }
+  input.addEventListener('input',apply);
+  // Clicking a file in the tree filters findings to that file.
+  document.querySelectorAll('.sidebar li.file').forEach(function(li){
+    li.addEventListener('click',function(){
+      input.value=li.getAttribute('data-path')||'';apply();
+      document.getElementById('issues').scrollIntoView({behavior:'smooth'});
+    });
+    li.style.cursor='pointer';
+  });
+})();
+
+</script>
+</body>
+</html>

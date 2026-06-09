@@ -38,6 +38,8 @@ export type SourceType =
   // IDENTITY
   | "CHROME_IDENTITY_TOKEN"
   | "CHROME_IDENTITY_PROFILE"
+  // MANAGED STORAGE (enterprise-policy data — sensitive, high-integrity)
+  | "CHROME_MANAGED_STORAGE"
   // NAVIGATOR
   | "NAVIGAROR_GEOLOCATION"
   | "NAVIGATOR_CLIPBOARD"
@@ -123,8 +125,17 @@ export type SinkType =
   | "NEW_FUNCTION"
   | "EVAL"
   | "TIME_EVAL"
+  // Implicit / privileged code-execution surfaces beyond eval().
+  | "WASM_INSTANTIATE"          // WebAssembly.instantiate(tainted buffer) — runs code
+  | "WORKER_URL"               // new Worker(taintedUrl) / Blob-URL worker bootstrap
+  | "CHROME_DEBUGGER_COMMAND"   // chrome.debugger.sendCommand(..,"Runtime.evaluate",{expression})
   | "FETCH_RESOURCE"
   | "FETCH_OPTIONS"
+  // Granular fetch init sinks. The init object is split so that data placed in
+  // a request *body* (exfiltration) can be distinguished from data placed in a
+  // request *header* (benign auth — e.g. a cookie sent as the Cookie header).
+  | "FETCH_BODY"
+  | "FETCH_HEADERS"
   | "JQUERY_AJAX_URL"
   | "JQUERY_AJAX_DATA"
   | "JQUERY_AJAX_SETTINGS_URL"
@@ -138,6 +149,7 @@ export type SinkType =
   | "JQUERY_GLOBAL_EVAL"
   | "XML_HTTP_REQUEST_OPEN"
   | "XML_HTTP_REQUEST_SEND"
+  | "XML_HTTP_REQUEST_SETHEADER"
   | "AXIOS_URL"
   | "AXIOS_DATA"
   | "AXIOS_HEADERS"
@@ -152,10 +164,20 @@ export type SinkType =
   | "JQUERY_ELEMENT_VAL_SET"
   | "JQUERY_ELEMENT_TEXT_SET"
   | "JQUERY_ELEMENT_HTML_SET"
+  // Generic DOM innerHTML/outerHTML write. Reserved for the member-assignment
+  // sink (`el.innerHTML = x`) follow-up; modeled frameworks reuse it where a
+  // raw DOM property write is the most faithful representation.
+  | "DOM_INNER_HTML"
+  // Front-end framework HTML-injection sinks. These are the call-based forms
+  // that survive bundling/compilation, so they fire even when the framework
+  // itself is a minified vendor file.
+  | "REACT_DANGEROUS_HTML"     // React dangerouslySetInnerHTML.__html (incl. JSX)
+  | "VUE_V_HTML"               // Vue v-html / template / render innerHTML
+  | "VUE_COMPILE"              // Vue.compile(tainted) — runtime template codegen
+  | "ANGULAR_BYPASS_SECURITY"  // DomSanitizer.bypassSecurityTrust* / $sce.trustAs*
   // TODO: Need to finish this in future
   // | "DOCUMENT_VAL_SET"
   // | "DOCUMENT_TEXT_SET"
-  // | "DOCUMENT_HTML_SET"  
   | "DOCUMENT_WRITE"
   | "DOCUMENT_EXECCOMMAND"
   // Chrome Action
@@ -229,6 +251,8 @@ export type SinkType =
   // Chrome Tabs
   | "CHROME_TABS_CREATE_OPTIONS"
   | "CHROME_TABS_EXECUTE"
+  // Chrome DeclarativeNetRequest — dynamic request rewriting (privileged).
+  | "CHROME_DECLARATIVENETREQUEST_RULES"
   // Chrome Window
   | "CHROME_WINDOWS_UPDATE_OPTIONS"
   | "CHROME_WINDOWS_CREATE_OPTIONS"

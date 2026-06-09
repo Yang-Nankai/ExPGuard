@@ -85,10 +85,26 @@ export function validateExtensionDir(extensionDir: string): boolean {
 
 
 /**
- * Throw LoaderError if extensionId is invalid.
+ * Throw LoaderError if extensionId is not a valid Chrome/Edge ID.
+ * Used by the CRX path, where the ID is derived from the package's public key
+ * and must match the strict `[a-p]{32}` format.
+ */
+export function assertValidChromeExtensionId(extensionId: string) {
+  if (!validateChromeOrEdgeExtensionId(extensionId)) {
+    Errors.LoaderError(`Invalid Chrome extensionId: ${extensionId}`);
+  }
+}
+
+/**
+ * Throw LoaderError if extensionId is neither a valid Chrome/Edge ID nor a
+ * valid Firefox ID (GUID or email-style). Used by the DIR/XPI paths, which may
+ * carry either browser's ID format.
  */
 export function assertValidExtensionId(extensionId: string) {
-  if (!validateChromeOrEdgeExtensionId(extensionId)) {
+  if (
+    !validateChromeOrEdgeExtensionId(extensionId) &&
+    !validateFirefoxExtensionId(extensionId)
+  ) {
     Errors.LoaderError(`Invalid extensionId: ${extensionId}`);
   }
 }

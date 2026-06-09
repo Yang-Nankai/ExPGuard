@@ -225,6 +225,26 @@ const BUILTINS: BuiltinSchema[] = [
   },
   {
     type: "constructor",
+    name: "Worker",
+    proto: "Function",
+    prototypeName: "Worker.prototype",
+    staticMethods: {},
+    prototypeMethods: {
+      constructor: method("Worker.prototype.constructor"),
+    },
+  },
+  {
+    type: "object",
+    name: "WebAssembly",
+    props: {
+      instantiate: method("WebAssembly.instantiate"),
+      instantiateStreaming: method("WebAssembly.instantiateStreaming"),
+      compile: method("WebAssembly.compile"),
+      compileStreaming: method("WebAssembly.compileStreaming"),
+    },
+  },
+  {
+    type: "constructor",
     name: "FormData",
     proto: "Function",
     prototypeName: "FormData.prototype",
@@ -247,6 +267,7 @@ const BUILTINS: BuiltinSchema[] = [
       // constructor: method("XMLHttpRequest.prototype.constructor"),
       open: method("XMLHttpRequest.prototype.open"),
       send: method("XMLHttpRequest.prototype.send"),
+      setRequestHeader: method("XMLHttpRequest.prototype.setRequestHeader"),
     },
   },
   {
@@ -263,6 +284,11 @@ const BUILTINS: BuiltinSchema[] = [
   {
     type: "object",
     name: "chrome",
+    // Firefox WebExtensions expose the same API surface under the `browser.*`
+    // namespace (heavily used alongside `chrome.*` in real add-ons). Aliasing
+    // it to the very same Def tree means every chrome.* semantic handler fires
+    // for browser.* too — no handler duplication, identical taint results.
+    alias: "browser",
     props: {
       action: {
         type: "object",
@@ -469,6 +495,41 @@ const BUILTINS: BuiltinSchema[] = [
           },
         },
       },
+      devtools: {
+        type: "object",
+        name: "chrome.devtools",
+        props: {
+          panels: {
+            type: "object",
+            name: "chrome.devtools.panels",
+            props: {
+              create: method("chrome.devtools.panels.create"),
+            },
+          },
+        },
+      },
+      debugger: {
+        type: "object",
+        name: "chrome.debugger",
+        props: {
+          sendCommand: method("chrome.debugger.sendCommand"),
+        },
+      },
+      declarativeNetRequest: {
+        type: "object",
+        name: "chrome.declarativeNetRequest",
+        props: {
+          updateDynamicRules: method(
+            "chrome.declarativeNetRequest.updateDynamicRules",
+          ),
+          updateSessionRules: method(
+            "chrome.declarativeNetRequest.updateSessionRules",
+          ),
+          updateEnabledRulesets: method(
+            "chrome.declarativeNetRequest.updateEnabledRulesets",
+          ),
+        },
+      },
       downloads: {
         type: "object",
         name: "chrome.downloads",
@@ -583,6 +644,15 @@ const BUILTINS: BuiltinSchema[] = [
           saveAsMHTML: method("chrome.pageCapture.saveAsMHTML"),
         },
       },
+      offscreen: {
+        type: "object",
+        name: "chrome.offscreen",
+        props: {
+          createDocument: method("chrome.offscreen.createDocument"),
+          closeDocument: method("chrome.offscreen.closeDocument"),
+          hasDocument: method("chrome.offscreen.hasDocument"),
+        },
+      },
       proxy: {
         type: "object",
         name: "chrome.proxy",
@@ -662,6 +732,16 @@ const BUILTINS: BuiltinSchema[] = [
           executeScript: method("chrome.scripting.executeScript"),
         },
       },
+      sidePanel: {
+        type: "object",
+        name: "chrome.sidePanel",
+        props: {
+          // Modeled as side-effect-only no-ops; nothing taints through here today.
+          setOptions: method("chrome.sidePanel.setOptions"),
+          setPanelBehavior: method("chrome.sidePanel.setPanelBehavior"),
+          open: method("chrome.sidePanel.open"),
+        },
+      },
       storage: {
         type: "object",
         name: "chrome.storage",
@@ -687,7 +767,14 @@ const BUILTINS: BuiltinSchema[] = [
             name: "chrome.storage.session",
             props: {
               set: method("chrome.storage.session.set"),
-              get: method("chrome.storage.sync.get"),
+              get: method("chrome.storage.session.get"),
+            },
+          },
+          managed: {
+            type: "object",
+            name: "chrome.storage.managed",
+            props: {
+              get: method("chrome.storage.managed.get"),
             },
           },
         },
@@ -876,6 +963,34 @@ const BUILTINS: BuiltinSchema[] = [
     type: "function",
     name: "btoa",
     effect: "btoa",
+  },
+  // Numeric/string casting built-ins. These appear constantly in extension
+  // code (URL params, querystring parsing, JSON-ish payloads). Without
+  // semantics, a tainted `parseInt(window.location.search.slice(1))` would
+  // silently drop its taint on the cast and downstream sinks would miss it.
+  //
+  // We intentionally skip `Number`/`String`/`Boolean`/`Array` here — they
+  // collide with the constructor/object schemas registered elsewhere; the
+  // safest taint-preserving coverage comes from the four globals below.
+  {
+    type: "function",
+    name: "parseInt",
+    effect: "parseInt",
+  },
+  {
+    type: "function",
+    name: "parseFloat",
+    effect: "parseFloat",
+  },
+  {
+    type: "function",
+    name: "isNaN",
+    effect: "isNaN",
+  },
+  {
+    type: "function",
+    name: "isFinite",
+    effect: "isFinite",
   },
   {
     type: "function",
@@ -1081,6 +1196,59 @@ const BUILTINS: BuiltinSchema[] = [
     props: {
       encode: method("base64.encode"),
       decode: method("base64.decode"),
+    },
+  },
+  // ======================================================
+  // Front-end frameworks (React / Vue / Angular)
+  // ------------------------------------------------------
+  // Only the taint-relevant HTML-injection surface is modeled. The frameworks'
+  // own vendor files stay `ignore`d (see constants/library.ts); these schemas
+  // make framework calls in *user* code resolve to modeled semantics.
+  // ======================================================
+  {
+    type: "object",
+    name: "React",
+    props: {
+      createElement: method("React.createElement"),
+    },
+  },
+  {
+    type: "object",
+    name: "ReactDOM",
+    props: {
+      render: method("ReactDOM.render"),
+    },
+  },
+  {
+    type: "function",
+    name: "Vue",
+    effect: "Vue.fn",
+    props: {
+      compile: method("Vue.compile"),
+      createApp: method("Vue.createApp"),
+    },
+  },
+  {
+    type: "object",
+    name: "$sce",
+    props: {
+      trustAsHtml: method("$sce.trustAs"),
+      trustAsUrl: method("$sce.trustAs"),
+      trustAsResourceUrl: method("$sce.trustAs"),
+    },
+  },
+  {
+    type: "constructor",
+    name: "DomSanitizer",
+    proto: "Function",
+    prototypeName: "DomSanitizer.prototype",
+    staticMethods: {},
+    prototypeMethods: {
+      bypassSecurityTrustHtml: method("angular.bypassSecurity"),
+      bypassSecurityTrustUrl: method("angular.bypassSecurity"),
+      bypassSecurityTrustResourceUrl: method("angular.bypassSecurity"),
+      bypassSecurityTrustStyle: method("angular.bypassSecurity"),
+      bypassSecurityTrustScript: method("angular.bypassSecurity"),
     },
   },
 ];

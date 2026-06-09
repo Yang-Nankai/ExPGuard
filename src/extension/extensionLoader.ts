@@ -2,7 +2,12 @@ import fs from "fs";
 import path from "path";
 import { Errors } from "../utils/errorCode";
 import { CrxExtractor } from "../loader/crxExtractor";
-import { assertDirectoryExists, assertFileExists, assertValidExtensionId } from "../utils/validation";
+import { XpiExtractor } from "../loader/xpiExtractor";
+import {
+  assertDirectoryExists,
+  assertFileExists,
+  assertValidChromeExtensionId,
+} from "../utils/validation";
 import logger from "../utils/logger";
 import { downloadCrxFromCWS } from "../loader/crxDownloader";
 import { copyDirectoryAsync } from "../utils/fileHandler";
@@ -12,6 +17,7 @@ export enum ExtensionSourceType {
   CRX = "CRX",
   DIR = "DIR",
   WEB = "WEB",
+  XPI = "XPI",
 }
 
 /**
@@ -23,9 +29,13 @@ export async function loadExtensionAsync(
   outputDir: string,
   extensionId: string
 ): Promise<ExtensionContext> {
+  // The ID used to construct the ExtensionContext. For XPI it may be replaced
+  // with the gecko ID derived from the manifest (see loadFromXpi).
+  let resolvedId = extensionId;
+
   switch (source) {
     case ExtensionSourceType.CRX: {
-      assertValidExtensionId(extensionId);
+      assertValidChromeExtensionId(extensionId);
       assertFileExists(inputPath);
 
       await loadFromCrx(inputPath, outputDir, extensionId);
@@ -33,7 +43,7 @@ export async function loadExtensionAsync(
     }
 
     case ExtensionSourceType.WEB: {
-      assertValidExtensionId(extensionId);
+      assertValidChromeExtensionId(extensionId);
 
       await loadFromWeb(extensionId, outputDir);
       break;
@@ -45,10 +55,17 @@ export async function loadExtensionAsync(
       await loadFromDir(inputPath, outputDir);
       break;
     }
+
+    case ExtensionSourceType.XPI: {
+      assertFileExists(inputPath);
+
+      resolvedId = await loadFromXpi(inputPath, outputDir, extensionId);
+      break;
+    }
   }
 
   if (fs.existsSync(outputDir) && fs.statSync(outputDir).isDirectory()) {
-    return new ExtensionContext(extensionId, outputDir);
+    return new ExtensionContext(resolvedId, outputDir);
   }
 
   throw Errors.LoaderError("Extension load error!");
@@ -76,6 +93,42 @@ async function loadFromCrx(
   }
 
   logger.info(`Extracted CRX → ID: ${extensionId}, Output: ${outputPath}`);
+}
+
+
+/**
+ * Handle Firefox XPI extraction.
+ *
+ * Returns the extension ID to use: the caller-supplied `extensionId` when it
+ * looks meaningful, otherwise the gecko ID read from the manifest
+ * (`browser_specific_settings.gecko.id` / `applications.gecko.id`), falling
+ * back to a stable placeholder for temporary add-ons that declare no ID.
+ */
+async function loadFromXpi(
+  inputPath: string,
+  outputDir: string,
+  extensionId: string
+): Promise<string> {
+  const extractor = new XpiExtractor(inputPath, outputDir);
+  await extractor.extract();
+
+  const manifestId = extractor.getExtensionId();
+  const provided =
+    extensionId && extensionId !== "unknown" ? extensionId : null;
+  // Placeholder is email-style so it passes Firefox ID validation in the
+  // ExtensionContext constructor (temporary add-ons may declare no ID).
+  const resolvedId = provided ?? manifestId ?? "unknown@firefox";
+
+  if (provided && manifestId && provided !== manifestId) {
+    logger.info(
+      `(handleXpi) Provided extensionId (${provided}) does not match manifest gecko ID (${manifestId})`
+    );
+  }
+
+  logger.info(
+    `Extracted XPI → ID: ${resolvedId}, Output: ${extractor.getOutputPath()}`
+  );
+  return resolvedId;
 }
 
 

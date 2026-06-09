@@ -1,7 +1,7 @@
 // barrel export
 export * from "./semantics";
 
-export { literalOuter, literalExtensionId, inferUrlTaintControl } from "./utils";
+export { literalOuter, literalExtensionId, inferUrlTaintControl, extractConfigLiteral } from "./utils";
 
 export { DefFactory, defFactory } from "../../factories/defFactory";
 

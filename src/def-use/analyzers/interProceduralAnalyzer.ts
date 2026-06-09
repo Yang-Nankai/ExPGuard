@@ -6,7 +6,6 @@ import { FunctionCallItem } from "../utils/functionCallItem";
 import { FunctionCallStack } from "../utils/functionCallStack";
 import { defFactory } from "../factories/defFactory";
 import { Range } from "../types/range";
-import { modelController } from "../../model/modelCtrl";
 import { reachingDefAnalyzer } from "./reachingDefinitionAnalyzer";
 import Scope from "../../scope/scope";
 import { patternAwareTypeHandler } from "../handlers/patternAwareTypeHandler";
@@ -126,28 +125,22 @@ export class InterProceduralAnalyzer {
       return;
     }
 
-    const calleeModel =
-      modelController.getIntraProceduralModelByMainlyRelatedScopeFromAPageModels(
-        callee.fromNode.scopeTree,
-        calleeScope
-      );
-    
-    if (calleeModel?.featureSemantic) {
-      const returnDef = calleeModel.featureSemantic.exec(argDefs, caller, thisDef) ?? defFactory.createUndefinedDef(caller);
+    if (calleeScope.featureSemantic) {
+      const returnDef = calleeScope.featureSemantic.exec(argDefs, caller, thisDef) ?? defFactory.createUndefinedDef(caller);
       this.setCurrentReturnDef(returnDef);
-      if (calleeModel.featureSemantic.hasSideEffect) this.setCurrentSideEffects();
+      if (calleeScope.featureSemantic.hasSideEffect) this.setCurrentSideEffects();
       return;
     }
 
-    if (!calleeModel?.graph?.entryNode) return;
+    if (!calleeScope.graph?.entryNode) return;
 
-    const entryNode = calleeModel.graph.entryNode;
+    const entryNode = calleeScope.graph.entryNode;
     this.bindFunctionParameters(entryNode, calleeScope, argDefs);
 
     /** ---- side effect snapshot (before) ---- */
     const beforeSnapshot = this.calcSideEffectSnapshot(calleeScope);
 
-    reachingDefAnalyzer.doAnalysis(calleeModel);
+    reachingDefAnalyzer.doAnalysis(calleeScope);
 
     /** ---- side effect snapshot (after) ---- */
     const afterSnapshot = this.calcSideEffectSnapshot(calleeScope);

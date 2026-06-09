@@ -18,6 +18,8 @@ const JS_OBJECTS: string[] = [
   "Uint8Array",
   "XMLHttpRequest",
   "WebSocket",
+  "Worker",
+  "WebAssembly",
   "localStorage",
   "sessionStorage",
   "document",
@@ -41,6 +43,14 @@ const JS_FUNCTIONS: string[] = [
   "btoa",
   "postMessage",
   "addEventListener",
+  // Scalar casts — wired up with taint-preserving semantics in
+  // builtinSemantics/browser/api.ts. Must be listed here so they are bound
+  // as page-scope locals; otherwise the analyzer falls back to UnknownDef
+  // and silently loses taint through `parseInt(taintedString)`.
+  "parseInt",
+  "parseFloat",
+  "isNaN",
+  "isFinite",
 ];
 
 const LIBRARY_NAMES: string[] = [
@@ -51,10 +61,21 @@ const LIBRARY_NAMES: string[] = [
   "axios",
   "CryptoJS",
   "base64",
+  // Front-end frameworks. Modeled in builtinSemantics/library/{react,vue,angular}.ts.
+  // Listed here so calls like `React.createElement(...)` / `new Vue({...})` /
+  // `$sce.trustAsHtml(...)` in *user* code bind to the modeled builtin instead
+  // of falling back to UnknownDef and dropping taint.
+  "React",
+  "ReactDOM",
+  "Vue",
+  "$sce",
 ];
 
-// Extension objects
-const EXTENSION_OBJECTS: string[] = ["chrome"];
+// Extension objects. `browser` is the Firefox WebExtension namespace; it is
+// registered as an alias of the `chrome` builtin Def tree (see builtins.ts),
+// so binding it here lets Firefox content/background/page scopes resolve
+// `browser.*` calls to the same modeled semantics as `chrome.*`.
+const EXTENSION_OBJECTS: string[] = ["chrome", "browser"];
 
 export const PAGE_BUILTINS: string[] = [
   ...GLOBAL_OBJECTS,

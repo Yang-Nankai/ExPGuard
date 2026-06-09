@@ -1,17 +1,16 @@
 import { traverseSimple } from "../../ast/walkes";
-import Model from "../../model/model";
+import Scope from "../../scope/scope";
 import logger from "../../utils/logger";
 import { defFactory } from "../factories/defFactory";
 import { setReachingDef } from "../utils/utils";
 
 export class FunctionDeclarationAnalyzer {
-  analyze(model: Model) {
-    if (!model?.graph) return;
+  analyze(scope: Scope) {
+    if (!scope?.graph) return;
 
-    const scope = model.mainlyRelatedScope;
-    const entryNode = model.graph.entryNode;
+    const entryNode = scope.graph.entryNode;
 
-    if (!scope || !entryNode.astNode) {
+    if (!entryNode.astNode) {
       logger.warn(`Scope ${scope?.name} entry node does not have an AST node`);
       return;
     }
