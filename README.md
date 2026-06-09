@@ -91,48 +91,74 @@ node dist/main.js analyze --type WEB --input=https://chromewebstore.google.com/d
 node dist/main.js analyze --type XPI --input ./path/to/addon.xpi --out=./output/firefox_addon
 ```
 
-## Batch analysis
+## Batch Analysis
 
-To analyze many extensions, use the Python orchestrator
-[`scripts/batch_analyze.py`](./scripts/batch_analyze.py). It drives a thread
-pool that spawns **one isolated `node dist/main.js analyze` subprocess per
-extension**. Process isolation is deliberate: the analyzer keeps ~30
-module-level singletons (taint manager, scope controller, factories, …), so
-running multiple extensions inside one Node process would leak taint state
-across them. A fresh OS process per extension starts with pristine state, so
-results can never cross-contaminate — and no in-process reset is needed.
+For analyzing multiple extensions concurrently, ExPGuard provides a built-in batch analysis module. It uses a worker pool that spawns **one isolated `node dist/main.js analyze` subprocess per extension**. Process isolation is crucial: the analyzer maintains ~30 module-level singletons (taint manager, scope controller, factories, …), so running multiple extensions in one Node process would leak taint state across them. A fresh OS process per extension ensures pristine state and prevents result cross-contamination.
 
-The orchestrator is stdlib-only (no `pip install`). Build first, then run:
+Build first, then run:
 
 ```bash
 npm run build
-python3 scripts/batch_analyze.py --input <manifest.json|dir> [options]
-# or: npm run batch -- --input <manifest.json|dir> [options]
+node dist/main.js batch --input <dir|jsonl> --mode <directory|jsonl> --platform <chrome|firefox> [options]
 ```
 
-**`--input`** accepts either:
-
-- a JSON manifest — `{"extensions": [{"type": "DIR|CRX|WEB", "input": "<path|url>", "id"?: "...", "version"?: "..."}, ...]}` (a bare top-level array also works), or
-- a directory — each immediate child that is an unpacked extension (has a `manifest.json`) or a `*.crx` file becomes one job.
-
-**Options**:
-
-- `--out <dir>`: root output directory; each extension writes to `<out>/<NNN_slug>/`. (Default: `./results/batch`)
-- `--jobs <N>`: number of concurrent worker subprocesses. (Default: CPU count)
-- `--html`: emit a `report.html` for every extension.
-- `--taint-rules <path>`: custom taint rule file applied to every extension.
-- `--timeout <seconds>`: per-extension timeout.
-- `--feishu-webhook <url>` / `--feishu-secret <secret>`: push live progress + summary cards to a Feishu (Lark) custom bot (also read from `EPG_FEISHU_WEBHOOK` / `EPG_FEISHU_SECRET`).
-- `--progress-every <N>`: send a Feishu progress card every N completed extensions. (Default: 1)
-
-A machine-readable `batch-summary.json` (per-extension status, findings, flow-type
-counts, coverage) is written to `--out`, and the process exits non-zero if any
-extension errored, so CI can gate on it.
+### Quick Examples
 
 ```bash
-# Analyze every unpacked extension under ./corpus, 8 at a time, with HTML reports.
-python3 scripts/batch_analyze.py --input ./corpus --out ./results/batch --jobs 8 --html
+# Analyze Chrome extensions from a directory
+node dist/main.js batch \
+  -i ./chrome-extensions \
+  -m directory \
+  -p chrome \
+  -o ./results/batch
+
+# Analyze Firefox add-ons from a JSONL file
+node dist/main.js batch \
+  -i ./extensions.jsonl \
+  -m jsonl \
+  -p firefox \
+  -o ./results/batch \
+  -j 8 \
+  --html
+
+# Use npm script shorthand
+npm run batch -- -i ./extensions -m directory -p chrome -o ./results/batch
 ```
+
+### Input Modes
+
+**Directory mode** (`--mode directory`): Scans the directory for extension packages. Filename patterns:
+- Chrome: `<id>.crx` or `<id>_<version>.crx`
+- Firefox: `<id>.xpi` or `<id>_<version>.xpi`
+
+**JSONL mode** (`--mode jsonl`): Each line is a JSON object with `id`, `path`, and optional `version`:
+```jsonl
+{"id": "abcdefghijklmnop", "version": "1.0.0", "path": "./extension.crx"}
+{"id": "bcdefghijklmnopq", "path": "./unpacked-extension"}
+```
+
+### Options
+
+- `-i, --input <path>`: (Required) Input directory or JSONL file
+- `-m, --mode <mode>`: (Required) Source mode: `directory` or `jsonl`
+- `-p, --platform <platform>`: (Required) Target platform: `chrome` or `firefox`
+- `-o, --output <dir>`: Output directory (default: `./results/batch`)
+- `-j, --jobs <N>`: Concurrent workers (default: CPU count)
+- `--html`: Generate HTML reports for each extension
+- `--taint-rules <path>`: Custom taint rule file for all extensions
+- `--timeout <seconds>`: Per-extension timeout
+
+### Output
+
+The batch analyzer generates:
+- **`batch-summary.json`**: Complete analysis results for all extensions
+- **`batch-statistics.json`**: Aggregated statistics and taint type distribution
+- **`batch-report.html`**: Interactive HTML visualization with charts and tables
+- **`<index>_<extension-id>/`**: Individual extension output directories
+
+The process exits non-zero if any extension errors, enabling CI gating.
+
+For detailed documentation, examples, and advanced usage, see [`docs/batch-analysis.md`](./docs/batch-analysis.md).
 
 ## Documentation
 
