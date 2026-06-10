@@ -36,7 +36,7 @@ function copyTree(from, to, filter) {
 }
 
 const isJson = (name) => name.endsWith(".json");
-const isJs = (name) => name.endsWith(".js");
+const isJsOrJson = (name) => name.endsWith(".js") || name.endsWith(".json");
 
 let total = 0;
 total += copyTree(
@@ -47,7 +47,7 @@ total += copyTree(
 total += copyTree(
   path.join(srcDir, "transformation"),
   path.join(distDir, "transformation"),
-  isJs,
+  isJsOrJson,
 );
 
 console.log(`[build] copied ${total} runtime asset(s) into dist/`);
