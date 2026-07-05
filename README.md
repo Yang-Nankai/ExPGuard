@@ -44,7 +44,7 @@ npm run build
 > Use `npm run build` rather than a bare `tsc`. `tsc` only emits the compiled
 > `.js`; the analyzer also needs `src/taint/rules/default-rules.json` and the
 > `src/transformation/**` JS libraries copied into `dist/`. `npm run build`
-> does this automatically — running `tsc` alone leaves the default rule set
+> does this automatically; running `tsc` alone leaves the default rule set
 > missing and every analysis silently reports zero findings.
 
 
@@ -57,7 +57,7 @@ To run the analyzer, you can use node on the compiled script, or ts-node on the 
 **Basic Syntax**:
 
 ```bash
-node dist/main.js analyze --type <CRX|DIR|WEB> --input <path> [options]
+node dist/main.js analyze --type <CRX|DIR|WEB|XPI> --input <path> [options]
 ```
 
 **Options**:
@@ -65,7 +65,7 @@ node dist/main.js analyze --type <CRX|DIR|WEB> --input <path> [options]
 - --type \<type\>: (Required) The format of the input extension. Valid options are CRX (packaged Chrome extension), DIR (unpacked extension directory), WEB (Chrome Web Store online extension), and XPI (packaged Firefox add-on).
 - --input \<path\>: (Required) Path to the target extension (.crx / .xpi file, local directory path, or URL).
 - --out \<dir\>: Directory where the analysis results will be saved. (Default: results)
-- --id \<extensionId\>: Explicitly pass the extension ID. Accepts a Chrome ID (`[a-p]{32}`) or a Firefox ID (GUID / email style). Optional for XPI — if omitted, the gecko ID is auto-derived from the manifest's `browser_specific_settings.gecko.id` / `applications.gecko.id`.
+- --id \<extensionId\>: Explicitly pass the extension ID. Accepts a Chrome ID (`[a-p]{32}`) or a Firefox ID (GUID / email style). Optional for XPI; if omitted, the gecko ID is auto-derived from the manifest's `browser_specific_settings.gecko.id` / `applications.gecko.id`.
 
 **Examples:**
 
@@ -85,93 +85,24 @@ node dist/main.js analyze --type CRX --input ./samples/code_injection/example.cr
 node dist/main.js analyze --type WEB --input=https://chromewebstore.google.com/detail/sponsorblock-for-youtube/mnjggcdmjocbbbhaepdhchncahnbgone --out=./output/cws_example --id=mnjggcdmjocbbbhaepdhchncahnbgone
 ```
 
-4. Analyze a packaged Firefox add-on (`.xpi`). The `--id` is optional — it is
+4. Analyze a packaged Firefox add-on (`.xpi`). The `--id` is optional; it is
    auto-derived from the manifest's gecko settings:
 ```bash
 node dist/main.js analyze --type XPI --input ./path/to/addon.xpi --out=./output/firefox_addon
 ```
 
-## Batch Analysis
-
-For analyzing multiple extensions concurrently, ExPGuard provides a built-in batch analysis module. It uses a worker pool that spawns **one isolated `node dist/main.js analyze` subprocess per extension**. Process isolation is crucial: the analyzer maintains ~30 module-level singletons (taint manager, scope controller, factories, …), so running multiple extensions in one Node process would leak taint state across them. A fresh OS process per extension ensures pristine state and prevents result cross-contamination.
-
-Build first, then run:
-
-```bash
-npm run build
-node dist/main.js batch --input <dir|jsonl> --mode <directory|jsonl> --platform <chrome|firefox> [options]
-```
-
-### Quick Examples
-
-```bash
-# Analyze Chrome extensions from a directory
-node dist/main.js batch \
-  -i ./chrome-extensions \
-  -m directory \
-  -p chrome \
-  -o ./results/batch
-
-# Analyze Firefox add-ons from a JSONL file
-node dist/main.js batch \
-  -i ./extensions.jsonl \
-  -m jsonl \
-  -p firefox \
-  -o ./results/batch \
-  -j 8 \
-  --html
-
-# Use npm script shorthand
-npm run batch -- -i ./extensions -m directory -p chrome -o ./results/batch
-```
-
-### Input Modes
-
-**Directory mode** (`--mode directory`): Scans the directory for extension packages. Filename patterns:
-- Chrome: `<id>.crx` or `<id>_<version>.crx`
-- Firefox: `<id>.xpi` or `<id>_<version>.xpi`
-
-**JSONL mode** (`--mode jsonl`): Each line is a JSON object with `id`, `path`, and optional `version`:
-```jsonl
-{"id": "abcdefghijklmnop", "version": "1.0.0", "path": "./extension.crx"}
-{"id": "bcdefghijklmnopq", "path": "./unpacked-extension"}
-```
-
-### Options
-
-- `-i, --input <path>`: (Required) Input directory or JSONL file
-- `-m, --mode <mode>`: (Required) Source mode: `directory` or `jsonl`
-- `-p, --platform <platform>`: (Required) Target platform: `chrome` or `firefox`
-- `-o, --output <dir>`: Output directory (default: `./results/batch`)
-- `-j, --jobs <N>`: Concurrent workers (default: CPU count)
-- `--html`: Generate HTML reports for each extension
-- `--taint-rules <path>`: Custom taint rule file for all extensions
-- `--timeout <seconds>`: Per-extension timeout
-
-### Output
-
-The batch analyzer generates:
-- **`batch-summary.json`**: Complete analysis results for all extensions
-- **`batch-statistics.json`**: Aggregated statistics and taint type distribution
-- **`batch-report.html`**: Interactive HTML visualization with charts and tables
-- **`<index>_<extension-id>/`**: Individual extension output directories
-
-The process exits non-zero if any extension errors, enabling CI gating.
-
-For detailed documentation, examples, and advanced usage, see [`docs/batch-analysis.md`](./docs/batch-analysis.md).
-
 ## Documentation
 
 In-depth component-level docs live under [`docs/`](./docs):
 
-- [`docs/architecture.md`](./docs/architecture.md) — high-level pipeline tour
-- [`docs/extension_loader.md`](./docs/extension_loader.md) — loader, unpacking, frame tagging, dependency graph
-- [`docs/ast_cfg.md`](./docs/ast_cfg.md) — parser strategy, CFG construction, FlowNode model
-- [`docs/scope_def_use.md`](./docs/scope_def_use.md) — scope tree, def-use, inter-procedural call analyzer, builtin semantics
-- [`docs/taint_engine.md`](./docs/taint_engine.md) — TaintManager, cross-context bridges, policy, severity
-- [`docs/taint_policy_catalog.md`](./docs/taint_policy_catalog.md) — full catalog of supported sources / sinks / sanitizers
-- [`docs/output_format.md`](./docs/output_format.md) — `report.txt` and `summary.json` reference
-- [`docs/samples_guide.md`](./docs/samples_guide.md) — what each sample under `samples/` exercises plus verified baseline flow counts
+- [`docs/architecture.md`](./docs/architecture.md) - high-level pipeline tour
+- [`docs/extension_loader.md`](./docs/extension_loader.md) - loader, unpacking, frame tagging, dependency graph
+- [`docs/ast_cfg.md`](./docs/ast_cfg.md) - parser strategy, CFG construction, FlowNode model
+- [`docs/scope_def_use.md`](./docs/scope_def_use.md) - scope tree, def-use, inter-procedural call analyzer, builtin semantics
+- [`docs/taint_engine.md`](./docs/taint_engine.md) - TaintManager, cross-context bridges, policy, severity
+- [`docs/taint_policy_catalog.md`](./docs/taint_policy_catalog.md) - full catalog of supported sources / sinks / sanitizers
+- [`docs/output_format.md`](./docs/output_format.md) - `report.txt` and `summary.json` reference
+- [`docs/samples_guide.md`](./docs/samples_guide.md) - what each sample under `samples/` exercises plus verified baseline flow counts
 
 ## Test samples
 
@@ -179,9 +110,9 @@ In-depth component-level docs live under [`docs/`](./docs):
 |--------|----------------|---------------------|
 | `samples/privilege_execution/` | PRIVILEGE_ESCALATION + STORAGE_POSOING via `chrome.runtime.sendMessage` + `chrome.storage.local` | `./samples/privilege_execution/` |
 | `samples/code_injection/` (CRX) | CODE_INJECTION via `setTimeout(string)` | (use `--type=CRX --input=./samples/code_injection/example.crx --id=caofmekclcabakldafkjbfkkmcebndal`) |
-| `samples/data_leak/` | DATA_LEAK + REQUEST_FORGERY via `chrome.cookies` / `chrome.history` → `fetch` / `onMessageExternal` | `./samples/data_leak/` |
-| `samples/storage_poisoning/` | STORAGE_POSOING + PRIVILEGE_ESCALATION via `WINDOW_CUSTOM_EVENT` → `chrome.storage.sync` → `chrome.tabs.*` | `./samples/storage_poisoning/` |
-| `samples/request_forgery/` | REQUEST_FORGERY via `onMessageExternal` → `fetch` / XHR / WebSocket / axios; sanitiser demo via `crypto.subtle.digest` | `./samples/request_forgery/` |
+| `samples/data_leak/` | DATA_LEAK + REQUEST_FORGERY via `chrome.cookies` / `chrome.history` -> `fetch` / `onMessageExternal` | `./samples/data_leak/` |
+| `samples/storage_poisoning/` | STORAGE_POSOING + PRIVILEGE_ESCALATION via `WINDOW_CUSTOM_EVENT` -> `chrome.storage.sync` -> `chrome.tabs.*` | `./samples/storage_poisoning/` |
+| `samples/request_forgery/` | REQUEST_FORGERY via `onMessageExternal` -> `fetch` / XHR / WebSocket / axios; sanitiser demo via `crypto.subtle.digest` | `./samples/request_forgery/` |
 | `samples/dom_xss/` | CODE_INJECTION via `location.hash` / `postMessage` / `element.value` / custom events | `./samples/dom_xss/` |
 | `samples/multi_channel/` | DATA_LEAK + PRIVILEGE_ESCALATION + REQUEST_FORGERY via `runtime.connect` / `onConnectExternal` / `pageCapture`; demonstrates `chrome.runtime.getURL` frame propagation to `helper.js` | `./samples/multi_channel/` |
 

@@ -14,13 +14,7 @@ import { Timer } from "./utils/timer";
 
 type TaskStatus = "success" | "error";
 
-/**
- * Structured outcome of a single analysis. Each analysis runs in its own
- * process (the CLI is one-extension-per-invocation; batch mode spawns one
- * subprocess per extension via scripts/batch_analyze.py), so there is no
- * in-process state to reset between runs — module-level singletons start
- * pristine in every fresh process.
- */
+/** Structured outcome of a single extension analysis. */
 export interface RunResult {
   extensionId?: string;
   extensionVersion?: string;
@@ -50,7 +44,7 @@ interface RunOptions {
   /**
    * Optional path to a custom taint-rule file. Overrides
    * `config.taintRulesPath` for this run only. The engine layers the file
-   * on top of the bundled defaults — it does not replace them.
+   * on top of the bundled defaults; it does not replace them.
    */
   taintRulesPath?: string;
 
@@ -228,7 +222,7 @@ export async function runSingleTask(opts: RunOptions): Promise<RunResult> {
 
     logger.info(`Analysis finished with status=${status}`);
 
-    // Aggregate a structured result for the caller (batch mode).
+    // Aggregate a structured result for the CLI caller.
     const flows: any[] = (baseSummary as any).flows ?? [];
     const flowTypeCounts: Record<string, number> = {};
     for (const f of flows) {
