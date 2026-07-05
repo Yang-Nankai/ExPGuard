@@ -123,7 +123,8 @@ class BatchProcessor:
             return False
         except Exception as e:
             self.logger.logger.error(f"Submit error: {e}")
-            return False
+            self.logger.logger.debug(traceback.format_exc())
+            raise
 
     # -------------------------
     # Completion handling
@@ -146,6 +147,7 @@ class BatchProcessor:
             )
             self.logger.logger.debug(traceback.format_exc())
             with self.lock:
+                self.stats.failed += 1
                 self.stats.error += 1
                 self.stats.processing -= 1
 
@@ -175,6 +177,10 @@ class BatchProcessor:
 
     def _cleanup(self):
         self.stats.end_time = datetime.now()
+        if self.stats.start_time:
+            self.stats.duration = (
+                self.stats.end_time - self.stats.start_time
+            ).total_seconds()
 
         if self.webhook:
             self.webhook.stop(self.stats)

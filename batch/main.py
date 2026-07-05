@@ -69,8 +69,7 @@ def setup_environment(args):
         Path(dir_path).mkdir(parents=True, exist_ok=True)
     
     # 动态配置覆盖
-    if args.webhook_url:
-        config.set("WEBHOOK_URL", args.webhook_url)
+    config.set("WEBHOOK_URL", args.webhook_url)
     
     config.set("OUTPUT_DIR", args.output_dir)
     config.set("LOG_DIR", args.log_dir)
@@ -181,8 +180,8 @@ def main():
         stats = processor.process()
         
         # 9. 根据结果决定退出码
-        if stats.failed + stats.error > 0:
-            logger.logger.warning(f"Processing completed with {stats.failed + stats.error} failures")
+        if stats.failed > 0:
+            logger.logger.warning(f"Processing completed with {stats.failed} failures")
             return 1
         else:
             logger.logger.info("Processing completed successfully")
