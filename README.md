@@ -66,13 +66,14 @@ node dist/main.js analyze --type <CRX|DIR|WEB|XPI> --input <path> [options]
 - --input \<path\>: (Required) Path to the target extension (.crx / .xpi file, local directory path, or URL).
 - --out \<dir\>: Directory where the analysis results will be saved. (Default: results)
 - --id \<extensionId\>: Explicitly pass the extension ID. Accepts a Chrome ID (`[a-p]{32}`) or a Firefox ID (GUID / email style). Optional for XPI; if omitted, the gecko ID is auto-derived from the manifest's `browser_specific_settings.gecko.id` / `applications.gecko.id`.
+- --extension-version \<version\>: Optional extension version metadata to include in `summary.json` and generated reports. This is separate from the CLI's own `--version` flag.
 
 **Examples:**
 
 1. Analyze an unpacked extension directory:
 
 ```bash
-node dist/main.js analyze --type=DIR --input=./samples/privilege_execution/ --out=./output/privilege_execution --id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+node dist/main.js analyze --type=DIR --input=./samples/privilege_execution/ --out=./output/privilege_execution --id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa --extension-version=1.0
 ```
 
 2. Analyze a packaged CRX file:

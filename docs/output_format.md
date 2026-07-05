@@ -104,6 +104,10 @@ The whole structure is also accessible programmatically through `taintManager.ge
 
 ## `summary.json`
 
+`extensionVersion` is emitted when the run is invoked with
+`--extension-version <version>`. The same value is also preferred in generated
+HTML report metadata over the manifest's own `version` field.
+
 ```
 {
   "extensionId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",

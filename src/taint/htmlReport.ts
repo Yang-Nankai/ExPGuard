@@ -497,7 +497,7 @@ function renderOverview(input: HtmlReportInput, totalIssues: number): string {
 
   return `<section class="overview">
     <h1>${escapeHtml(m.name ?? "Chrome Extension")} <small>v${escapeHtml(
-      m.version ?? meta.extensionVersion ?? "?",
+      meta.extensionVersion ?? m.version ?? "?",
     )}</small></h1>
     <p class="muted">${escapeHtml(m.description ?? "")}</p>
     <div class="cards">

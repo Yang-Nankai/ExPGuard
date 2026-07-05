@@ -18,6 +18,10 @@ program
   .option("--id <extensionId>", "extension id")
   .option("--extension-version <version>", "extension version")
   .option(
+    "--extension-version <version>",
+    "extension version to include in summary and generated reports",
+  )
+  .option(
     "--taint-rules <path>",
     "path to a custom taint rule file (.json or .ts/.js) to layer on top of the defaults",
   )

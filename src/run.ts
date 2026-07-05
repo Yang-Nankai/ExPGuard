@@ -136,11 +136,22 @@ export async function runSingleTask(opts: RunOptions): Promise<RunResult> {
     // the (possibly undefined) CLI-supplied one.
     const effectiveId =
       epgModelBuilder.extensionContext?.id ?? opts.extensionId;
+    const effectiveExtensionVersion = opts.extensionVersion;
 
    try {
-     const report = printTaintReportsCLI(
+     let report = printTaintReportsCLI(
        taintManager.generateGlobalReport(),
      );
+     if (effectiveExtensionVersion) {
+       report =
+         [
+           "ANALYSIS TARGET",
+           `Extension ID      : ${effectiveId ?? "unknown"}`,
+           `Extension Version : ${effectiveExtensionVersion}`,
+           `Source Type       : ${opts.sourceType}`,
+           "",
+         ].join("\n") + report;
+     }
      await fs.appendFile(
        path.join(outputDir, "report.txt"),
        report,
@@ -170,7 +181,9 @@ export async function runSingleTask(opts: RunOptions): Promise<RunResult> {
 
     const summary = {
       extensionId: effectiveId,
-      extensionVersion: opts.extensionVersion,
+      ...(effectiveExtensionVersion
+        ? { extensionVersion: effectiveExtensionVersion }
+        : {}),
       sourceType: opts.sourceType,
       status,
       duration: timer.getDuration(),
@@ -198,7 +211,7 @@ export async function runSingleTask(opts: RunOptions): Promise<RunResult> {
         const html = renderHtmlReport({
           meta: {
             extensionId: effectiveId,
-            extensionVersion: opts.extensionVersion,
+            extensionVersion: effectiveExtensionVersion,
             sourceType: opts.sourceType,
             generatedAt: new Date().toISOString(),
             durationMs: timer.getDurationMs(),
@@ -230,7 +243,7 @@ export async function runSingleTask(opts: RunOptions): Promise<RunResult> {
     }
     result = {
       extensionId: effectiveId,
-      extensionVersion: opts.extensionVersion,
+      extensionVersion: effectiveExtensionVersion,
       sourceType: opts.sourceType,
       input: opts.input,
       outputDir,

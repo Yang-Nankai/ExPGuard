@@ -161,8 +161,8 @@ const config: AppConfig = {
 
   artifactRetentionPolicy: "none",
   alwaysRetainedArtifacts: [
-    // "analysis.log",
-    // "report.txt",
+    "analysis.log",
+    "report.txt",
     "summary.json",
     // "manifest.json"
   ],
