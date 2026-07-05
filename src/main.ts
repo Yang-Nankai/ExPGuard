@@ -16,7 +16,6 @@ program
   .requiredOption("--input <path>", "CRX/XPI file path or directory path or web url")
   .option("--out <dir>", "output directory", "./results")
   .option("--id <extensionId>", "extension id")
-  .option("--extension-version <version>", "extension version")
   .option(
     "--extension-version <version>",
     "extension version to include in summary and generated reports",
