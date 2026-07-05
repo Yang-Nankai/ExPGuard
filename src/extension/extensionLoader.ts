@@ -29,16 +29,19 @@ export async function loadExtensionAsync(
   outputDir: string,
   extensionId: string
 ): Promise<ExtensionContext> {
-  // The ID used to construct the ExtensionContext. For XPI it may be replaced
-  // with the gecko ID derived from the manifest (see loadFromXpi).
+  // The ID used to construct the ExtensionContext. For CRX/XPI it may be
+  // replaced with an ID derived from the archive.
   let resolvedId = extensionId;
 
   switch (source) {
     case ExtensionSourceType.CRX: {
-      assertValidChromeExtensionId(extensionId);
       assertFileExists(inputPath);
 
-      await loadFromCrx(inputPath, outputDir, extensionId);
+      const provided =
+        extensionId && extensionId !== "unknown" ? extensionId : null;
+      if (provided) assertValidChromeExtensionId(provided);
+
+      resolvedId = await loadFromCrx(inputPath, outputDir, provided);
       break;
     }
 
@@ -71,30 +74,38 @@ export async function loadExtensionAsync(
   throw Errors.LoaderError("Extension load error!");
 }
 
-
 /**
- * Handle CRX file extraction
+ * Handle CRX file extraction.
+ *
+ * If the caller did not provide a Chrome extension ID, derive it from the CRX
+ * header. Batch mode often receives arbitrary local filenames, so requiring
+ * the filename to be the extension ID makes folder-based processing brittle.
  */
 async function loadFromCrx(
   inputPath: string,
   outputDir: string,
-  extensionId: string
-) {
+  extensionId: string | null
+): Promise<string> {
   const extractor = new CrxExtractor(inputPath, outputDir);
   await extractor.extract();
 
   const crxId = extractor.getExtensionId();
   const outputPath = extractor.getOutputPath();
 
-  if (extensionId !== crxId) {
+  if (!crxId) {
+    Errors.LoaderError("Could not derive extensionId from CRX header");
+    throw new Error("unreachable");
+  }
+
+  if (extensionId && extensionId !== crxId) {
     Errors.LoaderError(
       `(handleCrx) Provided extensionId (${extensionId}) does not match CRX ID (${crxId})`
     );
   }
 
-  logger.info(`Extracted CRX → ID: ${extensionId}, Output: ${outputPath}`);
+  logger.info(`Extracted CRX ID: ${crxId}, Output: ${outputPath}`);
+  return crxId;
 }
-
 
 /**
  * Handle Firefox XPI extraction.
@@ -126,11 +137,10 @@ async function loadFromXpi(
   }
 
   logger.info(
-    `Extracted XPI → ID: ${resolvedId}, Output: ${extractor.getOutputPath()}`
+    `Extracted XPI ID: ${resolvedId}, Output: ${extractor.getOutputPath()}`
   );
   return resolvedId;
 }
-
 
 /**
  * Handle loading from extension directory
@@ -147,7 +157,6 @@ async function loadFromDir(inputPath: string, outputDir: string) {
   const outputPath = await copyDirectoryAsync(inputPath, outputDir);
   logger.info(`Copied extension directory ${inputPath} to: ${outputPath}`);
 }
-
 
 /**
  * Download and load extension from Web Store
