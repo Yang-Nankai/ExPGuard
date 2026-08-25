@@ -22,7 +22,21 @@ import { isIgnoredAbsolutePath } from "../utils/scriptPathFilter";
  */
 export type ScriptKey = string;
 export type ScriptFrameTag = string;
-export type ScriptFrameFamily = "CS" | "BG" | "UNKNOWN";
+/**
+ * Frame families:
+ *  - BG   background service worker / scripts / background.html
+ *  - CS   content_scripts.js[]
+ *  - EX   privileged extension UI page (popup, options, side_panel,
+ *         chrome_url_overrides, ad-hoc extension_page)
+ *  - DT   devtools_page + devtools_panel scripts (privileged, only loaded
+ *         when DevTools is open)
+ *  - OF   offscreen document scripts (privileged, no UI)
+ *  - MAIN scripts dynamically injected into a tab's page world (no extension
+ *         APIs; distinct from an isolated content-script frame)
+ *  - UNKNOWN catch-all for orphan helpers not referenced by any manifest
+ *         entry (and not pulled in via import / runtime API)
+ */
+export type ScriptFrameFamily = "CS" | "BG" | "EX" | "DT" | "OF" | "MAIN" | "UNKNOWN";
 
 /**
  * Represents a single script file inside an extension

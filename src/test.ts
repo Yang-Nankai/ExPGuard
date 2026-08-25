@@ -1,12 +1,9 @@
 import { parser } from "./ast/jsParser";
 import fs from "fs";
 import path from "path";
-import { defuseAnalyzer } from "./def-use/defuseanalyzer";
 import { ExtensionScript } from "./extension/extensionScript";
 import { generateAstDot } from "./graph/dot-ast";
 import { generateCfgDot } from "./graph/dot-cfg";
-import { modelBuilder } from "./model/modelBuilder";
-import { modelController } from "./model/modelCtrl";
 import { scopeController } from "./scope/scopeCtrl";
 
 
@@ -69,25 +66,16 @@ function createPseudoExtensionScript(sourceCode: string): ExtensionScript {
 
 function runAnalysisAndDumpGraphs(sourceCode: string) {
   scopeController.clear();
-  modelController.clear();
 
   const ast = parser.parseAST(sourceCode);
   const pseudoScript = createPseudoExtensionScript(sourceCode);
   const scopeTree = scopeController.addPageScopeTree(ast, pseudoScript);
 
-  modelController.addPageModels(scopeTree);
-  modelBuilder.buildIntraProceduralModelsForAPage(scopeTree);
-//   defuseAnalyzer.buildInterProceduralModelsPDG(scopeTree);
+  scopeTree.buildIntraProceduralCFGs();
 
-  const pageModels = modelController.getPageModels(scopeTree);
-  if (!pageModels) {
-    throw new Error("No PageModels found for current scope tree");
-  }
-
-  const hasAnyGraph = [
-    ...pageModels.intraProceduralModels,
-    ...pageModels.interProceduralModels,
-  ].some((model) => Boolean(model.graph));
+  const hasAnyGraph = scopeTree
+    .getCFGEligibleScopes()
+    .some((scope) => Boolean(scope.graph));
 
   if (!hasAnyGraph) {
     throw new Error("No CFG graph available after analysis");
@@ -97,7 +85,7 @@ function runAnalysisAndDumpGraphs(sourceCode: string) {
   fs.mkdirSync(outputDir, { recursive: true });
 
   const astDot = generateAstDot(ast, { graphName: "MessageHandlerAST" });
-  const cfgDot = generateCfgDot(pageModels, {
+  const cfgDot = generateCfgDot(scopeTree, {
     graphName: "MessageHandlerCFG",
     source: sourceCode,
     includeLineCol: true,
@@ -114,7 +102,3 @@ function runAnalysisAndDumpGraphs(sourceCode: string) {
 }
 
 runAnalysisAndDumpGraphs(code);
-
-
-
-

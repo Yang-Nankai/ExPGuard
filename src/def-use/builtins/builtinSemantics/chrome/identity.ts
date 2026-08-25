@@ -9,6 +9,7 @@ createChromeBuiltinSemantics({
   callbackIndex: 1,
   sourceType: "CHROME_IDENTITY_TOKEN",
   createReturnDef: (callNode) => defFactory.createUnknownDef(callNode),
+  remarkFromArgs: () => "identity.authToken",
 });
 
 createChromeBuiltinSemantics({
@@ -16,4 +17,5 @@ createChromeBuiltinSemantics({
   callbackIndex: 1,
   sourceType: "CHROME_IDENTITY_PROFILE",
   createReturnDef: (callNode) => defFactory.createUnknownDef(callNode),
+  remarkFromArgs: () => "identity.profileUserInfo",
 });

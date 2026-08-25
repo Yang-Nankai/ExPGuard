@@ -84,10 +84,18 @@ function resolveStorageValue(
    * Also propagates taint if the stored value is tainted.
    */
   const attachStoredValue = (key: string) => {
-    const stored = defFactory.createUnknownDef(callNode);
+    // Retain only producer-proven primitive/syntax-safe field kinds.  Unknown
+    // fields still use the old opaque model, so page strings remain tainted
+    // when read back through extension storage.
+    const stored = taintManager.getStorageReadShape(area, key, callNode)
+      ?? defFactory.createUnknownDef(callNode);
+    stored.markStorageSerialized();
     taintManager.recordStorageGet(area, key, stored, astNode);
 
-    result.setProperty(key, stored);
+    // A specific storage read taints that property, not the complete result
+    // map.  Otherwise `get(["token", "theme"])` makes `result.theme`
+    // inherit `token`'s taint through generic container propagation.
+    result.setProperty(key, stored, false);
   };
 
   // Case 0: null / undefined / no argument
@@ -96,6 +104,9 @@ function resolveStorageValue(
     (Def.isLiteralDef(keyDef) &&
       (keyDef.value === null || keyDef.value === undefined))
   ) {
+    // `get(null)` reads every key in the area — a consumer for all of them.
+    taintManager.recordStorageWildcardRead(area);
+
     // If get the all items, then set a taint
     taintManager.createTaintSource(
       result,
@@ -110,6 +121,23 @@ function resolveStorageValue(
   //  Case 1: Literal key
   if (Def.isLiteralDef(keyDef)) {
     attachStoredValue(String(keyDef.value));
+    return result;
+  }
+
+  // A bounded ImplicitDef represents concrete alternatives (for example
+  // `keys[index]` where `keys` is ["token", "theme"]). Model every literal
+  // alternative precisely; retain a wildcard only for genuinely unresolved
+  // alternatives, never for the known ones.
+  if (Def.isImplicitDef(keyDef)) {
+    let hasUnknownAlternative = false;
+    for (const candidate of keyDef.defs) {
+      if (Def.isLiteralDef(candidate)) {
+        attachStoredValue(String(candidate.value));
+      } else {
+        hasUnknownAlternative = true;
+      }
+    }
+    if (hasUnknownAlternative) taintManager.recordStorageWildcardRead(area);
     return result;
   }
 
@@ -134,7 +162,18 @@ function resolveStorageValue(
     return result;
   }
 
-  // Unknown key type
+  // Generic wrappers such as `getStorage(keys)` often lose the caller's
+  // literal-array shape during inter-procedural modeling. Keep shapes for
+  // known literal producer keys while retaining the wildcard below for every
+  // unresolved key, so raw storage text remains conservative.
+  for (const [key, stored] of taintManager.getKnownStorageReadShapes(area, callNode)) {
+    taintManager.recordStorageGet(area, key, stored, astNode);
+    result.setProperty(key, stored, false);
+  }
+
+  // Unknown key type — the call could read anything in the area, so it counts
+  // as a consumer for every key (conservative; see `hasStorageConsumer`).
+  taintManager.recordStorageWildcardRead(area);
   return result;
 }
 
@@ -168,3 +207,60 @@ function registerStorageGet(area: "local" | "sync" | "session") {
 registerStorageGet("local");
 registerStorageGet("sync");
 registerStorageGet("session");
+
+// --------------------- chrome.storage.onChanged.addListener ---------------------
+// An onChanged listener observes writes to every key in every area, so it is a
+// wildcard consumer. Modeling it also gets the listener body analyzed, which is
+// a common place for "act on freshly poisoned config" logic.
+BuiltInSemantics.register(
+  "chrome.storage.onChanged.addListener",
+  (args, callNode, astNode) => {
+    interAnalyzer.setCurrentSideEffects();
+    taintManager.recordStorageWildcardRead("*");
+
+    const [callback] = args;
+    if (!Def.isFunctionDef(callback)) return defFactory.createUndefinedDef(callNode);
+
+    // (changes, areaName). `changes` values originate from storage; the
+    // storage round-trip resolution owns that taint, so pass opaque values
+    // here and let this call contribute reachability only.
+    const changes = defFactory.createObjectDef(callNode);
+    const areaName = defFactory.createUnknownDef(callNode);
+
+    interAnalyzer.analyze(callNode, callback, [changes, areaName], null, astNode);
+
+    return defFactory.createUndefinedDef(callNode);
+  },
+);
+
+// --------------------- chrome.storage.managed.get ---------------------
+// `managed` is read-only enterprise-policy data. Unlike local/sync/session it
+// is not an extension-controlled Set↔Get bridge — it is a sensitive *source*
+// (high-integrity, admin-provisioned). Model get() as minting a
+// CHROME_MANAGED_STORAGE taint source rather than a storage round-trip.
+BuiltInSemantics.register(
+  "chrome.storage.managed.get",
+  (args, callNode, astNode) => {
+    interAnalyzer.setCurrentSideEffects();
+
+    const [, callback] = args;
+    const result = defFactory.createObjectDef(callNode);
+
+    taintManager.createTaintSource(
+      result,
+      "CHROME_MANAGED_STORAGE",
+      astNode,
+      false,
+      "storage.managed",
+    );
+
+    // Callback style
+    if (Def.isFunctionDef(callback)) {
+      interAnalyzer.analyze(callNode, callback, [result], null, astNode);
+      return undefined;
+    }
+
+    // Promise style
+    return defFactory.createPromiseDef(callNode, result);
+  },
+);

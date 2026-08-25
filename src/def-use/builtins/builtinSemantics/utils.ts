@@ -20,6 +20,27 @@ export function literalOuter(def?: Def | null): string | undefined {
 }
 
 /**
+ * Extract a literal value for the first matching key from a config-object
+ * argument, e.g. `chrome.cookies.get({ url: "https://facebook.com" })` →
+ * `"https://facebook.com"`. Used to tag sensitive sources with the domain /
+ * query they read so the report can show *what* was accessed.
+ *
+ * Returns undefined when the argument isn't an object or no key carries a
+ * literal — callers should treat that as "no extra info", never an error.
+ */
+export function extractConfigLiteral(
+  argDef: Def | null | undefined,
+  keys: string[],
+): string | undefined {
+  if (!Def.isObjectDef(argDef)) return undefined;
+  for (const key of keys) {
+    const v = literalOuter(argDef.lookupProperty(key));
+    if (v !== undefined && v !== "") return v;
+  }
+  return undefined;
+}
+
+/**
  * Get the right extension id from a literal def
  */
 export function literalExtensionId(extensionId?: Def): string | undefined {

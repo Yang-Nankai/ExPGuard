@@ -1,9 +1,9 @@
-// content.js
+// Source: an untrusted page can send this message to the content script.
 window.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SAVE_BMK") {
-    // SINK 1: Storage Poisoning
-    chrome.storage.local.set({ title: event.data.title }, () => {
-      chrome.runtime.sendMessage({ type: "EXEC", url: event.data.url });
-    });
-  }
+  if (event.source !== window || event.data?.type !== "OPEN_URL") return;
+
+  chrome.runtime.sendMessage({
+    type: "OPEN_URL",
+    url: event.data.url,
+  });
 });

@@ -10,15 +10,39 @@ import {
   literalOuter,
   taintManager,
 } from "../index";
+import {
+  getReceiverMessageProtocol,
+  getSenderMessageProtocol,
+  projectMessageForReceiver,
+} from "../../../../taint/messageProtocol";
 
 // --------------------- chrome.runtime.getURL -------------------
-BuiltInSemantics.register("chrome.runtime.getURL", (args, callNode) => {
+BuiltInSemantics.register("chrome.runtime.getURL", (args, callNode, astNode) => {
   const pathArg = args[0];
 
   if (Def.isLiteralDef(pathArg) && typeof pathArg.value === "string") {
+    // A script element appended to the document executes in the tab's MAIN
+    // world. Do not inherit the caller's isolated-CS frame for this narrow
+    // pattern: doing so would incorrectly grant the injected page script the
+    // extension privileges of its loader.
+    const fromScriptKey = callNode.scopeTree?.key;
+    const canRunAsContentScript = fromScriptKey
+      ? scriptUsageTracker
+          .getScriptFrameDescriptorsByKey(fromScriptKey)
+          .some((frame) => frame.family === "CS")
+      : false;
+    const mainWorldInjection =
+      canRunAsContentScript &&
+      scriptUsageTracker.isMainWorldScriptReference(
+        callNode,
+        astNode,
+        fromScriptKey,
+      );
     scriptUsageTracker.markReferencedScriptByPathOrUrlByKey(
       callNode.scopeTree?.key,
       pathArg.value,
+      true,
+      mainWorldInjection ? "MAIN" : undefined,
     );
 
     // Keep literal path to support downstream file resolution in static model.
@@ -57,6 +81,7 @@ function recordSendMessageTaint(
       astNode,
       contextFilename: contextFile,
       channel: "runtime.single.sender.message",
+      protocol: getSenderMessageProtocol(message, contextFile),
     });
   }
 }
@@ -306,14 +331,19 @@ BuiltInSemantics.register(
       targetDef: message,
       contextFilename: callNode.scopeTree?.key!,
       channel: "runtime.single.sender.message",
+      protocol: getReceiverMessageProtocol(
+        callbackFunc,
+        callNode.scopeTree?.key!,
+      ),
       deferredMessage: {
         callNode,
         astNode,
         invoke: (message: Def) => {
+          const deliveredMessage = projectMessageForReceiver(message, callNode);
           interAnalyzer.analyze(
             callNode,
             callbackFunc,
-            [message, sender, sendResponse],
+            [deliveredMessage, sender, sendResponse],
             null,
             astNode,
           );
@@ -507,6 +537,79 @@ BuiltInSemantics.register(
   },
 );
 
+// --------------------- P1 sender-guard helpers -------------------
+// Detect patterns like:
+//   if (sender.id === "trusted-ext-id") { ... }
+//   if (sender.origin !== "https://example.com") return;
+//   if (sender.url === "https://example.com/page") { ... }
+// Only checks top-level `if`/`switch`/expression statements to avoid
+// treating isDevelopment-gated or deeply nested guards as unconditional.
+
+const _SENDER_GUARD_PROPS = new Set(["id", "origin", "url"]);
+
+/** Walk a binary / logical / unary test node and return true iff it contains
+ *  a strict equality/inequality check of sender.<id|origin|url> against a
+ *  non-empty string literal. Only follows `||` chains, not `&&`, to avoid
+ *  treating `isDev && sender.origin === "..."` as an unconditional guard. */
+function _isSenderGuardTest(node: any, senderName: string): boolean {
+  if (!node || typeof node !== "object") return false;
+
+  if (node.type === "BinaryExpression" &&
+      (node.operator === "===" || node.operator === "!==")) {
+    for (const [left, right] of [[node.left, node.right], [node.right, node.left]]) {
+      if (
+        left?.type === "MemberExpression" &&
+        left.object?.type === "Identifier" &&
+        left.object.name === senderName &&
+        left.property?.type === "Identifier" &&
+        _SENDER_GUARD_PROPS.has(left.property.name) &&
+        right?.type === "Literal" &&
+        typeof right.value === "string" &&
+        right.value !== ""
+      ) {
+        return true;
+      }
+    }
+  }
+
+  // sender.id === "a" || sender.id === "b"
+  if (node.type === "LogicalExpression" && node.operator === "||") {
+    return _isSenderGuardTest(node.left, senderName) ||
+           _isSenderGuardTest(node.right, senderName);
+  }
+
+  // !(...)
+  if (node.type === "UnaryExpression" && node.operator === "!") {
+    return _isSenderGuardTest(node.argument, senderName);
+  }
+
+  return false;
+}
+
+/**
+ * Return true when the callback function body contains a top-level sender
+ * identity guard on the named parameter.  Scanning only the outermost
+ * statement list avoids picking up guards that are themselves conditional
+ * (e.g. an isDevelopment gate wrapping a localhost origin check).
+ */
+function _hasSenderGuard(callbackAst: any, senderName: string): boolean {
+  const body = callbackAst?.body;
+  if (!Array.isArray(body)) return false;
+
+  for (const stmt of body) {
+    if (!stmt) continue;
+    if (stmt.type === "IfStatement" && _isSenderGuardTest(stmt.test, senderName)) {
+      return true;
+    }
+    // bare logical short-circuit: sender.id === "x" || return;
+    if (stmt.type === "ExpressionStatement" &&
+        _isSenderGuardTest(stmt.expression, senderName)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // --------------------- chrome.runtime.onMessageExternal.addListener -------------------
 BuiltInSemantics.register(
   "chrome.runtime.onMessageExternal.addListener",
@@ -528,13 +631,27 @@ BuiltInSemantics.register(
       "runtime.sendResponse.external",
     );
 
+    // P1: detect sender identity guard in the callback body.
+    // The sender parameter is at index 1; extract its name from the raw AST.
+    const funcNode = callback.functionNode as any;
+    const senderParam = funcNode?.params?.[1];
+    const senderName =
+      senderParam?.type === "Identifier" ? senderParam.name : null;
+    const isGuarded =
+      senderName != null &&
+      _hasSenderGuard(funcNode?.body, senderName);
+
+    const remarkBase =
+      "chrome.runtime.onMessageExternal.addListener[message]";
+    const remark = isGuarded ? `${remarkBase}|sender-guarded` : remarkBase;
+
     // Pseudo taint source
     taintManager.createTaintSource(
       message,
       "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
       astNode,
       false,
-      "chrome.runtime.onMessageExternal.addListener[message]",
+      remark,
     );
 
     interAnalyzer.analyze(

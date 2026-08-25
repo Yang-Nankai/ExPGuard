@@ -10,7 +10,37 @@ import {
 } from "../utils/utils";
 import { Identifier } from "acorn";
 import { taintManager as tm } from "../../taint";
+import { SinkType } from "../../taint";
 import logger from "../../utils/logger";
+
+/**
+ * Element properties whose assignment parses the value as HTML. Writing a
+ * tainted value here is a DOM-based XSS sink. The receiver is not required to
+ * be a modeled DOM element — `x.innerHTML = tainted` is dangerous for any `x`,
+ * and `checkSink` already no-ops on untainted values, so the false-positive
+ * surface is limited to genuinely tainted writes.
+ */
+const DOM_WRITE_SINK_PROPS: Record<string, SinkType> = {
+  innerHTML: "DOM_INNER_HTML",
+  outerHTML: "DOM_INNER_HTML",
+};
+
+/**
+ * Writing a tainted value back into a schema-backed browser global (notably
+ * `document.title = title`) must update that property without tainting the
+ * entire global object.  Propagating the property value to the `document`
+ * container makes unrelated calls such as `document.querySelectorAll()` look
+ * tainted, which then pollutes arbitrary extension state.  This does not alter
+ * ordinary user objects or JSON containers, where container taint remains
+ * necessary for dynamic property reads.
+ */
+function isBrowserGlobalPropertyWrite(root: any, key: string): boolean {
+  return (
+    root?.type === "Identifier" &&
+    ["document", "location", "window", "globalThis"].includes(root.name) &&
+    ["title", "URL", "documentURI", "cookie", "href", "hash", "search"].includes(key)
+  );
+}
 
 export function patternAwareTypeHandler(
   cfgNode: FlowNode,
@@ -21,6 +51,29 @@ export function patternAwareTypeHandler(
   if (!currentScope) return;
 
   const literalFallback = () => defFactory.createUnknownDef(cfgNode);
+
+  /**
+   * Fresh opaque value standing for "some part of `container`", linked to the
+   * container in the taint DAG.
+   *
+   * Used wherever a pattern cannot resolve a concrete property. Destructuring
+   * an opaque tainted value — `const { url } = msg`, the single most common
+   * shape in extension message handlers — must not drop the taint just because
+   * the container was never modeled as a concrete ObjectDef.
+   * `handleMemberExpression` already applies the same rule to `msg.url`.
+   * No-ops on untainted containers.
+   */
+  const deriveOpaqueChild = (
+    container: Def | null,
+    astNode: any,
+    remark: string,
+  ): Def => {
+    const child = literalFallback();
+    if (container && container.isTainted && container.uniqueId !== child.uniqueId) {
+      tm.propagateTaint(container, child, astNode, "ELEMENT", remark);
+    }
+    return child;
+  };
 
   // helper: create VarDef for an Identifier name using given def
   const createForIdentifier = (pattern: Identifier, def: Def | null) => {
@@ -51,7 +104,18 @@ export function patternAwareTypeHandler(
         const propDef = def.getProperty(keyName);
         c(property.value, propDef);
       } else {
-        c(property.value, literalFallback());
+        // The container could not be resolved to a concrete property (opaque
+        // `UnknownDef`, or an ObjectDef without that key). Destructuring must
+        // still carry the container's taint — `const { url } = msg` is the
+        // single most common shape in extension message handlers.
+        c(
+          property.value,
+          deriveOpaqueChild(
+            def,
+            property,
+            `destructure-property${keyName ? `[${keyName}]` : ""}`,
+          ),
+        );
       }
     },
     ArrayPattern: (pattern: any, def: Def | null, c: any) => {
@@ -60,13 +124,16 @@ export function patternAwareTypeHandler(
       for (let idx = 0; idx < pattern.elements.length; idx++) {
         const elem = pattern.elements[idx];
         if (!elem) continue; // hole
-        if (Def.isObjectDef(def)) {
-          const maybeDef = def.getProperty(idx.toString());
-          c(elem, maybeDef || literalFallback());
-        } else {
-          // not object/array-like => fallback
-          c(elem, literalFallback());
-        }
+        const maybeDef = Def.isObjectDef(def)
+          ? def.getProperty(idx.toString())
+          : null;
+        c(
+          elem,
+          maybeDef ||
+            // Same rationale as `Property`: an unresolved element of a tainted
+            // container stays tainted (`const [first] = msg.list`).
+            deriveOpaqueChild(def, elem, `destructure-element[${idx}]`),
+        );
       }
     },
     ObjectPattern: (pattern: any, def: Def | null, c: any) => {
@@ -196,9 +263,18 @@ export function patternAwareTypeHandler(
         if (!key) return;
 
         if (isLast) {
+          // [SINK] Assigning a tainted value to `.innerHTML` / `.outerHTML`
+          // parses it as HTML — a DOM-based XSS sink. checkSink no-ops unless
+          // the value is actually tainted.
+          const sinkType = DOM_WRITE_SINK_PROPS[key];
+          if (sinkType && def) {
+            tm.checkSink(def, sinkType, propNode, key);
+          }
+
           curObjDef.setProperty(
             key,
             def || defFactory.createUnknownDef(cfgNode),
+            !isBrowserGlobalPropertyWrite(cur, key),
           );
         } else {
           let next = curObjDef.getProperty(key);

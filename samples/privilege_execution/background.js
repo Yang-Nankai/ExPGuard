@@ -1,19 +1,7 @@
-// background.js
-import { addBmk } from "./utils.js";
+chrome.runtime.onMessage.addListener((message) => {
+  if (message?.type !== "OPEN_URL") return;
 
-self.saveBmk = function(url) {
-  chrome.storage.local.get(["title"], ({ title }) => {
-    addBmk(title, url);
-  });
-};
-
-chrome.runtime.onMessage.addListener((req) => {
-  if (req.type === "EXEC") {
-    const funcs = ["saveBmk"];
-    for (const func of funcs) {
-      if (typeof self[func] === "function") {
-        self[func](req.url); 
-      }
-    }
-  }
+  // Sink: the service worker opens an attacker-selected URL with extension
+  // privileges and without authenticating or validating the request.
+  chrome.tabs.create({ url: message.url });
 });

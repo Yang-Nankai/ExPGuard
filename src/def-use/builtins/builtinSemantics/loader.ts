@@ -1,5 +1,6 @@
 // ======  js =======
 import "./js/object";
+import "./js/date";
 import "./js/funciton";
 import "./js/array";
 import "./js/json";
@@ -23,6 +24,7 @@ import "./browser/timer";
 import "./browser/url";
 import "./browser/event";
 import "./browser/document";
+import "./browser/code";
 
 
 
@@ -32,6 +34,9 @@ import "./library/base64";
 import "./library/cryptoJS";
 import "./library/jquery";
 import "./library/lodash";
+import "./library/react";
+import "./library/vue";
+import "./library/angular";
 
 
 // ======  chrome =======
@@ -41,7 +46,10 @@ import "./chrome/bookmarks";
 import "./chrome/browsingData";
 import "./chrome/contentSettings";
 import "./chrome/cookies";
+import "./chrome/debugger";
 import "./chrome/declarativeContent";
+import "./chrome/declarativeNetRequest";
+import "./chrome/devtools";
 import "./chrome/downloads";
 import "./chrome/fontSettings";
 import "./chrome/gcm";
@@ -49,11 +57,13 @@ import "./chrome/history";
 import "./chrome/identity";
 import "./chrome/management";
 import "./chrome/notifications";
+import "./chrome/offscreen";
 import "./chrome/pageCapture";
 import "./chrome/proxy";
 import "./chrome/readingList";
 import "./chrome/runtime";
 import "./chrome/scripting";
+import "./chrome/sidePanel";
 import "./chrome/storage";
 import "./chrome/system";
 import "./chrome/tabs";

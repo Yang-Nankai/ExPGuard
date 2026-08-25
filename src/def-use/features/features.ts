@@ -61,7 +61,10 @@ FeatureModelRegistry.register({
           .attrEq("left.property.name", "exports")
           .has(
             S.type("CallExpression").has(
-              S.type("Identifier").attrEq("name", "chrome")
+              // Match both the Chrome (`chrome`) and Firefox (`browser`)
+              // WebExtension namespaces — the browser-polyfill wraps whichever
+              // global is present.
+              S.type("Identifier").attrRegex("name", /^(chrome|browser)$/)
             )
           )
       )

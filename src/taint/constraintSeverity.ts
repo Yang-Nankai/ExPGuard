@@ -1,7 +1,15 @@
 import { SourceType, SinkType } from "./types";
 import { FrameConstraint, scriptUsageTracker } from "../extension/scriptUsageTracker";
 
-type ConstraintKind = "EXTERNALLY_CONNECTABLE" | "CONTENT_SCRIPT_MATCHES" | "UNKNOWN";
+type ConstraintKind =
+  | "EXTERNALLY_CONNECTABLE"
+  | "CONTENT_SCRIPT_MATCHES"
+  // Source originates from an extension UI surface (popup, options, side panel,
+  // devtools, override pages, offscreen). These pages do not have
+  // content_scripts.matches — their attack surface is governed by who can open
+  // them (the user, in most cases) and what messages they accept.
+  | "EXTENSION_UI_PAGE"
+  | "UNKNOWN";
 
 export type SeverityLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
@@ -23,6 +31,27 @@ const WEB_ATTACK_SOURCES: SourceType[] = [
   "WINDOW_MESSAGE_EVENT",
   "WINDOW_CUSTOM_EVENT",
   "TARGET_CUSTOM_EVENT",
+];
+
+/**
+ * Sources whose values are read from the webpage/DOM by a content script.
+ * These were previously omitted, so a CS_1 flow such as
+ * `ELEMENT_TEXT_CONTENT -> eval` fell through to UNKNOWN/LOW even when the
+ * manifest supplied precise content_scripts.matches constraints.
+ */
+const CONTENT_SCRIPT_WEB_SOURCES: SourceType[] = [
+  "DOCUMENT_LOCATION",
+  "DOCUMENT_COOKIE",
+  "DOCUMENT_URL",
+  "DOCUMENT_TITLE",
+  "SCREEN_INFO",
+  "ELEMENT_TEXT_CONTENT",
+  "ELEMENT_INNER_HTML",
+  "ELEMENT_OUTER_HTML",
+  "ELEMENT_VALUE",
+  "JQUERY_ELEMENT_VAL",
+  "JQUERY_ELEMENT_TEXT",
+  "JQUERY_ELEMENT_HTML",
 ];
 
 const EXTERNAL_MESSAGE_SOURCES: SourceType[] = [
@@ -83,7 +112,7 @@ function parseMatchPattern(pattern: string): {
   };
 }
 
-function isLoopbackHost(host: string): boolean {
+export function isLoopbackHost(host: string): boolean {
   const cleanHost = host.replace(/:\*$/, "").replace(/:\d+$/, "").toLowerCase();
   return (
     cleanHost === "localhost" ||
@@ -180,6 +209,27 @@ function evaluateMatches(matches: string[] | undefined): SeverityResult {
   return maxSeverity(ranked);
 }
 
+/**
+ * Returns true when every non-loopback, non-file `externally_connectable`
+ * match pattern names a specific host — no `<all_urls>`, no bare `*` host,
+ * no `*.domain` subdomain wildcard. Loopback origins (localhost, 127.0.0.1,
+ * etc.) are counted as restricted per user requirement.
+ *
+ * An empty (or all-ignored) matches list also returns true: no web attacker
+ * can reach the extension through web origins.
+ */
+export function isExternalConnectableHostRestricted(
+  matches: string[] | undefined,
+): boolean {
+  const relevant = (matches ?? []).filter((m) => !shouldIgnorePattern(m));
+  return relevant.every((m) => {
+    if (m === "<all_urls>") return false;
+    const parsed = parseMatchPattern(m);
+    if (!parsed) return true; // unparsable → conservatively treat as restricted
+    return parsed.host !== "*" && !parsed.host.startsWith("*.");
+  });
+}
+
 function evaluateIds(
   ids: string[] | undefined,
   externallyConnectableDeclared: boolean,
@@ -187,10 +237,17 @@ function evaluateIds(
   const list = ids ?? [];
 
   if (!externallyConnectableDeclared) {
+    // Without an `externally_connectable` declaration, Chrome allows ANY
+    // extension to invoke onMessageExternal by default — this holds for both
+    // MV2 and MV3.  (Web-page access is a separate matter: it requires an
+    // explicit `matches` list regardless of manifest version; evaluateMatches
+    // handles that path and already returns LOW when matches is absent.)
     return {
       rank: 4,
       level: "CRITICAL",
-      reason: "`externally_connectable` is not declared, allowing connections from any extension by default.",
+      reason:
+        "`externally_connectable` is not declared; any external extension " +
+        "can connect by default (MV2 and MV3 behave identically here).",
       evidence: ["externally_connectable: <missing>"],
     };
   }
@@ -232,7 +289,21 @@ function isContentScriptWebAttackSurface(
   sourceType: SourceType,
   sourceFrame: string,
 ): boolean {
-  return WEB_ATTACK_SOURCES.includes(sourceType) && sourceFrame.startsWith("CS_");
+  return (
+    (sourceFrame.startsWith("CS_") ||
+      scriptUsageTracker.getFrameFamily(sourceFrame) === "MAIN") &&
+    (WEB_ATTACK_SOURCES.includes(sourceType) ||
+      CONTENT_SCRIPT_WEB_SOURCES.includes(sourceType))
+  );
+}
+
+function isExtensionUiWebAttackSurface(
+  sourceType: SourceType,
+  sourceFrame: string,
+): boolean {
+  if (!WEB_ATTACK_SOURCES.includes(sourceType)) return false;
+  const family = scriptUsageTracker.getFrameFamily(sourceFrame);
+  return family === "EX" || family === "DT" || family === "OF";
 }
 
 export function analyzeFlowConstraintSeverity(input: {
@@ -258,13 +329,33 @@ export function analyzeFlowConstraintSeverity(input: {
   }
 
   if (isContentScriptWebAttackSurface(sourceType, sourceFrame)) {
-    const best = evaluateMatches(sourceFrameConstraint?.matches);
+    // P0#4: fall back to tracker when caller did not supply the constraint
+    // (avoids silent LOW severity when the manifest entry is simply not wired up)
+    const constraint =
+      sourceFrameConstraint ?? scriptUsageTracker.getFrameConstraint(sourceFrame);
+    const best = evaluateMatches(constraint?.matches);
 
     return {
       constraintKind: "CONTENT_SCRIPT_MATCHES",
       severity: best.level,
       severityReason: best.reason,
       severityEvidence: best.evidence,
+    };
+  }
+
+  if (isExtensionUiWebAttackSurface(sourceType, sourceFrame)) {
+    // Popups / options / side panels / devtools / offscreen documents accept
+    // postMessage / custom events too, but they have no manifest-level URL
+    // constraint to evaluate. Mark them MEDIUM by default: they are reachable
+    // only from inside the extension permissions context (high impact if
+    // exploitable), but the actor must already control a posted message in
+    // that context (which usually requires another foothold).
+    return {
+      constraintKind: "EXTENSION_UI_PAGE",
+      severity: "MEDIUM",
+      severityReason:
+        "Source originates from an extension UI surface (popup/options/side_panel/devtools/offscreen); no manifest URL constraint applies.",
+      severityEvidence: [sourceFrame],
     };
   }
 

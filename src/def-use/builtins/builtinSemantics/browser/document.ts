@@ -1,5 +1,6 @@
 import {
   BuiltInSemantics,
+  DefFactory,
   defFactory,
   literalOuter,
   interAnalyzer,
@@ -35,7 +36,6 @@ const ELEMENT_PROPERTIES = [
   {
     name: "innerHTML",
     source: "ELEMENT_INNER_HTML",
-    sink: "DOCUMENT_HTML_SET",
   },
   {
     name: "outerHTML",
@@ -48,18 +48,37 @@ const ELEMENT_PROPERTIES = [
 ] as const;
 
 /**
- * Create a modeled DOM element object
+ * Create a modeled DOM element object.
+ *
+ * Exported so event modeling can reuse it for `event.target` — an event's
+ * target is a page-controlled element and must expose the same
+ * `ELEMENT_VALUE` / `ELEMENT_INNER_HTML` sources as an element obtained via
+ * `document.getElementById`.
  */
-function createElementDef(callNode: any, astNode: any, selector?: string) {
+export function createElementDef(callNode: any, astNode: any, selector?: string) {
   const elementDef = defFactory.createObjectDef(callNode);
 
-  // addEventListener
-  const listener = defFactory.createBuiltInFunctionDef(
-    callNode,
-    "target.addEventListener"
-  );
-  listener.semanticExec = BuiltInSemantics.get("target.addEventListener");
-  elementDef.setProperty("addEventListener", listener);
+  /** Bind a registered semantic onto the element as a callable property. */
+  const attachMethod = (propName: string, effect: string) => {
+    const fn = defFactory.createBuiltInFunctionDef(callNode, effect);
+    fn.semanticExec = BuiltInSemantics.get(effect);
+    elementDef.setProperty(propName, fn);
+  };
+
+  attachMethod("addEventListener", "target.addEventListener");
+
+  // DOM traversal from an element. Handler code almost never starts from
+  // `document` — it starts from `event.target` and walks:
+  //   const form = passwordField.closest("form");
+  //   const user = form.querySelector('input[type="email"]');
+  // Without these the walk dead-ends and the field values downstream are never
+  // recognised as `ELEMENT_VALUE` sources. Each returns a *fresh* element def,
+  // built lazily at call time, so there is no eager recursion.
+  attachMethod("querySelector", "document.querySelector");
+  attachMethod("closest", "document.querySelector");
+  attachMethod("querySelectorAll", "document.querySelectorAll");
+  attachMethod("getElementsByTagName", "document.querySelectorAll");
+  attachMethod("getElementsByClassName", "document.querySelectorAll");
 
   for (const { name, source } of ELEMENT_PROPERTIES) {
     const propDef = defFactory.createUnknownDef(callNode);
@@ -93,6 +112,32 @@ BuiltInSemantics.register(
     const selector = literalOuter(args[0]);
 
     return createElementDef(callNode, astNode, selector);
+  },
+);
+
+// --------------------- document.querySelectorAll -------------------
+// Also backs getElementsByClassName / getElementsByTagName / getElementsByName.
+//
+// Returns a one-element array whose single member is a *summary* element
+// standing for every node the selector matches. That is what makes the
+// ubiquitous registration idiom analyzable:
+//
+//   document.querySelectorAll("input").forEach(el =>
+//     el.addEventListener("input", () => send(el.value)));
+//
+// Without it the collection is opaque, `.forEach` never fires, and neither the
+// listener nor anything it reaches is ever analyzed.
+BuiltInSemantics.register(
+  "document.querySelectorAll",
+  (args, callNode, astNode) => {
+    interAnalyzer.setCurrentSideEffects();
+
+    const selector = literalOuter(args[0]);
+    const summaryElement = createElementDef(callNode, astNode, selector);
+
+    return DefFactory.createArrayInstanceDef(callNode, astNode, [
+      summaryElement,
+    ]);
   },
 );
 

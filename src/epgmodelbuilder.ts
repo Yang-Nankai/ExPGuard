@@ -39,6 +39,8 @@ export class EPGModelBuilder {
         return this.analyzeDIR(options);
       case ExtensionSourceType.WEB:
         return this.analyzeWEB(options);
+      case ExtensionSourceType.XPI:
+        return this.analyzeXPI(options);
       default:
         throw new Error(`Unsupported extension type: ${options.extensionType}`);
     }
@@ -58,6 +60,10 @@ export class EPGModelBuilder {
 
   async analyzeWEB(options: EPGOptions): Promise<ExtensionContext> {
     return this._analyze(options, ExtensionSourceType.WEB);
+  }
+
+  async analyzeXPI(options: EPGOptions): Promise<ExtensionContext> {
+    return this._analyze(options, ExtensionSourceType.XPI);
   }
 
   /** =======================

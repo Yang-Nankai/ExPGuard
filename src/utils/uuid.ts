@@ -87,5 +87,10 @@ export const defGenerator = idManager.getNumberGenerator('def', 1);
 export const nodeGenerator = idManager.getNumberGenerator('flownode', 1);
 export const taintGenerator = idManager.getNumberGenerator('taint', 1);
 
+/** Reset every registered ID generator. */
+export function resetAllIdGenerators(): void {
+  idManager.resetAll();
+}
+
 // Reset specific generator
 // idManager.reset('definition');

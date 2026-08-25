@@ -42,6 +42,7 @@ export const SENSITIVE_SOURCES: SourceType[] = [
   "CHROME_PAGECAPTURE_MHTML",
   "CHROME_IDENTITY_TOKEN",
   "CHROME_IDENTITY_PROFILE",
+  "CHROME_MANAGED_STORAGE",
 
   "CHROME_BOOKMARKS_ONCREATED",
   "CHROME_COOKIES_ONCHANGED",
@@ -116,12 +117,21 @@ export const CODE_SINKS: SinkType[] = [
   "EVAL",
   "TIME_EVAL",
   "JQUERY_GLOBAL_EVAL",
+  // Vue.compile turns a string into a render function — runtime codegen.
+  "VUE_COMPILE",
+  // Implicit code-execution surfaces.
+  "WASM_INSTANTIATE",
+  "WORKER_URL",
+  // chrome.debugger Runtime.evaluate runs an arbitrary expression in the page.
+  "CHROME_DEBUGGER_COMMAND",
 ];
 
 // Network send
 export const NETWORK_SINKS: SinkType[] = [
   "FETCH_RESOURCE",
   "FETCH_OPTIONS",
+  "FETCH_BODY",
+  "FETCH_HEADERS",
   "JQUERY_AJAX_URL",
   "JQUERY_AJAX_DATA",
   "JQUERY_AJAX_SETTINGS_URL",
@@ -134,6 +144,7 @@ export const NETWORK_SINKS: SinkType[] = [
   "JQUERY_SETTINGS_DATA",
   "XML_HTTP_REQUEST_OPEN",
   "XML_HTTP_REQUEST_SEND",
+  "XML_HTTP_REQUEST_SETHEADER",
   "AXIOS_URL",
   "AXIOS_DATA",
   "AXIOS_HEADERS",
@@ -160,6 +171,11 @@ export const DOM_SINKS: SinkType[] = [
   "JQUERY_ELEMENT_HTML_SET",
   "DOCUMENT_WRITE",
   "DOCUMENT_EXECCOMMAND",
+  // Generic + framework HTML-injection sinks.
+  "DOM_INNER_HTML",
+  "REACT_DANGEROUS_HTML",
+  "VUE_V_HTML",
+  "ANGULAR_BYPASS_SECURITY",
 ];
 
 // Storage write
@@ -207,6 +223,7 @@ export const PRIVILEGED_SINKS: SinkType[] = [
   "CHROME_CONTENTSETTINGS_CLEAR",
   "CHROME_DECLARATIVECONTENT_RULES",
   "CHROME_DECLARATIVECONTENT_RULE_IDS",
+  "CHROME_DECLARATIVENETREQUEST_RULES",
   "CHROME_DOWNLOADS_REMOVE_ID",
   "CHROME_DOWNLOADS_OPTIONS",
   "CHROME_FONTSETTINGS_SET_OPTIONS",

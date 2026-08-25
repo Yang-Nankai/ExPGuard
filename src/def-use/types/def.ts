@@ -61,6 +61,15 @@ abstract class Def {
   // semantic version
   protected _version: number = 0;
 
+  /**
+   * True when this value crossed a browser storage serialization boundary.
+   * Storage cannot preserve user-defined methods.  This lets a subsequent
+   * successful numeric formatter call retain the JavaScript runtime fact that
+   * its receiver was a number, without treating arbitrary storage text as
+   * safe for HTML/code sinks.
+   */
+  protected _storageSerialized = false;
+
   constructor(fromNode: FlowNode, type: DefType) {
     // Def.validateType(fromNode, type);
     this._fromNode = fromNode;
@@ -77,6 +86,12 @@ abstract class Def {
   }
   static isUnknownDef(def: unknown): def is UnknownDef {
     return def instanceof UnknownDef;
+  }
+  static isPrimitiveDef(def: unknown): def is PrimitiveDef {
+    return def instanceof PrimitiveDef;
+  }
+  static isStringSafeDef(def: unknown): def is StringSafeDef {
+    return def instanceof StringSafeDef;
   }
   static isLiteralDef(def: unknown): def is LiteralDef {
     return def instanceof LiteralDef;
@@ -148,6 +163,14 @@ abstract class Def {
     this._tainted = false;
   }
 
+  markStorageSerialized() {
+    this._storageSerialized = true;
+  }
+
+  get isStorageSerialized(): boolean {
+    return this._storageSerialized;
+  }
+
   /**
    * Shallow clone.
    *
@@ -184,6 +207,19 @@ abstract class Def {
 export class ObjectDef extends Def {
   protected _props: Map<string, Def> = new Map();
   protected _proto: Def | null = null;
+  /** True only for instances created through the Array constructor/factory. */
+  protected _isArrayLike = false;
+  /** Separate summary for array elements; never aliases `.length` metadata. */
+  protected _arrayElementSummary: Def | null = null;
+
+  /**
+   * True when this container itself was derived from an opaque value (for
+   * example JSON.parse(x), an unresolved spread, or an externally supplied
+   * object).  This is deliberately distinct from ordinary property taint:
+   * `{ title: tainted }` must not make `obj.url` or `obj.length` tainted,
+   * whereas `JSON.parse(tainted).url` must remain conservative.
+   */
+  protected _hasOpaqueContainerTaint = false;
 
   constructor(fromNode: FlowNode, proto?: Def | null) {
     super(fromNode, "object");
@@ -193,11 +229,16 @@ export class ObjectDef extends Def {
     this._proto = proto ?? BuiltInRegistry.getObjectPrototype();
   }
 
-  setProperty(name: string, def: Def) {
+  setProperty(
+    name: string,
+    def: Def,
+    propagateContainerTaint = true,
+    markAsArrayElement = false,
+  ) {
     const old = this._props.get(name);
     if (old === def) return;
 
-    if (def.isTainted) {
+    if (propagateContainerTaint && def.isTainted) {
       tm.propagateTaint(
         def,
         this,
@@ -208,11 +249,53 @@ export class ObjectDef extends Def {
     }
 
     this._props.set(name, def);
+    if (markAsArrayElement) this.addArrayElement(def);
     this.bumpVersion();
   }
 
   getProperty(name: string): Def | null {
     return this._props.get(name) ?? null;
+  }
+
+  markOpaqueContainerTaint() {
+    this._hasOpaqueContainerTaint = true;
+  }
+
+  get hasOpaqueContainerTaint(): boolean {
+    return this._hasOpaqueContainerTaint;
+  }
+
+  markArrayLike() {
+    this._isArrayLike = true;
+  }
+
+  get isArrayLike(): boolean {
+    return this._isArrayLike;
+  }
+
+  addArrayElement(def: Def) {
+    const previous = this._arrayElementSummary;
+    if (!previous) {
+      this._arrayElementSummary = def;
+      return;
+    }
+    if (previous === def) return;
+    this._arrayElementSummary = defFactory.createImplicitDef(this.fromNode, [
+      previous,
+      def,
+    ]);
+  }
+
+  get arrayElementSummary(): Def | null {
+    return this._arrayElementSummary;
+  }
+
+  /** Whether a known own field, rather than an opaque whole-object value, is tainted. */
+  get hasTaintedOwnProperty(): boolean {
+    for (const value of this._props.values()) {
+      if (value.isTainted) return true;
+    }
+    return false;
   }
 
   /**
@@ -261,6 +344,13 @@ export class ObjectDef extends Def {
 
     const obj = new ObjectDef(node);
     visited.set(this, obj);
+
+    obj._hasOpaqueContainerTaint = this._hasOpaqueContainerTaint;
+    obj._storageSerialized = this._storageSerialized;
+    obj._isArrayLike = this._isArrayLike;
+    obj._arrayElementSummary = this._arrayElementSummary
+      ? this._arrayElementSummary.cloneDeep(node, visited)
+      : null;
 
     if (this._proto) {
       obj._proto = this._proto.cloneDeep(node, visited);
@@ -726,6 +816,106 @@ export class UnknownDef extends Def {
   get key(): string {
     return "unknown";
   }
+}
+
+/**
+ * An opaque value with a known primitive runtime kind.
+ *
+ * This differs from a LiteralDef: the concrete value is not known and taint
+ * must still propagate.  It records only a type fact supplied by language
+ * semantics, such as `parseInt` always producing a number (or NaN) and
+ * `isFinite` always producing a boolean.
+ */
+export class PrimitiveDef extends UnknownDef {
+  readonly primitiveKind: "number" | "boolean";
+
+  constructor(fromNode: FlowNode, primitiveKind: "number" | "boolean") {
+    super(fromNode);
+    this.primitiveKind = primitiveKind;
+  }
+
+  override cloneShallow(node: FlowNode): PrimitiveDef {
+    return new PrimitiveDef(node, this.primitiveKind);
+  }
+
+  override cloneDeep(node: FlowNode): PrimitiveDef {
+    return new PrimitiveDef(node, this.primitiveKind);
+  }
+
+  override get key(): string {
+    return `primitive:${this.primitiveKind}`;
+  }
+}
+
+/**
+ * A string that may carry taint but whose dynamic pieces are all known to be
+ * non-string primitives. It is used for template/formatting output such as
+ * `<span>${number.toFixed(2)}</span>`: the extension's static markup remains
+ * trusted and attacker data cannot contribute HTML or JavaScript syntax.
+ */
+export class StringSafeDef extends UnknownDef {
+  override cloneShallow(node: FlowNode): StringSafeDef {
+    return new StringSafeDef(node);
+  }
+
+  override cloneDeep(node: FlowNode): StringSafeDef {
+    return new StringSafeDef(node);
+  }
+
+  override get key(): string {
+    return "string-safe";
+  }
+}
+
+/**
+ * True only when JavaScript cannot parse the value as source text.  Unknown
+ * values intentionally remain false.  The fact is used only for sinks that
+ * interpret a string as code/HTML; it must never de-taint a value globally,
+ * because the same numeric value can still control an Alarm or another
+ * privileged configuration API.
+ */
+export function isDefinitelyNonStringValue(value: Def | undefined): boolean {
+  if (!value) return false;
+  if (Def.isFunctionDef(value) || Def.isPrimitiveDef(value)) return true;
+
+  if (Def.isLiteralDef(value)) {
+    return typeof value.value !== "string";
+  }
+
+  if (Def.isImplicitDef(value) && value.size > 0) {
+    for (const candidate of value.defs) {
+      if (!isDefinitelyNonStringValue(candidate)) return false;
+    }
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * True when tainted data cannot influence the grammar of a code/HTML sink.
+ * A StringSafeDef may itself be a string, but all tainted interpolations are
+ * non-string primitive values and any markup around them is extension-static.
+ */
+export function isSafeForStringInterpretation(value: Def | undefined): boolean {
+  if (!value) return false;
+  if (Def.isStringSafeDef(value) || isDefinitelyNonStringValue(value)) {
+    return true;
+  }
+
+  // Literal strings originate in the extension source and have no dynamic
+  // attacker-controlled syntax. (A tainted literal is represented by another
+  // Def in this analysis, not by mutating the source literal.)
+  if (Def.isLiteralDef(value)) return true;
+
+  if (Def.isImplicitDef(value) && value.size > 0) {
+    for (const candidate of value.defs) {
+      if (!isSafeForStringInterpretation(candidate)) return false;
+    }
+    return true;
+  }
+
+  return false;
 }
 
 /** ----------------------------------------

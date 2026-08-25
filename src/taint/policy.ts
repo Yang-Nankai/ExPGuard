@@ -26,6 +26,8 @@ import {
 import config from "../config";
 import { scriptUsageTracker } from "../extension/scriptUsageTracker";
 import { ScriptFrameTag } from "../extension/extensionScript";
+import { taintRuleEngine } from "./ruleEngine";
+import { RuleMatch } from "./ruleTypes";
 
 /* ================= Script Filter ================= */
 
@@ -34,19 +36,72 @@ export function shouldIncludeScriptInPolicy(scriptKey: string): boolean {
   return scriptUsageTracker.isScriptUsed(scriptKey);
 }
 
+/**
+ * Frame-feasibility filter — orthogonal to the rule engine. Even if a rule
+ * matches a (source, sink) pair, the analyzer may know the source can't
+ * physically fire in the source frame (e.g. window message events in a
+ * background service worker). Returning `true` here drops the flow.
+ */
 export function shouldFilterSourceByFrame(
   source: SourceType,
   sourceFrame: ScriptFrameTag,
   sink: SinkType,
-  sinkFrame: ScriptFrameTag
+  sinkFrame: ScriptFrameTag,
+  sourceFrameTags: ScriptFrameTag[] = [],
 ): boolean {
   const sourceFamily = scriptUsageTracker.getFrameFamily(sourceFrame);
   const sinkFamily = scriptUsageTracker.getFrameFamily(sinkFrame);
+  const sourceFamilies = new Set(
+    [sourceFrame, ...sourceFrameTags].map((tag) =>
+      scriptUsageTracker.getFrameFamily(tag),
+    ),
+  );
+
+  /**
+   * DOM reads in an extension-owned document are not web attacker input.  This
+   * applies to form controls as well as to static markup used by a popup's
+   * localization/rendering code. The caller preserves the root frame across
+   * runtime/storage relays, so a real content-script or external-message source
+   * is never hidden by this rule.
+   */
+  const isExtensionOwnedDomSource = [
+    "ELEMENT_VALUE",
+    "JQUERY_ELEMENT_VAL",
+    "ELEMENT_TEXT_CONTENT",
+    "JQUERY_ELEMENT_TEXT",
+    "ELEMENT_INNER_HTML",
+    "JQUERY_ELEMENT_HTML",
+    "ELEMENT_OUTER_HTML",
+  ].includes(source);
+  // A script can be referenced by both the background and popup. Reporting
+  // chooses BG first, but `document.getElementById(...).value` executes only
+  // in its extension-owned page instance. Suppress it when the script is
+  // shared exclusively by BG/EX frames; retain the flow if CS is also a
+  // possible execution frame so real page-DOM sources remain detectable.
+  const sharedUiAndBackgroundOnly =
+    sourceFamily === "BG" &&
+    (sourceFamilies.has("EX") ||
+      sourceFamilies.has("DT") ||
+      sourceFamilies.has("OF")) &&
+    !sourceFamilies.has("CS");
+  if (
+    isExtensionOwnedDomSource &&
+    (sourceFamily === "EX" ||
+      sourceFamily === "DT" ||
+      sourceFamily === "OF" ||
+      sharedUiAndBackgroundOnly)
+  ) {
+    return true;
+  }
 
   if (WEB_EVENT_SOURCES.includes(source)) {
-    if (sourceFamily === "BG") {
+    // Background service workers and offscreen documents have no `window`
+    // event loop — any `window.addEventListener("message", ...)` registered
+    // there can never fire. Drop those flows as infeasible.
+    if (sourceFamily === "BG" || sourceFamily === "OF") {
       return true;
-    } else if (
+    }
+    if (
       sourceFamily === "CS" &&
       sinkFamily === "CS" &&
       WEB_STORAGE_SINKS.includes(sink)
@@ -55,7 +110,7 @@ export function shouldFilterSourceByFrame(
     }
   }
 
-  return sourceFamily === "BG" && WEB_EVENT_SOURCES.includes(source);
+  return false;
 }
 
 /* ================= Classification ================= */
@@ -80,151 +135,46 @@ export function classifySink(sink: SinkType): SinkCapability {
   return "UNKNOWN_SINK";
 }
 
+/**
+ * Sinks that parse/coerce their input as code or HTML.  This deliberately
+ * excludes configuration APIs such as chrome.alarms.create: a number cannot
+ * inject JavaScript/markup, but it can still change an alarm schedule and is
+ * therefore security-relevant.
+ */
+export function isStringInterpretingSink(sink: SinkType): boolean {
+  return CODE_SINKS.includes(sink) || DOM_SINKS.includes(sink);
+}
+
 /* ================= Core Flow Logic ================= */
 
+/**
+ * Resolve a (source, sink) pair through the rule engine. Returns every
+ * matching FlowType minus any suppressed by the loaded rule set.
+ *
+ * The default rule set (src/taint/rules/default-rules.json) reproduces the
+ * original hand-written matrix exactly; user-supplied rule files (loaded via
+ * `config.taintRulesPath` / `--taint-rules`) can add or refine categories
+ * (e.g. classify cookies → fetch body as DATA_LEAK while still flagging
+ * REQUEST_FORGERY for the same pair).
+ */
+export function getFlowTypes(source: SourceType, sink: SinkType): FlowType[] {
+  return taintRuleEngine.getFlowTypes(source, sink);
+}
+
+/** Like `getFlowTypes` but keeps the rule provenance for reporting. */
+export function getFlowMatches(source: SourceType, sink: SinkType): RuleMatch[] {
+  return taintRuleEngine.matchFlowTypes(source, sink);
+}
+
+/**
+ * @deprecated Use `getFlowTypes` (all-match) or `getFlowMatches` (with rule
+ * provenance). Kept for any out-of-tree callers that still expect a single
+ * FlowType; returns the first match or null.
+ */
 export function getFlowType(
   source: SourceType,
   sink: SinkType,
 ): FlowType | null {
-  if (isNativeOutputSource(source)) return null;
-  if (isNativeOutputSink(sink)) return null;
-
-  const srcCap = classifySource(source);
-  const sinkCap = classifySink(sink);
-
-  switch (srcCap) {
-    /* ===== ATTACKER INPUT ===== */
-
-    case "ATTACKER_INPUT":
-      if (sinkCap === "PRIVILEGED_OPERATION") return "PRIVILEGE_ESCALATION";
-
-      if (sinkCap === "STORAGE_WRITE") return "STORAGE_POSOING";
-
-      if (sinkCap === "NETWORK_SEND") return "REQUEST_FORGERY";
-
-      if (sinkCap === "CODE_EXECUTION") return "CODE_INJECTION";
-
-      if (
-        sinkCap === "MESSAGE_RESPONSE" &&
-        filterMessageTaint(source, sink)
-      )
-        return "PRIVILEGE_ESCALATION";
-
-      break;
-
-    /* ===== SENSITIVE DATA ===== */
-
-    case "SENSITIVE_DATA":
-      if (
-        sinkCap === "MESSAGE_RESPONSE" &&
-        shouldReportDataLeakSource(source)
-      )
-        return "DATA_LEAK";
-      break;
-
-    /* ===== SYSTEM INFO (Fingerprint → DATA_LEAK) ===== */
-
-    case "SYSTEM_INFO":
-      if (
-        sinkCap === "MESSAGE_RESPONSE" &&
-        shouldReportDataLeakSource(source)
-      )
-        return "DATA_LEAK";
-      break;
-
-    /* ===== NETWORK RESPONSE ===== */
-
-    case "NETWORK_RESPONSE":
-      if (sinkCap === "CODE_EXECUTION") return "CODE_INJECTION";
-
-      if (sinkCap === "PRIVILEGED_OPERATION")
-        return "PRIVILEGE_ESCALATION";
-
-      if (sinkCap === "STORAGE_WRITE") return "STORAGE_POSOING";
-
-      break;
-
-    /* ===== WEB CONTENT ===== */
-
-    case "WEB_CONTENT":
-      if (sinkCap === "CODE_EXECUTION") return "CODE_INJECTION";
-      // if (sinkCap === "STORAGE_WRITE") return "STORAGE_POSOING";
-      if (sinkCap === "PRIVILEGED_OPERATION") return "PRIVILEGE_ESCALATION";
-
-      break;
-
-    /* ===== STORAGE DATA ===== */
-
-    case "STORAGE_DATA":
-      if (
-        sinkCap === "MESSAGE_RESPONSE" &&
-        shouldReportDataLeakSource(source)
-      )
-        return "DATA_LEAK";
-      break;
-  }
-
-  return null;
-}
-
-function shouldReportDataLeakSource(source: SourceType): boolean {
-  if (source === "SCREEN_INFO") return false;
-
-  // Keep compatibility with current enum typo NAVIGAROR_GEOLOCATION.
-  if (source.startsWith("NAVIGATOR_") || source.startsWith("NAVIGAROR_")) {
-    return false;
-  }
-
-  return true;
-}
-
-/* ================= Native Filter ================= */
-
-function isNativeOutputSink(sink: SinkType): boolean {
-  return (
-    sink === "CHROME_RUNTIME_SENDNATIVEMESSAGE_EXTERNAL" ||
-    sink === "CHROME_RUNTIME_ONCONNECTNATIVE_POSTMESSAGE"
-  );
-}
-
-function isNativeOutputSource(source: SourceType): boolean {
-  return (
-    source === "CHROME_CONNECTNATIVE_ONMESSAGE" ||
-    source === "CHROME_SENDNATIVEMESSAGE_EXTERNAL_RESPONSE"
-  );
-}
-
-/* ================= FP Reduction ================= */
-
-function filterMessageTaint(source: SourceType, sink: SinkType): boolean {
-  const safePairs: [SourceType, SinkType][] = [
-    // ==========================================
-    // 1. Window & DOM Level
-    // ==========================================
-    ["WINDOW_MESSAGE_EVENT", "WINDOW_POSTMESSAGE"],
-    ["WINDOW_CUSTOM_EVENT", "WINDOW_POSTMESSAGE"],
-    ["TARGET_CUSTOM_EVENT", "WINDOW_POSTMESSAGE"],
-
-    // ==========================================
-    // 2. Extension External
-    // ==========================================
-    ["WINDOW_MESSAGE_EVENT", "CHROME_RUNTIME_SENDMESSAGE_EXTERNAL"],
-    ["WINDOW_CUSTOM_EVENT", "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE"],
-    ["CHROME_ONMESSAGEEXTERNAL_MESSAGE", "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE"],
-    ["CHROME_ONMESSAGEEXTERNAL_MESSAGE", "CHROME_RUNTIME_SENDMESSAGE_EXTERNAL"],
-    ["CHROME_ONMESSAGEEXTERNAL_MESSAGE", "CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE"],
-    ["CHROME_ONMESSAGEEXTERNAL_MESSAGE", "WINDOW_POSTMESSAGE"],
-    ["CHROME_ONCONNECTEXTERNAL_ONMESSAGE", "CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE"],
-    ["CHROME_SENDMESSAGE_EXTERNAL_RESPONSE", "CHROME_RUNTIME_SENDMESSAGE_EXTERNAL"],
-
-    // ==========================================
-    // 3. Extension Native
-    // ==========================================
-    ["CHROME_SENDNATIVEMESSAGE_EXTERNAL_RESPONSE", "CHROME_RUNTIME_SENDNATIVEMESSAGE_EXTERNAL"],
-    ["CHROME_CONNECTNATIVE_ONMESSAGE", "CHROME_RUNTIME_ONCONNECTNATIVE_POSTMESSAGE"],
-  ];
-
-  return !safePairs.some(
-    ([safeSrc, safeSink]) => source === safeSrc && sink === safeSink
-  );
+  const matches = taintRuleEngine.getFlowTypes(source, sink);
+  return matches.length > 0 ? matches[0] : null;
 }

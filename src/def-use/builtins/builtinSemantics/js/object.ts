@@ -38,7 +38,19 @@ BuiltInSemantics.register("Object.assign", (args, callNode, astNode) => {
   }
 
   for (const source of sources) {
-    if (!Def.isObjectDef(source)) continue;
+    if (!Def.isObjectDef(source)) {
+      // Opaque source (typically a message payload). No properties to copy,
+      // but the target now aggregates it — keep the taint on the container so
+      // later `target.field` reads recover the flow.
+      taintManager.propagateTaint(
+        source,
+        target,
+        astNode,
+        "COPY",
+        "object.assign-opaque",
+      );
+      continue;
+    }
     copyEnumerableProps(target, source, astNode, "object.assign");
   }
 

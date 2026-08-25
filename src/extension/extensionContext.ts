@@ -11,8 +11,6 @@ import { ScriptDependencyGraph } from "./scriptDependenctGraph";
 import { ExtensionScript } from "./extensionScript";
 import { topoSort } from "../utils/topoSort";
 import { scopeController } from "../scope/scopeCtrl";
-import { modelController } from "../model/modelCtrl";
-import { modelBuilder } from "../model/modelBuilder";
 import config from "../config";
 import { defuseAnalyzer } from "../def-use/defuseanalyzer";
 import { taintManager } from "../taint";
@@ -160,10 +158,9 @@ export class ExtensionContext {
         const ast = script.getAST();
 
         const scopeTree = scopeController.addPageScopeTree(ast, script);
-        modelController.addPageModels(scopeTree);
 
-        // Create Intra Model
-        modelBuilder.buildIntraProceduralModelsForAPage(scopeTree);
+        // Build intra-procedural CFGs and bind them onto their scopes.
+        scopeTree.buildIntraProceduralCFGs();
 
         if (config.enableInterProcedural) {
           taintManager.enterFile(script);

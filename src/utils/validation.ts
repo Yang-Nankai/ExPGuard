@@ -12,8 +12,11 @@ const CHROME_EDGE_EXTENSION_ID_REGEX = /^[a-p]{32}$/;
 const FIREFOX_GUID_REGEX =
   /^\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\}$/;
 
-// Firefox extension ID (email-like format)
-const FIREFOX_EMAIL_REGEX = /^[\w.-]+@[\w.-]+$/;
+// Firefox extension ID (email-like format).
+// The local part (before "@") may be empty to allow the "@name" short-ID form
+// (e.g. "@aliexpress-share-a-cart"), matching Firefox's own AddonManager
+// grammar `[a-z0-9-._]*@[a-z0-9-._]+`.
+const FIREFOX_EMAIL_REGEX = /^[\w.-]*@[\w.-]+$/;
 
 // Extension version (e.g. 1.0.3 / 1.2 / 2.0.0.1)
 const EXTENSION_VERSION_REGEX = /^(\d+\.)?(\d+\.)?(\d+)(\.\d+)*$/;
@@ -85,10 +88,26 @@ export function validateExtensionDir(extensionDir: string): boolean {
 
 
 /**
- * Throw LoaderError if extensionId is invalid.
+ * Throw LoaderError if extensionId is not a valid Chrome/Edge ID.
+ * Used by the CRX path, where the ID is derived from the package's public key
+ * and must match the strict `[a-p]{32}` format.
+ */
+export function assertValidChromeExtensionId(extensionId: string) {
+  if (!validateChromeOrEdgeExtensionId(extensionId)) {
+    Errors.LoaderError(`Invalid Chrome extensionId: ${extensionId}`);
+  }
+}
+
+/**
+ * Throw LoaderError if extensionId is neither a valid Chrome/Edge ID nor a
+ * valid Firefox ID (GUID or email-style). Used by the DIR/XPI paths, which may
+ * carry either browser's ID format.
  */
 export function assertValidExtensionId(extensionId: string) {
-  if (!validateChromeOrEdgeExtensionId(extensionId)) {
+  if (
+    !validateChromeOrEdgeExtensionId(extensionId) &&
+    !validateFirefoxExtensionId(extensionId)
+  ) {
     Errors.LoaderError(`Invalid extensionId: ${extensionId}`);
   }
 }

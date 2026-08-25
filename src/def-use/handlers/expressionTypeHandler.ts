@@ -3,13 +3,50 @@ import Scope from "../../scope/scope";
 import { taintManager as tm } from "../../taint";
 import { interAnalyzer } from "../analyzers/interProceduralAnalyzer";
 import { DefFactory, defFactory } from "../factories/defFactory";
-import Def from "../types/def";
+import { BuiltInRegistry } from "../builtins/builtinRegistry";
+import Def, { isSafeForStringInterpretation } from "../types/def";
 import {
   evaluateDefTruth,
   lookupMatchingDef,
   performMemberLookup,
   resolvePropName,
 } from "../utils/utils";
+/**
+ * Link a value that is structurally derived from `container` (a spread
+ * element, a destructured binding, ...) to the container in the taint DAG.
+ *
+ * Intentionally inlined rather than imported from a shared module: this file
+ * sits early in the builtin-registry initialization order, and adding an
+ * import edge to a module that pulls in `../../taint` reorders module
+ * evaluation enough that `BuiltInRegistry`'s Array constructor is not yet
+ * registered when array instances are built here. No-ops on untainted
+ * containers, so it adds no false-positive surface.
+ */
+/**
+ * An object/array-like value with real structure to offer — as opposed to a
+ * boxed literal (`LiteralDef extends ObjectDef`) or `undefined`.
+ */
+function isContainerDef(def: Def | null): def is Def {
+  return (
+    Def.isObjectDef(def) &&
+    !Def.isLiteralDef(def) &&
+    !Def.isUndefinedDef(def)
+  );
+}
+
+function propagateContainerTaint(
+  container: Def | null,
+  derived: Def | null,
+  astNode: any,
+  kind: Parameters<typeof tm.propagateTaint>[3],
+  remark: string,
+): void {
+  if (!container || !derived) return;
+  if (!container.isTainted) return;
+  if (container.uniqueId === derived.uniqueId) return;
+
+  tm.propagateTaint(container, derived, astNode, kind, remark);
+}
 import { classTypeHandler } from "./classTypeHandler";
 
 export function expressionTypeHandler(cfgNode: FlowNode, node: any): Def {
@@ -103,7 +140,19 @@ function handleObjectExpression(cfgNode: FlowNode, node: any) {
           objectDef.setProperty(k, v);
         }
       }
-      // Unknown, not set
+
+      // Whether or not the spread source resolved to concrete properties, the
+      // result object now *contains* it. Marking the container tainted lets
+      // `handleMemberExpression`'s container-taint fallback recover the flow
+      // for `{ ...msg }.url`, which no property copy can model when `msg` is
+      // an opaque UnknownDef.
+      propagateContainerTaint(
+        spreadDef,
+        objectDef,
+        property,
+        "COPY",
+        "object-spread",
+      );
     } else {
       // handle normal property
       const propName = resolvePropName(
@@ -142,8 +191,17 @@ function handleArrayExpression(cfgNode: FlowNode, node: any) {
           argsDef.push(v);
         }
       } else {
-        // Unknown type, push a generic unknown definition
-        argsDef.push(defFactory.createUnknownDef(cfgNode));
+        // Opaque spread source (`[...msg.list]`): the synthesized element
+        // stands for every member, so it inherits the container's taint.
+        const element = defFactory.createUnknownDef(cfgNode);
+        propagateContainerTaint(
+          spreadDef,
+          element,
+          elem,
+          "ELEMENT",
+          "array-spread",
+        );
+        argsDef.push(element);
       }
     } else {
       // Handle normal elements
@@ -166,6 +224,19 @@ function handleNewExpression(cfgNode: FlowNode, node: any) {
   }
 
   const calleeDef = expressionTypeHandler(cfgNode, node.callee);
+
+  // A Date converts its input to a time value.  Preserve taint on the Date
+  // instance so non-string/configuration uses remain auditable, while the
+  // Date formatting methods below can mark their grammar-safe output.
+  if (node.callee?.type === "Identifier" && node.callee.name === "Date") {
+    const instance = DefFactory.createClassInstanceDef(
+      BuiltInRegistry.getConstructor("Date"), cfgNode, node, argsDef,
+    );
+    for (const arg of argsDef) {
+      tm.propagateTaint(arg, instance, node, "RETURN", "Date.constructor");
+    }
+    return instance;
+  }
 
   // Determine if calleeDef is a function (didn't consider arrow function or other)
   if (Def.isFunctionDef(calleeDef)) {
@@ -252,6 +323,43 @@ function handleLogical(cfgNode: FlowNode, node: any) {
     }
   }
 
+  // Undecidable short-circuit against a *structural* default — the
+  // `x || []` / `x || {}` defaulting idiom:
+  //
+  //   const list = result.harvested || [];
+  //   list.push(secret);
+  //   chrome.storage.local.set({ harvested: list });
+  //
+  // Collapsing this to an opaque UnknownDef meant `.push` no longer resolved
+  // to `Array.prototype.push`, so everything accumulated into the list became
+  // invisible. Adopting the structural operand keeps the container analyzable;
+  // taint from the other operand is still attached below, so nothing is lost.
+  //
+  // Restricted to a genuine *container* on the right. Note `LiteralDef extends
+  // ObjectDef` (literals are boxed), so `Def.isObjectDef` alone is not the
+  // right test: for a scalar default like `event.data.method || 0` the opaque
+  // result is the more useful answer, because it keeps `arr[selector]` widening
+  // to *every* element instead of narrowing to index 0 — which is exactly what
+  // exposes indirect-dispatch sinks.
+  if (!resultDef && isContainerDef(rightDef)) {
+    resultDef = DefFactory.rebase(rightDef, cfgNode);
+  }
+
+  // `safeFormatted || "fallback"` / `safeFormatted ?? "fallback"` is
+  // still a syntax-safe string. This matters for localized fixed status
+  // tables such as `queuedMsg[lang] || queuedMsg.ko`: the selected template
+  // contains only extension-authored text and numeric counts. Unknown/raw
+  // operands deliberately do not qualify, so this cannot hide a message or
+  // page string merely because a literal fallback exists.
+  if (
+    !resultDef &&
+    (operator === "||" || operator === "??") &&
+    isSafeForStringInterpretation(leftDef) &&
+    isSafeForStringInterpretation(rightDef)
+  ) {
+    resultDef = defFactory.createStringSafeDef(cfgNode);
+  }
+
   resultDef = resultDef ?? defFactory.createUnknownDef(cfgNode);
 
   // Taint propagation
@@ -300,8 +408,14 @@ function handleTemplateLiteral(cfgNode: FlowNode, node: any) {
   if (isAllLiteral && resultValue !== null) {
     finalDef = defFactory.createLiteralDef(cfgNode, resultValue);
   } else {
-    // If the string cannot be fully reconstructed, create an UnknownDef
-    finalDef = defFactory.createUnknownDef(cfgNode);
+    // The static template text is extension-authored. If every interpolation
+    // is a number/boolean or another syntax-safe formatted value, the result
+    // can be rendered as HTML/text but cannot contain attacker-supplied
+    // markup or code grammar. Keep its taint for non-string sinks (Alarm,
+    // storage, privileged APIs) while suppressing only code/HTML findings.
+    finalDef = components.every((def) => isSafeForStringInterpretation(def))
+      ? defFactory.createStringSafeDef(cfgNode)
+      : defFactory.createUnknownDef(cfgNode);
   }
 
   // [Taint Propagation] if any expression in the template is tainted, the result is tainted
@@ -317,7 +431,14 @@ function handleConditional(cfgNode: FlowNode, node: any) {
   const altDef = expressionTypeHandler(cfgNode, node.alternate);
   // TODO: Later will be set ImplictDef, now set as consequent
   // const condDef = defFactory.createUnknownDef(cfgNode);
-  const condDef = Def.isUnknownDef(consDef) ? altDef : consDef;
+  // `typeof value === "number" ? value : 0` is a real type sanitizer, not
+  // just a branch.  If the fallback is numeric too, the result can never
+  // carry HTML/code syntax even when `value` originally came from a page or
+  // storage.  Keep its taint; sink-specific policy decides where it matters.
+  const condDef =
+    isNumberTypeGuardFor(node.test, node.consequent) && isNumericDef(altDef)
+      ? defFactory.createPrimitiveDef(cfgNode, "number")
+      : Def.isUnknownDef(consDef) ? altDef : consDef;
 
   tm.propagateTaint(
     consDef,
@@ -334,6 +455,43 @@ function handleConditional(cfgNode: FlowNode, node: any) {
     "conditional-alternate",
   );
   return condDef;
+}
+
+function isNumericDef(def: Def): boolean {
+  return (
+    (Def.isPrimitiveDef(def) && def.primitiveKind === "number") ||
+    (Def.isLiteralDef(def) && typeof def.value === "number")
+  );
+}
+
+function isNumberTypeGuardFor(test: any, consequent: any): boolean {
+  if (!test || test.type !== "BinaryExpression") return false;
+  if (!["===", "=="].includes(test.operator)) return false;
+
+  const isNumberLiteral = (node: any) =>
+    node?.type === "Literal" && node.value === "number";
+  const typeofOperand = (node: any) =>
+    node?.type === "UnaryExpression" && node.operator === "typeof"
+      ? node.argument
+      : null;
+  const guarded = isNumberLiteral(test.right)
+    ? typeofOperand(test.left)
+    : isNumberLiteral(test.left)
+      ? typeofOperand(test.right)
+      : null;
+  return !!guarded && sameReferenceExpression(guarded, consequent);
+}
+
+function sameReferenceExpression(a: any, b: any): boolean {
+  if (!a || !b || a.type !== b.type) return false;
+  if (a.type === "Identifier") return a.name === b.name;
+  if (a.type !== "MemberExpression" || a.computed !== b.computed) return false;
+  if (!sameReferenceExpression(a.object, b.object)) return false;
+  if (!a.computed) return a.property?.name === b.property?.name;
+  if (a.property?.type === "Literal" && b.property?.type === "Literal") {
+    return a.property.value === b.property.value;
+  }
+  return false;
 }
 
 function handleBinary(cfgNode: FlowNode, node: any) {
@@ -385,10 +543,28 @@ function handleBinary(cfgNode: FlowNode, node: any) {
   const rightDef = expressionTypeHandler(cfgNode, node.right);
 
   if (!Def.isLiteralDef(leftDef) || !Def.isLiteralDef(rightDef)) {
-    const unknown = defFactory.createUnknownDef(cfgNode);
-    tm.propagateTaint(leftDef, unknown, node.left, "ASSIGN", "binary-left");
-    tm.propagateTaint(rightDef, unknown, node.right, "ASSIGN", "binary-right");
-    return unknown;
+    const numericOperators = new Set(["-", "*", "/", "%", "|", "&"]);
+    const booleanOperators = new Set(["==", "!=", "===", "!==", "<", "<=", ">", ">="]);
+    const isNumber = (def: Def) =>
+      (Def.isPrimitiveDef(def) && def.primitiveKind === "number") ||
+      (Def.isLiteralDef(def) && typeof def.value === "number");
+
+    // Arithmetic always performs numeric coercion. Preserve this type fact so
+    // chains such as parseFloat(x) / 100 and Math.pow(...) do not become an
+    // opaque string-capable value before an HTML/code sink.
+    const result = booleanOperators.has(node.operator)
+      ? defFactory.createPrimitiveDef(cfgNode, "boolean")
+      : numericOperators.has(node.operator) ||
+          (node.operator === "+" && isNumber(leftDef) && isNumber(rightDef))
+        ? defFactory.createPrimitiveDef(cfgNode, "number")
+        : node.operator === "+" &&
+            isSafeForStringInterpretation(leftDef) &&
+            isSafeForStringInterpretation(rightDef)
+          ? defFactory.createStringSafeDef(cfgNode)
+        : defFactory.createUnknownDef(cfgNode);
+    tm.propagateTaint(leftDef, result, node.left, "ASSIGN", "binary-left");
+    tm.propagateTaint(rightDef, result, node.right, "ASSIGN", "binary-right");
+    return result;
   }
 
   const l = leftDef.value;
@@ -426,6 +602,9 @@ function handleAwait(cfgNode: FlowNode, node: any) {
 }
 
 function handleCallExpression(cfgNode: FlowNode, node: any) {
+  const knownPrimitiveResult = handleKnownPrimitiveCall(cfgNode, node);
+  if (knownPrimitiveResult) return knownPrimitiveResult;
+
   const funcDef = expressionTypeHandler(cfgNode, node.callee);
 
   const argDefs: Def[] = [];
@@ -453,6 +632,77 @@ function handleCallExpression(cfgNode: FlowNode, node: any) {
   return interAnalyzer.analyze(cfgNode, funcDef, argDefs, thisDef, node);
 }
 
+/**
+ * Small, sound type summaries for common numeric formatting expressions.
+ * They preserve taint but carry the type fact necessary to distinguish
+ * numeric display formatting from string injection. No Alarm/storage sink is
+ * filtered here; that decision remains sink-specific in TaintManager.
+ */
+function handleKnownPrimitiveCall(cfgNode: FlowNode, node: any): Def | null {
+  const callee = node?.callee;
+  if (!callee || callee.type !== "MemberExpression" || callee.computed) {
+    return null;
+  }
+
+  const property = callee.property?.name;
+  if (!property) return null;
+
+  const object = callee.object;
+  if (
+    object?.type === "Identifier" &&
+    object.name === "Math" &&
+    ["abs", "ceil", "floor", "max", "min", "pow", "round", "trunc"].includes(property)
+  ) {
+    const argDefs = (node.arguments || []).map((arg: any) =>
+      expressionTypeHandler(cfgNode, arg),
+    );
+    const result = defFactory.createPrimitiveDef(cfgNode, "number");
+    for (const arg of argDefs) {
+      tm.propagateTaint(arg, result, node, "RETURN", `Math.${property}`);
+    }
+    return result;
+  }
+
+  if (["toFixed", "toPrecision", "toExponential"].includes(property)) {
+    const receiver = expressionTypeHandler(cfgNode, object);
+    if (
+      (Def.isPrimitiveDef(receiver) && receiver.primitiveKind === "number") ||
+      receiver.isStorageSerialized
+    ) {
+      const result = defFactory.createStringSafeDef(cfgNode);
+      tm.propagateTaint(receiver, result, node, "RETURN", `Number.${property}`);
+      return result;
+    }
+  }
+
+  // Transforming a syntax-safe formatted string cannot introduce attacker
+  // markup. This is intentionally narrow: `raw.replace(...)` stays unknown
+  // and tainted, while `count.toFixed(2).replace('.', ',')` preserves the
+  // safe string grammar established by the numeric formatter.
+  if (["replace", "replaceAll"].includes(property)) {
+    const receiver = expressionTypeHandler(cfgNode, object);
+    if (Def.isStringSafeDef(receiver)) {
+      const result = defFactory.createStringSafeDef(cfgNode);
+      tm.propagateTaint(receiver, result, node, "RETURN", `String.${property}`);
+      return result;
+    }
+  }
+
+  // `number.toString()` yields text, but its grammar is limited to the
+  // numeric representation.  Retain the taint for configuration/storage
+  // sinks while recording that it cannot carry arbitrary title/code text.
+  if (property === "toString") {
+    const receiver = expressionTypeHandler(cfgNode, object);
+    if (Def.isPrimitiveDef(receiver)) {
+      const result = defFactory.createStringSafeDef(cfgNode);
+      tm.propagateTaint(receiver, result, node, "RETURN", "Primitive.toString");
+      return result;
+    }
+  }
+
+  return null;
+}
+
 function handleChainExpression(cfgNode: FlowNode, node: any) {
   if (!node.expression) return defFactory.createUndefinedDef(cfgNode);
 
@@ -469,6 +719,18 @@ function handleMemberExpression(cfgNode: FlowNode, node: any) {
     ? expressionTypeHandler(cfgNode, node.property)
     : null;
   const propName = resolvePropName(cfgNode, node.property, node.computed);
+
+  // JavaScript always exposes `.length` as a number.  Preserve taint for
+  // configuration sinks (an attacker-controlled *number* can still matter
+  // there), while carrying the type fact so textual Action Badge/Title sinks
+  // do not mistake a title-bearing array's cardinality for title text.  This
+  // also covers an array reloaded from chrome.storage, whose structural Array
+  // type is intentionally opaque at the read site.
+  if (propName === "length") {
+    const result = defFactory.createPrimitiveDef(cfgNode, "number");
+    tm.propagateTaint(objectDef, result, node, "ELEMENT", "member.length");
+    return result;
+  }
 
   let resultDef: Def | null = null;
 
@@ -500,11 +762,39 @@ function handleMemberExpression(cfgNode: FlowNode, node: any) {
     }
   }
 
+  // An array index selects an element summary, while `.length` remains clean
+  // metadata even if one or more elements contain page-derived values.
+  if (
+    !resultDef &&
+    Def.isObjectDef(objectDef) &&
+    objectDef.isArrayLike &&
+    propName !== null &&
+    /^(?:0|[1-9]\d*)$/.test(propName)
+  ) {
+    resultDef = objectDef.arrayElementSummary;
+  }
+
+  // A container made solely by *known* tainted fields must remain field
+  // sensitive.  For example, `{ title: document.title, count: 0 }.count` and
+  // `[{ title: document.title }].length` cannot carry title text.  Opaque
+  // containers (JSON.parse, unknown spread/message payload) deliberately keep
+  // the old conservative fallback, preserving real dynamic-property TPs.
+  const shouldUseContainerFallback =
+    !Def.isObjectDef(objectDef) ||
+    !propName ||
+    objectDef.hasOpaqueContainerTaint ||
+    !objectDef.hasTaintedOwnProperty ||
+    // An unresolved index can select a summarized element. Unlike `.length`,
+    // this is not sibling metadata and remains conservative.
+    (Def.isObjectDef(objectDef) &&
+      objectDef.isArrayLike &&
+      /^(?:0|[1-9]\d*)$/.test(propName));
+
   // Lazy fallback: create UnknownDef only if nothing is resolved
   if (!resultDef) {
     resultDef = defFactory.createUnknownDef(cfgNode);
     // [NEW ADD] Taint Propagation
-    if (objectDef.isTainted)
+    if (objectDef.isTainted && shouldUseContainerFallback)
       tm.propagateTaint(
         objectDef,
         resultDef,
@@ -512,7 +802,28 @@ function handleMemberExpression(cfgNode: FlowNode, node: any) {
         "ELEMENT",
         "member-element",
       );
+  } else if (
+    objectDef.isTainted &&
+    shouldUseContainerFallback &&
+    objectDef.uniqueId !== resultDef.uniqueId
+  ) {
+    // Container taint: if the *container* is tainted (e.g. an object built
+    // out of a tainted JSON.parse result, or a tainted array), reading any
+    // property of it must carry the container's taint forward. Without this
+    // step, a downstream sink on `obj.field` after `obj = JSON.parse(x)`
+    // would be missed because `field` was sealed as a fresh UnknownDef
+    // during parse and never linked back to `x`.
+    tm.propagateTaint(
+      objectDef,
+      resultDef,
+      node,
+      "ELEMENT",
+      "member-element-container",
+    );
   }
+
+  if (objectDef.isStorageSerialized) resultDef.markStorageSerialized();
+
 
   /**
    * Attach hidden this-binding for CallExpression:

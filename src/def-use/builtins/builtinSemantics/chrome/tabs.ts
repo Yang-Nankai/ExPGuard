@@ -69,6 +69,7 @@ BuiltInSemantics.register(
         scriptUsageTracker.markReferencedScriptByPathOrUrlByKey(
           callNode.scopeTree?.key,
           fileDef.value,
+          false, // executeScript injects into a page tab, not the caller frame
         );
       }
 

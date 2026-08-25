@@ -38,6 +38,8 @@ export type SourceType =
   // IDENTITY
   | "CHROME_IDENTITY_TOKEN"
   | "CHROME_IDENTITY_PROFILE"
+  // MANAGED STORAGE (enterprise-policy data — sensitive, high-integrity)
+  | "CHROME_MANAGED_STORAGE"
   // NAVIGATOR
   | "NAVIGAROR_GEOLOCATION"
   | "NAVIGATOR_CLIPBOARD"
@@ -123,8 +125,17 @@ export type SinkType =
   | "NEW_FUNCTION"
   | "EVAL"
   | "TIME_EVAL"
+  // Implicit / privileged code-execution surfaces beyond eval().
+  | "WASM_INSTANTIATE"          // WebAssembly.instantiate(tainted buffer) — runs code
+  | "WORKER_URL"               // new Worker(taintedUrl) / Blob-URL worker bootstrap
+  | "CHROME_DEBUGGER_COMMAND"   // chrome.debugger.sendCommand(..,"Runtime.evaluate",{expression})
   | "FETCH_RESOURCE"
   | "FETCH_OPTIONS"
+  // Granular fetch init sinks. The init object is split so that data placed in
+  // a request *body* (exfiltration) can be distinguished from data placed in a
+  // request *header* (benign auth — e.g. a cookie sent as the Cookie header).
+  | "FETCH_BODY"
+  | "FETCH_HEADERS"
   | "JQUERY_AJAX_URL"
   | "JQUERY_AJAX_DATA"
   | "JQUERY_AJAX_SETTINGS_URL"
@@ -138,6 +149,7 @@ export type SinkType =
   | "JQUERY_GLOBAL_EVAL"
   | "XML_HTTP_REQUEST_OPEN"
   | "XML_HTTP_REQUEST_SEND"
+  | "XML_HTTP_REQUEST_SETHEADER"
   | "AXIOS_URL"
   | "AXIOS_DATA"
   | "AXIOS_HEADERS"
@@ -152,10 +164,20 @@ export type SinkType =
   | "JQUERY_ELEMENT_VAL_SET"
   | "JQUERY_ELEMENT_TEXT_SET"
   | "JQUERY_ELEMENT_HTML_SET"
+  // Generic DOM innerHTML/outerHTML write. Reserved for the member-assignment
+  // sink (`el.innerHTML = x`) follow-up; modeled frameworks reuse it where a
+  // raw DOM property write is the most faithful representation.
+  | "DOM_INNER_HTML"
+  // Front-end framework HTML-injection sinks. These are the call-based forms
+  // that survive bundling/compilation, so they fire even when the framework
+  // itself is a minified vendor file.
+  | "REACT_DANGEROUS_HTML"     // React dangerouslySetInnerHTML.__html (incl. JSX)
+  | "VUE_V_HTML"               // Vue v-html / template / render innerHTML
+  | "VUE_COMPILE"              // Vue.compile(tainted) — runtime template codegen
+  | "ANGULAR_BYPASS_SECURITY"  // DomSanitizer.bypassSecurityTrust* / $sce.trustAs*
   // TODO: Need to finish this in future
   // | "DOCUMENT_VAL_SET"
   // | "DOCUMENT_TEXT_SET"
-  // | "DOCUMENT_HTML_SET"  
   | "DOCUMENT_WRITE"
   | "DOCUMENT_EXECCOMMAND"
   // Chrome Action
@@ -229,6 +251,8 @@ export type SinkType =
   // Chrome Tabs
   | "CHROME_TABS_CREATE_OPTIONS"
   | "CHROME_TABS_EXECUTE"
+  // Chrome DeclarativeNetRequest — dynamic request rewriting (privileged).
+  | "CHROME_DECLARATIVENETREQUEST_RULES"
   // Chrome Window
   | "CHROME_WINDOWS_UPDATE_OPTIONS"
   | "CHROME_WINDOWS_CREATE_OPTIONS"
@@ -237,6 +261,30 @@ export type SinkType =
   ;
 
 export type UrlTaintControl = "FULL" | "PARTIAL";
+
+/**
+ * Provenance of a taint value when it crosses a runtime/storage boundary.
+ *
+ * `EXTENSION_UI` is deliberately distinct from `CONTENT_SCRIPT`: a value
+ * typed into a popup/options page is user input to the extension, not input
+ * supplied by the web page.  `EXTERNAL_MESSAGE` and `UNTRUSTED_STORAGE` are
+ * explicit web-reachable routes and must remain eligible for TP reporting.
+ */
+export type TaintProvenance =
+  | "CONTENT_SCRIPT"
+  | "EXTENSION_UI"
+  | "EXTERNAL_MESSAGE"
+  | "UNTRUSTED_STORAGE"
+  | "UNKNOWN";
+
+export type TaintFrameFamily =
+  | "CS"
+  | "BG"
+  | "EX"
+  | "DT"
+  | "OF"
+  | "MAIN"
+  | "UNKNOWN";
 
 export interface TaintSinkRecord {
   taintId: number;
@@ -260,6 +308,12 @@ export interface TaintSource {
   originDefId: number;
   isPseudo: boolean; // pseudo taint source
   remark?: string;
+  /** Context that created the root source, before any message/storage relay. */
+  originContextFilename?: string;
+  /** Frame family of the root source at its actual creation site. */
+  originFrameFamily?: TaintFrameFamily;
+  /** Whether the root value is reachable from a web page. */
+  provenance?: TaintProvenance;
 }
 
 export interface TaintPathRecord {
@@ -269,6 +323,12 @@ export interface TaintPathRecord {
   astNode: Node;
   PropagateType: PropagateType;
   remark: string;
+  /** Actual sender/receiver metadata for MESSAGE edges. */
+  senderContextFilename?: string;
+  senderFrameFamily?: TaintFrameFamily;
+  receiverContextFilename?: string;
+  receiverFrameFamily?: TaintFrameFamily;
+  senderProvenance?: TaintProvenance;
 }
 
 export interface TaintAnalysisSummary {
@@ -308,6 +368,8 @@ export interface PseudoTaintReceiver {
   targetDef: Def; // target def where the data arrives
   outer?: string;
   deferredMessage?: DeferredMessageInvoke;
+  /** Statically recovered constraints for an internal runtime message handler. */
+  protocol?: MessageProtocol;
 }
 
 export interface PseudoTaintSender {
@@ -316,6 +378,25 @@ export interface PseudoTaintSender {
   astNode: Node;
   channel: string;
   outer?: string;
+  /** Action/type alternatives carried by the outgoing message. */
+  protocol?: MessageProtocol;
+}
+
+export type MessageDispatchKey = "action" | "type";
+
+/**
+ * Bounded action/type alternatives. `hasUnknown` means at least one branch
+ * could not be resolved statically, so it must remain eligible for matching.
+ */
+export interface MessageValueCandidates {
+  values: string[];
+  hasUnknown: boolean;
+}
+
+/** Metadata used only to decide whether two internal message endpoints can meet. */
+export interface MessageProtocol {
+  frameFamily: TaintFrameFamily;
+  dispatch: Partial<Record<MessageDispatchKey, MessageValueCandidates>>;
 }
 
 export interface StorageAction {
