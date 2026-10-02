@@ -113,6 +113,37 @@ export interface AppConfig {
   /** Filter taint reports by actually used runtime scripts */
   filterUnusedRuntimeScripts: boolean;
 
+  /**
+   * Drop matched flows that cross no privilege boundary (see
+   * `src/taint/privilege.ts`) — page-controlled data reaching a sink a content
+   * script shares with the page, and `chrome.storage` writes nothing reads
+   * back. Suppressed flows remain available via
+   * `taintManager.getPrivilegeSuppressedFlows()` and in `summary.json`.
+   *
+   * Set to false to report every rule match regardless of exploitability; each
+   * flow still carries `privilegeCrossing` / `privilegeReason`.
+   */
+  privilegeDeltaFiltering: boolean;
+
+  /**
+   * Drop flows where page input only reaches a capability the page or its
+   * MAIN-world script already has. This covers same-document DOM rewrites in
+   * extension-owned pages and MAIN-world network/DOM/code execution.
+   *
+   * Set EXPGUARD_DISABLE_PAGE_CONTEXT_FILTERING=1 to restore legacy reporting.
+   */
+  pageContextFiltering: boolean;
+
+  /**
+   * Fraction of a file's analysis budget the entry-point sweep may consume.
+   *
+   * The sweep runs last and is pure upside, but on function-dense scripts it
+   * can cost two orders of magnitude more than the main pass. Bounding it
+   * keeps per-file wall clock predictable at corpus scale. Set to 0 to
+   * effectively disable the sweep while leaving `coverageAnalysis` on.
+   */
+  entrySweepBudgetRatio: number;
+
   /** Taint analysis report configuration */
   taintReportOptions: ReportOptions;
 
@@ -155,7 +186,7 @@ const config: AppConfig = {
   analysisTimeoutMs: 1 * 60 * 1000,
   fileSizeTimeoutMs: {
     small: 30_000,    // 10 seconds for < 100KB
-    medium: 60_000,   // 60 seconds for 100KB-1MB
+    medium: 120_000,  // 120 seconds for 100KB-1MB (minified extension bundles)
     large: 120_000,    // 120 seconds for >1MB
   },
 
@@ -194,6 +225,10 @@ const config: AppConfig = {
     "node_modules/**",
   ],
   filterUnusedRuntimeScripts: true,  // true
+  privilegeDeltaFiltering: true,
+  pageContextFiltering:
+    process.env.EXPGUARD_DISABLE_PAGE_CONTEXT_FILTERING !== "1",
+  entrySweepBudgetRatio: 0.35,
 
   taintReportOptions: {
     level: "partial",
@@ -204,8 +239,14 @@ const config: AppConfig = {
 
   emitHtmlReport: false,
 
-  // TODO: 存在一点问题，对事件处理不完全，导致有些漏洞可能被遗漏(不过这些事件需要用户去触发才行肯定是)
-  coverageAnalysis: false,  // false
+  /**
+   * Entry-point sweep: after the root pass, re-enter every function scope the
+   * analyzer never reached (callbacks handed to unmodeled APIs, dispatch
+   * tables, ...) as a standalone entry point. Parameters are bound to
+   * untainted opaque values, so the sweep only adds reachability — taint still
+   * originates exclusively at modeled sources. See `EntryPointAnalyzer`.
+   */
+  coverageAnalysis: true,
 };
 
 export default config;

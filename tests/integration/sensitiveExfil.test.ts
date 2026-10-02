@@ -48,14 +48,14 @@ async function analyzeFixture(name: string): Promise<FlowLite[]> {
   return summary.flows;
 }
 
-describe("Sensitive data exfiltration (DATA_LEAK via network)", () => {
+describe("Restricted DATA_LEAK policy (sensitive sources → webpage messages)", () => {
   jest.setTimeout(60_000);
 
   afterAll(() => {
     taintRuleEngine.loadDefaults();
   });
 
-  it("history → fetch body is reported as DATA_LEAK", async () => {
+  it("history → fetch body is outside the restricted DATA_LEAK policy", async () => {
     const flows = await analyzeFixture("sensitive_exfil_history");
     const leak = flows.find(
       (f) =>
@@ -63,10 +63,27 @@ describe("Sensitive data exfiltration (DATA_LEAK via network)", () => {
         f.sinkType === "FETCH_BODY" &&
         f.flowType === "DATA_LEAK",
     );
-    expect(leak).toBeTruthy();
+    expect(leak).toBeUndefined();
   });
 
-  it("cookie → fetch body is reported as DATA_LEAK and tagged with the domain", async () => {
+  it("tab URL source → network body is outside the restricted DATA_LEAK policy", async () => {
+    const flows = await analyzeFixture("indexeddb_tab_url_exfil");
+    const leak = flows.find(
+      (f) =>
+        f.sourceType === "CHROME_TABS_ONUPDATED_URL" &&
+        f.sinkType === "FETCH_BODY" &&
+        f.flowType === "DATA_LEAK",
+    );
+    expect(leak).toBeUndefined();
+  });
+
+  it("tab URL source → Qi IndexedDB cursor → JSON body is outside the restricted policy", async () => {
+    const flows = await analyzeFixture("qi_idb_tab_url_exfil");
+    expect(flows.some((f) => f.sourceType === "CHROME_TABS_ONUPDATED_URL" && f.sinkType === "FETCH_BODY" && f.flowType === "DATA_LEAK")).toBe(false);
+    expect(flows.every((f) => !(f as any).sinkScriptCode)).toBe(true);
+  });
+
+  it("cookie → fetch body is outside the restricted DATA_LEAK policy", async () => {
     const flows = await analyzeFixture("sensitive_exfil_cookie_body");
     const cookieBodyLeaks = flows.filter(
       (f) =>
@@ -74,12 +91,7 @@ describe("Sensitive data exfiltration (DATA_LEAK via network)", () => {
         f.sinkType === "FETCH_BODY" &&
         f.flowType === "DATA_LEAK",
     );
-    expect(cookieBodyLeaks.length).toBeGreaterThan(0);
-    // Source domain tagging: cookies.getAll({domain:"facebook.com"}).
-    const tagged = cookieBodyLeaks.some((f) =>
-      (f.sourceRemark ?? "").includes("facebook.com"),
-    );
-    expect(tagged).toBe(true);
+    expect(cookieBodyLeaks).toHaveLength(0);
   });
 
   it("cookie → fetch Cookie header is suppressed (benign auth)", async () => {
@@ -100,7 +112,7 @@ describe("Sensitive data exfiltration (DATA_LEAK via network)", () => {
     expect(leak).toBeUndefined();
   });
 
-  it("cookie → axios data (body) is reported as DATA_LEAK", async () => {
+  it("cookie → axios data (body) is outside the restricted DATA_LEAK policy", async () => {
     const flows = await analyzeFixture("sensitive_exfil_axios_body");
     const leak = flows.find(
       (f) =>
@@ -108,7 +120,7 @@ describe("Sensitive data exfiltration (DATA_LEAK via network)", () => {
         f.sinkType === "AXIOS_DATA" &&
         f.flowType === "DATA_LEAK",
     );
-    expect(leak).toBeTruthy();
+    expect(leak).toBeUndefined();
   });
 
   it("cookie → axios headers is suppressed (header suppression spans axios)", async () => {
@@ -120,7 +132,7 @@ describe("Sensitive data exfiltration (DATA_LEAK via network)", () => {
     expect(leak).toBeUndefined();
   });
 
-  it("cookie → XHR send body is reported (body leak, not a header)", async () => {
+  it("cookie → XHR send body is outside the restricted DATA_LEAK policy", async () => {
     const flows = await analyzeFixture("sensitive_exfil_xhr_body");
     const leak = flows.find(
       (f) =>
@@ -128,10 +140,10 @@ describe("Sensitive data exfiltration (DATA_LEAK via network)", () => {
         f.sinkType === "XML_HTTP_REQUEST_SEND" &&
         f.flowType === "DATA_LEAK",
     );
-    expect(leak).toBeTruthy();
+    expect(leak).toBeUndefined();
   });
 
-  it("cookie → fetch URL (query string) is reported (URL leak, not a header)", async () => {
+  it("cookie → fetch URL is outside the restricted DATA_LEAK policy", async () => {
     const flows = await analyzeFixture("sensitive_exfil_cookie_url");
     const leak = flows.find(
       (f) =>
@@ -139,10 +151,10 @@ describe("Sensitive data exfiltration (DATA_LEAK via network)", () => {
         f.sinkType === "FETCH_RESOURCE" &&
         f.flowType === "DATA_LEAK",
     );
-    expect(leak).toBeTruthy();
+    expect(leak).toBeUndefined();
   });
 
-  it("identity auth token → fetch body is reported and tagged", async () => {
+  it("identity auth token → fetch body is outside the restricted DATA_LEAK policy", async () => {
     const flows = await analyzeFixture("sensitive_exfil_identity_token");
     const leaks = flows.filter(
       (f) =>
@@ -150,14 +162,74 @@ describe("Sensitive data exfiltration (DATA_LEAK via network)", () => {
         f.sinkType === "FETCH_BODY" &&
         f.flowType === "DATA_LEAK",
     );
-    expect(leaks.length).toBeGreaterThan(0);
-    const tagged = leaks.some((f) =>
-      (f.sourceRemark ?? "").includes("identity.authToken"),
-    );
-    expect(tagged).toBe(true);
+    expect(leaks).toHaveLength(0);
   });
 
-  it("system.cpu fingerprint → fetch body is reported as DATA_LEAK and tagged", async () => {
+  it("pseudo storage returned to the page is outside the restricted policy", async () => {
+    const flows = await analyzeFixture("storage_page_egress_exact_key");
+    const leak = flows.find(
+      (f) =>
+        f.sourceType === "PSEUDO_STORAGE" &&
+        f.sinkType === "WINDOW_POSTMESSAGE" &&
+        f.flowType === "DATA_LEAK" &&
+        f.ruleId === "pseudo-storage-page-message-egress",
+    );
+    expect(leak).toBeUndefined();
+  });
+
+  it("ordinary stored UI preferences are not treated as sensitive leaks", async () => {
+    const flows = await analyzeFixture("storage_page_egress_preference_key");
+    expect(
+      flows.some(
+        (f) =>
+          f.sourceType === "PSEUDO_STORAGE" &&
+          f.sinkType === "WINDOW_POSTMESSAGE" &&
+          f.flowType === "DATA_LEAK",
+      ),
+    ).toBe(false);
+  });
+
+  it("page-selected storage keys are tracked through their message response", async () => {
+    const flows = await analyzeFixture("storage_page_egress_dynamic_key");
+    expect(
+      flows.some(
+        (f) =>
+          f.sourceType === "STORAGE_ALL_ITEMS" &&
+          f.sinkType === "WINDOW_POSTMESSAGE" &&
+          f.flowType === "DATA_LEAK" &&
+          f.ruleId === "storage-data-message-egress",
+      ),
+    ).toBe(true);
+  });
+
+  it("pseudo storage external response is outside the restricted policy", async () => {
+    const allowedFlows = await analyzeFixture(
+      "storage_external_page_egress_allowed",
+    );
+    expect(
+      allowedFlows.some(
+        (f) =>
+          f.sourceType === "PSEUDO_STORAGE" &&
+          f.sinkType === "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE" &&
+          f.flowType === "DATA_LEAK" &&
+          f.ruleId === "pseudo-storage-page-message-egress",
+      ),
+    ).toBe(false);
+
+    const blockedFlows = await analyzeFixture(
+      "storage_external_page_egress_blocked",
+    );
+    expect(
+      blockedFlows.some(
+        (f) =>
+          f.sourceType === "PSEUDO_STORAGE" &&
+          f.sinkType === "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE" &&
+          f.flowType === "DATA_LEAK",
+      ),
+    ).toBe(false);
+  });
+
+  it("system.cpu → fetch body is outside the restricted DATA_LEAK policy", async () => {
     const flows = await analyzeFixture("sensitive_exfil_system_cpu");
     const leaks = flows.filter(
       (f) =>
@@ -165,9 +237,6 @@ describe("Sensitive data exfiltration (DATA_LEAK via network)", () => {
         f.sinkType === "FETCH_BODY" &&
         f.flowType === "DATA_LEAK",
     );
-    expect(leaks.length).toBeGreaterThan(0);
-    expect(leaks.some((f) => (f.sourceRemark ?? "").includes("system.cpu"))).toBe(
-      true,
-    );
+    expect(leaks).toHaveLength(0);
   });
 });

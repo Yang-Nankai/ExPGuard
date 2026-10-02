@@ -4,12 +4,49 @@ import { taintManager as tm } from "../../taint";
 import { interAnalyzer } from "../analyzers/interProceduralAnalyzer";
 import { DefFactory, defFactory } from "../factories/defFactory";
 import Def from "../types/def";
+import { IDB_SUCCESS_RESULT } from "../builtins/builtinSemantics/browser/indexedDb";
 import {
   evaluateDefTruth,
   lookupMatchingDef,
   performMemberLookup,
   resolvePropName,
 } from "../utils/utils";
+/**
+ * Link a value that is structurally derived from `container` (a spread
+ * element, a destructured binding, ...) to the container in the taint DAG.
+ *
+ * Intentionally inlined rather than imported from a shared module: this file
+ * sits early in the builtin-registry initialization order, and adding an
+ * import edge to a module that pulls in `../../taint` reorders module
+ * evaluation enough that `BuiltInRegistry`'s Array constructor is not yet
+ * registered when array instances are built here. No-ops on untainted
+ * containers, so it adds no false-positive surface.
+ */
+/**
+ * An object/array-like value with real structure to offer — as opposed to a
+ * boxed literal (`LiteralDef extends ObjectDef`) or `undefined`.
+ */
+function isContainerDef(def: Def | null): def is Def {
+  return (
+    Def.isObjectDef(def) &&
+    !Def.isLiteralDef(def) &&
+    !Def.isUndefinedDef(def)
+  );
+}
+
+function propagateContainerTaint(
+  container: Def | null,
+  derived: Def | null,
+  astNode: any,
+  kind: Parameters<typeof tm.propagateTaint>[3],
+  remark: string,
+): void {
+  if (!container || !derived) return;
+  if (!container.isTainted) return;
+  if (container.uniqueId === derived.uniqueId) return;
+
+  tm.propagateTaint(container, derived, astNode, kind, remark);
+}
 import { classTypeHandler } from "./classTypeHandler";
 
 export function expressionTypeHandler(cfgNode: FlowNode, node: any): Def {
@@ -27,8 +64,7 @@ export function expressionTypeHandler(cfgNode: FlowNode, node: any): Def {
     UnaryExpression: () => handleUnary(cfgNode, node, ["+", "-", "!"]),
     UpdateExpression: () => handleUpdateExpression(cfgNode, node),
     BinaryExpression: () => handleBinary(cfgNode, node),
-    // Only consider right hand expression
-    AssignmentExpression: () => expressionTypeHandler(cfgNode, node.right),
+    AssignmentExpression: () => handleAssignmentExpression(cfgNode, node),
     LogicalExpression: () => handleLogical(cfgNode, node),
     MemberExpression: () => handleMemberExpression(cfgNode, node),
     ConditionalExpression: () => handleConditional(cfgNode, node),
@@ -54,6 +90,34 @@ export function expressionTypeHandler(cfgNode: FlowNode, node: any): Def {
 
   // default: cannot recognize
   return defFactory.createUndefinedDef(cfgNode);
+}
+
+/** Evaluate an assignment and model callback properties on opaque async APIs. */
+function handleAssignmentExpression(cfgNode: FlowNode, node: any): Def {
+  const rightDef = expressionTypeHandler(cfgNode, node.right);
+
+  if (
+    node.left?.type === "MemberExpression" &&
+    !node.left.computed &&
+    node.left.property?.type === "Identifier" &&
+    node.left.property.name === "onsuccess" &&
+    Def.isFunctionDef(rightDef)
+  ) {
+    const owner = expressionTypeHandler(cfgNode, node.left.object);
+    if (Def.isObjectDef(owner)) {
+      const result = owner.getProperty(IDB_SUCCESS_RESULT);
+      if (result) {
+        const target = defFactory.createObjectDef(cfgNode);
+        target.setProperty("result", result);
+        const event = defFactory.createObjectDef(cfgNode);
+        event.setProperty("target", target);
+        interAnalyzer.analyze(cfgNode, rightDef, [event], null, node);
+      }
+      owner.setProperty("onsuccess", rightDef);
+    }
+  }
+
+  return rightDef;
 }
 
 //===============Helpers====================
@@ -103,7 +167,19 @@ function handleObjectExpression(cfgNode: FlowNode, node: any) {
           objectDef.setProperty(k, v);
         }
       }
-      // Unknown, not set
+
+      // Whether or not the spread source resolved to concrete properties, the
+      // result object now *contains* it. Marking the container tainted lets
+      // `handleMemberExpression`'s container-taint fallback recover the flow
+      // for `{ ...msg }.url`, which no property copy can model when `msg` is
+      // an opaque UnknownDef.
+      propagateContainerTaint(
+        spreadDef,
+        objectDef,
+        property,
+        "COPY",
+        "object-spread",
+      );
     } else {
       // handle normal property
       const propName = resolvePropName(
@@ -142,8 +218,17 @@ function handleArrayExpression(cfgNode: FlowNode, node: any) {
           argsDef.push(v);
         }
       } else {
-        // Unknown type, push a generic unknown definition
-        argsDef.push(defFactory.createUnknownDef(cfgNode));
+        // Opaque spread source (`[...msg.list]`): the synthesized element
+        // stands for every member, so it inherits the container's taint.
+        const element = defFactory.createUnknownDef(cfgNode);
+        propagateContainerTaint(
+          spreadDef,
+          element,
+          elem,
+          "ELEMENT",
+          "array-spread",
+        );
+        argsDef.push(element);
       }
     } else {
       // Handle normal elements
@@ -250,6 +335,28 @@ function handleLogical(cfgNode: FlowNode, node: any) {
           resultDef = DefFactory.rebase(leftDef, cfgNode);
         }
     }
+  }
+
+  // Undecidable short-circuit against a *structural* default — the
+  // `x || []` / `x || {}` defaulting idiom:
+  //
+  //   const list = result.harvested || [];
+  //   list.push(secret);
+  //   chrome.storage.local.set({ harvested: list });
+  //
+  // Collapsing this to an opaque UnknownDef meant `.push` no longer resolved
+  // to `Array.prototype.push`, so everything accumulated into the list became
+  // invisible. Adopting the structural operand keeps the container analyzable;
+  // taint from the other operand is still attached below, so nothing is lost.
+  //
+  // Restricted to a genuine *container* on the right. Note `LiteralDef extends
+  // ObjectDef` (literals are boxed), so `Def.isObjectDef` alone is not the
+  // right test: for a scalar default like `event.data.method || 0` the opaque
+  // result is the more useful answer, because it keeps `arr[selector]` widening
+  // to *every* element instead of narrowing to index 0 — which is exactly what
+  // exposes indirect-dispatch sinks.
+  if (!resultDef && isContainerDef(rightDef)) {
+    resultDef = DefFactory.rebase(rightDef, cfgNode);
   }
 
   resultDef = resultDef ?? defFactory.createUnknownDef(cfgNode);

@@ -98,7 +98,7 @@ Message channels create deferred sender/receiver pairs identified by a channel n
 
 `getFlowTypes(source, sink): FlowType[]` is the engine-facing API; `getFlowMatches(source, sink): RuleMatch[]` adds rule provenance. Both delegate to the **`TaintRuleEngine`** singleton in `src/taint/ruleEngine.ts`, which evaluates a user-extensible JSON rule set.
 
-The bundled default rule file (`src/taint/rules/default-rules.json`) reproduces the original hand-written matrix exactly:
+The bundled default rule file (`src/taint/rules/default-rules.json`) covers the following matrix. The last two rows are only safe to include because the **privilege-delta gate** (below) decides their exploitability separately:
 
 | Source capability | Sink capability | FlowType |
 |-------------------|-----------------|----------|
@@ -115,6 +115,9 @@ The bundled default rule file (`src/taint/rules/default-rules.json`) reproduces 
 | WEB_CONTENT | CODE_EXECUTION | `CODE_INJECTION` |
 | WEB_CONTENT | PRIVILEGED_OPERATION | `PRIVILEGE_ESCALATION` |
 | STORAGE_DATA | MESSAGE_RESPONSE | `DATA_LEAK` |
+| STORAGE_DATA | NETWORK_SEND | `DATA_LEAK` (request-header sinks suppressed) |
+| WEB_CONTENT | NETWORK_SEND | `DATA_LEAK` (gated by privilege delta) |
+| WEB_CONTENT | STORAGE_WRITE | `STORAGE_POSOING` (gated by privilege delta) |
 
 Default suppress rules also reproduce the original carve-outs:
 
@@ -194,6 +197,47 @@ module.exports = rules;
 The loader accepts `module.exports = rules`, `module.exports.default = rules`, or an inline `module.exports = { version: 1, rules: [...] }`.
 
 Native messaging endpoints (`CHROME_RUNTIME_SENDNATIVEMESSAGE_EXTERNAL`, `CHROME_RUNTIME_ONCONNECTNATIVE_POSTMESSAGE`) are excluded entirely via blanket suppress rules in the default file.
+
+## Privilege delta
+
+`src/taint/privilege.ts` runs after the rule engine and the frame filter, and
+answers a different question: **does this flow actually cross a privilege
+boundary?**
+
+A rule match proves a source→sink data flow exists. That is necessary but not
+sufficient to call something a vulnerability — the sink has to grant the data's
+origin some capability it did not already have. Two patterns dominated the
+low-value findings on a 5,503-extension run (`STORAGE_POSOING` alone was 37% of
+all reported flows):
+
+1. **Page-equivalent sinks.** Page-controlled data (`WEB_CONTENT` /
+   `ATTACKER_INPUT`) reaching a `NETWORK_SEND` or `DOM_WRITE` sink where *both*
+   ends sit in a content-script frame. A content script's `fetch` carries the
+   page's origin and a DOM write goes back into the page the data came from —
+   the page could do either itself.
+   `CODE_EXECUTION` is deliberately excluded: `eval` in a content script runs in
+   the isolated world with `chrome.*` access. `STORAGE_WRITE` too: extension
+   storage is outside the page's reach.
+2. **Storage writes nothing reads back.** A `chrome.storage` key that is written
+   but never read anywhere in the extension cannot poison a later decision.
+   `TaintManager.hasStorageConsumer(area, key)` decides this from the recorded
+   sets/gets, and is conservative: any wildcard read — `get(null)`, a get whose
+   key could not be resolved statically, or a `storage.onChanged` listener —
+   counts as a consumer for every key in that area.
+
+Anything else crosses: every `chrome.*` privileged API, code execution, and any
+hop out of the page's reach via messaging or extension storage.
+
+Suppressed flows are **not discarded**. Each carries `privilegeCrossing` and
+`privilegeReason`; the dropped set is available as
+`taintManager.getPrivilegeSuppressedFlows()` and surfaces in `summary.json` as
+`privilegeSuppressed` / `privilegeSuppressedCount`. Set
+`config.privilegeDeltaFiltering = false` to report every rule match regardless
+of exploitability (the fields are still populated, so consumers can triage).
+
+This split is why the default rule set can carry `WEB_CONTENT → NETWORK_SEND`
+and `WEB_CONTENT → STORAGE_WRITE` rules at all: the rule engine answers "is
+there a flow", the gate answers "does it matter".
 
 ## Severity
 

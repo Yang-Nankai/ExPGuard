@@ -9,6 +9,7 @@ export type SourceType =
   // TABS
   | "CHROME_TABS_DETECT_LANUAGE"
   | "CHROME_TABS_CAPUTURE_VISIBLE_TAB"
+  | "CHROME_TABS_ONUPDATED_URL"
   // BOOKMARKS
   | "CHROME_BOOKMARK_INFO"
   // COOKIES
@@ -284,6 +285,7 @@ export interface TaintSource {
   originDefId: number;
   isPseudo: boolean; // pseudo taint source
   remark?: string;
+  provenance?: unknown;
 }
 
 export interface TaintPathRecord {

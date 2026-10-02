@@ -34,7 +34,14 @@ export type ScriptFrameTag = string;
  *  - UNKNOWN catch-all for orphan helpers not referenced by any manifest
  *         entry (and not pulled in via import / runtime API)
  */
-export type ScriptFrameFamily = "CS" | "BG" | "EX" | "DT" | "OF" | "UNKNOWN";
+export type ScriptFrameFamily =
+  | "CS"
+  | "BG"
+  | "EX"
+  | "DT"
+  | "OF"
+  | "MAIN"
+  | "UNKNOWN";
 
 /**
  * Represents a single script file inside an extension
@@ -75,7 +82,8 @@ export class ExtensionScript {
    *
    * Rules:
    * 1. source starts with "."  -> relative to current script directory
-   * 2. source does NOT start with "." -> relative to extension baseDir
+   * 2. source starts with "/" -> extension-package-root relative
+   * 3. source does NOT start with "." -> relative to extension baseDir
    */
   resolveRelativeScriptKey(source: string): ScriptKey | null {
     let resolvedAbsPath: string;
@@ -84,6 +92,11 @@ export class ExtensionScript {
       // relative to current script
       const importerDir = path.dirname(this.absPath);
       resolvedAbsPath = path.resolve(importerDir, source);
+    } else if (source.startsWith("/")) {
+      // Extension ESM imports commonly use `/foo.js` for a package-root path.
+      // Do not hand that path directly to path.resolve(), because on Windows
+      // and POSIX it escapes the unpacked extension directory.
+      resolvedAbsPath = path.resolve(this.baseDir, source.replace(/^[/\\]+/, ""));
     } else {
       // relative to extension baseDir
       resolvedAbsPath = path.resolve(this.baseDir, source);

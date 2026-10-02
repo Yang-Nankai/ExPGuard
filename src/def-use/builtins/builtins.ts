@@ -777,6 +777,13 @@ const BUILTINS: BuiltinSchema[] = [
               get: method("chrome.storage.managed.get"),
             },
           },
+          onChanged: {
+            type: "object",
+            name: "chrome.storage.onChanged",
+            props: {
+              addListener: method("chrome.storage.onChanged.addListener"),
+            },
+          },
         },
       },
       system: {
@@ -827,6 +834,13 @@ const BUILTINS: BuiltinSchema[] = [
           sendMessage: method("chrome.tabs.sendMessage"),
           connect: method("chrome.tabs.connect", "chrome.runtime.connect"), // effect is same as runtime
           executeScript: method("chrome.tabs.executeScript"),
+          onUpdated: {
+            type: "object",
+            name: "chrome.tabs.onUpdated",
+            props: {
+              addListener: method("chrome.tabs.onUpdated.addListener"),
+            },
+          },
         },
       },
       topSites: {
@@ -844,6 +858,13 @@ const BUILTINS: BuiltinSchema[] = [
           update: method("chrome.windows.update"),
         },
       },
+    },
+  },
+  {
+    type: "object",
+    name: "indexedDB",
+    props: {
+      open: method("indexedDB.open"),
     },
   },
   {
@@ -1048,7 +1069,10 @@ const BUILTINS: BuiltinSchema[] = [
       title: attribute("document.title", "DOCUMENT_TITLE"),
       getElementById: method("document.getElementById"),
       querySelector: method("document.querySelector"),
-      // querySelectorAll: method("document.querySelectorAll"),
+      querySelectorAll: method("document.querySelectorAll"),
+      getElementsByClassName: method("document.querySelectorAll"),
+      getElementsByTagName: method("document.querySelectorAll"),
+      getElementsByName: method("document.querySelectorAll"),
       addEventListener: method("target.addEventListener")
     },
   },

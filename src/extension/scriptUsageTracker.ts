@@ -150,7 +150,8 @@ class ScriptUsageTracker {
       EX: 2,
       DT: 3,
       OF: 4,
-      UNKNOWN: 5,
+      MAIN: 5,
+      UNKNOWN: 6,
     };
 
     const arr = Array.from(tags.values());
@@ -345,8 +346,13 @@ class ScriptUsageTracker {
     for (const item of contentScripts) {
       csIndex += 1;
       const frameId = `CS_${csIndex}`;
+      const isMainWorld =
+        String(item?.world ?? "").toUpperCase() === "MAIN";
 
-      this._frameFamilies.set(frameId, "CS");
+      // MAIN-world content scripts execute with page authority, not the
+      // isolated extension world. Keep the CS frame id for manifest lookup,
+      // but preserve the effective world family for privilege analysis.
+      this._frameFamilies.set(frameId, isMainWorld ? "MAIN" : "CS");
       this._frameConstraints.set(frameId, {
         matches: this.normalizeStrArray(item?.matches),
         includeGlobs: this.normalizeStrArray(item?.include_globs),

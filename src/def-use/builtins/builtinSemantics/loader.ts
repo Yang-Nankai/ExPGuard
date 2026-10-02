@@ -22,6 +22,7 @@ import "./browser/storage";
 import "./browser/timer";
 import "./browser/url";
 import "./browser/event";
+import "./browser/indexedDb";
 import "./browser/document";
 import "./browser/code";
 

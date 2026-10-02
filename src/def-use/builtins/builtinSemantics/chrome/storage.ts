@@ -96,6 +96,9 @@ function resolveStorageValue(
     (Def.isLiteralDef(keyDef) &&
       (keyDef.value === null || keyDef.value === undefined))
   ) {
+    // `get(null)` reads every key in the area — a consumer for all of them.
+    taintManager.recordStorageWildcardRead(area);
+
     // If get the all items, then set a taint
     taintManager.createTaintSource(
       result,
@@ -134,7 +137,21 @@ function resolveStorageValue(
     return result;
   }
 
-  // Unknown key type
+  // Unknown key type — the call could read anything in the area, so it counts
+  // as a consumer for every key (conservative; see `hasStorageConsumer`).
+  // A computed key is useful as a storage-data source only when the webpage
+  // can choose it. Internal computed keys frequently represent harmless UI
+  // settings; treating all of them as sensitive would create noisy reports.
+  taintManager.recordStorageWildcardRead(area);
+  if (keyDef && taintManager.hasPageControlledTaint(keyDef)) {
+    taintManager.createTaintSource(
+      result,
+      "STORAGE_ALL_ITEMS",
+      astNode,
+      false,
+      `storage.dynamic.items[${area}]`,
+    );
+  }
   return result;
 }
 
@@ -168,6 +185,31 @@ function registerStorageGet(area: "local" | "sync" | "session") {
 registerStorageGet("local");
 registerStorageGet("sync");
 registerStorageGet("session");
+
+// --------------------- chrome.storage.onChanged.addListener ---------------------
+// An onChanged listener observes writes to every key in every area, so it is a
+// wildcard consumer. Modeling it also gets the listener body analyzed, which is
+// a common place for "act on freshly poisoned config" logic.
+BuiltInSemantics.register(
+  "chrome.storage.onChanged.addListener",
+  (args, callNode, astNode) => {
+    interAnalyzer.setCurrentSideEffects();
+    taintManager.recordStorageWildcardRead("*");
+
+    const [callback] = args;
+    if (!Def.isFunctionDef(callback)) return defFactory.createUndefinedDef(callNode);
+
+    // (changes, areaName). `changes` values originate from storage; the
+    // storage round-trip resolution owns that taint, so pass opaque values
+    // here and let this call contribute reachability only.
+    const changes = defFactory.createObjectDef(callNode);
+    const areaName = defFactory.createUnknownDef(callNode);
+
+    interAnalyzer.analyze(callNode, callback, [changes, areaName], null, astNode);
+
+    return defFactory.createUndefinedDef(callNode);
+  },
+);
 
 // --------------------- chrome.storage.managed.get ---------------------
 // `managed` is read-only enterprise-policy data. Unlike local/sync/session it

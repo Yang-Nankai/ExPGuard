@@ -13,7 +13,9 @@ export function evaluatePureExpressions(node: FlowNode) {
     ReturnStatement: (n: any) => {
       if (!n.argument) return;
       const def = expressionTypeHandler(node, n.argument);
-      interAnalyzer.setCurrentReturnDef(def);
+      // Pass the ReturnStatement as the site key so repeated evaluations of
+      // the same `return` overwrite instead of widening the union.
+      interAnalyzer.setCurrentReturnDef(def, n);
     },
     default: (n: any) => {
       if (n.type.endsWith("Expression")) {

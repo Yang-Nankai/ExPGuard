@@ -28,13 +28,13 @@ Externally controllable data: cross-extension messages, web-page postMessage, cu
 
 ### SENSITIVE_DATA (`SENSITIVE_SOURCES`)
 
-User data behind permissions: bookmarks, history, cookies, identity tokens, tab info, etc. Reports a `DATA_LEAK` only when reaching a MESSAGE sink.
+User data behind permissions: bookmarks, history, cookies, identity tokens, tab info, etc. Only selected concrete source/message-sink pairs in `src/taint/rules/default-rules.json` qualify as `DATA_LEAK`. Network disclosure is outside the paper scope.
 
 `CHROME_TABS_DETECT_LANUAGE`, `CHROME_TABS_CAPUTURE_VISIBLE_TAB`, `CHROME_BOOKMARK_INFO`, `CHROME_COOKIES_INFO`, `CHROME_COOKIES_STORE`, `CHROME_HISTORY_INFO`, `CHROME_READINGLIST_INFO`, `CHROME_MANAGEMENT_INFO`, `CHROME_DOWNLOADS_SEARCH`, `CHROME_DOWNLOADS_FILEICON`, `CHROME_TOPSITES_INFO`, `CHROME_PAGECAPTURE_MHTML`, `CHROME_IDENTITY_TOKEN`, `CHROME_IDENTITY_PROFILE`, `CHROME_BOOKMARKS_ONCREATED`, `CHROME_COOKIES_ONCHANGED`, `CHROME_DOWNLOADS_ONCHANGED`, `CHROME_DOWNLOADS_ONCREATED`, `CHROME_HISTORY_ONVISITED`, `CHROME_MANAGEMENT_ONENABLED`, `CHROME_MANAGEMENT_ONDISABLED`, `CHROME_MANAGEMENT_ONINSTALLED`.
 
 ### SYSTEM_INFO (`SYSTEM_SOURCES`)
 
-Browser fingerprint / system specs. Reports `DATA_LEAK` only for non-navigator entries (navigator.* and SCREEN_INFO are excluded via `shouldReportDataLeakSource`).
+Browser fingerprint / system specs. The default Data Leak rule selects font-list and display information reaching message-egress sinks. Other system-source models remain available for custom rules.
 
 `NAVIGAROR_GEOLOCATION` (typo preserved for compatibility), `NAVIGATOR_CLIPBOARD`, `NAVIGATOR_CONNECTION`, `NAVIGATOR_DEVICE_MEMORY`, `NAVIGATOR_HARDWARE_CONCURRENCY`, `NAVIGATOR_LANGUAGE`, `NAVIGATOR_MAX_TOUCH_POINTS`, `NAVIGATOR_PLATFORM`, `NAVIGATOR_PLUGINS`, `NAVIGATOR_USER_AGENT`, `NAVIGATOR_GPU_ADAPTER`, `SCREEN_INFO`, `CHROME_FONTSETTINGS_FONTLIST`, `CHROME_SYSTEM_CPU`, `CHROME_SYSTEM_DISPLAY_LAYOUT`, `CHROME_SYSTEM_DISPLAY`, `CHROME_SYSTEM_MEMORY`, `CHROME_SYSTEM_STORAGE`.
 
@@ -106,8 +106,7 @@ To add a sanitizer, call `taintManager.applySanitizer(def, "<name>", astNode)` i
 |---------------|--------|------|----------|
 | `privilege_execution/` | `WINDOW_MESSAGE_EVENT` | `CHROME_BOOKMARK_CREATE_INFO`, `CHROME_LOCAL_STORAGE` | `PRIVILEGE_ESCALATION`, `STORAGE_POSOING` |
 | `code_injection/` | `ELEMENT_VALUE` | `TIME_EVAL` | `CODE_INJECTION` |
-| `data_leak/` (added) | `CHROME_COOKIES_INFO`, `CHROME_HISTORY_INFO` | `CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE`, `FETCH_RESOURCE` | `DATA_LEAK`, `REQUEST_FORGERY` |
+| `data_leak/` | `CHROME_COOKIES_INFO`, `CHROME_HISTORY_INFO` | `CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE` | `DATA_LEAK` |
 | `storage_poisoning/` (added) | `WINDOW_CUSTOM_EVENT` | `CHROME_SYNC_STORAGE`, `CHROME_HISTORY_ADD_URL` | `STORAGE_POSOING`, `PRIVILEGE_ESCALATION` |
 | `request_forgery/` (added) | `CHROME_ONMESSAGEEXTERNAL_MESSAGE` | `FETCH_RESOURCE`, `XML_HTTP_REQUEST_OPEN` | `REQUEST_FORGERY` |
-| `dom_xss/` (added) | `DOCUMENT_URL`, `WINDOW_MESSAGE_EVENT` | `EVAL`, `DOCUMENT_WRITE` | `CODE_INJECTION` |
 | `multi_channel/` (added) | port `onMessage`, `chrome.runtime.connect` | `CHROME_TABS_EXECUTE`, `NEW_FUNCTION` | `CODE_INJECTION`, `PRIVILEGE_ESCALATION` |

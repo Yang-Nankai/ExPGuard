@@ -186,9 +186,9 @@ export class InterProceduralAnalyzer {
   /**
    * Set return definition for current call frame
    */
-  setCurrentReturnDef(returnDef: Def) {
+  setCurrentReturnDef(returnDef: Def, site?: object) {
     const frame = this.callStack.peek();
-    if (frame) frame.returnDef = returnDef;
+    if (frame) frame.recordReturnDef(returnDef, site);
   }
 
   /**

@@ -7,8 +7,10 @@ import { Errors } from "../utils/errorCode";
 import { exportAnalyzer } from "./analyzers/exportAnalyzer";
 import { interAnalyzer } from "./analyzers/interProceduralAnalyzer";
 import { featureModelAnalyzer } from "./analyzers/featureAnalyzer";
+import { entryPointAnalyzer } from "./analyzers/entryPointAnalyzer";
 import { detectLibraryByContent, detectLibraryByFilename } from "../constants/library";
 import config from "../config";
+import logger from "../utils/logger";
 
 // File Level Analyzer
 class DefUseAnalyzer {
@@ -56,11 +58,14 @@ class DefUseAnalyzer {
       // Inter reaching-definition (root)
       reachingDefAnalyzer.doAnalysis(rootScope);
 
-      // Coverage phase
+      // Entry-point sweep: re-enter functions the root pass never reached
+      // (callbacks handed to unmodeled APIs, dispatch tables, ...).
       if (config.coverageAnalysis) {
-        for (const scope of scopeTree.getCFGEligibleScopes()) {
-          if (!scope.graph || scope.hasTaintAnalyzed) continue;
-          reachingDefAnalyzer.doAnalysis(scope);
+        const swept = entryPointAnalyzer.sweep(scopeTree);
+        if (swept > 0) {
+          logger.debug(
+            `[ENTRY-SWEEP] ${scopeTree.key}: analyzed ${swept} previously unreached scope(s)`,
+          );
         }
       }
     }

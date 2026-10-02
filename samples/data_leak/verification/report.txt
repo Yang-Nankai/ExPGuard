@@ -1,0 +1,129 @@
+ANALYSIS TARGET
+Extension ID      : aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+Extension Version : 1.0.0
+Source Type       : DIR
+══════════════════════════════════════════════
+TAINT REPORT  background
+FRAME        BG_1
+══════════════════════════════════════════════
+
+[!] Issue #1
+ ├─ Source     : CHROME_ONMESSAGEEXTERNAL_MESSAGE
+ ├─ Remark     : chrome.runtime.onMessageExternal.addListener[message]
+ │  Location   : L5:C6 -> L5:C13
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   ASSIGN     @ L5:C6 -> L5:C13 (identifier)
+ │   ELEMENT    @ L5:C6 -> L5:C18 (member-element)
+ │   ASSIGN     @ L5:C6 -> L5:C18 (binary-left)
+ │   ASSIGN     @ L5:C6 -> L5:C13 (identifier)
+ │   ELEMENT    @ L5:C6 -> L5:C18 (member-element)
+ │   ASSIGN     @ L5:C6 -> L5:C13 (identifier)
+ │   ELEMENT    @ L5:C6 -> L5:C18 (member-element)
+ │   ASSIGN     @ L5:C6 -> L5:C18 (binary-left)
+ │   ASSIGN     @ L12:C6 -> L12:C13 (identifier)
+ │   ELEMENT    @ L12:C6 -> L12:C18 (member-element)
+ │   ASSIGN     @ L12:C6 -> L12:C18 (binary-left)
+ │   ASSIGN     @ L12:C6 -> L12:C13 (identifier)
+ │   ELEMENT    @ L12:C6 -> L12:C18 (member-element)
+ │   ASSIGN     @ L12:C6 -> L12:C13 (identifier)
+ │   ELEMENT    @ L12:C6 -> L12:C18 (member-element)
+ │   ASSIGN     @ L12:C6 -> L12:C18 (binary-left)
+ │   ASSIGN     @ L12:C6 -> L12:C13 (identifier)
+ │   ELEMENT    @ L12:C6 -> L12:C18 (member-element)
+ │   ASSIGN     @ L12:C6 -> L12:C18 (binary-left)
+ │   ASSIGN     @ L12:C6 -> L12:C13 (identifier)
+ │   ELEMENT    @ L12:C6 -> L12:C18 (member-element)
+ │   ASSIGN     @ L12:C6 -> L12:C13 (identifier)
+ │   ELEMENT    @ L12:C6 -> L12:C18 (member-element)
+ │   ASSIGN     @ L12:C6 -> L12:C18 (binary-left)
+ │   (total steps: 24)
+ │
+ ├─ Sink(s):
+ │
+ └─ Sanitized : NO
+
+[!] Issue #2
+ ├─ Source     : CHROME_COOKIES_INFO
+ ├─ Remark     : 
+ │  Location   : L6:C4 -> L8:C6
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L6:C4 -> L8:C6 (object.setProperty)
+ │   ELEMENT    @ L7:C6 -> L7:C31 (object.setProperty)
+ │   (total steps: 2)
+ │
+ ├─ Sink(s):
+ │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L7:C6 -> L7:C31 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+[!] Issue #3
+ ├─ Source     : CHROME_COOKIES_INFO
+ ├─ Remark     : cookies(https://private.example.test/)
+ │  Location   : L7:C6 -> L7:C31
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L7:C6 -> L7:C31 (object.setProperty)
+ │   (total steps: 1)
+ │
+ ├─ Sink(s):
+ │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L7:C6 -> L7:C31 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+[!] Issue #4
+ ├─ Source     : CHROME_HISTORY_INFO
+ ├─ Remark     : 
+ │  Location   : L13:C4 -> L15:C6
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L13:C4 -> L15:C6 (object.setProperty)
+ │   ELEMENT    @ L14:C6 -> L14:C31 (object.setProperty)
+ │   ELEMENT    @ L13:C4 -> L15:C6 (object.setProperty)
+ │   ELEMENT    @ L14:C6 -> L14:C31 (object.setProperty)
+ │   (total steps: 4)
+ │
+ ├─ Sink(s):
+ │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L14:C6 -> L14:C31 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
+ │     frame: BG_1
+ │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L14:C6 -> L14:C31 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+[!] Issue #5
+ ├─ Source     : CHROME_HISTORY_INFO
+ ├─ Remark     : history.search
+ │  Location   : L14:C6 -> L14:C31
+ │  File       : background
+ │  Frame      : BG_1
+ │
+ ├─ Propagation:
+ │   ELEMENT    @ L14:C6 -> L14:C31 (object.setProperty)
+ │   ELEMENT    @ L14:C6 -> L14:C31 (object.setProperty)
+ │   (total steps: 2)
+ │
+ ├─ Sink(s):
+ │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L14:C6 -> L14:C31 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
+ │     frame: BG_1
+ │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L14:C6 -> L14:C31 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
+ │     frame: BG_1
+ │
+ └─ Sanitized : NO
+
+Summary:
+  File            : background
+  Issues          : 5
+══════════════════════════════════════════════
+

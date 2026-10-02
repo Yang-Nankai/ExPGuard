@@ -94,6 +94,33 @@ for each FlowNode in worklist(model.graph, forward):
    if feasible: enqueue all
 ```
 
+#### Loops and termination
+
+The CFG is **cyclic**: a loop body's last statement carries a back edge to the
+loop's test / update node, and `continue` re-enters the loop rather than leaving
+it (`src/cfg/esgraph.ts`, `getLoopContinueTarget`). Without that edge every loop
+was effectively unrolled zero times and loop-carried dependencies
+(`prev = cur; cur = tainted[i]`) were invisible.
+
+Termination comes from the worklist's **per-node visit budget**
+(`DEFAULT_MAX_NODE_VISITS`, currently 3, in `src/utils/worklist.ts`). Processing
+a node N times is equivalent to unrolling the enclosing loop N times; total work
+is bounded at `budget × |nodes|`. The bound is deliberately the *only*
+termination mechanism — there is no "state stopped changing" early exit, because
+reaching-def state is a graph of mutable `Def` objects with no cheap canonical
+form, and a heuristic equality check that under-reports silently truncates loop
+iteration.
+
+These two changes are a pair. Removing the visit budget while the CFG has back
+edges hangs the analyzer; removing the back edges while keeping the budget just
+wastes work.
+
+One consequence worth knowing: `getFeasibleSuccessors` will **not** prune the
+exit edge of a loop whose guard currently evaluates TRUE. Under bounded
+unrolling the analyzer cannot prove the loop runs forever, and pruning there
+would make every statement after the loop unreachable. Proving a guard FALSE
+still prunes the body.
+
 `computeGenFromAST` is a `walkes` visitor that handles:
 
 - `AssignmentExpression` (delegates RHS to `expressionTypeHandler`, LHS to `patternAwareTypeHandler`)
@@ -137,6 +164,32 @@ Dispatch order:
 - Otherwise, bind formal params to actual `argDefs` (`bindFunctionParameters` → `patternAwareTypeHandler`), snapshot outer-scope reaching defs, run `reachingDefAnalyzer.doAnalysis`, compare snapshots to mark side-effect frames.
 
 A `FunctionCallStack` and `FunctionCallCache` (`src/def-use/utils/`) bound recursion and (optionally) cache pure-call results.
+
+### Entry-point sweep
+
+`src/def-use/analyzers/entryPointAnalyzer.ts` (gated on
+`config.coverageAnalysis`, on by default).
+
+The main pass is driven by "execute the top-level script", so a function body is
+analyzed only if some modeled semantic actually calls it. Anything reachable
+*only* through an unmodeled callback — `MutationObserver`, a library's
+`.on("submit", fn)`, a hand-rolled dispatch table — was never entered. Measured
+on a 240KB script: 13 of 356 function scopes.
+
+After the root pass, the sweep re-enters every leftover CFG-eligible scope as a
+standalone entry point, binding formal parameters to fresh **untainted**
+`UnknownDef`s. Synthesizing attacker-controlled arguments for an arbitrary
+uncalled helper would invent an attack surface that may not exist, so the sweep
+contributes *reachability only* — taint still originates exclusively at modeled
+sources the function reads itself.
+
+The sweep is by far the most expensive phase (0.6s → 60s on that same script if
+left unbounded), so it runs under its own timer: `config.entrySweepBudgetRatio`
+(default 0.35) of the file's budget, capped by whatever is left of it. Swapping
+the timer rather than checking a deadline between scopes is what bounds a
+*single* expensive scope, since `interAnalyzer` consults the current timer on
+every call. Whatever the sweep drops is reported via a `[ENTRY-SWEEP]` warning
+rather than silently omitted.
 
 ### Feature analyzer
 

@@ -48,10 +48,27 @@ describe("TaintRuleEngine", () => {
     ]);
   });
 
-  it("default matrix: WEB_CONTENT × STORAGE_WRITE → (no flow)", () => {
-    // Original policy.ts deliberately left this commented out.
+  it("default matrix: WEB_CONTENT × STORAGE_WRITE → STORAGE_POSOING", () => {
+    // This pair used to be left out of the matrix entirely, because emitting
+    // it unconditionally is mostly noise: extensions legitimately cache page
+    // data in chrome.storage all the time.
+    //
+    // It is now a rule, and exploitability is decided one layer up by the
+    // privilege-delta gate (`src/taint/privilege.ts`), which drops the finding
+    // unless something actually reads the key back. Keeping the rule here and
+    // the judgement there is the point: the rule engine answers "is there a
+    // flow", the gate answers "does it matter".
     const engine = new TaintRuleEngine();
-    expect(engine.getFlowTypes("DOCUMENT_URL", "CHROME_LOCAL_STORAGE")).toEqual([]);
+    expect(engine.getFlowTypes("DOCUMENT_URL", "CHROME_LOCAL_STORAGE")).toEqual([
+      "STORAGE_POSOING",
+    ]);
+  });
+
+  it("web content × NETWORK_SEND is outside the restricted DATA_LEAK policy", () => {
+    // DATA_LEAK is intentionally limited to extension-sensitive sources and
+    // webpage-reachable message sinks; network sinks are not part of this run.
+    const engine = new TaintRuleEngine();
+    expect(engine.getFlowTypes("ELEMENT_VALUE", "FETCH_BODY")).toEqual([]);
   });
 
   it("navigator.* sources are suppressed for DATA_LEAK only", () => {
@@ -71,20 +88,38 @@ describe("TaintRuleEngine", () => {
     expect(engine.getFlowTypes("NAVIGATOR_USER_AGENT", "EVAL")).toEqual([]);
   });
 
-  it("default matrix: SENSITIVE_DATA / SYSTEM_INFO × NETWORK_SEND → DATA_LEAK", () => {
+  it("sensitive/system sources × NETWORK_SEND are outside the restricted DATA_LEAK policy", () => {
     const engine = new TaintRuleEngine();
-    // Cookie (SENSITIVE_DATA) → fetch body.
-    expect(
-      engine.getFlowTypes("CHROME_COOKIES_INFO", "FETCH_BODY"),
-    ).toContain("DATA_LEAK");
-    // chrome.system.cpu (SYSTEM_INFO) → fetch body — newly covered.
-    expect(engine.getFlowTypes("CHROME_SYSTEM_CPU", "FETCH_BODY")).toContain(
-      "DATA_LEAK",
-    );
-    // navigator.* is SYSTEM_INFO too, but its DATA_LEAK is carved out.
+    expect(engine.getFlowTypes("CHROME_COOKIES_INFO", "FETCH_BODY")).toEqual([]);
+    expect(engine.getFlowTypes("CHROME_SYSTEM_CPU", "FETCH_BODY")).toEqual([]);
     expect(engine.getFlowTypes("NAVIGATOR_USER_AGENT", "FETCH_BODY")).toEqual(
       [],
     );
+  });
+
+  it("storage DATA_LEAK rules target webpage-facing message sinks", () => {
+    const engine = new TaintRuleEngine();
+    expect(
+      engine.getFlowTypes("STORAGE_ALL_ITEMS", "WINDOW_POSTMESSAGE"),
+    ).toContain("DATA_LEAK");
+    expect(
+      engine.getFlowTypes("PSEUDO_STORAGE", "WINDOW_POSTMESSAGE"),
+    ).not.toContain("DATA_LEAK");
+    expect(
+      engine.getFlowTypes(
+        "PSEUDO_STORAGE",
+        "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+      ),
+    ).not.toContain("DATA_LEAK");
+    // Sending locally stored values to an arbitrary server is not the
+    // webpage-accessible extension channel this experiment targets.
+    expect(
+      engine.getFlowTypes("STORAGE_ALL_ITEMS", "FETCH_RESOURCE"),
+    ).not.toContain("DATA_LEAK");
+    expect(
+      engine.getFlowTypes("PSEUDO_STORAGE", "FETCH_BODY"),
+    ).not.toContain("DATA_LEAK");
+    expect(engine.getFlowTypes("CHROME_COOKIES_INFO", "FETCH_RESOURCE")).toEqual([]);
   });
 
   it("default matrix: sensitive/system data in a request HEADER is suppressed", () => {
@@ -170,10 +205,8 @@ describe("TaintRuleEngine", () => {
     engine.loadFromFile(file);
 
     // The default REQUEST_FORGERY rule no longer fires because the source is
-    // SENSITIVE_DATA (cookies), not ATTACKER_INPUT. The bundled
-    // `sensitive-data-network-send` rule contributes DATA_LEAK, and our layered
-    // user rule contributes a second DATA_LEAK record (all-match keeps both,
-    // deduped by (flowType, ruleId)). Confirm the user rule is present.
+    // SENSITIVE_DATA (cookies), not ATTACKER_INPUT. The layered user rule
+    // contributes DATA_LEAK and remains visible through the rule identifier.
     const cookieFlow = engine.matchFlowTypes(
       "CHROME_COOKIES_INFO",
       "FETCH_RESOURCE",

@@ -18,6 +18,20 @@ import { getFeasibleSuccessors } from "../utils/utils";
  *   `computeGenFromAST` / `evaluatePureExpressions` are skipped — those are
  *   the operations that mutate reaching defs and emit taint edges. The net
  *   effect: dead branches produce zero spurious taint propagation.
+ *
+ * Loops:
+ *   The CFG carries back edges, so a loop body is re-entered and loop-carried
+ *   dependencies (`prev = cur; cur = tainted[i]`) become observable.
+ *   Termination comes from the worklist's per-node visit budget
+ *   (`DEFAULT_MAX_NODE_VISITS`), which bounds the total number of transfer
+ *   calls at `budget x |nodes|`.
+ *
+ *   There is deliberately no "state stopped changing, stop propagating" early
+ *   exit here. Reaching-def state is a graph of mutable `Def` objects with no
+ *   cheap canonical form, so any such check is a heuristic — and a heuristic
+ *   that under-reports equality silently truncates loop iteration, turning a
+ *   soundness bug into a hard-to-spot false negative. The visit budget is
+ *   small enough (3) that always running it costs less than the risk.
  */
 export class ReachingDefinitionAnalyzer {
   public doAnalysis(scope: Scope) {
@@ -78,8 +92,5 @@ export class ReachingDefinitionAnalyzer {
     }
   }
 }
-
-
-
 
 export const reachingDefAnalyzer = new ReachingDefinitionAnalyzer();

@@ -43,6 +43,7 @@ ExPGuard is a multi-pass static analyzer specialised for Chrome Extensions. It t
    │       ├─ builtInAnalyzer      (bind globals / chrome.*)│
    │       ├─ functionDeclarationAnalyzer                  │
    │       ├─ reachingDefAnalyzer  (worklist on CFG)       │
+   │       ├─ entryPointAnalyzer  (sweep unreached scopes) │
    │       └─ exportAnalyzer       (track re-exports)      │
    │   7. taintManager records sources, propagation edges, │
    │      sinks, sanitizers in a per-file TaintContext     │
@@ -51,6 +52,7 @@ ExPGuard is a multi-pass static analyzer specialised for Chrome Extensions. It t
    ┌─────── TaintManager cross-context resolution ─────────┐
    │  - resolveStorageTaints (chrome.storage Set ↔ Get)    │
    │  - InterContextBridge (runtime/port message channels) │
+   │  - privilege-delta gate (is a boundary crossed?)      │
    │  - generateGlobalReport → report.txt + summary.json   │
    └───────────────────────────────────────────────────────┘
 ```
@@ -88,7 +90,8 @@ Frames inherit through `import` / `importScripts` / `chrome.runtime.getURL` / `c
 ## How data flows through the analyzer
 
 1. **`Def`** is the abstract value (`src/def-use/types/def.ts`). Variants: `ObjectDef`, `FunctionDef`, `LiteralDef`, `UnknownDef`, `BuiltInFunctionDef`, `PromiseDef`, `ImplicitDef`, `UndefinedDef`.
-2. **Reaching definition analysis** runs a forward worklist over each CFG. For each FlowNode, `computeGenFromAST` walks the AST sub-tree and emits new `Def`s; `evaluatePureExpressions` short-circuits pure subtrees.
+2. **Reaching definition analysis** runs a forward worklist over each CFG. For each FlowNode, `computeGenFromAST` walks the AST sub-tree and emits new `Def`s; `evaluatePureExpressions` short-circuits pure subtrees. The CFG is cyclic (loops carry back edges); termination comes from a per-node visit budget that doubles as the loop-unroll bound. See `docs/scope_def_use.md`.
+   After the root pass, an **entry-point sweep** re-enters function scopes the main pass never reached (callbacks handed to unmodeled APIs), under its own time budget.
 3. **Inter-procedural calls** are dispatched through `interAnalyzer.analyze(caller, callee, argDefs, thisDef, astNode)`:
    - Built-in functions (`BuiltInFunctionDef`) execute the semantic registered for their effect name (e.g. `"chrome.storage.local.set"`).
    - User functions get a new frame on the call stack; recursion / max-depth produce `UnknownDef` returns.

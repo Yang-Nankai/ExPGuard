@@ -294,9 +294,29 @@ export function getFeasibleSuccessors(node: FlowNode): FlowNode[] | null {
     "ForStatement",
   ];
 
+  // Loop guards need an asymmetric rule. The CFG has back edges and the
+  // worklist unrolls loops only a bounded number of times, so the analyzer can
+  // never *prove* that a guard which currently evaluates TRUE stays TRUE
+  // forever — the induction variable is usually not modeled precisely enough
+  // (`i++` is not constant-folded). Pruning the exit edge there would make
+  // every statement after the loop unreachable, silently dropping all its
+  // flows. Proving a guard FALSE is still sound: the loop body simply never
+  // runs.
+  const LOOP_PARENT_TYPES = [
+    "WhileStatement",
+    "DoWhileStatement",
+    "ForStatement",
+  ];
+
   if (parent && TEST_PARENT_TYPES.includes(parent.type) && parent.test === ast) {
     const t = evaluateBranchTruth(node, ast);
-    if (t === "TRUE" && node.true) return [node.true];
+    const isLoopGuard = LOOP_PARENT_TYPES.includes(parent.type);
+
+    if (t === "TRUE" && node.true) {
+      // Non-loop branch: the else-arm is genuinely dead.
+      // Loop guard: keep both edges live (see comment above).
+      return isLoopGuard ? null : [node.true];
+    }
     if (t === "FALSE" && node.false) return [node.false];
     return null;
   }

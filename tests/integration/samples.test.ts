@@ -53,6 +53,13 @@ describe("End-to-end taint detection over bundled samples", () => {
     expect(hasFlows).toBe(true);
     expect(flows.length).toBeGreaterThan(0);
 
+    // Both paths cross a browser permission boundary and exit to the caller.
+    expect(new Set(flows.map(f => f.sourceType))).toEqual(new Set([
+      "CHROME_COOKIES_INFO", "CHROME_HISTORY_INFO",
+    ]));
+    expect(flows.every(f => f.flowType === "DATA_LEAK" &&
+      f.sinkType === "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE")).toBe(true);
+
     // Every reported flow must be well-formed.
     for (const f of flows) {
       expect(typeof f.flowType).toBe("string");

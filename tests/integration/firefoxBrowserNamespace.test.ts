@@ -59,17 +59,19 @@ describe("Firefox browser.* namespace support", () => {
     taintRuleEngine.loadDefaults();
   });
 
-  it("browser.cookies.getAll → fetch body is a DATA_LEAK (browser.* aliased to chrome.*)", async () => {
+  it("browser.cookies.getAll → external response is DATA_LEAK; fetch is outside scope", async () => {
     const flows = await analyzeFixture("firefox_browser_ns", FIREFOX_ID);
     const leak = flows.find(
       (f) =>
         f.sourceType === "CHROME_COOKIES_INFO" &&
-        f.sinkType === "FETCH_BODY" &&
+        f.sinkType === "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE" &&
         f.flowType === "DATA_LEAK",
     );
     // If browser.* were not modeled, the source would fall back to UnknownDef
     // and taint would be dropped — no flow at all.
     expect(leak).toBeTruthy();
+    expect(flows.some(f => f.sourceType === "CHROME_COOKIES_INFO" &&
+      f.sinkType === "FETCH_BODY" && f.flowType === "DATA_LEAK")).toBe(false);
   });
 
   it("accepts a Firefox GUID extension ID without throwing", async () => {

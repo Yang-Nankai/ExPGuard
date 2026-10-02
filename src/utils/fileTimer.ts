@@ -12,10 +12,17 @@ export class FileTimer {
   private stopped: boolean = false;
   private timedOut: boolean = false; // quick check mark
 
-  constructor(filePath: string, fileSize: number) {
+  constructor(
+    filePath: string,
+    fileSize: number,
+    timeoutOverrideMs?: number,
+  ) {
     this.filePath = filePath;
     this.fileSize = fileSize;
-    this.timeoutMs = this.calculateTimeout(fileSize);
+    // An override lets a sub-phase run under a tighter budget than the file's
+    // own (see the entry-point sweep), so the deep analysis inside it — which
+    // only ever consults the *current* timer — yields at the right moment.
+    this.timeoutMs = timeoutOverrideMs ?? this.calculateTimeout(fileSize);
   }
 
   /**
@@ -135,9 +142,25 @@ export class FileTimerManager {
   /**
    * Set the current file timer
    */
-  static setCurrentTimer(filePath: string, fileSize: number): void {
-    this.currentTimer = new FileTimer(filePath, fileSize);
+  static setCurrentTimer(
+    filePath: string,
+    fileSize: number,
+    timeoutOverrideMs?: number,
+  ): void {
+    this.currentTimer = new FileTimer(filePath, fileSize, timeoutOverrideMs);
     this.currentTimer.start();
+  }
+
+  /**
+   * Install a previously captured timer instance without restarting it.
+   *
+   * Used to restore the file's own timer after a sub-phase ran under a
+   * tighter budget. Restarting would reset `startTs` and hand the file a
+   * fresh full budget, which is exactly what the per-file cap exists to
+   * prevent.
+   */
+  static restoreTimer(timer: FileTimer | null): void {
+    this.currentTimer = timer;
   }
 
   /**

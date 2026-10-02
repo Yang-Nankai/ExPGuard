@@ -104,8 +104,14 @@ function ControlFlowGraph(astNode: Node): CFGResult {
         .connect(getSuccessor(forNode), FlowNode.FALSE_BRANCH_CONNECTION_TYPE);
     }
 
+    // Back edge: `update` re-enters the test, closing the loop. Previously
+    // this jumped straight to the statement after the loop, which made every
+    // loop a straight-line, single-pass construct and lost every
+    // loop-carried dependency.
     if (forNode.update) {
-      forNode.update.cfg?.connect(getSuccessor(forNode));
+      forNode.update.cfg?.connect(
+        testCfg || bodyEntry || getSuccessor(forNode)
+      );
     }
 
     if (forNode.init) {
@@ -387,6 +393,31 @@ function ControlFlowGraph(astNode: Node): CFGResult {
     return parent && types.indexOf(parent.type) !== -1 ? parent : null;
   }
 
+  /**
+   * Where control goes when a loop body finishes an iteration — i.e. the
+   * target of the loop's back edge, and of `continue`.
+   *
+   * Returns null when the loop has no re-entry point that owns a FlowNode
+   * (`for (;;) { ... }` with neither test nor update). Callers then fall back
+   * to the loop's successor, which under-approximates that rare shape rather
+   * than risking unbounded recursion while the CFG is being built.
+   */
+  function getLoopContinueTarget(loop: any): FlowNode | null {
+    switch (loop.type) {
+      case "WhileStatement":
+      case "DoWhileStatement":
+        return loop.test?.cfg ?? null;
+      case "ForStatement":
+        return loop.update?.cfg ?? loop.test?.cfg ?? null;
+      case "ForInStatement":
+      case "ForOfStatement":
+        // The loop node itself models "advance the iterator and test".
+        return loop.cfg ?? null;
+      default:
+        return null;
+    }
+  }
+
   function getSuccessor(node: Node): FlowNode {
     if (!node) {
       return node;
@@ -399,6 +430,16 @@ function ControlFlowGraph(astNode: Node): CFGResult {
     const parent: any = node.cfg?.parent;
     if (!parent) {
       return exitNode;
+    }
+
+    // Loop back edge. Reaching the end of a loop *body* means starting the
+    // next iteration, not leaving the loop. The `parent.body === node` guard
+    // keeps this from firing for the loop's own init / test / update nodes
+    // (notably `UpdateExpression`, which is wired through `connectNext`) —
+    // those would otherwise form a self-loop.
+    if (CONTINUE_TARGETS.includes(parent.type) && parent.body === node) {
+      const backEdge = getLoopContinueTarget(parent);
+      if (backEdge) return backEdge;
     }
 
     switch (parent.type) {
@@ -430,9 +471,14 @@ function ControlFlowGraph(astNode: Node): CFGResult {
     switch (node.type) {
       case "BreakStatement":
         return getSuccessor(getJumpTarget(node, BREAK_TARGETS) ?? node);
-      case "ContinueStatement":
-        // directly jump out loop
-        return getSuccessor(getJumpTarget(node, CONTINUE_TARGETS) ?? node);
+      case "ContinueStatement": {
+        // `continue` re-enters the loop at its update / test node. It used to
+        // jump *out* of the loop, which silently turned every `continue` into
+        // a `break`.
+        const loop = getJumpTarget(node, CONTINUE_TARGETS);
+        const backEdge = loop ? getLoopContinueTarget(loop) : null;
+        return backEdge ?? getSuccessor(loop ?? node);
+      }
       case "BlockStatement":
       case "Program":
         return (node as Program).body.length

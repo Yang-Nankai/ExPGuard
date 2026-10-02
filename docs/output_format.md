@@ -161,15 +161,41 @@ HTML report metadata over the manifest's own `version` field.
       "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
       "severityEvidence": ["<all_urls>"],
 
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+
       "sourceCode": "...>>>event.data<<<...",
       "sinkCode": "...>>>chrome.storage.local.set({...})<<<..."
     },
     ...
+  ],
+  "privilegeSuppressedCount": 2,
+  "privilegeSuppressed": [
+    {
+      "flowType": "DATA_LEAK",
+      "sourceType": "ELEMENT_VALUE",
+      "sourceFile": "content",
+      "sourceLoc": "L1:C14 -> L1:C40",
+      "sinkType": "FETCH_BODY",
+      "sinkFile": "content",
+      "sinkLoc": "L2:C0 -> L5:C2",
+      "reason": "page-controlled data reaches NETWORK_SEND inside a content script; the page can perform this itself, so no authority is gained"
+    }
   ]
 }
 ```
 
-Fields are produced by `taintManager.getGlobalSummary()` (`src/taint/manager.ts:1473` → `_collectFlowsLite`). Flow records are deduplicated across files but always retain `messagePassing` / `storagePassing` flags so you can identify cross-context flows.
+Fields are produced by `taintManager.getGlobalSummary()` (`src/taint/manager.ts` → `_collectFlowsLite`). Flow records are deduplicated across files but always retain `messagePassing` / `storagePassing` flags so you can identify cross-context flows.
+
+### `privilegeCrossing` / `privilegeSuppressed`
+
+Every flow carries `privilegeCrossing` and `privilegeReason` from the
+privilege-delta gate (see [`taint_engine.md`](./taint_engine.md#privilege-delta)).
+With `config.privilegeDeltaFiltering` on (the default), flows that cross no
+boundary are moved out of `flows` and into `privilegeSuppressed` rather than
+being discarded — so tuning the privilege model never means re-running the
+analysis. Turn the flag off to keep everything in `flows`; the two fields are
+populated either way.
 
 ## `analysis.log`
 

@@ -1,0 +1,262 @@
+{
+  "metadata": {
+    "project": "DoubleX",
+    "browser": "chrome",
+    "scope": "single extension subset; original labels and flow indices retained"
+  },
+  "extensions": [
+    {
+      "extension_id": "inehghpkjjjdgpnagcbogckbonilnidc",
+      "extension_key": "inehghpkjjjdgpnagcbogckbonilnidc@8.0.8",
+      "name": "Degreed Extension",
+      "version": "8.0.8",
+      "rank": 381,
+      "manifest_version": 3,
+      "manifest_version_source": "unpacked/manifest.json",
+      "extension_directory": "inehghpkjjjdgpnagcbogckbonilnidc_8.0.8",
+      "on_disk": true,
+      "flow_count": 2,
+      "flows": [
+        {
+          "flow_id": "doublex:chrome:inehghpkjjjdgpnagcbogckbonilnidc:8.0.8:f5b827eca79c87d5:01",
+          "flow_index": 0,
+          "flow_order": 1,
+          "flow_label": "F001",
+          "semantic_sha256": "f5b827eca79c87d593fbec07c3e7b9f67a08743e42713f02fffe770ab11cd953",
+          "identity_occurrence": 1,
+          "source_report_id": 1,
+          "flow_type": "STORAGE_POISONING",
+          "rule_id": "doublex-edg-provenance",
+          "severity": "CRITICAL",
+          "source": {
+            "type": "WINDOW_MESSAGE_EVENT",
+            "remark": "DoubleX web-accessible message input",
+            "file": "background.js",
+            "loc": "L374",
+            "frame": "BG_1",
+            "frames": [
+              {
+                "id": "BG_1",
+                "family": "BG"
+              }
+            ],
+            "provenance": "BACKGROUND",
+            "origin_context": "background.js",
+            "origin_frame_family": "BG"
+          },
+          "sink": {
+            "type": "CHROME_SYNC_STORAGE",
+            "remark": "chrome.storage.sync.set",
+            "file": "background.js",
+            "loc": "L383",
+            "frame": "BG_1",
+            "frames": [
+              {
+                "id": "BG_1",
+                "family": "BG"
+              }
+            ],
+            "url_taint_control": null
+          },
+          "structural": {
+            "constraint_kind": null,
+            "privilege_crossing": false,
+            "message_passing": false,
+            "storage_passing": false,
+            "message_sender": null,
+            "message_sender_provenance": null,
+            "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+          },
+          "verification": "FP",
+          "dynamic": true,
+          "duplicate_of": null,
+          "is_duplicate": false,
+          "duplicate_reason": null,
+          "verification_source": [
+            "ExPAgent"
+          ],
+          "verification_evidence": {
+            "true_positive": [],
+            "false_positive": [
+              {
+                "tier": "doublex_dynamic",
+                "source": "ExPAgent",
+                "kind": "doublex_dynamic",
+                "verdict": "FP",
+                "confidence": 0.9,
+                "detail": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+                "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                "basis": "external_condition_required",
+                "report_path": "extensions/inehghpkjjjdgpnagcbogckbonilnidc_8.0.8/dynamic/dynamic_report.json"
+              }
+            ]
+          },
+          "verification_conflict": false,
+          "verification_resolution": "dynamic_confirmed",
+          "static": {
+            "verdict": "TRUE_POSITIVE",
+            "confidence": 0.6,
+            "report_disposition": "SUMMARY",
+            "representative_index": null,
+            "source_report_id": null,
+            "source_provenance": "",
+            "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of ExPGuard Flow #0 — STORAGE_POSOING via `chrome.storage.sync.set`\n\n### 1. Source reachability / attacker control\n\nThe reported source is `background.js` L374 with codeContext `request`. The raw source shows the actual enclosing construct is:\n\n```js\nchrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => { ... })\n```\n\nThis is a `runtime.onMessageExternal` listener — an external web-message input surface. The reported `L374` line numbers are slightly offset (L374 is a `sendResponse` inside the `GET_ACCESS_TOKEN` case), but the flow plainly corresponds to the `EVENT_SET_ACCESS_TOKEN` branch (L377–390), where `request.token` is consumed. The sink report's `codeContext` names `chrome.storage.sync.set`, which lands at L385 in the source (L383 in the report is the immediately preceding `const storageValue = {};` line). The mapping is unambiguous.\n\nWho can reach the source:\n- `externally_connectable.matches` = `[\"https://*.degreed.com/*\", \"https://*.degreed.app/*\"]`.\n- So an arbitrary page on the web **cannot** send this message, but a page under any subdomain of `degreed.com` / `degreed.app` can — including via XSS on one of those origins (or a su",
+            "path": "extensions/inehghpkjjjdgpnagcbogckbonilnidc_8.0.8/static/static_report.json"
+          },
+          "dynamic_detail": {
+            "outcome": "EXTERNAL_CONDITION_REQUIRED",
+            "final_verdict": "FALSE_POSITIVE",
+            "recorded_label": "FP",
+            "confidence": 0.9,
+            "reproduced": false,
+            "basis": "external_condition_required",
+            "usable_for_label": true,
+            "evidence_stage": null,
+            "evidence_artifact_count": 2,
+            "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+            "path": "extensions/inehghpkjjjdgpnagcbogckbonilnidc_8.0.8/dynamic/dynamic_report.json",
+            "report_mtime": "2026-08-21T05:05:40.969553Z"
+          },
+          "dynamic_run_evidence": null,
+          "expagent_final": null,
+          "manual_verification": null,
+          "reused_from": null,
+          "notes": [
+            "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+            "DoubleX dynamic outcome: EXTERNAL_CONDITION_REQUIRED; final_verdict=FALSE_POSITIVE."
+          ],
+          "snapshot_drift": null,
+          "data_availability": "extensions-dir+doublex-source+static+dynamic"
+        },
+        {
+          "flow_id": "doublex:chrome:inehghpkjjjdgpnagcbogckbonilnidc:8.0.8:af61a830f121db89:01",
+          "flow_index": 2,
+          "flow_order": 3,
+          "flow_label": "F003",
+          "semantic_sha256": "af61a830f121db89d8cf25ebc77b2a600fb7ae0bb35d708b5067d9f0309f45ab",
+          "identity_occurrence": 1,
+          "source_report_id": 3,
+          "flow_type": "DATA_LEAK",
+          "rule_id": "doublex-sensitive-api-egress",
+          "severity": "HIGH",
+          "source": {
+            "type": "STORAGE_ALL_ITEMS",
+            "remark": "chrome.storage.sync.get",
+            "file": "background.js",
+            "loc": "L391",
+            "frame": "BG_1",
+            "frames": [
+              {
+                "id": "BG_1",
+                "family": "BG"
+              }
+            ],
+            "provenance": "BACKGROUND",
+            "origin_context": "background.js",
+            "origin_frame_family": "BG"
+          },
+          "sink": {
+            "type": "WINDOW_POSTMESSAGE",
+            "remark": "result",
+            "file": "background.js",
+            "loc": "L392",
+            "frame": "BG_1",
+            "frames": [
+              {
+                "id": "BG_1",
+                "family": "BG"
+              }
+            ],
+            "url_taint_control": null
+          },
+          "structural": {
+            "constraint_kind": null,
+            "privilege_crossing": true,
+            "message_passing": false,
+            "storage_passing": false,
+            "message_sender": null,
+            "message_sender_provenance": null,
+            "privilege_reason": "Sensitive extension data is returned to a web-accessible channel."
+          },
+          "verification": "TP",
+          "dynamic": true,
+          "duplicate_of": null,
+          "is_duplicate": false,
+          "duplicate_reason": null,
+          "verification_source": [
+            "Manual"
+          ],
+          "verification_evidence": {
+            "true_positive": [
+              {
+                "tier": "doublex_chrome_r1_user_manual",
+                "source": "Manual",
+                "kind": "doublex_chrome_r1_user_manual",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "detail": "人工验证为 TP：受信 Degreed 页面可经外部消息处理链读取扩展凭据状态。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\inehghpkjjjdgpnagcbogckbonilnidc_8.0.8\\dynamic\\evidence\\flow-2\\manual\\manual_validation.json",
+                "report_sha256": "0a09a1ec47a5a08be76e900dcecc92f4a06442a85eb78638d457dbd78751129b"
+              }
+            ],
+            "false_positive": []
+          },
+          "verification_conflict": false,
+          "verification_resolution": "manual_override",
+          "static": {
+            "verdict": "UNCERTAIN",
+            "confidence": 0,
+            "report_disposition": "SUMMARY",
+            "representative_index": null,
+            "source_report_id": null,
+            "source_provenance": "",
+            "reasoning": "Verification error: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+            "path": "extensions/inehghpkjjjdgpnagcbogckbonilnidc_8.0.8/static/static_report.json"
+          },
+          "dynamic_detail": {
+            "outcome": "NOT_ATTEMPTED",
+            "final_verdict": "UNCERTAIN",
+            "recorded_label": null,
+            "confidence": 0,
+            "reproduced": false,
+            "basis": "runtime_or_static_dynamic_evidence",
+            "usable_for_label": false,
+            "evidence_stage": null,
+            "evidence_artifact_count": 2,
+            "reasoning": "No deterministic replay was possible for this flow.",
+            "path": "extensions/inehghpkjjjdgpnagcbogckbonilnidc_8.0.8/dynamic/dynamic_report.json",
+            "report_mtime": "2026-08-21T05:05:40.969553Z"
+          },
+          "dynamic_run_evidence": null,
+          "expagent_final": null,
+          "manual_verification": [
+            {
+              "source": "Manual",
+              "kind": "doublex_chrome_r1_user_manual",
+              "verification_origin": "user_manual_validation",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "validated_at": "2026-09-23T16:46:15.474420Z",
+              "notes": "人工验证为 TP：受信 Degreed 页面可经外部消息处理链读取扩展凭据状态。",
+              "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\inehghpkjjjdgpnagcbogckbonilnidc_8.0.8\\dynamic\\evidence\\flow-2\\manual\\manual_validation.json",
+              "report_artifact": {
+                "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\inehghpkjjjdgpnagcbogckbonilnidc_8.0.8\\dynamic\\evidence\\flow-2\\manual\\manual_validation.json",
+                "kind": "manual_validation.json",
+                "mtime": "2026-09-23T16:46:15.474420Z",
+                "sha256": "0a09a1ec47a5a08be76e900dcecc92f4a06442a85eb78638d457dbd78751129b"
+              }
+            }
+          ],
+          "reused_from": null,
+          "notes": [
+            "DoubleX static verdict snapshot: UNCERTAIN (informational; not promoted to TP/FP).",
+            "DoubleX dynamic outcome: NOT_ATTEMPTED; final_verdict=UNCERTAIN.",
+            "DoubleX Chrome r1 manual verdict: TP."
+          ],
+          "snapshot_drift": null,
+          "data_availability": "extensions-dir+doublex-source+static+dynamic"
+        }
+      ]
+    }
+  ]
+}

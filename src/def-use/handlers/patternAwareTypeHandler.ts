@@ -12,6 +12,8 @@ import { Identifier } from "acorn";
 import { taintManager as tm } from "../../taint";
 import { SinkType } from "../../taint";
 import logger from "../../utils/logger";
+import { interAnalyzer } from "../analyzers/interProceduralAnalyzer";
+import { IDB_SUCCESS_RESULT } from "../builtins/builtinSemantics/browser/indexedDb";
 
 /**
  * Element properties whose assignment parses the value as HTML. Writing a
@@ -34,6 +36,29 @@ export function patternAwareTypeHandler(
   if (!currentScope) return;
 
   const literalFallback = () => defFactory.createUnknownDef(cfgNode);
+
+  /**
+   * Fresh opaque value standing for "some part of `container`", linked to the
+   * container in the taint DAG.
+   *
+   * Used wherever a pattern cannot resolve a concrete property. Destructuring
+   * an opaque tainted value — `const { url } = msg`, the single most common
+   * shape in extension message handlers — must not drop the taint just because
+   * the container was never modeled as a concrete ObjectDef.
+   * `handleMemberExpression` already applies the same rule to `msg.url`.
+   * No-ops on untainted containers.
+   */
+  const deriveOpaqueChild = (
+    container: Def | null,
+    astNode: any,
+    remark: string,
+  ): Def => {
+    const child = literalFallback();
+    if (container && container.isTainted && container.uniqueId !== child.uniqueId) {
+      tm.propagateTaint(container, child, astNode, "ELEMENT", remark);
+    }
+    return child;
+  };
 
   // helper: create VarDef for an Identifier name using given def
   const createForIdentifier = (pattern: Identifier, def: Def | null) => {
@@ -64,7 +89,18 @@ export function patternAwareTypeHandler(
         const propDef = def.getProperty(keyName);
         c(property.value, propDef);
       } else {
-        c(property.value, literalFallback());
+        // The container could not be resolved to a concrete property (opaque
+        // `UnknownDef`, or an ObjectDef without that key). Destructuring must
+        // still carry the container's taint — `const { url } = msg` is the
+        // single most common shape in extension message handlers.
+        c(
+          property.value,
+          deriveOpaqueChild(
+            def,
+            property,
+            `destructure-property${keyName ? `[${keyName}]` : ""}`,
+          ),
+        );
       }
     },
     ArrayPattern: (pattern: any, def: Def | null, c: any) => {
@@ -73,13 +109,16 @@ export function patternAwareTypeHandler(
       for (let idx = 0; idx < pattern.elements.length; idx++) {
         const elem = pattern.elements[idx];
         if (!elem) continue; // hole
-        if (Def.isObjectDef(def)) {
-          const maybeDef = def.getProperty(idx.toString());
-          c(elem, maybeDef || literalFallback());
-        } else {
-          // not object/array-like => fallback
-          c(elem, literalFallback());
-        }
+        const maybeDef = Def.isObjectDef(def)
+          ? def.getProperty(idx.toString())
+          : null;
+        c(
+          elem,
+          maybeDef ||
+            // Same rationale as `Property`: an unresolved element of a tainted
+            // container stays tainted (`const [first] = msg.list`).
+            deriveOpaqueChild(def, elem, `destructure-element[${idx}]`),
+        );
       }
     },
     ObjectPattern: (pattern: any, def: Def | null, c: any) => {
@@ -174,13 +213,14 @@ export function patternAwareTypeHandler(
 
         let key: string | null = null;
         let dynamic = false;
+        let propDef: Def | null = null;
 
         if (!computed) {
           // a.b
           key = resolvePropName(cfgNode, propNode, false);
         } else {
           // a[b] 需要 expressionTypeHandler
-          const propDef = expressionTypeHandler(cfgNode, propNode);
+          propDef = expressionTypeHandler(cfgNode, propNode);
 
           if (Def.isLiteralDef(propDef)) {
             key = String(propDef.value);
@@ -191,6 +231,19 @@ export function patternAwareTypeHandler(
 
         // dynamic property -> use unknown
         if (dynamic) {
+          // A computed key is part of the serialized object just as much as
+          // its value.  `record[taintedDomain] = count` is the shape used by
+          // IndexedDB-backed browsing-history collectors; retaining taint only
+          // on `count` would lose the sensitive domain during JSON.stringify.
+          if (propDef?.isTainted) {
+            tm.propagateTaint(
+              propDef,
+              curObjDef,
+              propNode,
+              "ELEMENT",
+              "object.dynamic-key",
+            );
+          }
           if (isLast) {
             curObjDef.setUnknown(def || defFactory.createUnknownDef(cfgNode));
           } else {
@@ -221,6 +274,23 @@ export function patternAwareTypeHandler(
             key,
             def || defFactory.createUnknownDef(cfgNode),
           );
+
+          // IndexedDB requests deliver their result through an `onsuccess`
+          // callback.  The generic assignment model records the callback but
+          // never invokes it, which makes IDB-backed delayed uploads opaque.
+          // The IndexedDB semantic attaches a private result summary to its
+          // request object; invoke only that modeled callback with the usual
+          // `{ target: { result } }` shape.
+          if (key === "onsuccess" && def && Def.isFunctionDef(def)) {
+            const result = curObjDef.getProperty(IDB_SUCCESS_RESULT);
+            if (result) {
+              const target = defFactory.createObjectDef(cfgNode);
+              target.setProperty("result", result);
+              const event = defFactory.createObjectDef(cfgNode);
+              event.setProperty("target", target);
+              interAnalyzer.analyze(cfgNode, def, [event], null, propNode);
+            }
+          }
         } else {
           let next = curObjDef.getProperty(key);
 

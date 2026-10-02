@@ -81,11 +81,11 @@ describe("HTML report generation", () => {
   });
 
   it("renders each finding with classification and a propagation timeline", async () => {
-    const html = await buildHtml("sensitive_exfil_cookie_body");
+    const html = await buildHtml("firefox_browser_ns");
     // Flow classification badge + source/sink kinds.
     expect(html).toContain("Data Leak");
     expect(html).toContain("CHROME_COOKIES_INFO");
-    expect(html).toContain("FETCH_BODY");
+    expect(html).toContain("CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE");
     // Timeline scaffolding present.
     expect(html).toContain('class="timeline"');
     expect(html).toContain("Sanitized:");

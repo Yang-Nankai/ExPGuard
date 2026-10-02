@@ -13,6 +13,58 @@ createChromeBuiltinSemantics({
   createReturnDef: (callNode) => defFactory.createUnknownDef(callNode),
 });
 
+/**
+ * A tab-update event carries a browsing URL even though it is delivered by an
+ * event listener rather than a query API. Treat both `changeInfo.url` and the
+ * current `tab.url` as sensitive browser data: background scripts can observe
+ * them for every tab when the extension has the `tabs`/host permission.
+ */
+BuiltInSemantics.register(
+  "chrome.tabs.onUpdated.addListener",
+  (args, callNode, astNode) => {
+    const callback = args[0];
+    if (!Def.isFunctionDef(callback)) {
+      return defFactory.createUndefinedDef(callNode);
+    }
+
+    interAnalyzer.setCurrentSideEffects();
+
+    const tabId = defFactory.createUnknownDef(callNode);
+    const changeInfo = defFactory.createObjectDef(callNode);
+    const tab = defFactory.createObjectDef(callNode);
+    const changeUrl = defFactory.createUnknownDef(callNode);
+    const tabUrl = defFactory.createUnknownDef(callNode);
+
+    changeInfo.setProperty("url", changeUrl);
+    changeInfo.setProperty("status", defFactory.createLiteralDef(callNode, "loading"));
+    tab.setProperty("url", tabUrl);
+
+    taintManager.createTaintSource(
+      changeUrl,
+      "CHROME_TABS_ONUPDATED_URL",
+      astNode,
+      false,
+      "chrome.tabs.onUpdated[changeInfo.url]",
+    );
+    taintManager.createTaintSource(
+      tabUrl,
+      "CHROME_TABS_ONUPDATED_URL",
+      astNode,
+      false,
+      "chrome.tabs.onUpdated[tab.url]",
+    );
+
+    interAnalyzer.analyze(
+      callNode,
+      callback,
+      [tabId, changeInfo, tab],
+      null,
+      astNode,
+    );
+    return defFactory.createUndefinedDef(callNode);
+  },
+);
+
 createChromeBuiltinSemantics({
   apiName: "chrome.tabs.detectLanguage",
   callbackIndex: 1,

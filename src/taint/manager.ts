@@ -20,17 +20,32 @@ import config, { DEFAULT_REPORT_OPTIONS, ReportOptions } from "../config";
 import { Errors } from "../utils/errorCode";
 import { ExtensionScript } from "../extension/extensionScript";
 import {
+  classifySink,
+  classifySource,
   getFlowMatches,
   shouldFilterSourceByFrame,
   shouldIncludeScriptInPolicy,
 } from "./policy";
 import { analyzeFlowConstraintSeverity } from "./constraintSeverity";
+import { evaluatePrivilegeDelta } from "./privilege";
 import { fileTimerManager } from "../utils/fileTimer";
 import { scriptUsageTracker } from "../extension/scriptUsageTracker";
 
 /* ============================================================
  * Helpers
  * ============================================================ */
+
+/** A flow that matched a rule but crosses no privilege boundary. */
+export interface PrivilegeSuppressedFlow {
+  flowType: string;
+  sourceType: string;
+  sourceFile: string;
+  sourceLoc: string;
+  sinkType: string;
+  sinkFile: string;
+  sinkLoc: string;
+  reason: string;
+}
 
 /**
  * Build stable source key for deduplicating taint ids.
@@ -48,6 +63,75 @@ function buildSourceKey(
   return remark ? `${base}#${remark}` : base;
 }
 
+/**
+ * Exact-key storage reads are represented by a pseudo source until a matching
+ * in-extension write can be resolved. They still contain real persisted data,
+ * but should only be promoted to DATA_LEAK when the sink is page-reachable.
+ */
+function isPageReachableStorageMessageSink(
+  sinkType: SinkType,
+  sinkFrameFamily: string,
+): boolean {
+  if (sinkType === "WINDOW_POSTMESSAGE") {
+    // postMessage is a webpage channel here only when emitted by a content
+    // script; extension/background windows are not page-readable.
+    return sinkFrameFamily === "CS";
+  }
+
+  if (
+    sinkType !== "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE" &&
+    sinkType !== "CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE"
+  ) {
+    return false;
+  }
+
+  // External extension callers alone are not webpage exposure. Require the
+  // manifest to explicitly allow at least one web origin (or <all_urls>).
+  const matches = scriptUsageTracker.getExternallyConnectableConfig().matches;
+  return (
+    matches?.some(
+      (pattern) =>
+        pattern === "<all_urls>" || /^(?:https?|\*):\/\//i.test(pattern),
+    ) ?? false
+  );
+}
+
+const SENSITIVE_STORAGE_FIELD_PATTERN =
+  /(?:auth|token|secret|pass(?:word|wd)?|credential|cookie|session|jwt|oauth|api.?key|private.?key|(?:user|account|visitor|machine|device|browser|client).?id|email|phone|profile|identity)/i;
+
+function isSensitiveStoragePageEgress(
+  sourceType: SourceType,
+  sourceRemark: string | undefined,
+  sinkCode: string,
+): boolean {
+  if (sourceType === "PSEUDO_STORAGE") {
+    const key = sourceRemark?.match(/\.get\(['"]([^'"]+)['"]\)/i)?.[1];
+    return !!key && SENSITIVE_STORAGE_FIELD_PATTERN.test(key);
+  }
+
+  if (sourceType !== "STORAGE_ALL_ITEMS") return false;
+
+  // Dynamic storage keys are modeled as STORAGE_ALL_ITEMS only when the key
+  // is controlled by a web/extension-message source (see storage.ts).
+  if (sourceRemark?.startsWith("storage.dynamic.items[")) return true;
+
+  if (!sourceRemark?.startsWith("storage.all.items[")) return false;
+
+  // A get(null) source is broad, so keep it only when the webpage receives
+  // the whole result, indexes it dynamically, or the returned field is
+  // recognizably sensitive. This drops settings relays such as defaultSpeed.
+  const sendsWholeValue =
+    /\b(?:sendResponse|postMessage)\s*\(\s*(?:JSON\.stringify\s*\(\s*)?[A-Za-z_$][\w$]*\s*(?:\)|,)/i.test(
+      sinkCode,
+    );
+  const returnsDynamicField = /\[\s*[A-Za-z_$][\w$]*\s*\]/.test(sinkCode);
+  return (
+    sendsWholeValue ||
+    returnsDynamicField ||
+    SENSITIVE_STORAGE_FIELD_PATTERN.test(sinkCode)
+  );
+}
+
 /** ----------------------------------------
  * TaintManager
  * ---------------------------------------- */
@@ -60,11 +144,30 @@ export class TaintManager {
   private _storageSets: StorageSet[] = [];
   private _storageGets: StorageGet[] = [];
 
+  /**
+   * Areas read with an unresolved / wildcard key — `storage.local.get(null)`,
+   * `get(someComputedKey)`, or a `storage.onChanged` listener. Any of these
+   * can observe *any* key in that area, so they count as a consumer for every
+   * key. `"*"` means "every area".
+   */
+  private _storageWildcardReads: Set<string> = new Set();
+
+  /** Flows dropped by the privilege-delta gate during the last report run. */
+  private _suppressedByPrivilegeDelta: PrivilegeSuppressedFlow[] = [];
+
   // report options (can be changed at runtime)
   private _reportOptions: Required<ReportOptions> = {
     ...DEFAULT_REPORT_OPTIONS,
     ...(config.taintReportOptions ?? {}),
   };
+
+  private _getNodeText(ctx: TaintContext, node: Node | null): string | undefined {
+    if (!ctx || !node) return undefined;
+    const range = (node as any).range;
+    const code = ctx.script.getCode?.();
+    if (!code || !range || range.length < 2) return undefined;
+    return code.slice(range[0], range[1]);
+  }
 
   /* ============================================================
    * Context Management
@@ -137,6 +240,35 @@ export class TaintManager {
     });
 
     return taintId;
+  }
+
+  /**
+   * Record a read that can observe any key in `area` (`"*"` for any area).
+   *
+   * Used by `storage.<area>.get(null)`, gets whose key expression could not be
+   * resolved statically, and `storage.onChanged` listeners. Keeping these
+   * separate from `_storageGets` matters for `hasStorageConsumer`: a wildcard
+   * read must not be treated as a *specific* (area, key) round-trip, but it
+   * must still count as a consumer so storage-poisoning findings are not
+   * suppressed for extensions that read their storage generically.
+   */
+  recordStorageWildcardRead(area: string) {
+    this._storageWildcardReads.add(area);
+  }
+
+  /**
+   * Does anything in this extension read back `(area, key)`?
+   *
+   * A `chrome.storage` write that nothing ever reads cannot poison a later
+   * decision, so `STORAGE_POSOING` findings for such keys carry no privilege
+   * consequence. Conservative by construction: any wildcard read makes this
+   * true for every key in the area.
+   */
+  hasStorageConsumer(area: string, key: string): boolean {
+    if (this._storageWildcardReads.has("*")) return true;
+    if (this._storageWildcardReads.has(area)) return true;
+
+    return this._storageGets.some((g) => g.area === area && g.key === key);
   }
 
   /* ============================================================
@@ -348,6 +480,18 @@ export class TaintManager {
     return s ? [...s] : [];
   }
 
+  /** True only when this definition depends on input a webpage can control. */
+  hasPageControlledTaint(def: Def): boolean {
+    const ctx = this.current;
+    const ids = this.getDefTaintIds(def);
+    return ids.some((id) => {
+      const source = ctx.sources.find((s) => s.taintId === id);
+      if (!source) return false;
+      const capability = classifySource(source.sourceType);
+      return capability === "ATTACKER_INPUT" || capability === "WEB_CONTENT";
+    });
+  }
+
   /* ============================================================
    * Pseudo-Taint Resolution
    * ============================================================ */
@@ -408,6 +552,7 @@ export class TaintManager {
       );
 
       for (const setReq of matchingSets) {
+
         const senderCtx = this.getContext(setReq.contextFilename);
         if (!senderCtx) continue;
 
@@ -1317,6 +1462,9 @@ export class TaintManager {
     const flowSet = new Set<string>();
     const flowObjs: any[] = [];
 
+    // Reset per-run so repeated report calls don't accumulate duplicates.
+    this._suppressedByPrivilegeDelta = [];
+
     // Build a global defId → context index ONCE per report run. The old
     // `_findContextByDefId` walked every context for every sink, which is
     // O(N·M) and was the hottest cross-context lookup. The index reduces
@@ -1364,7 +1512,35 @@ export class TaintManager {
         const taintId = sink.taintId;
 
         const source = sourceByTaint.get(taintId);
-        if (!source || source.isPseudo) continue;
+        if (!source) continue;
+
+        const sinkFrame = scriptUsageTracker.getPrimaryFrameByKey(
+          ctx.filename,
+        );
+        const sinkFrameFamily =
+          scriptUsageTracker.getFrameFamily(sinkFrame);
+        const sinkCodeForGate = this._getNodeText(ctx, sink.astNode) ?? "";
+        const isStorageBackedSource =
+          source.sourceType === "PSEUDO_STORAGE" ||
+          source.sourceType === "STORAGE_ALL_ITEMS";
+        const isPageReachableStorageEgress =
+          isStorageBackedSource &&
+          isPageReachableStorageMessageSink(sink.sinkType, sinkFrameFamily);
+        const isSensitivePageStorageEgress =
+          isPageReachableStorageEgress &&
+          isSensitiveStoragePageEgress(
+            source.sourceType,
+            source.remark,
+            sinkCodeForGate,
+          );
+        if (
+          isStorageBackedSource &&
+          classifySink(sink.sinkType) === "MESSAGE_RESPONSE" &&
+          !isSensitivePageStorageEgress
+        ) {
+          continue;
+        }
+        if (source.isPseudo && !isSensitivePageStorageEgress) continue;
 
         // The rule engine may return multiple FlowTypes for the same
         // (source, sink) pair — e.g. cookies → fetch.body matching both a
@@ -1407,9 +1583,6 @@ export class TaintManager {
             scriptUsageTracker.getFrameConstraint(sourceFrame);
           const sourceFrames =
             scriptUsageTracker.getScriptFrameDescriptorsByKey(sourceFile);
-          const sinkFrame = scriptUsageTracker.getPrimaryFrameByKey(
-            ctx.filename,
-          );
           const sinkFrameConstraint =
             scriptUsageTracker.getFrameConstraint(sinkFrame);
           const sinkFrames = scriptUsageTracker.getScriptFrameDescriptorsByKey(
@@ -1434,12 +1607,50 @@ export class TaintManager {
             continue;
           }
 
+          // Privilege-delta gate: a matched (source, sink) pair is only a
+          // finding when the sink grants authority the data's origin lacked.
+          // See `src/taint/privilege.ts`.
+          const privilege = evaluatePrivilegeDelta({
+            sourceProvenance: source.provenance,
+            sourceType: source.sourceType,
+            sinkType: sink.sinkType,
+            sourceFrame,
+            sinkFrame,
+            sourceFrameFamily:
+              scriptUsageTracker.getFrameFamily(sourceFrame),
+            sinkFrameFamily: scriptUsageTracker.getFrameFamily(sinkFrame),
+            flowType,
+            sinkRemark: sink.remark,
+            hasStorageConsumer: (a, k) => this.hasStorageConsumer(a, k),
+            pageContextFiltering: config.pageContextFiltering,
+          });
+
+          if (!privilege.crosses) {
+            this._suppressedByPrivilegeDelta.push({
+              flowType,
+              sourceType: source.sourceType,
+              sourceFile,
+              sourceLoc,
+              sinkType: sink.sinkType,
+              sinkFile: ctx.filename,
+              sinkLoc,
+              reason: privilege.reason,
+            });
+
+            logger.debug(
+              `[PRIVILEGE-DELTA] dropped ${flowType} ${source.sourceType} -> ${sink.sinkType} (${sinkLoc}): ${privilege.reason}`,
+            );
+
+            if (config.privilegeDeltaFiltering) continue;
+          }
+
           const flowObj: any = {
             flowType,
             ruleId: match.ruleId,
             ruleDescription: match.ruleDescription,
             sourceType: source.sourceType,
             sourceRemark: source.remark,
+            sinkCode: this._getNodeText(ctx, sink.astNode),
             sourceFile,
             sourceFrame,
             sourceFrameConstraint,
@@ -1464,6 +1675,11 @@ export class TaintManager {
             severity: constraintSeverity.severity,
             severityReason: constraintSeverity.severityReason,
             severityEvidence: constraintSeverity.severityEvidence,
+
+            // Present on every flow so a consumer can triage by exploitability
+            // even when `privilegeDeltaFiltering` is turned off.
+            privilegeCrossing: privilege.crosses,
+            privilegeReason: privilege.reason,
           };
 
           // Optionally attach source code snippet
@@ -1547,10 +1763,30 @@ export class TaintManager {
       }
     }
 
+    const suppressed = this.getPrivilegeSuppressedFlows();
+    if (suppressed.length > 0) {
+      logger.info(
+        `Suppressed ${suppressed.length} flow(s) that cross no privilege boundary ` +
+          `(set config.privilegeDeltaFiltering = false to include them).`,
+      );
+    }
+
     return {
       hasFlows: flows.length > 0,
       flows,
+      // Never silently discarded: the dropped findings stay available for
+      // audit / tuning of the privilege model.
+      privilegeSuppressedCount: suppressed.length,
+      privilegeSuppressed: suppressed,
     };
+  }
+
+  /**
+   * Flows that matched a rule but were dropped because no privilege boundary
+   * was crossed. Populated by the most recent `_collectFlowsLite()` run.
+   */
+  getPrivilegeSuppressedFlows(): PrivilegeSuppressedFlow[] {
+    return [...this._suppressedByPrivilegeDelta];
   }
 
   /* =======================
@@ -1574,6 +1810,9 @@ export class TaintManager {
     this._currentContext = null;
     this._bridges.clear();
     this._resolvedBridgePairs.clear();
+    this._storageSets = [];
+    this._storageGets = [];
+    this._storageWildcardReads.clear();
     taintGenerator.reset();
   }
 }

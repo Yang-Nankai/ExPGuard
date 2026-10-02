@@ -54,65 +54,31 @@ async function analyze(
 describe("Custom taint rule end-to-end", () => {
   jest.setTimeout(60_000);
 
-  it("default rules: cookies → fetch body IS now reported as DATA_LEAK", async () => {
+  it("default rules report permission-gated cookies through an external response", async () => {
     const flows = await analyze("data_leak");
-    const cookieFetchLeak = flows.find(
-      (f) =>
-        f.sourceType === "CHROME_COOKIES_INFO" &&
-        (f.sinkType === "FETCH_BODY" ||
-          f.sinkType === "FETCH_RESOURCE" ||
-          f.sinkType === "FETCH_OPTIONS") &&
-        f.flowType === "DATA_LEAK",
-    );
-    expect(cookieFetchLeak).toBeTruthy();
-    expect(cookieFetchLeak!.ruleId).toBe("sensitive-data-network-send");
+    const cookieLeak = flows.find(f => f.sourceType === "CHROME_COOKIES_INFO" &&
+      f.sinkType === "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE" && f.flowType === "DATA_LEAK");
+    expect(cookieLeak).toBeTruthy();
+    expect(cookieLeak!.ruleId).toBe("sensitive-data-message-egress");
   });
 
-  it("custom suppress rule can turn the sensitive-data-network-send flow off", async () => {
+  it("custom suppress rule removes cookie responses while preserving history responses", async () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "epg-custom-rules-"));
     const rulesPath = path.join(tmp, "rules.json");
-    fs.writeFileSync(
-      rulesPath,
-      JSON.stringify({
-        version: 1,
-        rules: [],
-        suppress: [
-          {
-            id: "user-suppress-cookie-network",
-            description: "This deployment treats cookies → network as benign.",
-            flowType: "DATA_LEAK",
-            match: {
-              sourceType: "CHROME_COOKIES_INFO",
-              sinkCapability: "NETWORK_SEND",
-            },
-          },
-        ],
-      }),
-      "utf-8",
-    );
-
-    const flows = await analyze("data_leak", rulesPath);
-
-    // The cookie → fetch flow is now suppressed by the user rule.
-    const cookieFetchLeak = flows.find(
-      (f) =>
-        f.sourceType === "CHROME_COOKIES_INFO" &&
-        f.flowType === "DATA_LEAK" &&
-        (f.sinkType === "FETCH_BODY" ||
-          f.sinkType === "FETCH_RESOURCE" ||
-          f.sinkType === "FETCH_OPTIONS"),
-    );
-    expect(cookieFetchLeak).toBeUndefined();
-
-    // Other DATA_LEAK flows (history → external message) are untouched.
-    const externalLeak = flows.find(
-      (f) =>
-        f.flowType === "DATA_LEAK" &&
-        f.sinkType === "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
-    );
-    expect(externalLeak).toBeTruthy();
-
-    fs.rmSync(tmp, { recursive: true, force: true });
+    try {
+      fs.writeFileSync(rulesPath, JSON.stringify({
+        version: 1, rules: [], suppress: [{
+          id: "user-suppress-cookie-response", flowType: "DATA_LEAK",
+          match: { sourceType: "CHROME_COOKIES_INFO", sinkCapability: "MESSAGE_RESPONSE" },
+        }],
+      }), "utf-8");
+      const flows = await analyze("data_leak", rulesPath);
+      expect(flows.some(f => f.sourceType === "CHROME_COOKIES_INFO" && f.flowType === "DATA_LEAK")).toBe(false);
+      expect(flows.some(f => f.sourceType === "CHROME_HISTORY_INFO" &&
+        f.sinkType === "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE" && f.flowType === "DATA_LEAK")).toBe(true);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
   });
 
   afterAll(() => {

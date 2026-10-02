@@ -1,7 +1,7 @@
 # ExPGuard: Extension Privilege Guard
 
 
-ExPGuard is a comprehensive static analysis framework built for Chrome **and Firefox** extensions to detect privacy leaks and security vulnerabilities. By building precise execution models and analyzing data flows, ExPGuard tracks sensitive information propagation across extension scripts and pages. Firefox add-ons (`.xpi`) are supported with the same detection engine: the `browser.*` WebExtension namespace is modeled as an alias of `chrome.*`, so source/sink coverage is identical across both browsers.
+ExPGuard is a comprehensive static analysis framework built for **Chrome, Edge, and Firefox** extensions to detect privacy leaks and security vulnerabilities. By building precise execution models and analyzing data flows, ExPGuard tracks sensitive information propagation across extension scripts and pages. Firefox add-ons (`.xpi`) are supported with the same detection engine: the `browser.*` WebExtension namespace is modeled as an alias of `chrome.*`, so source/sink coverage is identical across both browsers.
 
 ## Features
 
@@ -105,16 +105,41 @@ In-depth component-level docs live under [`docs/`](./docs):
 - [`docs/output_format.md`](./docs/output_format.md) - `report.txt` and `summary.json` reference
 - [`docs/samples_guide.md`](./docs/samples_guide.md) - what each sample under `samples/` exercises plus verified baseline flow counts
 
-## Test samples
+## Paper vulnerability classes and samples
 
-| Sample | Detector class | Run with `--input` |
-|--------|----------------|---------------------|
-| `samples/privilege_execution/` | PRIVILEGE_ESCALATION + STORAGE_POSOING via `chrome.runtime.sendMessage` + `chrome.storage.local` | `./samples/privilege_execution/` |
-| `samples/code_injection/` (CRX) | CODE_INJECTION via `setTimeout(string)` | (use `--type=CRX --input=./samples/code_injection/example.crx --id=caofmekclcabakldafkjbfkkmcebndal`) |
-| `samples/data_leak/` | DATA_LEAK + REQUEST_FORGERY via `chrome.cookies` / `chrome.history` -> `fetch` / `onMessageExternal` | `./samples/data_leak/` |
-| `samples/storage_poisoning/` | STORAGE_POSOING + PRIVILEGE_ESCALATION via `WINDOW_CUSTOM_EVENT` -> `chrome.storage.sync` -> `chrome.tabs.*` | `./samples/storage_poisoning/` |
-| `samples/request_forgery/` | REQUEST_FORGERY via `onMessageExternal` -> `fetch` / XHR / WebSocket / axios; sanitiser demo via `crypto.subtle.digest` | `./samples/request_forgery/` |
-| `samples/dom_xss/` | CODE_INJECTION via `location.hash` / `postMessage` / `element.value` / custom events | `./samples/dom_xss/` |
-| `samples/multi_channel/` | DATA_LEAK + PRIVILEGE_ESCALATION + REQUEST_FORGERY via `runtime.connect` / `onConnectExternal` / `pageCapture`; demonstrates `chrome.runtime.getURL` frame propagation to `helper.js` | `./samples/multi_channel/` |
+| Paper class | Report identifier | Sample |
+| --- | --- | --- |
+| Privilege Execution | `PRIVILEGE_ESCALATION` | `samples/privilege_execution/` |
+| Storage Poisoning | `STORAGE_POSOING` | `samples/storage_poisoning/` |
+| Request Forgery | `REQUEST_FORGERY` | `samples/request_forgery/` |
+| Data Leak | `DATA_LEAK` | `samples/data_leak/` |
 
-Each new sample is exercised by the same CLI invocation as the existing examples; just swap `--input` and adjust `--out`. See [`docs/samples_guide.md`](./docs/samples_guide.md) for the expected flow set per sample.
+The historical `STORAGE_POSOING` spelling is retained for compatibility.
+Data Leak requires sensitive browser or extension data to reach an
+attacker-observable output. The data leakage sample returns permission-gated
+cookies and history through an externally connectable response. Outbound
+network disclosure and DOM XSS are outside the paper's four-class evaluation.
+The engine retains legacy code/DOM rules and regression fixtures separately.
+
+```sh
+npm run build
+node scripts/verify_data_leak.cjs
+```
+
+The sample verifier invokes ExPGuard, saves its original report, and checks
+asynchronous responses with synthetic API mocks. These mocks do not constitute
+a browser exploit reproduction. See [the sample README](samples/data_leak/README.md)
+and [the samples guide](docs/samples_guide.md).
+
+## Manually validated dataset
+
+[datasets/](datasets/README.md) contains the initial requested subset of the
+paper's reference dataset: five confirmed MV3 Chrome extension instances,
+their unpacked source, available DoubleX/CoCo/ExPGuard-Opti report folders,
+original adjudication labels, selection decisions and SHA-256 hashes.
+Missing upstream reports are explicitly marked; absence is not a negative
+scan result. This subset is not the complete 337-extension reference set.
+
+```sh
+python scripts/build_paper_dataset.py --verify
+```
