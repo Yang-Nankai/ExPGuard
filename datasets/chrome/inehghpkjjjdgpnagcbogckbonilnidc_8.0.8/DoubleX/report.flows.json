@@ -1,0 +1,412 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L374",
+      "sourceCode": "request",
+      "sinkType": "CHROME_SYNC_STORAGE",
+      "sinkRemark": "chrome.storage.sync.set",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L383",
+      "sinkCode": "chrome.storage.sync.set(<pdg_js.node.ValueExpr object at 0x000001C43E78C310>, <pdg_js.node.FunctionExpression object at 0x000001C43E78C340>)",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": null,
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L374",
+      "sourceCode": "request",
+      "sinkType": "CHROME_SYNC_STORAGE",
+      "sinkRemark": "chrome.storage.sync.set",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L413",
+      "sinkCode": "chrome.storage.sync.set({'BEARER_ACCESS_TOKEN': None}, <pdg_js.node.FunctionExpression object at 0x000001C43E78DED0>)",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": null,
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    },
+    {
+      "flowType": "DATA_LEAK",
+      "ruleId": "doublex-sensitive-api-egress",
+      "ruleDescription": "DoubleX detected permission-gated data sent to a web-accessible channel.",
+      "sourceType": "STORAGE_ALL_ITEMS",
+      "sourceRemark": "chrome.storage.sync.get",
+      "sourceFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L391",
+      "sourceCode": "chrome.storage.sync.get(dgServiceHost, <pdg_js.node.FunctionExpression object at 0x000001C43E78C790>)",
+      "sinkType": "WINDOW_POSTMESSAGE",
+      "sinkRemark": "result",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L392",
+      "sinkCode": "result",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": "window.postMessage",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": true,
+      "privilegeReason": "Sensitive extension data is returned to a web-accessible channel.",
+      "doublexCategory": "exfiltration_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "cs:direct_dangers:danger1",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setInterval",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/content_scripts.js",
+      "sinkLoc": "L309",
+      "legacy": {
+        "danger": "setInterval",
+        "value": "setInterval(<pdg_js.node.FunctionExpression object at 0x000001C43E192320>, 500)",
+        "sink-param1": "() => {\r\n\t\t\t\tif (currentUrl !== location.href) {\r\n\t\t\t\t\t// Reset the current URL for next checks\r\n\t\t\t\t\tcurrentUrl = location.href;\r\n\t\t\t\t\t// ...and respond to the change detection:\r\n\t\t\t\t\tthis.onUrlChange(postMessaging);\r\n\t\t\t\t}\r\n\t\t\t}",
+        "sink-param2": 500,
+        "line": "309 - 316",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger2",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/content_scripts.js",
+      "sinkLoc": "L329",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x000001C43E1928C0>, 1000)",
+        "sink-param1": "() => {\r\n\t\t\t\tconst isUpdate = true;\r\n\t\t\t\tthis.pullContentFromBase();\r\n\t\t\t\tpostMessaging(isUpdate);\r\n\t\t\t}",
+        "sink-param2": 1000,
+        "line": "329 - 333",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:exfiltration_dangers:danger1",
+      "component": "cs",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/content_scripts.js",
+      "sinkLoc": "L602",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(<pdg_js.node.ValueExpr object at 0x000001C43E2E28C0>, <pdg_js.node.FunctionExpression object at 0x000001C43E2E28F0>)",
+        "sink-param1": "['dgServiceHost']",
+        "sink-param2": "function(result) {\r\n\t\t\t\tdgServiceHost = result.dgServiceHost;\r\n\t\t\t\tconst pdfPageUrl = `${dgServiceHost}/degreed-button/pdf?referer=${location.href}`;\r\n\t\t\t\t// Switch to our proxy pdf page so the extension can work within it\r\n\t\t\t\tlocation.replace(pdfPageUrl);\r\n\t\t\t}",
+        "line": "602 - 607",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkLoc": "L192",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x000001C43E6172B0>, 150)",
+        "sink-param1": "() => {\r\n\t\t\t\tconfirmPDFRedirect(interval, callback);\r\n\t\t\t}",
+        "sink-param2": 150,
+        "line": "192 - 194",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger2",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkLoc": "L132",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x000001C43E614CA0>, timertimer)",
+        "sink-param1": "function() {\r\n\t\t\t\t\tlongPollNotifications(timer);\r\n\t\t\t\t}",
+        "sink-param2": "timertimer",
+        "line": "132 - 134",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger3",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkLoc": "L149",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x000001C43E615780>, timer)",
+        "sink-param1": "function() {\r\n\t\t\t\t\t\t\tlongPollNotifications(timer * 10);\r\n\t\t\t\t\t\t}",
+        "sink-param2": "timer",
+        "line": "149 - 151",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger4",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkLoc": "L161",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x000001C43E615F90>, timer)",
+        "sink-param1": "function() {\r\n\t\t\t\t\t\tlongPollNotifications(timer);\r\n\t\t\t\t\t}",
+        "sink-param2": "timer",
+        "line": "161 - 163",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger5",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_SYNC_STORAGE",
+      "sinkRemark": "chrome.storage.sync.set",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkLoc": "L113",
+      "legacy": {
+        "danger": "chrome.storage.sync.set",
+        "value": "chrome.storage.sync.set(<pdg_js.node.ValueExpr object at 0x000001C43E4AFD90>)",
+        "sink-param1": "{\r\n\t\tBadgeCount: badgeText,\r\n\t}",
+        "line": "113 - 115",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger6",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_SYNC_STORAGE",
+      "sinkRemark": "chrome.storage.sync.set",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkLoc": "L383",
+      "legacy": {
+        "danger": "chrome.storage.sync.set",
+        "value": "chrome.storage.sync.set(<pdg_js.node.ValueExpr object at 0x000001C43E78C310>, <pdg_js.node.FunctionExpression object at 0x000001C43E78C340>)",
+        "sink-param1": "{\r\n\t\t\t\tdgServiceHost: dgServiceHost + localPort\r\n\t\t\t}",
+        "sink-param2": "function() {\r\n\t\t\t\tsendResponse(true);\r\n\t\t\t}",
+        "line": "383 - 387",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "request",
+            "line": "374 - 374",
+            "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+            "where": "request"
+          }
+        },
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger7",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_SYNC_STORAGE",
+      "sinkRemark": "chrome.storage.sync.set",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkLoc": "L413",
+      "legacy": {
+        "danger": "chrome.storage.sync.set",
+        "value": "chrome.storage.sync.set({'BEARER_ACCESS_TOKEN': None}, <pdg_js.node.FunctionExpression object at 0x000001C43E78DED0>)",
+        "sink-param1": {
+          "BEARER_ACCESS_TOKEN": null
+        },
+        "sink-param2": "function() {\r\n\t\t\t\tlongPollNotifications(null);\r\n\t\t\t\tsendResponse(true);\r\n\t\t\t}",
+        "line": "413 - 416",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "request",
+            "line": "374 - 374",
+            "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+            "where": "request"
+          }
+        },
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkLoc": "L173",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(degreed_bearer_access, <pdg_js.node.FunctionExpression object at 0x000001C43E616470>)",
+        "sink-param1": "degreed_bearer_access",
+        "sink-param2": "function(storage) {\r\n\t\tif (storage && storage[TOKEN_KEY]) {\r\n\t\t\taccessToken = storage[TOKEN_KEY];\r\n\t\t}\r\n\t\tif (typeof callback === 'function') {\r\n\t\t\tcallback(storage);\r\n\t\t}\r\n\t}",
+        "line": "173 - 180",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger2",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkLoc": "L125",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(<pdg_js.node.ValueExpr object at 0x000001C43E6145B0>, <pdg_js.node.FunctionExpression object at 0x000001C43E6145E0>)",
+        "sink-param1": "['dgServiceHost']",
+        "sink-param2": "function(result) {\r\n\t\tdgServiceHost = result.dgServiceHost;\r\n\t}",
+        "line": "125 - 127",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger3",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkLoc": "L98",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(BadgeCount, <pdg_js.node.FunctionExpression object at 0x000001C43E4AF400>)",
+        "sink-param1": "BadgeCount",
+        "sink-param2": "function(data) {\r\n\t\tif (typeof callback === 'function' && data.BadgeCount) {\r\n\t\t\tcallback(data.BadgeCount);\r\n\t\t}\r\n\t}",
+        "line": "98 - 102",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger4",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": true,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkLoc": "L391",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(dgServiceHost, <pdg_js.node.FunctionExpression object at 0x000001C43E78C790>)",
+        "sink-param1": "dgServiceHost",
+        "sink-param2": "function(result) {\r\n\t\t\t\tsendResponse(result);\r\n\t\t\t}",
+        "line": "391 - 393",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+        "dataflow": true,
+        "sent_to_wa_1": {
+          "wa": "result",
+          "line": "392 - 392",
+          "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+          "where": "result"
+        }
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger5",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkLoc": "L401",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(degreed_bearer_access, <pdg_js.node.FunctionExpression object at 0x000001C43E78CEE0>)",
+        "sink-param1": "degreed_bearer_access",
+        "sink-param2": "function(result) {\r\n\t\t\t\tsendResponse((result === null || result === void 0 ? void 0 : result[BEARER_ACCESS_TOKEN]) || '');\r\n\t\t\t}",
+        "line": "401 - 403",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger6",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "../../../doublex_bundle_xprtdhnj/background.js",
+      "sinkLoc": "L436",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(<pdg_js.node.ValueExpr object at 0x000001C43E78EBC0>, <pdg_js.node.FunctionExpression object at 0x000001C43E78EBF0>)",
+        "sink-param1": "['dgServiceHost']",
+        "sink-param2": "function(result) {\r\n\t\tconsole.log('dgServiceHost', result);\r\n\t}",
+        "line": "436 - 438",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_xprtdhnj\\background.js",
+        "dataflow": false
+      }
+    }
+  ]
+}

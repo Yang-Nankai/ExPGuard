@@ -136,13 +136,8 @@ and [the samples guide](docs/samples_guide.md).
 
 ## Manually validated dataset
 
-[datasets/](datasets/README.md) contains the initial requested subset of the
-paper's reference dataset: five confirmed MV3 Chrome extension instances,
-their source, available DoubleX/CoCo/ExPGuard report folders, selection
-decisions and SHA-256 hashes.
-Missing upstream reports are explicitly marked; absence is not a negative
-scan result. This subset is not the complete 337-extension reference set.
-
-```sh
-python scripts/build_paper_dataset.py --verify
-```
+[datasets/](datasets/) contains five confirmed MV3 Chrome extension instances.
+Each extension directory includes the unpacked source and the scan reports
+produced by ExPGuard, CoCo, and DoubleX. The `chrome`, `edge`, and `firefox`
+directories are kept separate so additional platform instances can be added
+without changing the layout.
