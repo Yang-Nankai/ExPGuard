@@ -56,8 +56,12 @@ async function main() {
     }
     assert.equal(listener({ kind: 'UNKNOWN' }, {}, () => assert.fail('Unexpected response')), undefined);
     fs.mkdirSync(evidence, { recursive: true });
-    for (const name of ['summary.json', 'report.txt']) {
-      fs.copyFileSync(path.join(out, name), path.join(evidence, name));
+    for (const [name, candidates] of Object.entries({
+      'summary.json': ['summary.json'],
+      'report.txt': ['report.txt', 'report.source.md', 'report.flows.json'],
+    })) {
+      const source = candidates.map(candidate => path.join(out, candidate)).find(candidate => fs.existsSync(candidate));
+      if (source) fs.copyFileSync(source, path.join(evidence, name));
     }
     fs.writeFileSync(path.join(evidence, 'synthetic-runtime.json'), JSON.stringify({
       mode: 'Node.js VM with asynchronous synthetic Chrome API mocks; not a browser reproduction',

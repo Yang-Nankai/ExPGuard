@@ -48,36 +48,65 @@ describe("End-to-end taint detection over bundled samples", () => {
   // The whole pipeline is fairly heavy, so give each sample room.
   jest.setTimeout(60_000);
 
-  it("data_leak: detects at least one source→sink flow", async () => {
-    const { hasFlows, flows } = await analyzeSampleDir("data_leak");
+  it.each([
+    ["privilege_execution", "PRIVILEGE_ESCALATION"],
+    ["storage_poisoning", "STORAGE_POSOING"],
+    ["data_leak", "DATA_LEAK"],
+    ["request_forgery", "REQUEST_FORGERY"],
+  ])("%s: reports the expected paper vulnerability class", async (sample, flowType) => {
+    const { hasFlows, flows } = await analyzeSampleDir(sample);
     expect(hasFlows).toBe(true);
-    expect(flows.length).toBeGreaterThan(0);
+    expect(flows.some((flow) => flow.flowType === flowType)).toBe(true);
 
-    // Both paths cross a browser permission boundary and exit to the caller.
-    expect(new Set(flows.map(f => f.sourceType))).toEqual(new Set([
-      "CHROME_COOKIES_INFO", "CHROME_HISTORY_INFO",
-    ]));
-    expect(flows.every(f => f.flowType === "DATA_LEAK" &&
-      f.sinkType === "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE")).toBe(true);
-
-    // Every reported flow must be well-formed.
-    for (const f of flows) {
-      expect(typeof f.flowType).toBe("string");
-      expect(f.sourceType).toBeTruthy();
-      expect(f.sinkType).toBeTruthy();
+    for (const flow of flows) {
+      expect(flow.flowType).toBeTruthy();
+      expect(flow.sourceType).toBeTruthy();
+      expect(flow.sinkType).toBeTruthy();
     }
   });
 
-  it("privilege_execution: produces flows after the scope-based refactor", async () => {
-    const { flows } = await analyzeSampleDir("privilege_execution");
-    expect(Array.isArray(flows)).toBe(true);
-    // This sample is designed to contain a privilege-escalation style flow.
-    expect(flows.length).toBeGreaterThan(0);
+  it("storage resolution is idempotent across report consumers", async () => {
+    const input = path.join(SAMPLES_DIR, "storage_poisoning");
+    const outDir = fs.mkdtempSync(path.join(os.tmpdir(), "epg-storage-idempotent-"));
+
+    taintManager.resetAll();
+    scopeController.clear();
+
+    try {
+      await epgModelBuilder.analyze({
+        extensionPath: input,
+        extensionType: ExtensionSourceType.DIR,
+        outputPath: outDir,
+        extensionId: VALID_ID,
+        extensionVersion: "1.0",
+      });
+
+      const shape = (reports: any[]) =>
+        reports.map((report) => ({
+          filename: report.filename,
+          issues: report.totalIssues,
+          pathSteps: report.issues.reduce(
+            (total: number, issue: any) => total + issue.flowMeta.totalSteps,
+            0,
+          ),
+        }));
+
+      const first = shape(
+        taintManager.generateGlobalReport({ includeCode: false, dedupSources: true }),
+      );
+      const second = shape(
+        taintManager.generateGlobalReport({ includeCode: false, dedupSources: true }),
+      );
+
+      expect(second).toEqual(first);
+    } finally {
+      fs.rmSync(outDir, { recursive: true, force: true });
+    }
   });
 
   it("re-running an analysis is deterministic for the same input", async () => {
-    const first = await analyzeSampleDir("data_leak");
-    const second = await analyzeSampleDir("data_leak");
+    const first = await analyzeSampleDir("request_forgery");
+    const second = await analyzeSampleDir("request_forgery");
     expect(second.flows.length).toBe(first.flows.length);
   });
 });

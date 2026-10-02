@@ -40,7 +40,7 @@ const EVENT_PAYLOAD_PROPERTIES: Record<string, string[]> = {
  * analyzing these handlers is reachability — the sources and sinks written
  * inside the handler body, and every function only reachable through it.
  */
-const buildStandardEventDef = (
+export const buildStandardEventDef = (
   callNode: any,
   astNode: any,
   eventName: string,
@@ -72,16 +72,34 @@ const buildStandardEventDef = (
  * Common handler for addEventListener logic.
  * Supports both standard "message" events and generic custom events.
  */
-const handleEventListener = (args: any[], callNode: any, astNode: any, isWindowEvent: boolean) => {
-  const [eventType, callback] = args;
+/**
+ * Analyze a DOM-style callback without relying on a concrete
+ * `addEventListener` call.  Library summaries (currently jQuery's event
+ * helpers) reuse this so that skipping a vendor implementation does not skip
+ * extension-owned handlers registered through that library.
+ */
+export function analyzeDomEventHandler(
+  eventName: string | null,
+  callback: Def | undefined,
+  callNode: any,
+  astNode: any,
+  isWindowEvent: boolean,
+) {
+  // The callback must be analyzable. Accept a concrete function OR an ImplicitDef
+  // set of candidate functions — obfuscated RPC bridges register the handler via a
+  // computed method name (e.g. `comm['handle' + srcId].bind(comm)`), which resolves
+  // to an ImplicitDef; the inter-procedural analyzer iterates such candidates.
+  if (!Def.isFunctionDef(callback) && !Def.isImplicitDef(callback)) return;
 
-  // Validate that the event type is a literal and callback is a function
-  if (!Def.isLiteralDef(eventType) || !Def.isFunctionDef(callback)) return;
-
-  const eventName = String(eventType.value);
+  // The event name may be a string literal (the common case) OR a computed /
+  // dynamic value (e.g. obfuscated RPC bridges register listeners on a runtime
+  // event name such as `document.addEventListener(comm.sid, handler)` where
+  // `comm.sid = vmid + destId`). A non-literal name is `null` here; we must NOT
+  // drop it — an attacker can dispatch an event of any (page-observable) name, so
+  // a dynamically-named listener is conservatively a custom-event taint source.
   interAnalyzer.setCurrentSideEffects();
 
-  if (JS_EVENT_NAMES.includes(eventName) && eventName !== "message") {
+  if (eventName !== null && JS_EVENT_NAMES.includes(eventName) && eventName !== "message") {
     /**
      * Standard DOM event (click / submit / input / keydown / ...).
      *
@@ -116,22 +134,31 @@ const handleEventListener = (args: any[], callNode: any, astNode: any, isWindowE
       false,
       "window.addEventListener(message)",
     );
-  } else if (!JS_EVENT_NAMES.includes(eventName)) {
+  } else if (eventName === null || !JS_EVENT_NAMES.includes(eventName)) {
     /**
-     * Handling for Custom Events (Events not in the standard JS_EVENT_NAMES list).
-     * Mark the entire event object as a taint source for custom event logic.
+     * Custom Events (a name not in JS_EVENT_NAMES) AND dynamically-named
+     * listeners (eventName === null). Both are treated as custom-event taint
+     * sources: the whole event object is marked tainted, so `event.detail` /
+     * `event.data` forwarded through the handler carry taint. A dynamic name is
+     * over-approximated as a custom event rather than silently dropped.
      */
     taintManager.createTaintSource(
       event,
       isWindowEvent ? "WINDOW_CUSTOM_EVENT" : "TARGET_CUSTOM_EVENT",
       astNode,
       false,
-      `${isWindowEvent ? "window" : "target"}.addEventListener(${eventName})`,
+      `${isWindowEvent ? "window" : "target"}.addEventListener(${eventName ?? "<dynamic>"})`,
     );
   }
 
   // Perform inter-procedural analysis on the callback with the mocked event object
   interAnalyzer.analyze(callNode, callback, [event], null, astNode);
+}
+
+const handleEventListener = (args: Def[], callNode: any, astNode: any, isWindowEvent: boolean) => {
+  const [eventType, callback] = args;
+  const eventName = Def.isLiteralDef(eventType) ? String(eventType.value) : null;
+  return analyzeDomEventHandler(eventName, callback, callNode, astNode, isWindowEvent);
 };
 
 // --------------------- window.addEventListener -------------------

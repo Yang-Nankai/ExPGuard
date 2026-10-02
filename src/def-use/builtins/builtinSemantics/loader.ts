@@ -1,5 +1,6 @@
 // ======  js =======
 import "./js/object";
+import "./js/date";
 import "./js/funciton";
 import "./js/array";
 import "./js/json";
@@ -22,7 +23,6 @@ import "./browser/storage";
 import "./browser/timer";
 import "./browser/url";
 import "./browser/event";
-import "./browser/indexedDb";
 import "./browser/document";
 import "./browser/code";
 

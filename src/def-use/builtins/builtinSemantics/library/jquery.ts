@@ -10,6 +10,7 @@ import {
   SinkType,
   SourceType,
 } from "../index";
+import { analyzeDomEventHandler } from "../browser/event";
 
 function getObjectPropertyValueNode(objExpr: any, propName: string): any | undefined {
   if (!objExpr || objExpr.type !== "ObjectExpression") return undefined;
@@ -60,6 +61,13 @@ const JQUERY_ELEMENT_METHODS = [
 ] as const;
 
 /**
+ * Event registration functions are an API boundary: their implementation
+ * belongs to jQuery and is skipped, while the extension-supplied callback is
+ * still analyzed with the same DOM-event model as addEventListener.
+ */
+const JQUERY_EVENT_METHODS = ["on", "one", "bind", "delegate"] as const;
+
+/**
  * jQuery(selector)
  */
 BuiltInSemantics.register("JQuery.fn", (args, callNode) => {
@@ -70,6 +78,13 @@ BuiltInSemantics.register("JQuery.fn", (args, callNode) => {
 
   // bind element methods
   for (const { name, effect } of JQUERY_ELEMENT_METHODS) {
+    const fn = defFactory.createBuiltInFunctionDef(callNode, effect);
+    fn.semanticExec = BuiltInSemantics.get(effect);
+    resDef.setProperty(name, fn);
+  }
+
+  for (const name of JQUERY_EVENT_METHODS) {
+    const effect = `JQuery.fn.${name}`;
     const fn = defFactory.createBuiltInFunctionDef(callNode, effect);
     fn.semanticExec = BuiltInSemantics.get(effect);
     resDef.setProperty(name, fn);
@@ -129,6 +144,39 @@ function registerJQueryElementMethod(
 
 for (const { effect, source, sink } of JQUERY_ELEMENT_METHODS) {
   registerJQueryElementMethod(effect, source, sink);
+}
+
+function getJQueryEventNames(eventDef: Def | undefined): Array<string | null> {
+  const rawName = literalOuter(eventDef);
+  if (typeof rawName !== "string") return [null];
+
+  // jQuery accepts space-separated event names and event namespaces such as
+  // `click.audit`.  The namespace changes registration semantics but not the
+  // payload shape of the underlying DOM event.
+  const names = rawName
+    .split(/\s+/)
+    .map((name) => name.split(".")[0].toLowerCase())
+    .filter(Boolean);
+
+  return names.length > 0 ? Array.from(new Set(names)) : [null];
+}
+
+for (const method of JQUERY_EVENT_METHODS) {
+  BuiltInSemantics.register(`JQuery.fn.${method}`, (args, callNode, astNode, thisDef) => {
+    // All supported jQuery registration forms put the event name first except
+    // delegate(selector, eventName, handler).  The handler is the final
+    // argument for each form, including optional selector/data overloads.
+    const eventDef = method === "delegate" ? args[1] : args[0];
+    const callback = args[args.length - 1];
+
+    for (const eventName of getJQueryEventNames(eventDef)) {
+      analyzeDomEventHandler(eventName, callback, callNode, astNode, false);
+    }
+
+    // Event methods are chainable.  Returning the receiver preserves the
+    // summary boundary without propagating jQuery's internal temporaries.
+    return thisDef ?? defFactory.createUnknownDef(callNode);
+  });
 }
 
 /**

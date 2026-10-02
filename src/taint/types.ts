@@ -9,7 +9,6 @@ export type SourceType =
   // TABS
   | "CHROME_TABS_DETECT_LANUAGE"
   | "CHROME_TABS_CAPUTURE_VISIBLE_TAB"
-  | "CHROME_TABS_ONUPDATED_URL"
   // BOOKMARKS
   | "CHROME_BOOKMARK_INFO"
   // COOKIES
@@ -263,6 +262,30 @@ export type SinkType =
 
 export type UrlTaintControl = "FULL" | "PARTIAL";
 
+/**
+ * Provenance of a taint value when it crosses a runtime/storage boundary.
+ *
+ * `EXTENSION_UI` is deliberately distinct from `CONTENT_SCRIPT`: a value
+ * typed into a popup/options page is user input to the extension, not input
+ * supplied by the web page.  `EXTERNAL_MESSAGE` and `UNTRUSTED_STORAGE` are
+ * explicit web-reachable routes and must remain eligible for TP reporting.
+ */
+export type TaintProvenance =
+  | "CONTENT_SCRIPT"
+  | "EXTENSION_UI"
+  | "EXTERNAL_MESSAGE"
+  | "UNTRUSTED_STORAGE"
+  | "UNKNOWN";
+
+export type TaintFrameFamily =
+  | "CS"
+  | "BG"
+  | "EX"
+  | "DT"
+  | "OF"
+  | "MAIN"
+  | "UNKNOWN";
+
 export interface TaintSinkRecord {
   taintId: number;
   sinkType: SinkType;
@@ -285,7 +308,12 @@ export interface TaintSource {
   originDefId: number;
   isPseudo: boolean; // pseudo taint source
   remark?: string;
-  provenance?: unknown;
+  /** Context that created the root source, before any message/storage relay. */
+  originContextFilename?: string;
+  /** Frame family of the root source at its actual creation site. */
+  originFrameFamily?: TaintFrameFamily;
+  /** Whether the root value is reachable from a web page. */
+  provenance?: TaintProvenance;
 }
 
 export interface TaintPathRecord {
@@ -295,6 +323,12 @@ export interface TaintPathRecord {
   astNode: Node;
   PropagateType: PropagateType;
   remark: string;
+  /** Actual sender/receiver metadata for MESSAGE edges. */
+  senderContextFilename?: string;
+  senderFrameFamily?: TaintFrameFamily;
+  receiverContextFilename?: string;
+  receiverFrameFamily?: TaintFrameFamily;
+  senderProvenance?: TaintProvenance;
 }
 
 export interface TaintAnalysisSummary {
@@ -334,6 +368,8 @@ export interface PseudoTaintReceiver {
   targetDef: Def; // target def where the data arrives
   outer?: string;
   deferredMessage?: DeferredMessageInvoke;
+  /** Statically recovered constraints for an internal runtime message handler. */
+  protocol?: MessageProtocol;
 }
 
 export interface PseudoTaintSender {
@@ -342,6 +378,25 @@ export interface PseudoTaintSender {
   astNode: Node;
   channel: string;
   outer?: string;
+  /** Action/type alternatives carried by the outgoing message. */
+  protocol?: MessageProtocol;
+}
+
+export type MessageDispatchKey = "action" | "type";
+
+/**
+ * Bounded action/type alternatives. `hasUnknown` means at least one branch
+ * could not be resolved statically, so it must remain eligible for matching.
+ */
+export interface MessageValueCandidates {
+  values: string[];
+  hasUnknown: boolean;
+}
+
+/** Metadata used only to decide whether two internal message endpoints can meet. */
+export interface MessageProtocol {
+  frameFamily: TaintFrameFamily;
+  dispatch: Partial<Record<MessageDispatchKey, MessageValueCandidates>>;
 }
 
 export interface StorageAction {

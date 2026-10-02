@@ -1,9 +1,8 @@
-// A page controls the request payload, but the content script sends it using
-// the same network authority as that page. A REQUEST_FORGERY rule matches,
-// then the privilege-delta gate records the reason for suppressing it.
-window.addEventListener("message", (event) => {
-  fetch("https://collector.example/x", {
-    method: "POST",
-    body: JSON.stringify(event.data),
-  });
+// The content script reads a page value and POSTs it from the content script
+// itself. The page could issue exactly this request on its own, so there is a
+// data flow but no privilege gain — the finding must be suppressed.
+const field = document.querySelector("#email");
+fetch("https://collector.example/x", {
+  method: "POST",
+  body: JSON.stringify({ v: field.value }),
 });

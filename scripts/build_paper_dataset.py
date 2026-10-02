@@ -25,7 +25,8 @@ REQUESTED = {
     "ljmaegmnepbgjekghdfkgegbckolmcok": "8.14.0.0",
     "lghkdmpjndggpffgahogcopicpednbgm": "2.4.4",
 }
-TOOLS = ("DoubleX", "CoCo", "ExPGuard-Opti")
+TOOLS = ("ExPGuard", "CoCo", "DoubleX")
+UPSTREAM_TOOLS = {"ExPGuard": "ExPGuard-Opti", "CoCo": "CoCo", "DoubleX": "DoubleX"}
 PLATFORMS = ("chrome", "edge", "firefox")
 TYPES = {
     "PRIVILEGE_ESCALATION": "Privilege Execution",
@@ -59,7 +60,7 @@ def build(args):
     root, out = args.top5000.resolve(), args.output.resolve()
     if out.exists():
         raise SystemExit(f"Refusing to overwrite existing dataset: {out}")
-    reports = {(t, p, r): read(root / t / p / r)
+    reports = {(t, p, r): read(root / UPSTREAM_TOOLS[t] / p / r)
                for t in TOOLS for p in PLATFORMS for r in REPORTS}
     with args.catalog.open(encoding="utf-8-sig", newline="") as handle:
         catalog = [row for row in csv.DictReader(handle) if row["extension_id"] in REQUESTED]
@@ -91,15 +92,15 @@ def build(args):
             decision.update(included=True, selected_versions=[{"platform": k[0], "version": k[1]} for k, _ in chosen])
             for (platform, version), entries in chosen:
                 key = f"{ext_id}_{version}"
-                source_tool = next((t for t, e in entries if qualifying(e) and (root / t / platform / "extensions" / key / "unpacked" / "manifest.json").is_file()), None)
+                source_tool = next((t for t, e in entries if qualifying(e) and (root / UPSTREAM_TOOLS[t] / platform / "extensions" / key / "unpacked" / "manifest.json").is_file()), None)
                 if source_tool is None:
                     raise ValueError(f"Confirmed extension has no source package: {key}")
-                src = root / source_tool / platform / "extensions" / key / "unpacked"
+                src = root / UPSTREAM_TOOLS[source_tool] / platform / "extensions" / key / "unpacked"
                 manifest = read(src / "manifest.json")
                 if manifest["version"] != version or manifest["manifest_version"] != 3:
                     raise ValueError(f"Manifest mismatch: {src}")
-                dest = out / "extensions" / platform / key
-                shutil.copytree(src, dest / "unpacked")
+                dest = out / platform / key
+                shutil.copytree(src, dest / "source")
                 item = {"extension_id": ext_id, "platform": platform, "version": version,
                         "requested_version": requested_version, "name": entries[0][1].get("name"),
                         "source_tool": source_tool, "source_path": src.relative_to(root).as_posix(),
@@ -107,8 +108,9 @@ def build(args):
                         "confirmed_types": sorted({TYPES[f["flow_type"]] for _, e in entries for f in qualifying(e)}),
                         "tools": {}}
                 for tool in TOOLS:
-                    tool_dir = dest / "reports" / tool
-                    upstream = root / tool / platform / "extensions" / key
+                    upstream_tool = UPSTREAM_TOOLS[tool]
+                    tool_dir = dest / tool
+                    upstream = root / upstream_tool / platform / "extensions" / key
                     entry = next((e for t, e in entries if t == tool), None)
                     availability = {"tool": tool, "platform": platform, "extension_id": ext_id, "version": version,
                                     "reference_entry_present": entry is not None,
@@ -118,12 +120,6 @@ def build(args):
                     write(tool_dir / "availability.json", availability)
                     if (upstream / "source").is_dir():
                         shutil.copytree(upstream / "source", tool_dir / "source")
-                    # Preserve adjudication reports, without copying browser profiles or transcripts.
-                    for phase in ("static", "dynamic"):
-                        report = upstream / phase / f"{phase}_report.json"
-                        if report.is_file():
-                            (tool_dir / phase).mkdir(parents=True, exist_ok=True)
-                            shutil.copy2(report, tool_dir / phase / report.name)
                     for report in REPORTS:
                         record = next((e for e in reports[tool, platform, report]["extensions"]
                                        if e["extension_id"] == ext_id and e["version"] == version), None)
@@ -140,19 +136,15 @@ def build(args):
     for (tool, platform, name), data in reports.items():
         entries = [e for e in data["extensions"] if (platform, e["extension_id"], e["version"]) in selected_keys]
         flows = [f for e in entries for f in e["flows"]]
-        write(out / "reports" / tool / platform / name, {"metadata": {
-            "project": tool, "browser": platform, "scope": "requested confirmed extension subset",
-            "upstream_report": f"{tool}/{platform}/{name}", "upstream_sha256": sha(root / tool / platform / name),
-            "extension_count": len(entries), "flow_count": len(flows),
-            "labels": dict(collections.Counter(f["verification"] for f in flows)),
-            "empty_subset_meaning": "No selected extension record in this upstream report; not a negative scan result."},
-            "extensions": entries})
+        # Reports are stored inside each selected extension directory. No
+        # aggregate or adjudication report is copied into the packaged dataset.
     write(out / "manifest.json", {"schema_version": "expguard-paper-subset/v1", "scope": "Initial subset, not the complete 337-extension/780-flow reference set",
           "selection": "Current Top5000 reports, MV3, at least one nonduplicate TP in a paper class; alternate verified version allowed only when requested version is ineligible",
           "allow_verified_version": args.allow_verified_version, "extension_count": len(selected), "extensions": selected})
     write(out / "selection-audit.json", decisions)
     write(out / "catalog-selected.json", [row for row in catalog if (row["platform"], row["extension_id"], row["version"]) in selected_keys])
-    checksums = {p.relative_to(out).as_posix(): sha(p) for p in sorted(out.rglob("*")) if p.is_file()}
+    checksums = {p.relative_to(out).as_posix(): sha(p) for p in sorted(out.rglob("*"))
+                 if p.is_file() and p.name != "checksums.json"}
     write(out / "checksums.json", checksums)
     print(f"Exported {len(selected)} extension instances, {len(checksums)} files to {out}")
 
@@ -168,10 +160,13 @@ def verify(out):
         raise ValueError("Dataset contains files absent from checksums.json")
     manifest = read(out / "manifest.json")
     for e in manifest["extensions"]:
-        src = out / "extensions" / e["platform"] / f"{e['extension_id']}_{e['version']}" / "unpacked"
+        src = out / e["platform"] / f"{e['extension_id']}_{e['version']}" / "source"
         m = read(src / "manifest.json")
         assert m["version"] == e["version"] and m["manifest_version"] == 3
         assert any(t["confirmed_flow_ids"] for t in e["tools"].values())
+        ext = src.parent
+        assert {p.name for p in ext.iterdir() if p.is_dir()} >= {"source", "ExPGuard", "CoCo", "DoubleX"}
+    assert {p.name for p in out.iterdir() if p.is_dir()} >= {"chrome", "edge", "firefox"}
     print(f"Verified {len(checksums)} file hashes and {len(manifest['extensions'])} MV3/TP records")
 
 
@@ -179,7 +174,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--top5000", type=Path)
     parser.add_argument("--catalog", type=Path)
-    parser.add_argument("--output", type=Path, default=Path("datasets/manually-validated"))
+    parser.add_argument("--output", type=Path, default=Path("datasets"))
     parser.add_argument("--allow-verified-version", action="store_true")
     parser.add_argument("--verify", action="store_true")
     args = parser.parse_args()

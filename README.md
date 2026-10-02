@@ -117,9 +117,12 @@ In-depth component-level docs live under [`docs/`](./docs):
 The historical `STORAGE_POSOING` spelling is retained for compatibility.
 Data Leak requires sensitive browser or extension data to reach an
 attacker-observable output. The data leakage sample returns permission-gated
-cookies and history through an externally connectable response. Outbound
-network disclosure and DOM XSS are outside the paper's four-class evaluation.
-The engine retains legacy code/DOM rules and regression fixtures separately.
+cookies and history through an externally connectable response. The Ablation
+baseline also reports sensitive or system data sent through outbound network
+requests (`fetch`, XHR, Axios, and WebSocket), subject to its header and
+privilege-delta filters. The paper's curated four-class ground truth selects
+flows according to its threat model; DOM XSS remains an engine regression
+class and is not part of that paper taxonomy.
 
 ```sh
 npm run build
@@ -135,8 +138,8 @@ and [the samples guide](docs/samples_guide.md).
 
 [datasets/](datasets/README.md) contains the initial requested subset of the
 paper's reference dataset: five confirmed MV3 Chrome extension instances,
-their unpacked source, available DoubleX/CoCo/ExPGuard-Opti report folders,
-original adjudication labels, selection decisions and SHA-256 hashes.
+their source, available DoubleX/CoCo/ExPGuard report folders, selection
+decisions and SHA-256 hashes.
 Missing upstream reports are explicitly marked; absence is not a negative
 scan result. This subset is not the complete 337-extension reference set.
 

@@ -48,58 +48,47 @@
     },
     {
       "id": "sensitive-data-message-egress",
-      "description": "Selected browser-sensitive sources leaving through a webpage-reachable message channel.",
+      "description": "User-permission-gated data (bookmarks, history, cookies, identity, ...) leaving via a cross-extension or window message channel.",
       "flowType": "DATA_LEAK",
       "match": {
-        "sourceType": [
-          "CHROME_COOKIES_INFO",
-          "CHROME_TABS_ONUPDATED_URL",
-          "CHROME_IDENTITY_TOKEN",
-          "CHROME_MANAGEMENT_INFO",
-          "CHROME_TABS_CAPUTURE_VISIBLE_TAB",
-          "CHROME_IDENTITY_PROFILE",
-          "CHROME_BOOKMARK_INFO",
-          "CHROME_HISTORY_INFO",
-          "CHROME_TABS_DETECT_LANUAGE",
-          "CHROME_DOWNLOADS_ONCHANGED"
-        ],
-        "sinkType": [
-          "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
-          "WINDOW_POSTMESSAGE",
-          "CHROME_RUNTIME_SENDMESSAGE_EXTERNAL",
-          "CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE"
-        ]
+        "sourceCapability": "SENSITIVE_DATA",
+        "sinkCapability": "MESSAGE_RESPONSE"
       }
     },
     {
       "id": "system-info-message-egress",
-      "description": "Selected system-sensitive sources leaving through a webpage-reachable message channel.",
+      "description": "Fingerprint / system info (navigator.*, screen.*, chrome.system.*) leaving via a message channel. The navigator/screen carve-out lives in 'suppress' below — pure-navigator leaks are too noisy to report by default.",
       "flowType": "DATA_LEAK",
       "match": {
-        "sourceType": [
-          "CHROME_FONTSETTINGS_FONTLIST",
-          "CHROME_SYSTEM_DISPLAY"
-        ],
-        "sinkType": [
-          "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
-          "WINDOW_POSTMESSAGE",
-          "CHROME_RUNTIME_SENDMESSAGE_EXTERNAL",
-          "CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE"
-        ]
+        "sourceCapability": "SYSTEM_INFO",
+        "sinkCapability": "MESSAGE_RESPONSE"
       }
     },
     {
       "id": "storage-data-message-egress",
-      "description": "Data read from chrome.storage leaving through a webpage-reachable message channel.",
+      "description": "Data read from chrome.storage being exfiltrated through a message channel.",
       "flowType": "DATA_LEAK",
       "match": {
-        "sourceType": "STORAGE_ALL_ITEMS",
-        "sinkType": [
-          "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
-          "WINDOW_POSTMESSAGE",
-          "CHROME_RUNTIME_SENDMESSAGE_EXTERNAL",
-          "CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE"
-        ]
+        "sourceCapability": "STORAGE_DATA",
+        "sinkCapability": "MESSAGE_RESPONSE"
+      }
+    },
+    {
+      "id": "sensitive-data-network-send",
+      "description": "User-permission-gated data (cookies, history, bookmarks, identity, downloads, ...) exfiltrated via an outbound network request (fetch / XHR / axios / WebSocket). The flagship data-leak pattern. Benign auth-header use is filtered by suppress-sensitive-data-request-headers below.",
+      "flowType": "DATA_LEAK",
+      "match": {
+        "sourceCapability": "SENSITIVE_DATA",
+        "sinkCapability": "NETWORK_SEND"
+      }
+    },
+    {
+      "id": "system-info-network-send",
+      "description": "System fingerprint / hardware info (chrome.system.cpu / memory / storage / display) exfiltrated via an outbound network request. The navigator.* / screen.* fingerprint carve-out lives in 'suppress' below; chrome.system.* requires a permission and is treated as a real leak. Benign auth-header use is filtered by suppress-sensitive-data-request-headers (which also covers SYSTEM_INFO).",
+      "flowType": "DATA_LEAK",
+      "match": {
+        "sourceCapability": "SYSTEM_INFO",
+        "sinkCapability": "NETWORK_SEND"
       }
     },
     {
@@ -181,6 +170,15 @@
       "match": {
         "sourceCapability": "STORAGE_DATA",
         "sinkCapability": "DOM_WRITE"
+      }
+    },
+    {
+      "id": "web-content-network-send",
+      "description": "Page-derived content (element values, document.cookie, location, ...) leaves via a network sink. Suppressed by the privilege-delta gate when both ends sit in a content script, where the page could issue the request itself; kept when the sink runs with extension host permissions (background / extension page / offscreen).",
+      "flowType": "DATA_LEAK",
+      "match": {
+        "sourceCapability": "WEB_CONTENT",
+        "sinkCapability": "NETWORK_SEND"
       }
     },
     {

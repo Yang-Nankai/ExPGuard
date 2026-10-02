@@ -12,8 +12,11 @@ const CHROME_EDGE_EXTENSION_ID_REGEX = /^[a-p]{32}$/;
 const FIREFOX_GUID_REGEX =
   /^\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\}$/;
 
-// Firefox extension ID (email-like format)
-const FIREFOX_EMAIL_REGEX = /^[\w.-]+@[\w.-]+$/;
+// Firefox extension ID (email-like format).
+// The local part (before "@") may be empty to allow the "@name" short-ID form
+// (e.g. "@aliexpress-share-a-cart"), matching Firefox's own AddonManager
+// grammar `[a-z0-9-._]*@[a-z0-9-._]+`.
+const FIREFOX_EMAIL_REGEX = /^[\w.-]*@[\w.-]+$/;
 
 // Extension version (e.g. 1.0.3 / 1.2 / 2.0.0.1)
 const EXTENSION_VERSION_REGEX = /^(\d+\.)?(\d+\.)?(\d+)(\.\d+)*$/;

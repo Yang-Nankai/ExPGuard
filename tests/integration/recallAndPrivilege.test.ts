@@ -216,7 +216,7 @@ describe("P1-1: privilege-delta gate", () => {
   jest.setTimeout(120_000);
 
   /**
-   * A content script receiving a page message and POSTing it from that same content
+   * A content script reading a page field and POSTing it from that same content
    * script gains nothing the page did not already have. The flow is real; the
    * finding is not.
    */

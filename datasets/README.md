@@ -20,31 +20,26 @@ therefore explicit in `manifest.json` and `selection-audit.json`.
 | `ogdlpmhglpejoiomcodnpjnfgcpmgale` | **3.7.9** | 3.5.2 | Storage Poisoning |
 | `lhannfkhjdhmibllojbbdjdbpegidojj` | 1.5.2 | 1.5.2 | Storage Poisoning, Privilege Execution, Data Leak |
 
-ExPGuard-Opti has 16 nonduplicate TP reports across these instances. DoubleX
+ExPGuard has 16 nonduplicate TP reports across these instances. DoubleX
 has 2 TP reports plus 1 FP report; its TP reports overlap the same selected
 extensions. Counts across tools are not independent vulnerabilities.
 
 ## Layout
 
 ```text
-manually-validated/
+datasets/
   manifest.json                         # membership, versions, classes, availability
   selection-audit.json                  # decisions for all 12 requested IDs
   catalog-selected.json                 # original matching catalog records
   checksums.json                        # SHA-256 for every exported file
-  extensions/chrome/<id>_<version>/
-    unpacked/                           # original extension source directory
+  {chrome,edge,firefox}/<id>_<version>/
+    source/                             # original extension source directory
     metadata.json
-    reports/{DoubleX,CoCo,ExPGuard-Opti}/
+    {DoubleX,CoCo,ExPGuard}/
       availability.json                 # present/missing, never a fabricated verdict
       source/                           # original scan output, where available
-      static/static_report.json         # original adjudication report, where available
-      dynamic/dynamic_report.json       # original adjudication report, where available
       flow-verification-results.json
       flow-verification-results-no-duplicate.json
-  reports/{DoubleX,CoCo,ExPGuard-Opti}/{chrome,edge,firefox}/
-    flow-verification-results.json
-    flow-verification-results-no-duplicate.json
 ```
 
 Each included extension has a folder for all three tools. The supplied
@@ -56,13 +51,11 @@ successfully scanned an extension and found nothing. The initial subset
 contains only Chrome instances; no Edge/Firefox counterpart is inferred.
 
 Original report paths and flow indices are retained as provenance and can
-point to files outside this package. The package includes the existing
-top-level static/dynamic JSON reports, not browser profiles or all runtime
-evidence files. Source-file bytes are copied unchanged from `unpacked/`;
-metadata helpers such as `.epg-inline` may be present if supplied upstream.
-The source report folders are preserved, including their original raw
-findings. Only membership requires an in-scope TP; a bundled raw report may
-also contain excluded classes or false positives.
+point to files outside this package. Only tool-produced scan outputs are
+included. Manual static/dynamic adjudication reports, browser profiles,
+transcripts, and manual audit artifacts are excluded. Source-file bytes are
+copied unchanged. Only membership requires an in-scope TP; a bundled raw
+report may also contain excluded classes or false positives.
 
 ## Excluded candidates
 

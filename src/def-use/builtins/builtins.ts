@@ -35,6 +35,21 @@ const BUILTINS: BuiltinSchema[] = [
   },
   {
     type: "constructor",
+    name: "Date",
+    proto: "Function",
+    prototypeName: "Date.prototype",
+    prototypeMethods: {
+      toLocaleString: method("Date.prototype.toLocaleString"),
+      toLocaleDateString: method("Date.prototype.toLocaleDateString"),
+      toLocaleTimeString: method("Date.prototype.toLocaleTimeString"),
+      toISOString: method("Date.prototype.toISOString"),
+      toUTCString: method("Date.prototype.toUTCString"),
+      toDateString: method("Date.prototype.toDateString"),
+      toTimeString: method("Date.prototype.toTimeString"),
+    },
+  },
+  {
+    type: "constructor",
     name: "TextEncoder",
     proto: "Function",
     prototypeName: "TextEncoder.prototype",
@@ -834,13 +849,6 @@ const BUILTINS: BuiltinSchema[] = [
           sendMessage: method("chrome.tabs.sendMessage"),
           connect: method("chrome.tabs.connect", "chrome.runtime.connect"), // effect is same as runtime
           executeScript: method("chrome.tabs.executeScript"),
-          onUpdated: {
-            type: "object",
-            name: "chrome.tabs.onUpdated",
-            props: {
-              addListener: method("chrome.tabs.onUpdated.addListener"),
-            },
-          },
         },
       },
       topSites: {
@@ -858,13 +866,6 @@ const BUILTINS: BuiltinSchema[] = [
           update: method("chrome.windows.update"),
         },
       },
-    },
-  },
-  {
-    type: "object",
-    name: "indexedDB",
-    props: {
-      open: method("indexedDB.open"),
     },
   },
   {

@@ -8,7 +8,12 @@ import { taintRuleEngine } from "../../src/taint/ruleEngine";
 import { scopeController } from "../../src/scope/scopeCtrl";
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..");
-const SAMPLES_DIR = path.join(REPO_ROOT, "samples");
+const FIXTURES_DIR = path.join(
+  REPO_ROOT,
+  "tests",
+  "fixtures",
+  "extension_components",
+);
 const VALID_ID = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
 interface FlowLite {
@@ -20,11 +25,11 @@ interface FlowLite {
 }
 
 async function analyze(
-  sample: string,
+  fixture: string,
   rulesPath?: string,
 ): Promise<FlowLite[]> {
-  const input = path.join(SAMPLES_DIR, sample);
-  const outDir = fs.mkdtempSync(path.join(os.tmpdir(), `epg-rule-${sample}-`));
+  const input = path.join(FIXTURES_DIR, fixture);
+  const outDir = fs.mkdtempSync(path.join(os.tmpdir(), `epg-rule-${fixture}-`));
 
   taintManager.resetAll();
   scopeController.clear();
@@ -54,31 +59,57 @@ async function analyze(
 describe("Custom taint rule end-to-end", () => {
   jest.setTimeout(60_000);
 
-  it("default rules report permission-gated cookies through an external response", async () => {
-    const flows = await analyze("data_leak");
-    const cookieLeak = flows.find(f => f.sourceType === "CHROME_COOKIES_INFO" &&
-      f.sinkType === "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE" && f.flowType === "DATA_LEAK");
-    expect(cookieLeak).toBeTruthy();
-    expect(cookieLeak!.ruleId).toBe("sensitive-data-message-egress");
+  it("default rules: cookies → fetch body IS now reported as DATA_LEAK", async () => {
+    const flows = await analyze("sensitive_exfil_cookie_body");
+    const cookieFetchLeak = flows.find(
+      (f) =>
+        f.sourceType === "CHROME_COOKIES_INFO" &&
+        (f.sinkType === "FETCH_BODY" ||
+          f.sinkType === "FETCH_RESOURCE" ||
+          f.sinkType === "FETCH_OPTIONS") &&
+        f.flowType === "DATA_LEAK",
+    );
+    expect(cookieFetchLeak).toBeTruthy();
+    expect(cookieFetchLeak!.ruleId).toBe("sensitive-data-network-send");
   });
 
-  it("custom suppress rule removes cookie responses while preserving history responses", async () => {
+  it("custom suppress rule can turn the sensitive-data-network-send flow off", async () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "epg-custom-rules-"));
     const rulesPath = path.join(tmp, "rules.json");
-    try {
-      fs.writeFileSync(rulesPath, JSON.stringify({
-        version: 1, rules: [], suppress: [{
-          id: "user-suppress-cookie-response", flowType: "DATA_LEAK",
-          match: { sourceType: "CHROME_COOKIES_INFO", sinkCapability: "MESSAGE_RESPONSE" },
-        }],
-      }), "utf-8");
-      const flows = await analyze("data_leak", rulesPath);
-      expect(flows.some(f => f.sourceType === "CHROME_COOKIES_INFO" && f.flowType === "DATA_LEAK")).toBe(false);
-      expect(flows.some(f => f.sourceType === "CHROME_HISTORY_INFO" &&
-        f.sinkType === "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE" && f.flowType === "DATA_LEAK")).toBe(true);
-    } finally {
-      fs.rmSync(tmp, { recursive: true, force: true });
-    }
+    fs.writeFileSync(
+      rulesPath,
+      JSON.stringify({
+        version: 1,
+        rules: [],
+        suppress: [
+          {
+            id: "user-suppress-cookie-network",
+            description: "This deployment treats cookies → network as benign.",
+            flowType: "DATA_LEAK",
+            match: {
+              sourceType: "CHROME_COOKIES_INFO",
+              sinkCapability: "NETWORK_SEND",
+            },
+          },
+        ],
+      }),
+      "utf-8",
+    );
+
+    const flows = await analyze("sensitive_exfil_cookie_body", rulesPath);
+
+    // The cookie → fetch flow is now suppressed by the user rule.
+    const cookieFetchLeak = flows.find(
+      (f) =>
+        f.sourceType === "CHROME_COOKIES_INFO" &&
+        f.flowType === "DATA_LEAK" &&
+        (f.sinkType === "FETCH_BODY" ||
+          f.sinkType === "FETCH_RESOURCE" ||
+          f.sinkType === "FETCH_OPTIONS"),
+    );
+    expect(cookieFetchLeak).toBeUndefined();
+
+    fs.rmSync(tmp, { recursive: true, force: true });
   });
 
   afterAll(() => {

@@ -28,13 +28,13 @@ Externally controllable data: cross-extension messages, web-page postMessage, cu
 
 ### SENSITIVE_DATA (`SENSITIVE_SOURCES`)
 
-User data behind permissions: bookmarks, history, cookies, identity tokens, tab info, etc. Only selected concrete source/message-sink pairs in `src/taint/rules/default-rules.json` qualify as `DATA_LEAK`. Network disclosure is outside the paper scope.
+User data behind permissions: bookmarks, history, cookies, identity tokens, tab info, etc. The Ablation default rules report these sources when they reach message egress or outbound network sinks, except for the explicit suppressions below (for example, cookie data placed in request headers). The paper dataset applies a separate curation step when selecting its four-class ground truth.
 
 `CHROME_TABS_DETECT_LANUAGE`, `CHROME_TABS_CAPUTURE_VISIBLE_TAB`, `CHROME_BOOKMARK_INFO`, `CHROME_COOKIES_INFO`, `CHROME_COOKIES_STORE`, `CHROME_HISTORY_INFO`, `CHROME_READINGLIST_INFO`, `CHROME_MANAGEMENT_INFO`, `CHROME_DOWNLOADS_SEARCH`, `CHROME_DOWNLOADS_FILEICON`, `CHROME_TOPSITES_INFO`, `CHROME_PAGECAPTURE_MHTML`, `CHROME_IDENTITY_TOKEN`, `CHROME_IDENTITY_PROFILE`, `CHROME_BOOKMARKS_ONCREATED`, `CHROME_COOKIES_ONCHANGED`, `CHROME_DOWNLOADS_ONCHANGED`, `CHROME_DOWNLOADS_ONCREATED`, `CHROME_HISTORY_ONVISITED`, `CHROME_MANAGEMENT_ONENABLED`, `CHROME_MANAGEMENT_ONDISABLED`, `CHROME_MANAGEMENT_ONINSTALLED`.
 
 ### SYSTEM_INFO (`SYSTEM_SOURCES`)
 
-Browser fingerprint / system specs. The default Data Leak rule selects font-list and display information reaching message-egress sinks. Other system-source models remain available for custom rules.
+Browser fingerprint / system specs. The default Data Leak rules select relevant system information reaching message egress or outbound network sinks; navigator and screen fingerprint flows are suppressed by the default carve-outs below. Other system-source models remain available for custom rules.
 
 `NAVIGAROR_GEOLOCATION` (typo preserved for compatibility), `NAVIGATOR_CLIPBOARD`, `NAVIGATOR_CONNECTION`, `NAVIGATOR_DEVICE_MEMORY`, `NAVIGATOR_HARDWARE_CONCURRENCY`, `NAVIGATOR_LANGUAGE`, `NAVIGATOR_MAX_TOUCH_POINTS`, `NAVIGATOR_PLATFORM`, `NAVIGATOR_PLUGINS`, `NAVIGATOR_USER_AGENT`, `NAVIGATOR_GPU_ADAPTER`, `SCREEN_INFO`, `CHROME_FONTSETTINGS_FONTLIST`, `CHROME_SYSTEM_CPU`, `CHROME_SYSTEM_DISPLAY_LAYOUT`, `CHROME_SYSTEM_DISPLAY`, `CHROME_SYSTEM_MEMORY`, `CHROME_SYSTEM_STORAGE`.
 

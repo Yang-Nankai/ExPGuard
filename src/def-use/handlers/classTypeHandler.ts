@@ -4,8 +4,6 @@ import { Errors } from "../../utils/errorCode";
 import { BuiltInRegistry } from "../builtins/builtinRegistry";
 import { defFactory } from "../factories/defFactory";
 import Def, { FunctionDef } from "../types/def";
-import { BuiltInSemantics } from "../builtins/builtinSemantics/semantics";
-import { QI_CLASS_MARKER } from "../builtins/builtinSemantics/browser/indexedDb";
 import {
   extractSimpleValue,
   isSimpleValueNode,
@@ -54,17 +52,11 @@ export function classTypeHandler(
 
     // MethodDefinition
     if (element.type === "MethodDefinition") {
-      const methodName = isSimpleValueNode(element.key)
-        ? extractSimpleValue(element.key)
-        : "";
-      const isQi = node.id?.name === "Qi" && BuiltInSemantics.get(`Qi.${methodName}`);
-      const methodDef = isQi
-        ? defFactory.createBuiltInFunctionDef(
-            cfgNode,
-            `Qi.${methodName}`,
-            BuiltInSemantics.get(`Qi.${methodName}`),
-          )
-        : defFactory.createFunctionDef(cfgNode, element.value, true);
+      const methodDef = defFactory.createFunctionDef(
+        cfgNode,
+        element.value,
+        true
+      );
       handleMethodOrProp(element.key, element.static, methodDef);
       continue;
     }
@@ -78,10 +70,6 @@ export function classTypeHandler(
   }
 
   const classFunction = defFactory.createFunctionDef(cfgNode, null);
-
-  if (node.id?.name === "Qi") {
-    classFunction.setProperty(QI_CLASS_MARKER, defFactory.createLiteralDef(cfgNode, true));
-  }
 
   // set prototypeObject，extend from superClass.prototype
   if (superClassDef && Def.isFunctionDef(superClassDef)) {

@@ -26,6 +26,17 @@ export interface ReportOptions {
 
   /** Number of characters in the code context */
   codeContextChars?: number;
+
+  /**
+   * Collapse sources that share (sourceType, remark, source-location) so the
+   * expensive full propagation path is materialized only for the first
+   * ("representative") occurrence; later duplicates are emitted as lightweight
+   * stubs (identity + sinks + sanitized, empty flow). Output-equivalent for
+   * consumers that already de-duplicate sources (the source-level report), and
+   * avoids building millions of flow-step objects on pathological files.
+   * Default: false (every source keeps its full path — legacy behavior).
+   */
+  dedupSources?: boolean;
 }
 
 /**
@@ -104,6 +115,20 @@ export interface AppConfig {
   /** Enable inter-procedural analysis */
   enableInterProcedural: boolean;
 
+  /**
+   * Resolve ES-module/importScripts bindings across extension files.
+   *
+   * This is intentionally independent of ordinary inter-procedural function
+   * analysis so ablation experiments can remove only cross-module resolution.
+   */
+  enableModuleResolution: boolean;
+
+  /**
+   * Resolve taint written through chrome.storage when a matching later read is
+   * observed. Storage writes remain modeled as sinks when this is disabled.
+   */
+  enableStorageImplicitPropagation: boolean;
+
   /** Enable code formatting (prettier) */
   enablePrettier: boolean;
 
@@ -126,15 +151,6 @@ export interface AppConfig {
   privilegeDeltaFiltering: boolean;
 
   /**
-   * Drop flows where page input only reaches a capability the page or its
-   * MAIN-world script already has. This covers same-document DOM rewrites in
-   * extension-owned pages and MAIN-world network/DOM/code execution.
-   *
-   * Set EXPGUARD_DISABLE_PAGE_CONTEXT_FILTERING=1 to restore legacy reporting.
-   */
-  pageContextFiltering: boolean;
-
-  /**
    * Fraction of a file's analysis budget the entry-point sweep may consume.
    *
    * The sweep runs last and is pure upside, but on function-dense scripts it
@@ -153,6 +169,22 @@ export interface AppConfig {
    * `--html` flag overrides this per run.
    */
   emitHtmlReport: boolean;
+
+  /**
+   * Taint report artifact format(s). The analyzer emits a source-level report
+   * that resolves every propagation step back to the extension's own source:
+   *   - "json" -> `report.flows.json` (machine form, one object per flow)
+   *   - "md"   -> `report.source.md`  (human/LLM form, one line per step)
+   *   - "both" -> both files
+   */
+  reportFormat: "json" | "md" | "both";
+
+  /**
+   * When true (default), only sources that actually reach a sink are emitted;
+   * sources whose taint never lands in a sink are dropped as non-actionable.
+   * Set false to keep every tainted source in the report.
+   */
+  reportOnlyWithSinks: boolean;
 
   /**
    * Optional path to a user-supplied taint rule file (.json or .ts/.js).
@@ -176,6 +208,7 @@ export const DEFAULT_REPORT_OPTIONS: Required<ReportOptions> = {
   maxFlowPerIssue: 200,
   includeCode: true,
   codeContextChars: 20,
+  dedupSources: false,
 };
 
 /**
@@ -185,15 +218,18 @@ const config: AppConfig = {
   appVersion: "1.0.0",
   analysisTimeoutMs: 1 * 60 * 1000,
   fileSizeTimeoutMs: {
-    small: 30_000,    // 10 seconds for < 100KB
-    medium: 120_000,  // 120 seconds for 100KB-1MB (minified extension bundles)
-    large: 120_000,    // 120 seconds for >1MB
+    // Wider per-file budgets for the vulnerability-target rerun. The outer
+    // batch runner still enforces a finite extension-level timeout.
+    small: 120_000,
+    medium: 300_000,
+    large: 600_000,
   },
 
   artifactRetentionPolicy: "none",
   alwaysRetainedArtifacts: [
     "analysis.log",
-    "report.txt",
+    "report.source.md",
+    "report.flows.json",
     "summary.json",
     // "manifest.json"
   ],
@@ -220,24 +256,32 @@ const config: AppConfig = {
   optimizationEnabled: true,
   enableOptimizationRewrite: false,
   enableInterProcedural: true,
+  // Runtime-only ablation switches: defaults preserve the full ExPGuard
+  // analysis, while a batch can opt out without editing the source again.
+  enableModuleResolution: process.env.EXPGUARD_DISABLE_MODULE_RESOLUTION !== "1",
+  enableStorageImplicitPropagation:
+    process.env.EXPGUARD_DISABLE_STORAGE_IMPLICIT_PROPAGATION !== "1",
   enablePrettier: true,
   analysisIgnorePatterns: [
     "node_modules/**",
   ],
   filterUnusedRuntimeScripts: true,  // true
   privilegeDeltaFiltering: true,
-  pageContextFiltering:
-    process.env.EXPGUARD_DISABLE_PAGE_CONTEXT_FILTERING !== "1",
   entrySweepBudgetRatio: 0.35,
 
   taintReportOptions: {
-    level: "partial",
+    // Emit the full taint propagation path (no head/tail truncation, no
+    // per-issue cap) so report.txt carries every propagation step.
+    level: "detailed",
     headCount: 50,
     tailCount: 50,
-    maxFlowPerIssue: 100,
+    maxFlowPerIssue: Number.MAX_SAFE_INTEGER,
   },
 
   emitHtmlReport: false,
+
+  reportFormat: "both",
+  reportOnlyWithSinks: true,
 
   /**
    * Entry-point sweep: after the root pass, re-enter every function scope the

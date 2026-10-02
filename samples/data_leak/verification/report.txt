@@ -1,129 +1,64 @@
-ANALYSIS TARGET
-Extension ID      : aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-Extension Version : 1.0.0
-Source Type       : DIR
-══════════════════════════════════════════════
-TAINT REPORT  background
-FRAME        BG_1
-══════════════════════════════════════════════
+# Source-level Taint Flow — aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 1.0.0
 
-[!] Issue #1
- ├─ Source     : CHROME_ONMESSAGEEXTERNAL_MESSAGE
- ├─ Remark     : chrome.runtime.onMessageExternal.addListener[message]
- │  Location   : L5:C6 -> L5:C13
- │  File       : background
- │  Frame      : BG_1
- │
- ├─ Propagation:
- │   ASSIGN     @ L5:C6 -> L5:C13 (identifier)
- │   ELEMENT    @ L5:C6 -> L5:C18 (member-element)
- │   ASSIGN     @ L5:C6 -> L5:C18 (binary-left)
- │   ASSIGN     @ L5:C6 -> L5:C13 (identifier)
- │   ELEMENT    @ L5:C6 -> L5:C18 (member-element)
- │   ASSIGN     @ L5:C6 -> L5:C13 (identifier)
- │   ELEMENT    @ L5:C6 -> L5:C18 (member-element)
- │   ASSIGN     @ L5:C6 -> L5:C18 (binary-left)
- │   ASSIGN     @ L12:C6 -> L12:C13 (identifier)
- │   ELEMENT    @ L12:C6 -> L12:C18 (member-element)
- │   ASSIGN     @ L12:C6 -> L12:C18 (binary-left)
- │   ASSIGN     @ L12:C6 -> L12:C13 (identifier)
- │   ELEMENT    @ L12:C6 -> L12:C18 (member-element)
- │   ASSIGN     @ L12:C6 -> L12:C13 (identifier)
- │   ELEMENT    @ L12:C6 -> L12:C18 (member-element)
- │   ASSIGN     @ L12:C6 -> L12:C18 (binary-left)
- │   ASSIGN     @ L12:C6 -> L12:C13 (identifier)
- │   ELEMENT    @ L12:C6 -> L12:C18 (member-element)
- │   ASSIGN     @ L12:C6 -> L12:C18 (binary-left)
- │   ASSIGN     @ L12:C6 -> L12:C13 (identifier)
- │   ELEMENT    @ L12:C6 -> L12:C18 (member-element)
- │   ASSIGN     @ L12:C6 -> L12:C13 (identifier)
- │   ELEMENT    @ L12:C6 -> L12:C18 (member-element)
- │   ASSIGN     @ L12:C6 -> L12:C18 (binary-left)
- │   (total steps: 24)
- │
- ├─ Sink(s):
- │
- └─ Sanitized : NO
+- Source type: DIR
+- Files with issues: 1 / 1
+- Distinct taint flows: 4  (collapsed from 4 raw issue entries)
+- Sinkless sources skipped: 1 (sources that reach no sink)
 
-[!] Issue #2
- ├─ Source     : CHROME_COOKIES_INFO
- ├─ Remark     : 
- │  Location   : L6:C4 -> L8:C6
- │  File       : background
- │  Frame      : BG_1
- │
- ├─ Propagation:
- │   ELEMENT    @ L6:C4 -> L8:C6 (object.setProperty)
- │   ELEMENT    @ L7:C6 -> L7:C31 (object.setProperty)
- │   (total steps: 2)
- │
- ├─ Sink(s):
- │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L7:C6 -> L7:C31 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
- │     frame: BG_1
- │
- └─ Sanitized : NO
+> Tainted token spans are wrapped in `»…«`. Each flow is de-duplicated; propagation lists every distinct source line once, in flow order, one line per step. Long minified lines are windowed around the tainted span. See `report.flows.json` for the machine form.
 
-[!] Issue #3
- ├─ Source     : CHROME_COOKIES_INFO
- ├─ Remark     : cookies(https://private.example.test/)
- │  Location   : L7:C6 -> L7:C31
- │  File       : background
- │  Frame      : BG_1
- │
- ├─ Propagation:
- │   ELEMENT    @ L7:C6 -> L7:C31 (object.setProperty)
- │   (total steps: 1)
- │
- ├─ Sink(s):
- │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L7:C6 -> L7:C31 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
- │     frame: BG_1
- │
- └─ Sanitized : NO
+---
 
-[!] Issue #4
- ├─ Source     : CHROME_HISTORY_INFO
- ├─ Remark     : 
- │  Location   : L13:C4 -> L15:C6
- │  File       : background
- │  Frame      : BG_1
- │
- ├─ Propagation:
- │   ELEMENT    @ L13:C4 -> L15:C6 (object.setProperty)
- │   ELEMENT    @ L14:C6 -> L14:C31 (object.setProperty)
- │   ELEMENT    @ L13:C4 -> L15:C6 (object.setProperty)
- │   ELEMENT    @ L14:C6 -> L14:C31 (object.setProperty)
- │   (total steps: 4)
- │
- ├─ Sink(s):
- │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L14:C6 -> L14:C31 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
- │     frame: BG_1
- │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L14:C6 -> L14:C31 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
- │     frame: BG_1
- │
- └─ Sanitized : NO
+## Flow #1 — CHROME_COOKIES_INFO
 
-[!] Issue #5
- ├─ Source     : CHROME_HISTORY_INFO
- ├─ Remark     : history.search
- │  Location   : L14:C6 -> L14:C31
- │  File       : background
- │  Frame      : BG_1
- │
- ├─ Propagation:
- │   ELEMENT    @ L14:C6 -> L14:C31 (object.setProperty)
- │   ELEMENT    @ L14:C6 -> L14:C31 (object.setProperty)
- │   (total steps: 2)
- │
- ├─ Sink(s):
- │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L14:C6 -> L14:C31 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
- │     frame: BG_1
- │   - CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE @ L14:C6 -> L14:C31 (chrome.runtime.onMessageExternal.addListener[sendResponse])  [file: background]
- │     frame: BG_1
- │
- └─ Sanitized : NO
+- **Source**: `CHROME_COOKIES_INFO` — `background` L6:C4 -> L8:C6 (spans to L8)  `»chrome.cookies.getAll({ url: "https://private.example.test/" }, (cookies) => {«`
+- **Sink(s)**:
+  - `CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE` (chrome.runtime.onMessageExternal.addListener[sendResponse]) — `background` L7:C6 -> L7:C31  `»sendResponse({ cookies })«;`
+- **Sanitized**: NO
+- **Frame**: `BG_1`
 
-Summary:
-  File            : background
-  Issues          : 5
-══════════════════════════════════════════════
+- **Propagation** (2 raw steps → 2 distinct lines):
+   1. L6 (→L8) `»    chrome.cookies.getAll({ url: "https://private.example.test/" }, (cookies) => {«`  · ELEMENT:object.setProperty
+   2. L7 `»sendResponse({ cookies })«;`  · ELEMENT:object.setProperty
 
+---
+
+## Flow #2 — CHROME_COOKIES_INFO (cookies(https://private.example.test/))
+
+- **Source**: `CHROME_COOKIES_INFO` — `background` L7:C6 -> L7:C31  `»sendResponse({ cookies })«;`
+- **Sink(s)**:
+  - `CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE` (chrome.runtime.onMessageExternal.addListener[sendResponse]) — `background` L7:C6 -> L7:C31  `»sendResponse({ cookies })«;`
+- **Sanitized**: NO
+- **Frame**: `BG_1`
+
+- **Propagation** (1 raw steps → 1 distinct lines):
+   1. L7 `»sendResponse({ cookies })«;`  · ELEMENT:object.setProperty
+
+---
+
+## Flow #3 — CHROME_HISTORY_INFO
+
+- **Source**: `CHROME_HISTORY_INFO` — `background` L13:C4 -> L15:C6 (spans to L15)  `»chrome.history.search({ text: "", maxResults: 10 }, (history) => {«`
+- **Sink(s)**:
+  - `CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE` (chrome.runtime.onMessageExternal.addListener[sendResponse]) — `background` L14:C6 -> L14:C31  `»sendResponse({ history })«;`
+- **Sanitized**: NO
+- **Frame**: `BG_1`
+
+- **Propagation** (4 raw steps → 2 distinct lines):
+   1. L13 (→L15) `»    chrome.history.search({ text: "", maxResults: 10 }, (history) => {«`  · ELEMENT:object.setProperty
+   2. L14 `»sendResponse({ history })«;`  · ELEMENT:object.setProperty
+
+---
+
+## Flow #4 — CHROME_HISTORY_INFO (history.search)
+
+- **Source**: `CHROME_HISTORY_INFO` — `background` L14:C6 -> L14:C31  `»sendResponse({ history })«;`
+- **Sink(s)**:
+  - `CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE` (chrome.runtime.onMessageExternal.addListener[sendResponse]) — `background` L14:C6 -> L14:C31  `»sendResponse({ history })«;`
+- **Sanitized**: NO
+- **Frame**: `BG_1`
+
+- **Propagation** (2 raw steps → 1 distinct lines):
+   1. L14 `»sendResponse({ history })«;`  · ELEMENT:object.setProperty
+
+---

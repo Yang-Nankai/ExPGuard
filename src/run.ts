@@ -2,7 +2,16 @@ import path from "path";
 import fs from "fs/promises";
 import { epgModelBuilder } from "./epgmodelbuilder";
 import { ExtensionSourceType } from "./extension/extensionLoader";
-import { taintManager, printTaintReportsCLI, renderHtmlReport, collectFileTree } from "./taint";
+import {
+  taintManager,
+  printTaintReportsCLI,
+  renderHtmlReport,
+  collectFileTree,
+  buildReportModel,
+  renderModelJson,
+  renderModelMarkdown,
+  ScriptSource,
+} from "./taint";
 import { computeCoverage, formatCoveragePct } from "./coverage/coverage";
 import { scopeController } from "./scope/scopeCtrl";
 import { taintRuleEngine } from "./taint/ruleEngine";
@@ -139,26 +148,58 @@ export async function runSingleTask(opts: RunOptions): Promise<RunResult> {
     const effectiveExtensionVersion = opts.extensionVersion;
 
    try {
-     let report = printTaintReportsCLI(
-       taintManager.generateGlobalReport(),
-     );
-     if (effectiveExtensionVersion) {
-       report =
-         [
-           "ANALYSIS TARGET",
-           `Extension ID      : ${effectiveId ?? "unknown"}`,
-           `Extension Version : ${effectiveExtensionVersion}`,
-           `Source Type       : ${opts.sourceType}`,
-           "",
-         ].join("\n") + report;
+     // Source-level report: resolve every propagation step back to the
+     // extension's own source and emit a compact, de-duplicated report.
+     // Format ("json" | "md" | "both") and sink filtering are config-driven.
+     const ctx = epgModelBuilder.extensionContext;
+     const sources: ScriptSource[] = [];
+     if (ctx) {
+       for (const script of ctx.scripts.values()) {
+         try {
+           const code = script.getCode?.();
+           if (typeof code === "string") {
+             sources.push({ key: script.key, code });
+           }
+         } catch {
+           /* skip unreadable script */
+         }
+       }
      }
-     await fs.appendFile(
-       path.join(outputDir, "report.txt"),
-       report,
-       "utf-8",
-     );
+
+     const model = buildReportModel({
+       // includeCode:false — the source report recomputes its own compact,
+       // resolved code lines, so per-step snippet building in the engine would
+       // be wasted work (it runs once per propagation step, i.e. millions of
+       // times on pathological flows).
+       reports: taintManager.generateGlobalReport({
+         level: "detailed",
+         includeCode: false,
+         dedupSources: true,
+       }),
+       sources,
+       extensionId: effectiveId ?? "unknown",
+       extensionVersion: effectiveExtensionVersion,
+       sourceType: opts.sourceType,
+       onlyWithSinks: config.reportOnlyWithSinks,
+     });
+
+     const fmt = config.reportFormat;
+     if (fmt === "json" || fmt === "both") {
+       await safeWriteFile(
+         path.join(outputDir, "report.flows.json"),
+         renderModelJson(model),
+       );
+     }
+     if (fmt === "md" || fmt === "both") {
+       await safeWriteFile(
+         path.join(outputDir, "report.source.md"),
+         renderModelMarkdown(model),
+       );
+     }
    } catch (err) {
-     logger.error("[REPORT] Failed to generate/write report");
+     logger.error(
+       `[REPORT] Failed to generate/write source report: ${String(err)}`,
+     );
    }
 
     const baseSummary = taintManager.getGlobalSummary?.() ?? {};
@@ -194,6 +235,11 @@ export async function runSingleTask(opts: RunOptions): Promise<RunResult> {
       coverage,
       errorType: taskError?.type,
       errorMessage: taskError?.message,
+      analysisConfiguration: {
+        enableModuleResolution: config.enableModuleResolution,
+        enableStorageImplicitPropagation:
+          config.enableStorageImplicitPropagation,
+      },
       ...baseSummary,
     };
 

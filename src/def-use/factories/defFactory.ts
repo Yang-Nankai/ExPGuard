@@ -7,7 +7,9 @@ import Def, {
   ImplicitDef,
   LiteralDef,
   ObjectDef,
+  PrimitiveDef,
   PromiseDef,
+  StringSafeDef,
   UndefinedDef,
   UnknownDef,
 } from "../types/def";
@@ -34,7 +36,9 @@ export class DefFactory {
     if (!Def.isDef(def)) {
       Errors.DFGError(`rebase(): not a Def (${typeof def})`);
     }
-    return def.cloneShallow(newFlowNode) as T;
+    const rebased = def.cloneShallow(newFlowNode) as T;
+    if (def.isStorageSerialized) rebased.markStorageSerialized();
+    return rebased;
   }
 
   /**
@@ -42,6 +46,19 @@ export class DefFactory {
    */
   createUnknownDef(from: FlowNode): UnknownDef {
     return new UnknownDef(from);
+  }
+
+  /** Create an opaque value with a known JavaScript primitive kind. */
+  createPrimitiveDef(
+    from: FlowNode,
+    primitiveKind: "number" | "boolean",
+  ): PrimitiveDef {
+    return new PrimitiveDef(from, primitiveKind);
+  }
+
+  /** Create a string with only syntax-safe dynamic components. */
+  createStringSafeDef(from: FlowNode): StringSafeDef {
+    return new StringSafeDef(from);
   }
 
   /**
@@ -128,6 +145,7 @@ export class DefFactory {
       astNode,
       elements,
     );
+    arrInstance.markArrayLike();
 
     return arrInstance;
   }

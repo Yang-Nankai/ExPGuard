@@ -44,6 +44,8 @@ class ScriptUsageTracker {
   private _frameFamilies: Map<ScriptFrameTag, ScriptFrameFamily> = new Map();
   private _frameConstraints: Map<ScriptFrameTag, FrameConstraint> = new Map();
   private _frameScriptOrder: Map<ScriptFrameTag, string[]> = new Map();
+  /** Synthetic page-world frame tags keyed by injected script. */
+  private _mainFrameTags: Map<string, ScriptFrameTag> = new Map();
   private _initialAnalysisOrder: string[] = [];
   private _externallyConnectableDeclared = false;
   private _externallyConnectableMatches?: string[];
@@ -63,6 +65,7 @@ class ScriptUsageTracker {
     this._frameFamilies.clear();
     this._frameConstraints.clear();
     this._frameScriptOrder.clear();
+    this._mainFrameTags.clear();
     this._initialAnalysisOrder = [];
     this._externallyConnectableDeclared = false;
     this._externallyConnectableMatches = undefined;
@@ -134,7 +137,7 @@ class ScriptUsageTracker {
   /**
    * Pick the most "important" frame tag of a script for reporting.
    *
-   * Precedence: BG > CS > EX > DT > OF > UNKNOWN. Background and content
+   * Precedence: BG > CS > EX > DT > OF > MAIN > UNKNOWN. Background and content
    * scripts come first because they were the original primary surfaces;
    * extension UI pages and devtools/offscreen follow, which means a script
    * shared by background + popup is still reported as `BG_1`. This matches
@@ -186,6 +189,10 @@ class ScriptUsageTracker {
     };
   }
 
+  getManifestVersion(): ManifestVersion {
+    return this._manifestVersion;
+  }
+
   getPrimaryFrameFamilyByKey(scriptKey: string): ScriptFrameFamily {
     return this.getFrameFamily(this.getPrimaryFrameByKey(scriptKey));
   }
@@ -211,7 +218,12 @@ class ScriptUsageTracker {
     return [...result.values()];
   }
 
-  markReferencedScript(fromScript: ExtensionScript | undefined, source: string) {
+  markReferencedScript(
+    fromScript: ExtensionScript | undefined,
+    source: string,
+    propagateFrame = true,
+    executionFrameFamily?: ScriptFrameFamily,
+  ) {
     if (!fromScript) return;
 
     if (this._enabled && !this._usedScriptKeys.has(fromScript.key)) return;
@@ -219,37 +231,200 @@ class ScriptUsageTracker {
     const resolved = fromScript.resolveRelativeScriptKey(source);
     if (!resolved) return;
 
-    this.propagateFrameByReference(
-      fromScript.key,
-      resolved,
-      `ref-from:${fromScript.key}`,
-    );
+    // `propagateFrame` is false for programmatic tab injection
+    // (`chrome.scripting.executeScript` / `chrome.tabs.executeScript`): those run
+    // the target file in the PAGE tab (a content-script context), NOT in the
+    // caller's frame, so inheriting the caller's (e.g. background) frame would
+    // misattribute a page-reachable script as privileged and collapse the CS->BG
+    // boundary. The file keeps its own manifest frame (e.g. content_scripts) or
+    // stays unframed; reachability is still marked so its body is analyzed.
+    if (executionFrameFamily) {
+      this.markScriptInSyntheticFrame(
+        resolved,
+        executionFrameFamily,
+        `runtime-injection:${fromScript.key}`,
+      );
+    } else if (propagateFrame) {
+      this.propagateFrameByReference(
+        fromScript.key,
+        resolved,
+        `ref-from:${fromScript.key}`,
+      );
+    }
 
     if (this._enabled) {
       this.markUsedByKey(resolved, `ref-from:${fromScript.key}`);
     }
   }
 
-  markReferencedScriptByKey(fromScriptKey: string | undefined, source: string) {
+  markReferencedScriptByKey(
+    fromScriptKey: string | undefined,
+    source: string,
+    propagateFrame = true,
+    executionFrameFamily?: ScriptFrameFamily,
+  ) {
     if (!fromScriptKey || !this._registry) return;
     const script = this._registry.get(fromScriptKey);
     if (!script) return;
-    this.markReferencedScript(script, source);
+    this.markReferencedScript(
+      script,
+      source,
+      propagateFrame,
+      executionFrameFamily,
+    );
   }
 
   markReferencedScriptByPathOrUrlByKey(
     fromScriptKey: string | undefined,
     value: string,
+    propagateFrame = true,
+    executionFrameFamily?: ScriptFrameFamily,
   ) {
     if (!value) return;
 
     const runtimePath = this.runtimeUrlToPath(value);
     if (runtimePath) {
-      this.markReferencedScriptByKey(fromScriptKey, runtimePath);
+      this.markReferencedScriptByKey(
+        fromScriptKey,
+        runtimePath,
+        propagateFrame,
+        executionFrameFamily,
+      );
       return;
     }
 
-    this.markReferencedScriptByKey(fromScriptKey, value);
+    this.markReferencedScriptByKey(
+      fromScriptKey,
+      value,
+      propagateFrame,
+      executionFrameFamily,
+    );
+  }
+
+  /**
+   * Recognize only a DOM script-element load. `runtime.getURL` is also used
+   * for images and extension pages, so all other calls retain their caller's
+   * frame and historical TP behavior.
+   */
+  isMainWorldScriptReference(
+    callNode: any,
+    astNode: any,
+    fromScriptKey?: string,
+  ): boolean {
+    // The CFG FlowNode is normally built for the containing statement, while
+    // `astNode` is the nested CallExpression. Walk that small statement tree
+    // to recover the syntactic parent of the getURL call.
+    let parent: any = callNode?.parent as any;
+    const root = callNode?.astNode as any;
+    const visit = (node: any, nodeParent: any): boolean => {
+      if (!node || typeof node !== "object") return false;
+      if (node === astNode) {
+        parent = nodeParent;
+        return true;
+      }
+      for (const [key, value] of Object.entries(node)) {
+        if (key === "loc" || key === "start" || key === "end" || key === "range") continue;
+        if (Array.isArray(value)) {
+          for (const child of value) {
+            if (visit(child, node)) return true;
+          }
+        } else if (visit(value, node)) {
+          return true;
+        }
+      }
+      return false;
+    };
+    visit(root, callNode?.parent);
+    if (!parent) return false;
+
+    // Bundled content scripts commonly split the idiom into two statements:
+    // `const url = chrome.runtime.getURL("injected.js"); script.src = url;`.
+    // Recover that one-hop local binding from the complete scope AST.
+    const declaredName =
+      parent.type === "VariableDeclarator" &&
+      parent.init === astNode &&
+      parent.id?.type === "Identifier"
+        ? parent.id.name
+        : undefined;
+    if (declaredName) {
+      const fullRoot = (callNode?.scopeTree as any)?.root?.ast ?? root;
+      let found = false;
+      const scan = (node: any): void => {
+        if (found || !node || typeof node !== "object") return;
+        if (
+          node.type === "AssignmentExpression" &&
+          node.left?.type === "MemberExpression" &&
+          !node.left.computed &&
+          node.left.property?.type === "Identifier" &&
+          node.left.property.name === "src" &&
+          node.right?.type === "Identifier" &&
+          node.right.name === declaredName
+        ) {
+          found = true;
+          return;
+        }
+        if (
+          node.type === "CallExpression" &&
+          node.callee?.type === "MemberExpression" &&
+          !node.callee.computed &&
+          node.callee.property?.type === "Identifier" &&
+          node.callee.property.name === "setAttribute" &&
+          node.arguments?.[0]?.type === "Literal" &&
+          node.arguments[0].value === "src" &&
+          node.arguments?.[1]?.type === "Identifier" &&
+          node.arguments[1].name === declaredName
+        ) {
+          found = true;
+          return;
+        }
+        for (const [key, value] of Object.entries(node)) {
+          if (key === "loc" || key === "start" || key === "end" || key === "range") continue;
+          if (Array.isArray(value)) value.forEach(scan);
+          else scan(value);
+        }
+      };
+      scan(fullRoot);
+      if (found) return true;
+    }
+
+    // ASTs produced by heavily bundled files may expose only the current
+    // function body through ScopeTree. Fall back to a bounded source-text
+    // check for the same one-hop binding; it is deliberately tied to a
+    // literal getURL path and a subsequent `.src = <that binding>`.
+    if (fromScriptKey && this._registry) {
+      const script = this._registry.get(fromScriptKey);
+      const code = script?.getCode() ?? "";
+      if (code) {
+        const binding = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*chrome\.runtime\.getURL\s*\([^;\n]*\)[\s\S]{0,1200}?\b[A-Za-z_$][\w$]*\.src\s*=\s*\1\b/;
+        if (binding.test(code)) return true;
+      }
+    }
+
+    if (
+      parent.type === "AssignmentExpression" &&
+      parent.right === astNode &&
+      parent.left?.type === "MemberExpression" &&
+      !parent.left.computed &&
+      parent.left.property?.type === "Identifier" &&
+      parent.left.property.name === "src"
+    ) {
+      return true;
+    }
+
+    if (
+      parent.type === "CallExpression" &&
+      parent.callee?.type === "MemberExpression" &&
+      !parent.callee.computed &&
+      parent.callee.property?.type === "Identifier" &&
+      parent.callee.property.name === "setAttribute" &&
+      parent.arguments?.[1] === astNode &&
+      parent.arguments?.[0]?.type === "Literal" &&
+      parent.arguments[0].value === "src"
+    ) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -346,13 +521,8 @@ class ScriptUsageTracker {
     for (const item of contentScripts) {
       csIndex += 1;
       const frameId = `CS_${csIndex}`;
-      const isMainWorld =
-        String(item?.world ?? "").toUpperCase() === "MAIN";
 
-      // MAIN-world content scripts execute with page authority, not the
-      // isolated extension world. Keep the CS frame id for manifest lookup,
-      // but preserve the effective world family for privilege analysis.
-      this._frameFamilies.set(frameId, isMainWorld ? "MAIN" : "CS");
+      this._frameFamilies.set(frameId, "CS");
       this._frameConstraints.set(frameId, {
         matches: this.normalizeStrArray(item?.matches),
         includeGlobs: this.normalizeStrArray(item?.include_globs),
@@ -800,6 +970,27 @@ class ScriptUsageTracker {
       this.markFrameByKey(toScriptKey, tag, reason);
       this.appendFrameOrderIfMissing(tag, toScriptKey);
     }
+  }
+
+  private markScriptInSyntheticFrame(
+    scriptKey: string,
+    family: ScriptFrameFamily,
+    reason: string,
+  ) {
+    if (!this._registry?.has(scriptKey)) return;
+
+    let tag = this._mainFrameTags.get(scriptKey);
+    if (!tag) {
+      const prefix = family === "MAIN" ? "MAIN" : family;
+      tag = this.uniqueFrameTag(
+        `${prefix}_${scriptKey.replace(/[^\w.-]+/g, "_")}`,
+      );
+      this._mainFrameTags.set(scriptKey, tag);
+      this._frameFamilies.set(tag, family);
+    }
+
+    this.markFrameByKey(scriptKey, tag, reason);
+    this.appendFrameOrderIfMissing(tag, scriptKey);
   }
 }
 

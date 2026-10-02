@@ -46,10 +46,53 @@ export function shouldFilterSourceByFrame(
   source: SourceType,
   sourceFrame: ScriptFrameTag,
   sink: SinkType,
-  sinkFrame: ScriptFrameTag
+  sinkFrame: ScriptFrameTag,
+  sourceFrameTags: ScriptFrameTag[] = [],
 ): boolean {
   const sourceFamily = scriptUsageTracker.getFrameFamily(sourceFrame);
   const sinkFamily = scriptUsageTracker.getFrameFamily(sinkFrame);
+  const sourceFamilies = new Set(
+    [sourceFrame, ...sourceFrameTags].map((tag) =>
+      scriptUsageTracker.getFrameFamily(tag),
+    ),
+  );
+
+  /**
+   * DOM reads in an extension-owned document are not web attacker input.  This
+   * applies to form controls as well as to static markup used by a popup's
+   * localization/rendering code. The caller preserves the root frame across
+   * runtime/storage relays, so a real content-script or external-message source
+   * is never hidden by this rule.
+   */
+  const isExtensionOwnedDomSource = [
+    "ELEMENT_VALUE",
+    "JQUERY_ELEMENT_VAL",
+    "ELEMENT_TEXT_CONTENT",
+    "JQUERY_ELEMENT_TEXT",
+    "ELEMENT_INNER_HTML",
+    "JQUERY_ELEMENT_HTML",
+    "ELEMENT_OUTER_HTML",
+  ].includes(source);
+  // A script can be referenced by both the background and popup. Reporting
+  // chooses BG first, but `document.getElementById(...).value` executes only
+  // in its extension-owned page instance. Suppress it when the script is
+  // shared exclusively by BG/EX frames; retain the flow if CS is also a
+  // possible execution frame so real page-DOM sources remain detectable.
+  const sharedUiAndBackgroundOnly =
+    sourceFamily === "BG" &&
+    (sourceFamilies.has("EX") ||
+      sourceFamilies.has("DT") ||
+      sourceFamilies.has("OF")) &&
+    !sourceFamilies.has("CS");
+  if (
+    isExtensionOwnedDomSource &&
+    (sourceFamily === "EX" ||
+      sourceFamily === "DT" ||
+      sourceFamily === "OF" ||
+      sharedUiAndBackgroundOnly)
+  ) {
+    return true;
+  }
 
   if (WEB_EVENT_SOURCES.includes(source)) {
     // Background service workers and offscreen documents have no `window`
@@ -90,6 +133,16 @@ export function classifySink(sink: SinkType): SinkCapability {
   if (STORAGE_SINKS.includes(sink)) return "STORAGE_WRITE";
   if (PRIVILEGED_SINKS.includes(sink)) return "PRIVILEGED_OPERATION";
   return "UNKNOWN_SINK";
+}
+
+/**
+ * Sinks that parse/coerce their input as code or HTML.  This deliberately
+ * excludes configuration APIs such as chrome.alarms.create: a number cannot
+ * inject JavaScript/markup, but it can still change an alarm schedule and is
+ * therefore security-relevant.
+ */
+export function isStringInterpretingSink(sink: SinkType): boolean {
+  return CODE_SINKS.includes(sink) || DOM_SINKS.includes(sink);
 }
 
 /* ================= Core Flow Logic ================= */

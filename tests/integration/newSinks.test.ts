@@ -88,7 +88,7 @@ describe("High-value source/sink coverage (#8)", () => {
     expect(wasm).toBeTruthy();
   });
 
-  it("chrome.storage.managed → network is outside the paper DATA_LEAK scope", async () => {
+  it("chrome.storage.managed is a SENSITIVE_DATA source → DATA_LEAK via network", async () => {
     const flows = await analyzeFixture("managed_storage_exfil");
     const hit = flows.find(
       (f) =>
@@ -96,6 +96,7 @@ describe("High-value source/sink coverage (#8)", () => {
         f.sinkType === "FETCH_BODY" &&
         f.flowType === "DATA_LEAK",
     );
-    expect(hit).toBeUndefined();
+    expect(hit).toBeTruthy();
+    expect((hit?.sourceRemark ?? "").includes("storage.managed")).toBe(true);
   });
 });

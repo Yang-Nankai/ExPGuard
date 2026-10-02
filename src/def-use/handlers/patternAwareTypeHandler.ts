@@ -12,8 +12,6 @@ import { Identifier } from "acorn";
 import { taintManager as tm } from "../../taint";
 import { SinkType } from "../../taint";
 import logger from "../../utils/logger";
-import { interAnalyzer } from "../analyzers/interProceduralAnalyzer";
-import { IDB_SUCCESS_RESULT } from "../builtins/builtinSemantics/browser/indexedDb";
 
 /**
  * Element properties whose assignment parses the value as HTML. Writing a
@@ -26,6 +24,23 @@ const DOM_WRITE_SINK_PROPS: Record<string, SinkType> = {
   innerHTML: "DOM_INNER_HTML",
   outerHTML: "DOM_INNER_HTML",
 };
+
+/**
+ * Writing a tainted value back into a schema-backed browser global (notably
+ * `document.title = title`) must update that property without tainting the
+ * entire global object.  Propagating the property value to the `document`
+ * container makes unrelated calls such as `document.querySelectorAll()` look
+ * tainted, which then pollutes arbitrary extension state.  This does not alter
+ * ordinary user objects or JSON containers, where container taint remains
+ * necessary for dynamic property reads.
+ */
+function isBrowserGlobalPropertyWrite(root: any, key: string): boolean {
+  return (
+    root?.type === "Identifier" &&
+    ["document", "location", "window", "globalThis"].includes(root.name) &&
+    ["title", "URL", "documentURI", "cookie", "href", "hash", "search"].includes(key)
+  );
+}
 
 export function patternAwareTypeHandler(
   cfgNode: FlowNode,
@@ -213,14 +228,13 @@ export function patternAwareTypeHandler(
 
         let key: string | null = null;
         let dynamic = false;
-        let propDef: Def | null = null;
 
         if (!computed) {
           // a.b
           key = resolvePropName(cfgNode, propNode, false);
         } else {
           // a[b] 需要 expressionTypeHandler
-          propDef = expressionTypeHandler(cfgNode, propNode);
+          const propDef = expressionTypeHandler(cfgNode, propNode);
 
           if (Def.isLiteralDef(propDef)) {
             key = String(propDef.value);
@@ -231,19 +245,6 @@ export function patternAwareTypeHandler(
 
         // dynamic property -> use unknown
         if (dynamic) {
-          // A computed key is part of the serialized object just as much as
-          // its value.  `record[taintedDomain] = count` is the shape used by
-          // IndexedDB-backed browsing-history collectors; retaining taint only
-          // on `count` would lose the sensitive domain during JSON.stringify.
-          if (propDef?.isTainted) {
-            tm.propagateTaint(
-              propDef,
-              curObjDef,
-              propNode,
-              "ELEMENT",
-              "object.dynamic-key",
-            );
-          }
           if (isLast) {
             curObjDef.setUnknown(def || defFactory.createUnknownDef(cfgNode));
           } else {
@@ -273,24 +274,8 @@ export function patternAwareTypeHandler(
           curObjDef.setProperty(
             key,
             def || defFactory.createUnknownDef(cfgNode),
+            !isBrowserGlobalPropertyWrite(cur, key),
           );
-
-          // IndexedDB requests deliver their result through an `onsuccess`
-          // callback.  The generic assignment model records the callback but
-          // never invokes it, which makes IDB-backed delayed uploads opaque.
-          // The IndexedDB semantic attaches a private result summary to its
-          // request object; invoke only that modeled callback with the usual
-          // `{ target: { result } }` shape.
-          if (key === "onsuccess" && def && Def.isFunctionDef(def)) {
-            const result = curObjDef.getProperty(IDB_SUCCESS_RESULT);
-            if (result) {
-              const target = defFactory.createObjectDef(cfgNode);
-              target.setProperty("result", result);
-              const event = defFactory.createObjectDef(cfgNode);
-              event.setProperty("target", target);
-              interAnalyzer.analyze(cfgNode, def, [event], null, propNode);
-            }
-          }
         } else {
           let next = curObjDef.getProperty(key);
 

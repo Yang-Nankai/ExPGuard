@@ -163,4 +163,26 @@ describe("Extension component discovery — end-to-end", () => {
     );
     expect(bookmark).toBeTruthy();
   });
+
+  it("main-world script injection does not turn page-local new Function into a TP", async () => {
+    const { summary } = await analyzeFixture("main_world_code_injection");
+    expect(scriptUsageTracker.getPrimaryFrameFamilyByKey("injected")).toBe("MAIN");
+
+    const codeInjection = summary.flows.find(
+      (f) => f.sinkType === "NEW_FUNCTION" && f.sinkFile === "injected",
+    );
+    expect(codeInjection).toBeUndefined();
+
+    const suppressed = (summary as any).privilegeSuppressed?.find(
+      (f: any) => f.sinkType === "NEW_FUNCTION" && f.sinkFile === "injected",
+    );
+    expect(suppressed).toBeTruthy();
+    expect(suppressed.reason).toMatch(/page-world script/);
+
+    expect(
+      summary.flows.some(
+        (f) => f.sinkType === "NEW_FUNCTION" && f.sinkFile === "content",
+      ),
+    ).toBe(true);
+  });
 });

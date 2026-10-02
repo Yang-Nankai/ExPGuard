@@ -41,10 +41,13 @@ class DefUseAnalyzer {
       throw Errors.DFGError("No main page CFG");
     }
 
-    // Import & feature phase
-    // NOTE: feature analysis depends on import result
+    // Import & feature phase. Module resolution is an independent capability
+    // so ablation can leave ordinary function/callback analysis intact.
+    // NOTE: feature analysis depends on import result.
     if (shouldAnalyze) {
-      importAnalyzer.analyze(rootScope, scopeTree);
+      if (config.enableModuleResolution) {
+        importAnalyzer.analyze(rootScope, scopeTree);
+      }
       featureModelAnalyzer.analyze(rootScope, scopeTree);
     }
 
@@ -70,8 +73,11 @@ class DefUseAnalyzer {
       }
     }
 
-    // Export phase
-    exportAnalyzer.analyze(rootScope, scopeTree);
+    // Export phase: disable it together with imports so no module binding can
+    // be materialized in the no-module-resolution ablation.
+    if (config.enableModuleResolution) {
+      exportAnalyzer.analyze(rootScope, scopeTree);
+    }
   }
 }
 

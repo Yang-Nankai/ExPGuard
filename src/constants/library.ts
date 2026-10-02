@@ -51,6 +51,12 @@ export const LIBRARY_FILE_NAMES: Record<string, LibraryFileRule> = {
   jquery: {
     name: "jQuery",
     regex: /(^|[\/\\])jquery([-.][\w.]*)?(\.min)?$/i,
+    // jQuery's implementation is generic DOM/event machinery.  Treating its
+    // minified single-letter temporaries as extension data creates synthetic
+    // source-to-sink paths (e.g. an internal CustomEvent to buildFragment).
+    // Calls made *by extension code* remain modeled in
+    // builtinSemantics/library/jquery.ts.
+    ignore: true,
   },
 
   /* ================= Lodash / Underscore ============== */
@@ -203,7 +209,8 @@ export function detectLibraryByFilename(filename: string): LibraryFileRule | nul
 const CONTENT_SCAN_LIMIT = 64 * 1024;
 
 interface ContentSignature {
-  model: LibraryModel;
+  /** Omitted for plain libraries that have a semantic API summary but no UI model. */
+  model?: LibraryModel;
   name: string;
   patterns: RegExp[];
 }
@@ -238,6 +245,18 @@ const CONTENT_SIGNATURES: ContentSignature[] = [
       /__NG_DEVTOOLS_GLOBAL_HOOK__/,
     ],
   },
+  {
+    name: "jQuery",
+    // Deliberately require the distribution banner rather than public API
+    // names such as `jQuery.fn` / `$`.  Those names commonly occur in
+    // extension business code, which must remain analyzable.  This covers
+    // vendor files named `jq.min`, bundles with a preserved jQuery banner,
+    // and the normal `jquery-*.min` releases.
+    patterns: [
+      /\/\*!\s*jQuery(?:\s+JavaScript\s+Library)?\s+v?\d+\.\d+(?:\.\d+)?/i,
+      /jQuery\s+JavaScript\s+Library\s+v?\d+\.\d+(?:\.\d+)?/i,
+    ],
+  },
 ];
 
 export function detectLibraryByContent(code: string): LibraryFileRule | null {
@@ -249,7 +268,11 @@ export function detectLibraryByContent(code: string): LibraryFileRule | null {
 
   for (const sig of CONTENT_SIGNATURES) {
     if (sig.patterns.some((p) => p.test(slice))) {
-      return { name: sig.name, model: sig.model, ignore: true };
+      return {
+        name: sig.name,
+        model: sig.model,
+        ignore: true,
+      };
     }
   }
 

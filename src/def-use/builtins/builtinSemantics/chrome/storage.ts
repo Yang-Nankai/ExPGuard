@@ -84,10 +84,18 @@ function resolveStorageValue(
    * Also propagates taint if the stored value is tainted.
    */
   const attachStoredValue = (key: string) => {
-    const stored = defFactory.createUnknownDef(callNode);
+    // Retain only producer-proven primitive/syntax-safe field kinds.  Unknown
+    // fields still use the old opaque model, so page strings remain tainted
+    // when read back through extension storage.
+    const stored = taintManager.getStorageReadShape(area, key, callNode)
+      ?? defFactory.createUnknownDef(callNode);
+    stored.markStorageSerialized();
     taintManager.recordStorageGet(area, key, stored, astNode);
 
-    result.setProperty(key, stored);
+    // A specific storage read taints that property, not the complete result
+    // map.  Otherwise `get(["token", "theme"])` makes `result.theme`
+    // inherit `token`'s taint through generic container propagation.
+    result.setProperty(key, stored, false);
   };
 
   // Case 0: null / undefined / no argument
@@ -116,6 +124,23 @@ function resolveStorageValue(
     return result;
   }
 
+  // A bounded ImplicitDef represents concrete alternatives (for example
+  // `keys[index]` where `keys` is ["token", "theme"]). Model every literal
+  // alternative precisely; retain a wildcard only for genuinely unresolved
+  // alternatives, never for the known ones.
+  if (Def.isImplicitDef(keyDef)) {
+    let hasUnknownAlternative = false;
+    for (const candidate of keyDef.defs) {
+      if (Def.isLiteralDef(candidate)) {
+        attachStoredValue(String(candidate.value));
+      } else {
+        hasUnknownAlternative = true;
+      }
+    }
+    if (hasUnknownAlternative) taintManager.recordStorageWildcardRead(area);
+    return result;
+  }
+
   // Case 2: Array of keys
   if (
     Def.isObjectDef(keyDef) &&
@@ -137,21 +162,18 @@ function resolveStorageValue(
     return result;
   }
 
+  // Generic wrappers such as `getStorage(keys)` often lose the caller's
+  // literal-array shape during inter-procedural modeling. Keep shapes for
+  // known literal producer keys while retaining the wildcard below for every
+  // unresolved key, so raw storage text remains conservative.
+  for (const [key, stored] of taintManager.getKnownStorageReadShapes(area, callNode)) {
+    taintManager.recordStorageGet(area, key, stored, astNode);
+    result.setProperty(key, stored, false);
+  }
+
   // Unknown key type — the call could read anything in the area, so it counts
   // as a consumer for every key (conservative; see `hasStorageConsumer`).
-  // A computed key is useful as a storage-data source only when the webpage
-  // can choose it. Internal computed keys frequently represent harmless UI
-  // settings; treating all of them as sensitive would create noisy reports.
   taintManager.recordStorageWildcardRead(area);
-  if (keyDef && taintManager.hasPageControlledTaint(keyDef)) {
-    taintManager.createTaintSource(
-      result,
-      "STORAGE_ALL_ITEMS",
-      astNode,
-      false,
-      `storage.dynamic.items[${area}]`,
-    );
-  }
   return result;
 }
 

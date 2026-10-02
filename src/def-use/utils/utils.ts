@@ -4,6 +4,7 @@ import { defFactory } from "../factories/defFactory";
 import { expressionTypeHandler } from "../handlers/expressionTypeHandler";
 import Def from "../types/def";
 import Var from "../types/var";
+import { taintManager } from "../../taint";
 
 const EXTENSION_ID_REGEX = /^[a-p]{32}$/;
 export type BranchTruth = "TRUE" | "FALSE" | "UNKNOWN";
@@ -164,6 +165,27 @@ export function performMemberLookup(
   // ------------------------------------------------------------
   if (Def.isUnknownDef(propDef)) {
     const allValues = getAllPossibleValues(objectDef);
+
+    // `ImplicitDef` intentionally excludes UnknownDef members.  Returning an
+    // implicit set for `{ literal, unknown }[dynamicIndex]` would therefore
+    // silently collapse the unknown alternative to the literal one, allowing
+    // protocol matching to reject a message that might actually match at
+    // runtime. Keep the result opaque in that mixed case and retain taint from
+    // every known candidate that can still be selected.
+    if (allValues.some((value) => Def.isUnknownDef(value))) {
+      const result = defFactory.createUnknownDef(cfgNode);
+      for (const value of allValues) {
+        taintManager.propagateTaint(
+          value,
+          result,
+          node,
+          "ELEMENT",
+          "computed-member-unknown-alternative",
+        );
+      }
+      return result;
+    }
+
     return defFactory.createImplicitDef(cfgNode, allValues);
   }
 

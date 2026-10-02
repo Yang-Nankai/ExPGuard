@@ -58,16 +58,17 @@ an isolated browser demonstration are in the sample README.
 The compatibility examples `code_injection/`, `multi_channel/`,
 `event_driven_attack/`, `advanced_stealth_exfiltration/` and
 `obfuscated_code_injection/` continue to exercise engine features. They are
-not additional paper vulnerability classes. Network exfiltration in a legacy
-example must not be interpreted as an in-scope `DATA_LEAK` finding under the
-current default rules. DOM/code execution fixtures remain useful engine
+not additional paper vulnerability classes. The Ablation default rules do
+report sensitive or system data reaching outbound network sinks as
+`DATA_LEAK`; the paper dataset applies its own threat-model curation before
+counting ground-truth flows. DOM/code execution fixtures remain useful engine
 regressions even though these classes are excluded from the paper dataset.
 
 ## Regression coverage
 
 `tests/integration/samples.test.ts` requires cookies and history to reach the
 external response sink. Custom-rule tests suppress the cookie response while
-preserving the history response. Sensitive-exfiltration tests require network
-egress to stay outside the default Data Leak scope. Firefox namespace tests
-check the same positive message-egress and negative network-egress semantics
-for `browser.*` aliases. Run `npm test -- --silent` for the full suite.
+preserving the history response. Sensitive-exfiltration tests cover the
+default network Data Leak rules and their request-header suppressions. Firefox
+namespace tests check the same source and sink policy through `browser.*`
+aliases. Run `npm test -- --silent` for the full suite.

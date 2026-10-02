@@ -29,7 +29,7 @@ BuiltInSemantics.register(
     }
 
     for (const arg of args) {
-      array.setProperty(array.propsLength, arg);
+      array.setProperty(array.propsLength, arg, true, true);
     }
   },
 );
@@ -83,7 +83,10 @@ BuiltInSemantics.register(
     // Copy elements from `this`.
     if (Def.isObjectDef(thisDef)) {
       for (const e of thisDef.values) {
-        result.setProperty(result.propsLength, e);
+        result.setProperty(result.propsLength, e, true, true);
+      }
+      if (thisDef.arrayElementSummary) {
+        result.addArrayElement(thisDef.arrayElementSummary);
       }
       // Propagate container taint from the receiver array to the new array.
       taintManager.propagateTaint(thisDef, result, astNode, "COPY", "array.concat");
@@ -93,11 +96,14 @@ BuiltInSemantics.register(
     for (const arg of args) {
       if (Def.isObjectDef(arg)) {
         for (const e of arg.values) {
-          result.setProperty(result.propsLength, e);
+          result.setProperty(result.propsLength, e, true, true);
+        }
+        if (arg.arrayElementSummary) {
+          result.addArrayElement(arg.arrayElementSummary);
         }
         taintManager.propagateTaint(arg, result, astNode, "COPY", "array.concat.arg");
       } else if (arg) {
-        result.setProperty(result.propsLength, arg);
+        result.setProperty(result.propsLength, arg, true, true);
         taintManager.propagateTaint(arg, result, astNode, "ELEMENT", "array.concat.scalar");
       }
     }
@@ -120,7 +126,7 @@ BuiltInSemantics.register(
     if (!Def.isObjectDef(thisDef) || !value) return thisDef;
 
     // fallback: set the last value
-    thisDef.setProperty(thisDef.propsLength, value);
+    thisDef.setProperty(thisDef.propsLength, value, true, true);
 
     taintManager.propagateTaint(
       value,
@@ -238,7 +244,7 @@ BuiltInSemantics.register(
     if (!Def.isObjectDef(thisDef)) return thisDef;
 
     for (const arg of args) {
-      thisDef.setProperty(thisDef.propsLength, arg);
+      thisDef.setProperty(thisDef.propsLength, arg, true, true);
     }
 
     return defFactory.createLiteralDef(callNode, thisDef.propsLength);
@@ -306,7 +312,7 @@ BuiltInSemantics.register(
     if (!Def.isObjectDef(thisDef)) return thisDef;
 
     for (const arg of args) {
-      thisDef.setProperty(thisDef.propsLength, arg);
+      thisDef.setProperty(thisDef.propsLength, arg, true, true);
     }
 
     return defFactory.createLiteralDef(callNode, thisDef.propsLength);

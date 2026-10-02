@@ -19,6 +19,7 @@ describe("detectLibraryByFilename", () => {
 
   it("matches dist/min/version variants", () => {
     expect(detectLibraryByFilename("jquery-3.6.0.min")).toBeTruthy();
+    expect(detectLibraryByFilename("jquery-3.6.0.min")?.ignore).toBe(true);
     expect(detectLibraryByFilename("vue.runtime.global")).toBeTruthy();
     expect(detectLibraryByFilename("react-18.2.0")).toBeTruthy();
   });
@@ -59,6 +60,13 @@ describe("detectLibraryByContent", () => {
     expect(detectLibraryByContent(code)?.model).toBe("angular");
   });
 
+  it("detects a banner-identified jQuery distribution, including jq.min", () => {
+    const code = "/*! jQuery v3.7.1 | (c) OpenJS Foundation */!function(){}";
+    const detected = detectLibraryByContent(code);
+    expect(detected?.name).toBe("jQuery");
+    expect(detected?.ignore).toBe(true);
+  });
+
   it("does NOT flag user code that merely calls a framework's public API", () => {
     // A user file that uses React must still be analyzed, not skipped.
     expect(
@@ -66,6 +74,7 @@ describe("detectLibraryByContent", () => {
     ).toBeNull();
     expect(detectLibraryByContent("Vue.compile(tpl);")).toBeNull();
     expect(detectLibraryByContent("$sce.trustAsHtml(x);")).toBeNull();
+    expect(detectLibraryByContent("jQuery.fn.on.call(node, 'click', cb);")).toBeNull();
   });
 
   it("returns null for ordinary code", () => {
