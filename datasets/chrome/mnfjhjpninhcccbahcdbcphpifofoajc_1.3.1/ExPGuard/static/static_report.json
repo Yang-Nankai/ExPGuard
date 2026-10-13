@@ -1,0 +1,99 @@
+{
+  "extension_id": "mnfjhjpninhcccbahcdbcphpifofoajc",
+  "extension_version": "1.3.1",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.3,
+      "reasoning": "Structured extraction unavailable; preserved analyst notes: ## Verification Ledger\n\n**(a) Who controls the source?**  \nA page running on `https://www.patreon.com/*` (or `patreon.com/*`). The listener is registered in the content script's ISOLATED world, but it listens on the shared `document` DOM:\n\n```js\ndocument.addEventListener(\"pd-bootstrap-data\", function handleBootstrapData(e) {\n  console.log(\"Patreon Downloader | Received bootstrap data.\", e.detail);\n  setState(e.detail, 0);\n});\n```\n\nThe extension itself dispatches `pd-bootstrap-data` CustomEvents (L24–30, L68–74) to feed real Patreon data in, but the event name is public, the listener has no `isTrusted` check, no `origin` check, and no secret token. Any page script (including XSS on Patreon) can do `document.dispatchEvent(new CustomEvent(\"pd-bootstrap-data\", {detail: {...}}))` and the isolated-world listener will fire with the attacker's `detail`. **Source is attacker-controllable.**\n\n**(b) Source → sink path (unbroken):**  \n`e.detail` (L169) → `setState(e.detail, 0)` (L170) → retry loop keeps the same `state` (L184) → `data[tab.toString()] = state` (L191) → `chrome.storage.local.set(data, ...)` (L192). The `tab` key is browser-derived (`whoAmI` background response), so it is not att",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "src/contentScript",
+          "reportedLoc": "L169:C65 -> L169:C73",
+          "resolvedFile": "src/contentScript.js",
+          "resolved": true,
+          "snippet": "L169 C65-73:     console.log(\"Patreon Downloader | Received bootstrap data.\", e.detail);"
+        },
+        "sinkAnchor": {
+          "reportedFile": "src/contentScript",
+          "reportedLoc": "L192:C4 -> L203:C6",
+          "resolvedFile": "src/contentScript.js",
+          "resolved": true,
+          "snippet": ">>   192|     chrome.storage.local.set(data, function () {\n>>   193|       if (chrome.runtime.lastError) {\n>>   194|         console.error(\n>>   195|           \"Patreon Downloader | Failed to set data for tab.\",\n>>   196|           tab,\n>>   197|           data,\n>>   198|           chrome.runtime.lastError.message,\n>>   199|         );\n>>   200|       } else {\n>>   201|         console.log(\"Patreon Downloader | Set page data.\", tab, data);\n>>   202|       }\n>>   203|     });"
+        },
+        "sourceExpectedMarkers": [
+          "addEventListener",
+          "detail"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://www.patreon.com/*",
+              "https://patreon.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "src/contentScript.js",
+              "src/js/downloader.js",
+              "src/fflate/fflate.js",
+              "src/js/compressor.js"
+            ],
+            "runAt": "document_idle",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "No structured verdict or explicit labelled transcript verdict was available.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 0 true-positive, 0 false-positive, 1 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

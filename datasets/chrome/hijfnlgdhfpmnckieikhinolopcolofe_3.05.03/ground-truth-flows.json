@@ -1,0 +1,280 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "hijfnlgdhfpmnckieikhinolopcolofe",
+  "version": "3.05.03",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-349b072d7b63e5a0",
+      "verification": "TP",
+      "source_family": "ELEMENT_VALUE",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "CoCo"
+      ],
+      "match_region": "CoCo only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:hijfnlgdhfpmnckieikhinolopcolofe:3.05.03:8f5495ce90d8d534:01",
+          "flow": {
+            "flow_id": "coco:chrome:hijfnlgdhfpmnckieikhinolopcolofe:3.05.03:8f5495ce90d8d534:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "8f5495ce90d8d5343d8c9d70f7cc78b129d3341bc6910e7ff2fd3d0e677f4913",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "coco-storage_posoing",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "ELEMENT_VALUE",
+              "remark": "CoCo source evidence",
+              "file": "crx_headers/expguard_compat_header.js",
+              "loc": "L33:C1 -> L33:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "crx_headers/expguard_compat_header.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "CoCo sink evidence",
+              "file": "crx_headers/expguard_compat_header.js",
+              "loc": "L33:C1 -> L33:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "coco_dynamic",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+                  "outcome": "CONFIRMED",
+                  "basis": "runtime_or_static_dynamic_evidence",
+                  "report_path": "extensions/hijfnlgdhfpmnckieikhinolopcolofe_3.05.03/dynamic/dynamic_report.json"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": {
+              "verdict": "FALSE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — STORAGE_POSOING (ELEMENT_VALUE → CHROME_LOCAL_STORAGE)\n\n### Evidence assessment\n\nThe entire finding rests on a single, self-referential anchor:\n\n- **Source**: `ELEMENT_VALUE` @ `crx_headers/expguard_compat_header.js` L33:C1 → L33:C1\n- **Sink**: `CHROME_LOCAL_STORAGE` @ `crx_headers/expguard_compat_header.js` L33:C1 → L33:C1\n- **Code context (both)**: `Document_element.prototype.value = 'element-value'`\n- **Propagation**: empty (0 hops of real data flow), `Sanitized: False`\n\nI attempted to resolve the reported file and it does not exist:\n\n1. `list_files()` shows no `crx_headers/` directory and no `expguard_compat_header.js`. Actual files are `js/content_script.js`, `js/service_worker.js`, `js/popup.js`, `js/options.js`, `manifest.json`, etc.\n2. `read_code(\"crx_headers/expguard_compat_header.js\", ...)` returns `FILE NOT FOUND`.\n3. `search_code(\"expguard_compat_header\")` returns **NO MATCHES** across the whole extension.\n\n### Four-part decision ledger\n\n**(a) Who controls the source?**  \nNot established. The \"source\" is a synthetic harness stub — `Document_element.prototype.value = 'element-value'` — living in a CoCo compatibility header that is not part of",
+              "path": "extensions/hijfnlgdhfpmnckieikhinolopcolofe_3.05.03/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.95,
+              "reproduced": true,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 7,
+              "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+              "path": "extensions/hijfnlgdhfpmnckieikhinolopcolofe_3.05.03/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T04:52:38.111082Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": null,
+            "notes": [
+              "CoCo static verdict snapshot: FALSE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: CONFIRMED; final_verdict=TRUE_POSITIVE."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "3.05.03",
+        "latest_version": "3.05.03",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-a2c7cee1e068b785",
+      "verification": "TP",
+      "source_family": "ELEMENT_VALUE",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "CoCo"
+      ],
+      "match_region": "CoCo only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:hijfnlgdhfpmnckieikhinolopcolofe:3.05.03:aadd0f6a3eda14b7:01",
+          "flow": {
+            "flow_id": "coco:chrome:hijfnlgdhfpmnckieikhinolopcolofe:3.05.03:aadd0f6a3eda14b7:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "aadd0f6a3eda14b79f626745d636a23891e74b265116509516bd7d5b3e6c9373",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "coco-storage_posoing",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "ELEMENT_VALUE",
+              "remark": "CoCo source evidence",
+              "file": "crx_headers/expguard_compat_header.js",
+              "loc": "L33:C1 -> L33:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "crx_headers/expguard_compat_header.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "CoCo sink evidence",
+              "file": "js/content_script.js",
+              "loc": "L1:C1 -> L1:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "coco_dynamic",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+                  "outcome": "CONFIRMED",
+                  "basis": "runtime_or_static_dynamic_evidence",
+                  "report_path": "extensions/hijfnlgdhfpmnckieikhinolopcolofe_3.05.03/dynamic/dynamic_report.json"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": {
+              "verdict": "UNCERTAIN",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 2,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've completed source-level verification. Here is my analysis.\n\n## Four-part decision ledger\n\n**(a) Who controls the source?**\nThe reported source is `ELEMENT_VALUE` — DOM element content on pages where `js/content_script.js` runs. The manifest restricts content-script matches to `*.google.*` TLDs, there is **no `externally_connectable`**, no `onMessageExternal`, and the service worker only writes a constant `{color:\"#3aa757\"}`. So an arbitrary web page on another origin cannot directly drive this source; the \"source\" is Google-page DOM content (search box value / business headings).\n\n**(b) Exact source-to-sink path**\nThe report's own propagation evidence is weak and internally inconsistent:\n- Step 1 `t.indexOf(\"?sa=\")` lives in the `w()` mapper (business heading / `a[data-url]` href handling).\n- Step 2 `e.substring(5)` lives in the `localServiceNewResultsFetchedEvent` listener.\n- These are **two unrelated code paths**, and the sink `codeContext` (`JSON.parse(e.substring(5))`) is a **JSON.parse call, not a `chrome.storage` write**.\n\nReading the real minified source, the genuine element-value→storage route is:\n- `document.querySelector('form[action=\"/search\"] input[type=\"search\"]').",
+              "path": "extensions/hijfnlgdhfpmnckieikhinolopcolofe_3.05.03/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.95,
+              "reproduced": true,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 7,
+              "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+              "path": "extensions/hijfnlgdhfpmnckieikhinolopcolofe_3.05.03/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T04:52:38.111082Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": null,
+            "notes": [
+              "CoCo static verdict snapshot: UNCERTAIN (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: CONFIRMED; final_verdict=TRUE_POSITIVE."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "3.05.03",
+        "latest_version": "3.05.03",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

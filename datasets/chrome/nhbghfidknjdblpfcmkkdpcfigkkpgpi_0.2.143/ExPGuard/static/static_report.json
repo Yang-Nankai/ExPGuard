@@ -1,0 +1,261 @@
+{
+  "extension_id": "nhbghfidknjdblpfcmkkdpcfigkkpgpi",
+  "extension_version": "0.2.143",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 11,
+  "verified_count": 3,
+  "verdicts": [
+    {
+      "flow_index": 1,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.3,
+      "reasoning": "Structured extraction unavailable; preserved analyst notes: Sorry, need more steps to process this request.",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/customer_followups/alura-followup-listener",
+          "reportedLoc": "L1:C174 -> L1:C184",
+          "resolvedFile": "js/customer_followups/alura-followup-listener.js",
+          "resolved": true,
+          "snippet": "L1 C174-184: …window.addEventListener(\"message\",e=>{if(e.source!==window)return;const{type:t}=e.data||{};\"ALURA_FOLLOWUP_BATCH_START\"===t&&(console.log(\"[Alura Listener] Batch start re…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.bundle",
+          "reportedLoc": "L2:C111168 -> L2:C111224",
+          "resolvedFile": "background.bundle.js",
+          "resolved": true,
+          "snippet": "L2 C111168-111224: …})),function(e){return L.apply(this,arguments)}),saveUISettings:function(e,n,t){chrome.storage.local.set({uiSettings:JSON.stringify(a)}),\"function\"==typeof t&&t({uiSettings:a})},getSettingsDB:function(e,n,t){chrome.t…"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://*.alura.io/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "js/customer_followups/alura-followup-listener.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.alura.io/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "No structured verdict or explicit labelled transcript verdict was available.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 2,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: The primary evidence and the raw code confirm an unbroken external-message → storage-write path.\n\n## Decision ledger\n\n**(a) Who controls the source?**\nThe source is `chrome.runtime.onMessageExternal.addListener(function(e,n,t){...})` in the background service worker. The tainted span is the message payload `e`. The manifest's `externally_connectable.matches` is `*://*.alura.io/*`, so any page on an alura.io subdomain (or any page injected there via XSS/subdomain takeover) can send this message. The listener uses `e` and never validates `n` (the browser-supplied sender).\n\n**(b) Source-to-sink path**\n```\nonMessageExternal listener (e)\n  -> handleBridgeMessage(e,n,t) short-circuit (returns falsy for this command)\n  -> e && \"saveLoggedInToExtension\" == e.command\n  -> chrome.storage.local.set({loggedInCustomToken: e.data.customToken})\n```\nThe exact sink is present in the resolved snippet:\n\n```js\ne&&\"saveLoggedInToExtension\"==e.command?(chrome.storage.local.set({loggedInCustomToken:e.data.customToken}),t({loggedInSave:\"success\"}))\n```\n\n**(c) Which security-relevant argument is attacker-controlled?**\nThe *stored value* itself — `e.data.customToken` — is written verbatim into `chrome.stora",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background.bundle",
+          "reportedLoc": "L2:C120485 -> L2:C120486",
+          "resolvedFile": "background.bundle.js",
+          "resolved": true,
+          "snippet": "L2 C120485-120486: …e.onMessageExternal.addListener(function(e,n,t){return(0,k.handleBridgeMessage)(e,n,t)||(e&&\"checkExtensionInstalled\"==e.command?t({installed:\"success\"}):e&&\"sav…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.bundle",
+          "reportedLoc": "L2:C120600 -> L2:C120666",
+          "resolvedFile": "background.bundle.js",
+          "resolved": true,
+          "snippet": "L2 C120600-120666: …d\"==e.command?t({installed:\"success\"}):e&&\"saveLoggedInToExtension\"==e.command?(chrome.storage.local.set({loggedInCustomToken:e.data.customToken}),t({loggedInSave:\"success\"})):e&&\"openEtsySearchTearmListingStatePage\"==e.comman…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.alura.io/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — STORAGE_POSOING (ELEMENT_TEXT_CONTENT → chrome.storage.local)\n\n### (a) Who controls the source?\nThe source is the `textContent` of `p[data-seller-name-container] .wt-screen-reader-only:not([aria-hidden=\"true\"])` inside a listing card on the Alura keyword-research page. The content script runs only on:\n\n- `*://app.alura.io/research/keyword*`\n- `*://platform.alura.io/research/keyword*`\n\nThe value rendered there is the Etsy shop name (`From shop <name>`), i.e. third-party seller-controlled text rendered into the page DOM. In the content-script world the page DOM is web-influenceable surface (the harness confirms `PAGE_TO_CONTENT_SCRIPT` and that a page can mutate shared DOM values). Provenance is `CONTENT_SCRIPT`, which the tool treats as web taint rather than trusted extension-user input.\n\n### (b) Source-to-sink path\nThe report's propagation is confirmed by the raw bundle:\n\n1. Source (L2 C4128–4146):\n   `var h = y.textContent.trim().match(/From shop\\s+(.+)/i); h && (f = h[1].trim())`\n2. The extracted shop name is placed in the returned listing object (L2 C4180+):\n   `... shop_name: f, images: [...] ...`\n3. That object array becomes the page data (`b = f(S",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content_ranking.bundle",
+          "reportedLoc": "L2:C4128 -> L2:C4146",
+          "resolvedFile": "content_ranking.bundle.js",
+          "resolved": true,
+          "snippet": "L2 C4128-4146: …-name-container] .wt-screen-reader-only:not([aria-hidden=\"true\"])');if(y){var h=y.textContent.trim().match(/From shop\\s+(.+)/i);h&&(f=h[1].trim())}var m=e.querySelector(\".v2-list…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "content_ranking.bundle",
+          "reportedLoc": "L2:C9384 -> L2:C9442",
+          "resolvedFile": "content_ranking.bundle.js",
+          "resolved": true,
+          "snippet": "L2 C9384-9442: …ase 12:return b=f(S),k=(k=c.etsySearchRankingProcessData||[]).concat(b),e.n=13,chrome.storage.local.set({etsySearchRankingProcessData:k});case 13:return w={currentPage:S,totalPages:v,pageData:b,allData:k,isComplete:S>=…"
+        },
+        "sourceExpectedMarkers": [
+          "document",
+          "window",
+          "value",
+          "textContent",
+          "innerHTML"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.alura.io/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 3 flow(s): 2 true-positive, 0 false-positive, 0 partial-available (PA), 1 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

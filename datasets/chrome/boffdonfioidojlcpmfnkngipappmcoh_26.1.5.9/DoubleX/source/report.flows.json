@@ -1,0 +1,190 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "content_scripts.js",
+      "sourceFrame": "CS_1",
+      "sourceLoc": "L15",
+      "sourceCode": "e",
+      "sinkType": "CHROME_NOTIFICATIONS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.notifications.create",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L42",
+      "sinkCode": "chrome.notifications.create(None, <pdg_js.node.ValueExpr object at 0x7f740f0b2b50>)",
+      "ctx": "background",
+      "messagePassing": true,
+      "channel": "doublex-edg",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": true,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "content_scripts.js",
+      "sourceFrame": "CS_1",
+      "sourceLoc": "L15",
+      "sourceCode": "e",
+      "sinkType": "CHROME_ALARMS_CLEAR_NAME",
+      "sinkRemark": "chrome.alarms.clear",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L63",
+      "sinkCode": "chrome.alarms.clear(e.alarmType)",
+      "ctx": "background",
+      "messagePassing": true,
+      "channel": "doublex-edg",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": true,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_NOTIFICATIONS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.notifications.create",
+      "sinkFile": "background.js",
+      "sinkLoc": "L42",
+      "legacy": {
+        "danger": "chrome.notifications.create",
+        "value": "chrome.notifications.create(None, <pdg_js.node.ValueExpr object at 0x7f740f0b2b50>)",
+        "sink-param1": null,
+        "sink-param2": "{\n\t\t\ttitle: e,\n\t\t\tmessage: t,\n\t\t\ticonUrl: \"/icon128.png\",\n\t\t\ttype: \"basic\",\n\t\t\t...n\n\t\t}",
+        "line": "42 - 48",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zcw8szsi/unpacked/boffdonfioidojlcpmfnkngipappmcoh.26.1.5.9/background.js",
+        "dataflow": true,
+        "param_id0": {},
+        "param_id1": {
+          "received_from_wa_1": {
+            "wa": "e",
+            "line": "15 - 15",
+            "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zcw8szsi/unpacked/boffdonfioidojlcpmfnkngipappmcoh.26.1.5.9/content_scripts.js",
+            "where": "e"
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger2",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.create",
+      "sinkFile": "background.js",
+      "sinkLoc": "L51",
+      "legacy": {
+        "danger": "chrome.tabs.create",
+        "value": "chrome.tabs.create(<pdg_js.node.ValueExpr object at 0x7f740f0d2310>)",
+        "sink-param1": "{\n\t\turl: \"https://www.ea.com/ea-sports-fc/ultimate-team/web-app/?tradepile\"\n\t}",
+        "line": "51 - 53",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zcw8szsi/unpacked/boffdonfioidojlcpmfnkngipappmcoh.26.1.5.9/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger3",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_ALARMS_CLEAR_NAME",
+      "sinkRemark": "chrome.alarms.clear",
+      "sinkFile": "background.js",
+      "sinkLoc": "L63",
+      "legacy": {
+        "danger": "chrome.alarms.clear",
+        "value": "chrome.alarms.clear(e.alarmType)",
+        "sink-param1": "e.alarmType",
+        "line": "63 - 63",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zcw8szsi/unpacked/boffdonfioidojlcpmfnkngipappmcoh.26.1.5.9/background.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "e",
+            "line": "15 - 15",
+            "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zcw8szsi/unpacked/boffdonfioidojlcpmfnkngipappmcoh.26.1.5.9/content_scripts.js",
+            "where": "e"
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger4",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_ALARMS_CLEAR_NAME",
+      "sinkRemark": "chrome.alarms.clear",
+      "sinkFile": "background.js",
+      "sinkLoc": "L66",
+      "legacy": {
+        "danger": "chrome.alarms.clear",
+        "value": "chrome.alarms.clear(e)",
+        "sink-param1": "e",
+        "line": "66 - 66",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zcw8szsi/unpacked/boffdonfioidojlcpmfnkngipappmcoh.26.1.5.9/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger5",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_ALARMS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.alarms.create",
+      "sinkFile": "background.js",
+      "sinkLoc": "L66",
+      "legacy": {
+        "danger": "chrome.alarms.create",
+        "value": "chrome.alarms.create(e, <pdg_js.node.ValueExpr object at 0x7f740f08d2b0>)",
+        "sink-param1": "e",
+        "sink-param2": "{\n\t\tperiodInMinutes: t,\n\t\twhen: a\n\t}",
+        "line": "66 - 69",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zcw8szsi/unpacked/boffdonfioidojlcpmfnkngipappmcoh.26.1.5.9/background.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger1",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": false,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkLoc": "L17",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(e, <pdg_js.node.ValueExpr object at 0x7f740f113670>)",
+        "sink-param1": "e",
+        "sink-param2": "{\n\t\t\tmethod: t,\n\t\t\theaders: a,\n\t\t\tbody: s\n\t\t}",
+        "line": "17 - 21",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zcw8szsi/unpacked/boffdonfioidojlcpmfnkngipappmcoh.26.1.5.9/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    }
+  ]
+}

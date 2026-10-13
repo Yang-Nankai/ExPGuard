@@ -1,0 +1,212 @@
+{
+  "extension_id": "jabjbhgjaidecageckilhonbggakppme",
+  "extension_version": "1.3.19.0",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 2,
+  "verified_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.0,
+      "reasoning": "Verification error: Connection error.",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {
+        "sanitized": false,
+        "duplicatePaths": 1,
+        "rawSteps": 1422,
+        "distinctLines": 96,
+        "crossContextHops": [
+          "runtime.single.sender.message[content->background]"
+        ],
+        "sinkUrlControl": []
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L38:C31 -> L38:C38",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": "L38 C31-38:                     let meta = message?.meta;"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L937:C20 -> L937:C71",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L937 C20-71:                     chrome.notifications.create(...notificationOptions).then?.(callback) || callback();"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "<all_urls>"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "includes/jquery.js",
+              "includes/formats.js",
+              "includes/base64.js",
+              "content.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "PRIVILEGED_EXTENSION_UI_CONTROL",
+          "rule": "Treat attacker-controlled badge/title/icon/notification content or state as a privilege escalation: it controls browser/extension UI outside the page principal. Still prove the untrusted value reaches the actual API argument; a literal, browser-derived value, or disconnected action branch is not a flow."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Verifier exception; no final semantic judgement was produced.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1\n\n### (a) Who controls the source?\nThe source is `window.addEventListener(\"message\", ...)` in `content.js` (CS_1), which runs on `<all_urls>` with `allFrames: true`. Any page can forge a `postMessage` payload into this listener. The tainted field is the page-supplied `message` object (specifically `message.meta`, `message.id`, `message.routes[0].node`). **Source is genuinely attacker-controllable.**\n\n### (b) Exact source-to-sink path\nConfirmed from the report and raw source:\n1. `L37` `let message = event?.data` \u2014 page payload.\n2. `L38` `let meta = message?.meta` (reported tainted span).\n3. `L40` gate on `meta?.format?.category === \"gosuslugi.plugin\"` (attacker-satisfiable \u2014 it is an attacker-chosen field).\n4. `L42` gate on `message?.node === \"\"` (attacker-satisfiable).\n5. `L44` `routeNode = meta.routes?.[0]?.node` (attacker value) \u2192 cached at `L49` `_cache[id] = routeNode`.\n6. `L53` `chrome.runtime.sendMessage(message)` \u2014 content\u2192background.\n7. `L59` `chrome.runtime.onMessage` \u2014 background\u2192content response (HOP `runtime.single.sender.message[background->content]`).\n8. `L70` `message.node = cached` \u2014 the attacker-cached `routeNode` is put back into the resp",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SOURCE_REPORT_ONLY",
+      "source_report_id": 1,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "Recovered source-level flow; inspect propagation and code",
+      "report_evidence": {
+        "sanitized": false,
+        "duplicatePaths": 1,
+        "rawSteps": 656,
+        "distinctLines": 21,
+        "crossContextHops": [
+          "runtime.single.sender.message[background->content]"
+        ],
+        "sinkUrlControl": []
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L38:C31 -> L38:C38",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": "L38 C31-38:                     let meta = message?.meta;"
+        },
+        "sinkAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L75:C35 -> L75:C67",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": "L75 C35-67:                                    window.postMessage(message, '*');"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "<all_urls>"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "includes/jquery.js",
+              "includes/formats.js",
+              "includes/base64.js",
+              "content.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "NEEDS_SEMANTIC_CLASSIFICATION",
+          "rule": "Inspect the invoked API and the precise tainted argument before assigning a security label."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "WINDOW_POSTMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 2 flow(s): 0 true-positive, 1 false-positive, 0 partial-available (PA), 1 uncertain, 0 duplicate; 2 flagged triggerable for dynamic testing."
+}

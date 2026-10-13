@@ -1,0 +1,101 @@
+{
+  "extension_id": "mbchdidopjakdkjkekaogajhcdekciop",
+  "extension_version": "1.4.4",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've now inspected enough of the service worker to reach a grounded decision.\n\n## Decision ledger\n\n**(a) Who controls the source?**\n`chrome.runtime.onMessageExternal.addListener(this.handleExternalMessage.bind(this))` (confirmed at ~L1 C826700). The message object `t` is attacker-controllable from any origin in `externally_connectable` (`*://qa.bookbeam.io/*`, `*://app.bookbeam.io/*`, and the Amazon/Audible domains). There is **no** fixed `sender.id` allowlist (`authenticatedExtensionAllowlist: null`). So the *source* is genuinely untrusted in principle. However, an untrusted source alone does not make the flagged sink real.\n\n**(b) Exact source→sink path?**\nThe propagation evidence is **not a concrete path**. It is a single minified line with a `⟨tainted span: 428049 chars⟩` covering columns ~402096–830144 — i.e., the taint engine painted roughly half the bundle (the HTTP client class `Vf` at C446363, dozens of service/repository classes, the locator, and the message handler at C830144) as one contiguous taint blob. The listed operators are generic (`ASSIGN:identifier`, `ELEMENT:member-element`, `RETURN:template-literal`, …), and there is no function-level chain from `handleExterna",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "service-worker",
+          "reportedLoc": "L1:C830144 -> L1:C830145",
+          "resolvedFile": "service-worker.js",
+          "resolved": true,
+          "snippet": "L1 C830144-830145: …)&&chrome.tabs.reload(r.id)})}handleExternalMessage(t,n,r){switch(null!=t.event?t.event:t.id){case yt.PREREQUISITE_REQUEST:this.handlePrerequisiteRequest(t.marke…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "service-worker",
+          "reportedLoc": "L1:C446363 -> L1:C446389",
+          "resolvedFile": "service-worker.js",
+          "resolved": true,
+          "snippet": "L1 C446363-446389: …=>{i.error({status:0,message:o.message})})}).pipe(me(1)))))}delete(t){return ml(fetch(t,{method:\"DELETE\"}))}}class Ke{static getHttpClient(){return Ke.HttpClient||(Ke.HttpClient=new Vf),…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://qa.bookbeam.io/*",
+            "*://app.bookbeam.io/*",
+            "*://www.amazon.com/*",
+            "*://www.amazon.de/*",
+            "*://www.amazon.it/*",
+            "*://www.amazon.co.uk/*",
+            "*://www.audible.com/*",
+            "*://www.audible.co.uk/*",
+            "*://www.amazon.fr/*",
+            "*://www.amazon.es/*",
+            "*://www.amazon.ca/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 0 true-positive, 1 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

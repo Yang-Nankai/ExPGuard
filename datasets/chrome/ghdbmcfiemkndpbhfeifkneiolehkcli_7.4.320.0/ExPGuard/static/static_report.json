@@ -1,0 +1,394 @@
+{
+  "extension_id": "ghdbmcfiemkndpbhfeifkneiolehkcli",
+  "extension_version": "7.4.320.0",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 11,
+  "verified_count": 4,
+  "verdicts": [
+    {
+      "flow_index": 2,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Analysis\n\n### 1. Who controls the source\nThe true attacker source is the page-side `windowManagerEventEx` CustomEvent listener in **csWindowManagement.js** (L18–57), not the `csNativeMessage` anchor the normalized flow cited (the harness warning about a source-anchor mismatch is correct — the real bridge is in `csWindowManagement.js`).\n\n```js\ndocument.addEventListener(\"windowManagerEventEx\", function (evt) {\n    const request = evt?.detail?.request;\n    if (!request) return;\n    request.listenerId = evt?.detail?.id;\n    request.isWindowManagement = true;\n    chrome.runtime.sendMessage(request) ...\n```\n\nThere is **no origin check, no `event.source` check, and no field validation**. Any script running on a page where the content script is injected can dispatch a `CustomEvent` with an arbitrary `detail.request` object. The content-script match list is host-wildcarded (`*://*/*SynapseSignOn/sts/login*`, `*://*/WorkflowUI*`, etc.), so an attacker can host their own matching URL (e.g. `https://evil.example/WorkflowUI/x`) and fully control the page context.\n\n### 2. Source-to-sink path\n- Page → `document.dispatchEvent(new CustomEvent('windowManagerEventEx', {detail:{request",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 4,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "csNativeMessage",
+          "reportedLoc": "L55:C0 -> L63:C6",
+          "resolvedFile": "csNativeMessage.js",
+          "resolved": true,
+          "snippet": ">>    55| chrome.runtime.onMessage.addListener(\n>>    56|     function (message, sender, sendResponse) {\n>>    57|         logExtError(chrome.runtime.lastError);\n>>    58|         if (message.action === \"nativeHostDisconnect\") {\n>>    59|             document.documentElement.setAttribute(\"native\", false);\n>>    60|             document.documentElement.setAttribute(\"hostName\", \"\");\n>>    61|         }\n>>    62|         postPageEvent(message.action, message.errorCode);\n>>    63|     });"
+        },
+        "sinkAnchor": {
+          "reportedFile": "bsWindowManagement",
+          "reportedLoc": "L283:C8 -> L286:C10",
+          "resolvedFile": "bsWindowManagement.js",
+          "resolved": true,
+          "snippet": ">>   283|         chrome.tabs.create({\n>>   284|             url: request.url,\n>>   285|             active: true\n>>   286|         }).then((tab) => {"
+        },
+        "sourceExpectedMarkers": [
+          "addEventListener",
+          "detail"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://*/*SynapseSignOn/sts/login*",
+              "*://*/ImageViewer*",
+              "*://*/*PowerJacket*",
+              "*://*/WorkflowUI*",
+              "*://*/*Client.Web*",
+              "*://*/Synapse/WebQuery*",
+              "*://*/*ThinkLogChatUI*",
+              "*://*/*WebQueryAPI*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "csNativeMessage.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 6,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #6 (ExPGuard report id #5)\n\n### 1) Who controls the source\n\nThe effective source is not the mislabeled `csNativeMessage` snippet; the harness warning is correct. The actual page→extension bridge is in **`csWindowManagement.js` L18–57**:\n\n```js\ndocument.addEventListener(\"windowManagerEventEx\", function (evt) {\n    const request = evt?.detail?.request;\n    if (!request) return;\n    request.listenerId = evt?.detail?.id;\n    request.isWindowManagement = true;\n    chrome.runtime.sendMessage(request) ...\n});\n```\n\nThe content script runs in an **ISOLATED** world, but `document.dispatchEvent(new CustomEvent(...))` is a shared DOM channel: any page script on a matched origin can dispatch `windowManagerEventEx` with a `detail.request` object, and this listener receives it. There is no origin/source check. `request.isWindowManagement` is force-set by the content script, so it is not a trust boundary. The source is fully page-controlled.\n\nThe manifest content-script match `*://*/*SynapseSignOn/sts/login*` (and the other path patterns with wildcard scheme/host) means an attacker can host `https://evil.example/SynapseSignOn/sts/login` (or `/ImageViewer`, etc.) and drive t",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 4,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "csNativeMessage",
+          "reportedLoc": "L55:C0 -> L63:C6",
+          "resolvedFile": "csNativeMessage.js",
+          "resolved": true,
+          "snippet": ">>    55| chrome.runtime.onMessage.addListener(\n>>    56|     function (message, sender, sendResponse) {\n>>    57|         logExtError(chrome.runtime.lastError);\n>>    58|         if (message.action === \"nativeHostDisconnect\") {\n>>    59|             document.documentElement.setAttribute(\"native\", false);\n>>    60|             document.documentElement.setAttribute(\"hostName\", \"\");\n>>    61|         }\n>>    62|         postPageEvent(message.action, message.errorCode);\n>>    63|     });"
+        },
+        "sinkAnchor": {
+          "reportedFile": "bsWindowManagement",
+          "reportedLoc": "L242:C12 -> L250:C14",
+          "resolvedFile": "bsWindowManagement.js",
+          "resolved": true,
+          "snippet": ">>   242|             chrome.windows.create({\n>>   243|                 url: request.url,\n>>   244|                 type: 'popup',\n>>   245|                 incognito: sender.tab.incognito,\n>>   246|                 width: 20,\n>>   247|                 height: 20,\n>>   248|                 left: 0,\n>>   249|                 top: windowTop\n>>   250|             }).then((win) => {"
+        },
+        "sourceExpectedMarkers": [
+          "addEventListener",
+          "detail"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://*/*SynapseSignOn/sts/login*",
+              "*://*/ImageViewer*",
+              "*://*/*PowerJacket*",
+              "*://*/WorkflowUI*",
+              "*://*/*Client.Web*",
+              "*://*/Synapse/WebQuery*",
+              "*://*/*ThinkLogChatUI*",
+              "*://*/*WebQueryAPI*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "csNativeMessage.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 4,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence. Let me lay out the four-part ledger.\n\n## (a) Who controls the source?\n\nThe real source is **not** the `csNativeMessage` anchor in the summary (that anchor is a mislabeled `nativeHostDisconnect` handler — the harness warning is correct). The actual page-to-extension bridge is in `csWindowManagement.js`:\n\n```js\ndocument.addEventListener(\n    \"windowManagerEventEx\",\n    function (evt) {\n        const request = evt?.detail?.request;\n        if (!request) return;\n        request.listenerId = evt?.detail?.id;\n        request.isWindowManagement = true;\n        try {\n            chrome.runtime.sendMessage(request)\n                .then(...)\n```\n\nThe listener runs in the content script's isolated world but receives `CustomEvent`s dispatched from the page (main world). The page fully controls `evt.detail.request`, including every field (`type`, `pollingUrl`, `pollingInterval`, `pollingAuthorization`, `pollingContentType`, etc.). The content script adds `isWindowManagement = true` and forwards the object verbatim. There is no origin/source/field validation in this listener. Content-script matches include `*://*/*PowerJacket*`, `*://*/*WebQueryAPI*`, etc., so an attacke",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 4,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "csNativeMessage",
+          "reportedLoc": "L55:C0 -> L63:C6",
+          "resolvedFile": "csNativeMessage.js",
+          "resolved": true,
+          "snippet": ">>    55| chrome.runtime.onMessage.addListener(\n>>    56|     function (message, sender, sendResponse) {\n>>    57|         logExtError(chrome.runtime.lastError);\n>>    58|         if (message.action === \"nativeHostDisconnect\") {\n>>    59|             document.documentElement.setAttribute(\"native\", false);\n>>    60|             document.documentElement.setAttribute(\"hostName\", \"\");\n>>    61|         }\n>>    62|         postPageEvent(message.action, message.errorCode);\n>>    63|     });"
+        },
+        "sinkAnchor": {
+          "reportedFile": "bsWindowManagement",
+          "reportedLoc": "L550:C31 -> L557:C14",
+          "resolvedFile": "bsWindowManagement.js",
+          "resolved": true,
+          "snippet": ">>   550|         const response = await fetch(url,\n>>   551|             {\n>>   552|                 method: \"GET\",\n>>   553|                 headers: {\n>>   554|                     Authorization: authorization,\n>>   555|                     'Content-Type': contentType\n>>   556|                 }\n>>   557|             });"
+        },
+        "sourceExpectedMarkers": [
+          "addEventListener",
+          "detail"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://*/*SynapseSignOn/sts/login*",
+              "*://*/ImageViewer*",
+              "*://*/*PowerJacket*",
+              "*://*/WorkflowUI*",
+              "*://*/*Client.Web*",
+              "*://*/Synapse/WebQuery*",
+              "*://*/*ThinkLogChatUI*",
+              "*://*/*WebQueryAPI*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "csNativeMessage.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 5,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence to decide. Here is my verification.\n\n## (a) Who controls the source\n\nThe real page→content-script bridge is in `csWindowManagement.js`:\n\n```js\ndocument.addEventListener(\"windowManagerEventEx\", function (evt) {\n    const request = evt?.detail?.request;\n    if (!request) return;\n    request.listenerId = evt?.detail?.id;\n    request.isWindowManagement = true;\n    chrome.runtime.sendMessage(request) ...\n});\n```\n\nThere is **no** sender/origin/allow-list authentication. A page that matches the content-script patterns can dispatch `new CustomEvent('windowManagerEventEx', {detail:{id, request:{...}}})`, and the content script forwards the whole attacker-supplied `request` object to the background via `runtime.sendMessage`. The manifest match `*://*/ImageViewer*`, `*://*/WorkflowUI*`, `*://*/*PowerJacket*`, etc. means the attacker can simply host `https://attacker.example/ImageViewer` — no trusted-site XSS is required. Source is genuinely attacker-controllable.\n\n## (b) Source-to-sink path\n\nConfirmed via the primary propagation plus raw source:\n\n1. Page dispatches `windowManagerEventEx` (`csWindowManagement.js:18-27`).\n2. Content script `chrome.runtime.sendMessage(requ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 4,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "csNativeMessage",
+          "reportedLoc": "L55:C0 -> L63:C6",
+          "resolvedFile": "csNativeMessage.js",
+          "resolved": true,
+          "snippet": ">>    55| chrome.runtime.onMessage.addListener(\n>>    56|     function (message, sender, sendResponse) {\n>>    57|         logExtError(chrome.runtime.lastError);\n>>    58|         if (message.action === \"nativeHostDisconnect\") {\n>>    59|             document.documentElement.setAttribute(\"native\", false);\n>>    60|             document.documentElement.setAttribute(\"hostName\", \"\");\n>>    61|         }\n>>    62|         postPageEvent(message.action, message.errorCode);\n>>    63|     });"
+        },
+        "sinkAnchor": {
+          "reportedFile": "bsWindowManagement",
+          "reportedLoc": "L550:C31 -> L557:C14",
+          "resolvedFile": "bsWindowManagement.js",
+          "resolved": true,
+          "snippet": ">>   550|         const response = await fetch(url,\n>>   551|             {\n>>   552|                 method: \"GET\",\n>>   553|                 headers: {\n>>   554|                     Authorization: authorization,\n>>   555|                     'Content-Type': contentType\n>>   556|                 }\n>>   557|             });"
+        },
+        "sourceExpectedMarkers": [
+          "addEventListener",
+          "detail"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://*/*SynapseSignOn/sts/login*",
+              "*://*/ImageViewer*",
+              "*://*/*PowerJacket*",
+              "*://*/WorkflowUI*",
+              "*://*/*Client.Web*",
+              "*://*/Synapse/WebQuery*",
+              "*://*/*ThinkLogChatUI*",
+              "*://*/*WebQueryAPI*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "csNativeMessage.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 4 flow(s): 4 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

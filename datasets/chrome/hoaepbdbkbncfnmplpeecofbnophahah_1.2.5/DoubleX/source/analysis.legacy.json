@@ -1,0 +1,80 @@
+{
+    "benchmarks": {
+        "crashes": [],
+        "cs: got AST": 0.1182005712762475,
+        "cs: AST": 0.0016967086121439934,
+        "cs: CFG": 0.0002637449651956558,
+        "cs: PDG": 0.0023641949519515038,
+        "bp: got AST": 0.10461631417274475,
+        "bp: AST": 0.008651403710246086,
+        "bp: CFG": 0.0016073314473032951,
+        "bp: PDG": 0.022152618505060673,
+        "collected messages": 0.003989896737039089,
+        "linked messages": 0.0019923849031329155,
+        "cs: dangers & from WA": 0.0009803147986531258,
+        "bp: dangers & from WA": 0.00618244893848896,
+        "cs: got vulnerabilities": 1.0295771062374115e-05,
+        "bp: got vulnerabilities": 0.0002337554469704628,
+        "totalAnalysisSeconds": 0.29451170563697815
+    },
+    "extension": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_hoaepbdbkbncfnmplpeecofbnophahah_e318273cf9a9/dx_to6xfg0a/unpacked/hoaepbdbkbncfnmplpeecofbnophahah.1.2.5",
+    "cs": {
+        "direct_dangers": {},
+        "indirect_dangers": {},
+        "exfiltration_dangers": {}
+    },
+    "bp": {
+        "direct_dangers": {
+            "danger1": {
+                "danger": "chrome.storage.local.set",
+                "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7f99ce289a90>, <pdg_js.node.FunctionExpression object at 0x7f99ce289ac0>)",
+                "sink-param1": "{\n\t\t\t'email': message.email\n\t\t}",
+                "sink-param2": "function() {}",
+                "line": "76 - 78",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_hoaepbdbkbncfnmplpeecofbnophahah_e318273cf9a9/dx_to6xfg0a/unpacked/hoaepbdbkbncfnmplpeecofbnophahah.1.2.5/background.js",
+                "dataflow": true,
+                "param_id0": {
+                    "received_from_wa_1": {
+                        "wa": "event",
+                        "line": "2 - 2",
+                        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_hoaepbdbkbncfnmplpeecofbnophahah_e318273cf9a9/dx_to6xfg0a/unpacked/hoaepbdbkbncfnmplpeecofbnophahah.1.2.5/content_scripts.js",
+                        "where": "event"
+                    }
+                },
+                "param_id1": {}
+            }
+        },
+        "indirect_dangers": {
+            "danger1": {
+                "danger": "fetch",
+                "value": "fetch(Noneapi/chrome-extension-import-from-aliexpress, <pdg_js.node.ValueExpr object at 0x7f99ce267430>)",
+                "sink-param1": "Noneapi/chrome-extension-import-from-aliexpress",
+                "sink-param2": "{\n\t\t\t\t\tmethod: 'POST',\n\t\t\t\t\theaders: {\n\t\t\t\t\t\t'Content-Type': 'application/json',\n\t\t\t\t\t},\n\t\t\t\t\tbody: JSON.stringify(requestData),\n\t\t\t\t}",
+                "line": "38 - 44",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_hoaepbdbkbncfnmplpeecofbnophahah_e318273cf9a9/dx_to6xfg0a/unpacked/hoaepbdbkbncfnmplpeecofbnophahah.1.2.5/background.js",
+                "dataflow": false,
+                "param_id0": {}
+            }
+        },
+        "exfiltration_dangers": {
+            "danger1": {
+                "danger": "chrome.storage.local.get",
+                "value": "chrome.storage.local.get(<pdg_js.node.ValueExpr object at 0x7f99ce3d4c70>, <pdg_js.node.FunctionExpression object at 0x7f99ce3d4ca0>)",
+                "sink-param1": "['email']",
+                "sink-param2": "function(result) {\n\t\t\t// Get the email\n\t\t\tlet email = result['email'];\n\n\t\t\tconst requestData = {\n\t\t\t\temail: email,\n\t\t\t\tproductData: content.data,\n\t\t\t\turl: content.url,\n\t\t\t};\n\n\t\t\tfetch(url, {\n\t\t\t\t\tmethod: 'POST',\n\t\t\t\t\theaders: {\n\t\t\t\t\t\t'Content-Type': 'application/json',\n\t\t\t\t\t},\n\t\t\t\t\tbody: JSON.stringify(requestData),\n\t\t\t\t})\n\t\t\t\t.then((response) => response.json())\n\t\t\t\t.then((data) => {\n\t\t\t\t\tchrome.runtime.sendMessage({\n\t\t\t\t\t\ttype: 'updatePopup',\n\t\t\t\t\t\tdata: data\n\t\t\t\t\t});\n\t\t\t\t})\n\t\t\t\t.catch((error) => {\n\t\t\t\t\tchrome.runtime.sendMessage({\n\t\t\t\t\t\ttype: 'updatePopup',\n\t\t\t\t\t\tdata: error\n\t\t\t\t\t});\n\t\t\t\t});\n\t\t}",
+                "line": "28 - 58",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_hoaepbdbkbncfnmplpeecofbnophahah_e318273cf9a9/dx_to6xfg0a/unpacked/hoaepbdbkbncfnmplpeecofbnophahah.1.2.5/background.js",
+                "dataflow": false
+            },
+            "danger2": {
+                "danger": "chrome.storage.local.get",
+                "value": "chrome.storage.local.get(<pdg_js.node.ValueExpr object at 0x7f99ce436ca0>, <pdg_js.node.FunctionExpression object at 0x7f99ce436d90>)",
+                "sink-param1": "[key]",
+                "sink-param2": "function(result) {\n\t\t\tif (chrome.runtime.lastError) {\n\t\t\t\treject(chrome.runtime.lastError);\n\t\t\t} else {\n\t\t\t\tresolve(result[key]);\n\t\t\t}\n\t\t}",
+                "line": "7 - 13",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_hoaepbdbkbncfnmplpeecofbnophahah_e318273cf9a9/dx_to6xfg0a/unpacked/hoaepbdbkbncfnmplpeecofbnophahah.1.2.5/background.js",
+                "dataflow": false
+            }
+        }
+    }
+}

@@ -1,0 +1,419 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L342",
+      "sourceCode": "msg",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L25",
+      "sinkCode": "fetch(msg.url, {'method': 'GET'})",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": null,
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "indirect_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.create",
+      "sinkFile": "background.js",
+      "sinkLoc": "L416",
+      "legacy": {
+        "danger": "chrome.tabs.create",
+        "value": "chrome.tabs.create(<pdg_js.node.ValueExpr object at 0x7f5170789430>)",
+        "sink-param1": "hrome.tabs.create({\n\t\turl",
+        "line": "416 - 418",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger2",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.create",
+      "sinkFile": "background.js",
+      "sinkLoc": "L89",
+      "legacy": {
+        "danger": "chrome.tabs.create",
+        "value": "chrome.tabs.create(<pdg_js.node.ValueExpr object at 0x7f5170fb51f0>)",
+        "sink-param1": "{\n\t\turl: url\n\t}",
+        "line": "89 - 91",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger3",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L141",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f5170f71b50>)",
+        "sink-param1": "{\n\t\t\t\t\ttarget: {\n\t\t\t\t\t\ttabId: tabs[0].id\n\t\t\t\t\t},\n\t\t\t\t\tfunc: function() {\n\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\tvar premiumData = localStorage.getItem(\"premium-ai\");\n\t\t\t\t\t\t\treturn {\n\t\t\t\t\t\t\t\tcookie: document.cookie.split(';').find(c => c.trim().startsWith('token-id='))?.split('=')[1] || null,\n\t\t\t\t\t\t\t\tpremiumData: premiumData\n\t\t\t\t\t\t\t};\n\t\t\t\t\t\t} catch (e) {\n\t\t\t\t\t\t\treturn {\n\t\t\t\t\t\t\t\tcookie: null,\n\t\t\t\t\t\t\t\tpremiumData: null\n\t\t\t\t\t\t\t};\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}",
+        "line": "141 - 159",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger4",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L301",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7f5170852bb0>, <pdg_js.node.FunctionExpression object at 0x7f5170852be0>)",
+        "sink-param1": "storage.local.set({\n\t\t\t\t\tmarkup: JSON.stringi",
+        "sink-param2": "(fullData)\n\t\t\t\t}, function() {\n\t\t\t\t\tconsole.log('markup d",
+        "line": "301 - 305",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger5",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L315",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7f5170872730>, <pdg_js.node.FunctionExpression object at 0x7f5170872760>)",
+        "sink-param1": "storage.local.set({\n\t\t\t\t\t'short-data': JSON.stringif",
+        "sink-param2": "shortData)\n\t\t\t\t}, function() {\n\t\t\t\t\tconsole.log('short-d",
+        "line": "315 - 319",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger6",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_SYNC_STORAGE",
+      "sinkRemark": "chrome.storage.sync.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L364",
+      "legacy": {
+        "danger": "chrome.storage.sync.set",
+        "value": "chrome.storage.sync.set(<pdg_js.node.ValueExpr object at 0x7f517082eeb0>, <pdg_js.node.FunctionExpression object at 0x7f517082eee0>)",
+        "sink-param1": ".storage.sync.set({\n\t\t\t\t\t'maziiopti",
+        "sink-param2": "': options\n\t\t",
+        "line": "364 - 366",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger7",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.update",
+      "sinkFile": "background.js",
+      "sinkLoc": "L437",
+      "legacy": {
+        "danger": "chrome.tabs.update",
+        "value": "chrome.tabs.update(tabId, <pdg_js.node.ValueExpr object at 0x7f51707a5580>, <pdg_js.node.FunctionExpression object at 0x7f51707a55b0>)",
+        "sink-param1": "tabId",
+        "sink-param2": " một trang mới\n\t\t\t\tchrome.tabs.update(tabId, {\n\t\t\t\t\turl: chrome.runtime.getURL('index.html'),\n\t\t\t\t\tactive: false,\n\t\t",
+        "sink-param3": "\thighlighted: false,\n\t\t\t\t\tselected: false\n\t\t\t\t}, function() {\n\t\t\t\t\tconsole.",
+        "line": "437 - 444",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {},
+        "param_id2": {}
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger1",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": false,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkLoc": "L55",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(msg.url, <pdg_js.node.ValueExpr object at 0x7f51708fac10>)",
+        "sink-param1": "msg.url",
+        "sink-param2": "{\n\t\tmethod: 'POST',\n\t\theaders: {\n\t\t\t'Content-Type': 'application/json',\n\t\t\t'x-no-encryption': 'kY1w17QkuwpS1PYNhQwF4OfBAaRqRh',\n\t\t},\n\t\tbody: JSON.stringify(data)\n\t}",
+        "line": "55 - 55",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger2",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": true,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkLoc": "L25",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(msg.url, {'method': 'GET'})",
+        "sink-param1": "msg.url",
+        "sink-param2": {
+          "method": "GET"
+        },
+        "line": "25 - 25",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "msg",
+            "line": "342 - 342",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+            "where": "msg",
+            "sent_to_wa_1": {
+              "wa": "\tport.postMessage({\n\t\t\t\t\tresult: data,\n\t\t\t\t\trequest",
+              "line": "346 - 349",
+              "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+              "where": "msg"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L411",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(install_time)",
+        "sink-param1": "install_time",
+        "line": "411 - 411",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger2",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.cookies.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L162",
+      "legacy": {
+        "danger": "chrome.cookies.get",
+        "value": "chrome.cookies.get(<pdg_js.node.ValueExpr object at 0x7f5170f0ffa0>, <pdg_js.node.FunctionExpression object at 0x7f5170f0ffd0>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\turl: 'https://mazii.net',\n\t\t\t\t\t\t\tname: 'token-id'\n\t\t\t\t\t\t}",
+        "sink-param2": "function(cookie) {\n\t\t\t\t\t\t\tsendResponse({\n\t\t\t\t\t\t\t\tcookie: cookie ? cookie.value : result.cookie,\n\t\t\t\t\t\t\t\tpremiumData: result.premiumData\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t}",
+        "line": "162 - 170",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger3",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.cookies.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L172",
+      "legacy": {
+        "danger": "chrome.cookies.get",
+        "value": "chrome.cookies.get(<pdg_js.node.ValueExpr object at 0x7f5170f316d0>, <pdg_js.node.FunctionExpression object at 0x7f5170f31700>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\turl: 'https://mazii.net',\n\t\t\t\t\t\t\tname: 'token-id'\n\t\t\t\t\t\t}",
+        "sink-param2": "function(cookie) {\n\t\t\t\t\t\t\tsendResponse({\n\t\t\t\t\t\t\t\tcookie: cookie ? cookie.value : null,\n\t\t\t\t\t\t\t\tpremiumData: null\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t}",
+        "line": "172 - 180",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger4",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.cookies.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L183",
+      "legacy": {
+        "danger": "chrome.cookies.get",
+        "value": "chrome.cookies.get(<pdg_js.node.ValueExpr object at 0x7f5170f31d30>, <pdg_js.node.FunctionExpression object at 0x7f5170f31d60>)",
+        "sink-param1": "{\n\t\t\t\t\t\turl: 'https://mazii.net',\n\t\t\t\t\t\tname: 'token-id'\n\t\t\t\t\t}",
+        "sink-param2": "function(cookie) {\n\t\t\t\t\t\tsendResponse({\n\t\t\t\t\t\t\tcookie: cookie ? cookie.value : null,\n\t\t\t\t\t\t\tpremiumData: null\n\t\t\t\t\t\t});\n\t\t\t\t\t}",
+        "line": "183 - 191",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger5",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.cookies.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L194",
+      "legacy": {
+        "danger": "chrome.cookies.get",
+        "value": "chrome.cookies.get(<pdg_js.node.ValueExpr object at 0x7f5170ed0340>, <pdg_js.node.FunctionExpression object at 0x7f5170ed0370>)",
+        "sink-param1": "{\n\t\t\t\t\turl: 'https://mazii.net',\n\t\t\t\t\tname: 'token-id'\n\t\t\t\t}",
+        "sink-param2": "function(cookie) {\n\t\t\t\t\tsendResponse({\n\t\t\t\t\t\tcookie: cookie ? cookie.value : null,\n\t\t\t\t\t\tpremiumData: null\n\t\t\t\t\t});\n\t\t\t\t}",
+        "line": "194 - 202",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger6",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L261",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(<pdg_js.node.ValueExpr object at 0x7f5170898370>, <pdg_js.node.FunctionExpression object at 0x7f51708983a0>)",
+        "sink-param1": "storage.lo",
+        "sink-param2": "l.get(['markup'], function(result) {\n\t\t\tvar fullData = result.markup ? JSON.parse(result.markup) : [];\n\t\t\tif (fullData == null || fullData == undefined) {\n\t\t\t\tfullData = [];\n\t\t\t}\n\n\t\t\t// Retrieve 'short-data' from chrome.storage.local\n\t\t\tchrome.storage.local.get(['short-data'], function(result) {\n\t\t\t\tvar shortData = result['short-data'] ? JSON.parse(result['short-data']) : [];\n\t\t\t\tif (!shortData) {\n\t\t\t\t\tshortData = [];\n\t\t\t\t}\n\n\t\t\t\tvar data = msg.data;\n\t\t\t\tvar d = new Date();\n\t\t\t\tvar n = d.getTime();\n\n\t\t\t\tfor (var i = 0; i < data.length; i++) {\n\t\t\t\t\tdata[i].time = n;\n\t\t\t\t\tvar checkTime = 0;\n\t\t\t\t\tfor (var j = 0; j < shortData.length; j++) {\n\t\t\t\t\t\tif (data[i].word == shortData[j].word && data[i].phonetic == shortData[j].phonetic) {\n\t\t\t\t\t\t\tcheckTime = 1;\n\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\tcheckTime = 0;\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\n\t\t\t\t\tif (checkTime == 0) {\n\t\t\t\t\t\tfullData.unshift(data[i]);\n\t\t\t\t\t\tshortData.unshift(data[i]);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tif (fullData.length > 100) {\n\t\t\t\t\tfullData = fullData.splice(0, 100);\n\t\t\t\t}\n\n\t\t\t\t// Store 'markup' data back in chrome.storage.local\n\t\t\t\tchrome.storage.local.set({\n\t\t\t\t\tmarkup: JSON.stringify(fullData)\n\t\t\t\t}, function() {\n\t\t\t\t\tconsole.log('markup data saved');\n\t\t\t\t});\n\n\t\t\t\t// Remove entries older than 1 hour from shortData\n\t\t\t\tfor (var k = 0; k < shortData.length; k++) {\n\t\t\t\t\tif (parseInt(n) - parseInt(shortData[k].time) > 3600000) {\n\t\t\t\t\t\tshortData.splice(k, 1);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\t// Store 'short-data' back in chrome.storage.local\n\t\t\t\tchrome.storage.local.set({\n\t\t\t\t\t'short-data': JSON.stringify(shortData)\n\t\t\t\t}, function() {\n\t\t\t\t\tconsole.log('short-data saved');\n",
+        "line": "261 - 321",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger7",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L268",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(<pdg_js.node.ValueExpr object at 0x7f5170898bb0>, <pdg_js.node.FunctionExpression object at 0x7f5170898be0>)",
+        "sink-param1": "storage.local.",
+        "sink-param2": "t(['short-data'], function(result) {\n\t\t\t\tvar shortData = result['short-data'] ? JSON.parse(result['short-data']) : [];\n\t\t\t\tif (!shortData) {\n\t\t\t\t\tshortData = [];\n\t\t\t\t}\n\n\t\t\t\tvar data = msg.data;\n\t\t\t\tvar d = new Date();\n\t\t\t\tvar n = d.getTime();\n\n\t\t\t\tfor (var i = 0; i < data.length; i++) {\n\t\t\t\t\tdata[i].time = n;\n\t\t\t\t\tvar checkTime = 0;\n\t\t\t\t\tfor (var j = 0; j < shortData.length; j++) {\n\t\t\t\t\t\tif (data[i].word == shortData[j].word && data[i].phonetic == shortData[j].phonetic) {\n\t\t\t\t\t\t\tcheckTime = 1;\n\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\tcheckTime = 0;\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\n\t\t\t\t\tif (checkTime == 0) {\n\t\t\t\t\t\tfullData.unshift(data[i]);\n\t\t\t\t\t\tshortData.unshift(data[i]);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tif (fullData.length > 100) {\n\t\t\t\t\tfullData = fullData.splice(0, 100);\n\t\t\t\t}\n\n\t\t\t\t// Store 'markup' data back in chrome.storage.local\n\t\t\t\tchrome.storage.local.set({\n\t\t\t\t\tmarkup: JSON.stringify(fullData)\n\t\t\t\t}, function() {\n\t\t\t\t\tconsole.log('markup data saved');\n\t\t\t\t});\n\n\t\t\t\t// Remove entries older than 1 hour from shortData\n\t\t\t\tfor (var k = 0; k < shortData.length; k++) {\n\t\t\t\t\tif (parseInt(n) - parseInt(shortData[k].time) > 3600000) {\n\t\t\t\t\t\tshortData.splice(k, 1);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\t// Store 'short-data' back in chrome.storage.local\n\t\t\t\tchrome.storage.local.set({\n\t\t\t\t\t'short-data': JSON.stringify(shortData)\n\t\t\t\t}, function() {\n\t\t\t\t\tconsole.log('short-data sav",
+        "line": "268 - 320",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger8",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L325",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(<pdg_js.node.ValueExpr object at 0x7f5170872cd0>, <pdg_js.node.FunctionExpression object at 0x7f5170872d00>)",
+        "sink-param1": "storage.lo",
+        "sink-param2": "l.get(['markup'], function(result) {\n\t\t\tvar fullData = result.markup ? JSON.parse(result.markup) : [];\n\t\t\tif (fullData == null || fullData == undefined) {\n\t\t\t\tfullData = [];\n\t\t\t}\n\t\t\tsendResponse({\n\t\t\t\tresult: f",
+        "line": "325 - 333",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger9",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L359",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(maziioption, <pdg_js.node.FunctionExpression object at 0x7f517082e640>)",
+        "sink-param1": "maziioption",
+        "sink-param2": "et(\"maziioption\", function(obj) {\n\t\t\tlet options = null;\n\t\t\toptions = obj?.maziioption ?? defaultOption();\n\t\t\tif (options.shortKeyEnableDbclick == true) {\n\t\t\t\toptions.doubleClickEnable = !options.doubleClickEnable;\n\t\t\t\tchrome.storage.sync.set({\n\t\t\t\t\t'maziioption': options\n\t\t\t\t}, functi",
+        "line": "359 - 368",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger10",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L427",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(maziioption, <pdg_js.node.FunctionExpression object at 0x7f5170789d90>)",
+        "sink-param1": "maziioption",
+        "sink-param2": "et(\"maziioption\", function(obj) {\n\t\t\tvar options = null;\n\t\t\tif (obj && obj.maziioption) {\n\t\t\t\toptions = obj.maziioption;\n\t\t\t}\n\n\t\t\tif (options && options.checkTabMazii === false) {\n\t\t\t\t// Không làm gì nếu điều kiện được thỏa mãn\n\t\t\t} else {\n\t\t\t\t// Cập nhật tab hiện tại với một trang mới\n\t\t\t\tchrome.tabs.update(tabId, {\n\t\t\t\t\turl: chrome.runtime.getURL('index.html'),\n\t\t\t\t\tactive: false,\n\t\t\t\t\thighlighted: false,\n\t\t\t\t\tselected: false\n\t\t\t\t}, function() {\n\t\t\t\t\tconsole.log('Tab đ",
+        "line": "427 - 446",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lkjffochdceoneajnigkbdddjdekhojj_84fb6235b7fc/dx_4aa40zzg/unpacked/lkjffochdceoneajnigkbdddjdekhojj.1.7.2/background.js",
+        "dataflow": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,353 @@
+{
+  "extensionId": "lee-su-threads@meetandy.ai",
+  "extensionVersion": "1.0.3",
+  "sourceType": "XPI",
+  "stats": {
+    "filesWithIssues": 4,
+    "totalFiles": 4,
+    "distinctFlows": 5,
+    "rawIssueEntries": 6,
+    "sinklessSourcesSkipped": 22
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "content",
+      "frame": "CS_1",
+      "constraint": {
+        "matches": [
+          "https://www.threads.com/*"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_CUSTOM_EVENT",
+        "remark": "window.addEventListener(threads-friendships-list-loaded)",
+        "file": "content",
+        "loc": "L10:C1950 -> L10:C1958",
+        "line": 10,
+        "col": [
+          1950,
+          1958
+        ],
+        "spansTo": null,
+        "code": "…USER_IDS\",data:n})}});var I=[],q=[],me=[];window.addEventListener(\"threads-friendships-list-loaded\",e=>{var o;let t=((o=»e.detail«)==null?void 0:o.users)||[];console.log(`[Threads Extractor] Friendships list loaded with ${t.length} users`),me=t,setTi…"
+      },
+      "sinks": [
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "*",
+          "file": "content",
+          "loc": "L1:C53722 -> L1:C53797",
+          "line": 1,
+          "col": [
+            53722,
+            53797
+          ],
+          "spansTo": null,
+          "code": "…id 0:s.requestId)===o&&(window.removeEventListener(\"message\",a),n(r.data.result))};window.addEventListener(\"message\",a),»window.postMessage({type:\"threads-fetch-request\",requestId:o,userId:e},\"*\")«,setTimeout(()=>{window.removeEventListener(\"message\",a),n(null)},t)})}async function G(e,t=2e3){let o=Math.random().toS…",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "https://www.threads.com/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 754,
+        "distinctLines": 2,
+        "steps": [
+          {
+            "n": 1,
+            "file": "content",
+            "line": 10,
+            "ops": [
+              "ELEMENT:member-element",
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left",
+              "ELEMENT:member.length",
+              "ASSIGN:template-literal",
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-left",
+              "RETURN:Math.min",
+              "ASSIGN:binary-right",
+              "ASSIGN:unary",
+              "ITERATE:loop.iteration",
+              "ELEMENT:destructure-property[pk]",
+              "ELEMENT:destructure-property[username]",
+              "ASSIGN:logical-right",
+              "ELEMENT:array.find"
+            ],
+            "code": "…ed\",e=>{var o;let t=»((o=e.detail)==null?void 0:o.users)||[];console.log(`[Threads Extractor] Friendships list loaded with ${t.length} users` …⟨tainted span: 4341 chars⟩… ips-location-badge\")||u.querySelector(\".threads-friendships-fetch-btn\"))){i++;let K=l.find(E=>E.username===d);K?S(d,K.pk«,f,y):G(d,100).then(…"
+          },
+          {
+            "n": 2,
+            "file": "content",
+            "line": 1,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:template-literal",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "…t o=e.querySelector(»`a[href=\"/@${t}\"]`);if(!o)return null;let n=o;for(let a=0;a<15&&n;a++){let r=n.parentElement;if(r&&Array.from(r.children …⟨tainted span: 56933 chars⟩… on\");return t.className=\"threads-friendships-fetch-btn\",t.textContent=\"\\u2796\",t.title=`No location available for @${e}`«,t.disabled=!0,t.sty…"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_CUSTOM_EVENT",
+        "remark": "window.addEventListener(threads-profile-extracted)",
+        "file": "background",
+        "loc": "L1:C1640 -> L1:C1674",
+        "line": 1,
+        "col": [
+          1640,
+          1674
+        ],
+        "spansTo": null,
+        "code": "…e(o[0].id,{url:t.url,active:!0}),e.windows.update(o[0].windowId,{focused:!0})):e.tabs.create({url:t.url})}),!1}return!1}»e.runtime.onMessage.addListener(m)«;var I=\"0.3.5\";e.runtime.onInstalled.addListener(t=>{let a=e.runtime.getManifest().version;t.reason===\"install\"?(e.tabs.…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "profileCache",
+          "file": "background",
+          "loc": "L1:C575 -> L1:C612",
+          "line": 1,
+          "col": [
+            575,
+            612
+          ],
+          "spansTo": null,
+          "code": "…cal.get([\"profileCache\"]).then(r=>{let o=r.profileCache||{},n=t.data.username;n&&(o[n]={...t.data,timestamp:Date.now()},»e.storage.local.set({profileCache:o})«)}),!1;if(t.type===\"GET_CACHED_PROFILES\")return e.storage.local.get([\"profileCache\"]).then(r=>{let o=r.profileCache||{},…",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 7,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 1,
+            "ops": [
+              "MESSAGE",
+              "ELEMENT:member-element",
+              "COPY:object-spread",
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "…che\"]).then(r=>{let »o=r.profileCache||{},n=t.data.username;n&&(o[n]={...t.data,timestamp:Date.now()},e.storage.local.set({profileCache:o}))} …⟨tainted span: 1180 chars⟩… .windows.update(o[0].windowId,{focused:!0})):e.tabs.create({url:t.url})}),!1}return!1}e.runtime.onMessage.addListener(m)«;var I=\"0.3.5\";e.run…",
+            "crossContextHop": "runtime.single.sender.message[content->background]"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_CUSTOM_EVENT",
+        "remark": "From storage.local.set('profileCache') in background",
+        "file": "background",
+        "loc": "L1:C1640 -> L1:C1674",
+        "line": 1,
+        "col": [
+          1640,
+          1674
+        ],
+        "spansTo": null,
+        "code": "…e(o[0].id,{url:t.url,active:!0}),e.windows.update(o[0].windowId,{focused:!0})):e.tabs.create({url:t.url})}),!1}return!1}»e.runtime.onMessage.addListener(m)«;var I=\"0.3.5\";e.runtime.onInstalled.addListener(t=>{let a=e.runtime.getManifest().version;t.reason===\"install\"?(e.tabs.…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "profileCache",
+          "file": "background",
+          "loc": "L1:C575 -> L1:C612",
+          "line": 1,
+          "col": [
+            575,
+            612
+          ],
+          "spansTo": null,
+          "code": "…cal.get([\"profileCache\"]).then(r=>{let o=r.profileCache||{},n=t.data.username;n&&(o[n]={...t.data,timestamp:Date.now()},»e.storage.local.set({profileCache:o})«)}),!1;if(t.type===\"GET_CACHED_PROFILES\")return e.storage.local.get([\"profileCache\"]).then(r=>{let o=r.profileCache||{},…",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 2,
+      "propagation": {
+        "rawSteps": 9,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 1,
+            "ops": [
+              "MESSAGE",
+              "ELEMENT:member-element",
+              "COPY:object-spread",
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "STORAGE:STORAGE_FLOW[area: local, key: profileCache, sender: background, receiver: background]",
+              "ASSIGN:logical-left"
+            ],
+            "code": "… received:\",t.data),»e.storage.local.get([\"profileCache\"]).then(r=>{let o=r.profileCache||{},n=t.data.username;n&&(o[n]={...t.data,timestamp: …⟨tainted span: 1231 chars⟩… .windows.update(o[0].windowId,{focused:!0})):e.tabs.create({url:t.url})}),!1}return!1}e.runtime.onMessage.addListener(m)«;var I=\"0.3.5\";e.run…",
+            "crossContextHop": "runtime.single.sender.message[content->background]"
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "file": "injected",
+      "frame": "MAIN_injected",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "injected",
+        "loc": "L1:C19730 -> L1:C19731",
+        "line": 1,
+        "col": [
+          19730,
+          19731
+        ],
+        "spansTo": null,
+        "code": "….fromEntries(_)}window.addEventListener(\"message\",async e=>{var t,o,s;if(e.source===window){if(((t=e.data)==null?void 0:»t«.type)===\"threads-userid-request\"){let{requestId:n,username:r}=e.data,a=_.get(r)||null;console.log(`[Threads Extractor] …"
+      },
+      "sinks": [
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "*",
+          "file": "injected",
+          "loc": "L1:C19884 -> L1:C19961",
+          "line": 1,
+          "col": [
+            19884,
+            19961
+          ],
+          "spansTo": null,
+          "code": "…){let{requestId:n,username:r}=e.data,a=_.get(r)||null;console.log(`[Threads Extractor] User ID lookup for @${r}: ${a}`),»window.postMessage({type:\"threads-userid-response\",requestId:n,userId:a},\"*\")«}if(((o=e.data)==null?void 0:o.type)===\"threads-fetch-request\"){let{requestId:n,userId:r}=e.data;console.log(`[Threads E…",
+          "frame": "MAIN_injected"
+        },
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "*",
+          "file": "injected",
+          "loc": "L1:C20151 -> L1:C20227",
+          "line": 1,
+          "col": [
+            20151,
+            20227
+          ],
+          "spansTo": null,
+          "code": "…questId:n,userId:r}=e.data;console.log(`[Threads Extractor] Profile fetch request for user ID: ${r}`);let a=await se(r);»window.postMessage({type:\"threads-fetch-response\",requestId:n,result:a},\"*\")«}(s=e.data)==null||s.type}});window.__threadsFetchProfileInfo=se;window.__threadsGetUserIdMap=()=>Object.fromEntries(_);…",
+          "frame": "MAIN_injected"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 76,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "injected",
+            "line": 1,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left",
+              "ELEMENT:destructure-property[requestId]",
+              "ELEMENT:destructure-property[username]",
+              "ELEMENT:destructure-property[userId]",
+              "ASSIGN:template-literal",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "…rget_user_id:String(»e)})),o.append(\"__d\",i.__d||\"www\"),console.log(\"[Threads Extractor] Fetching profile info for user ID:\",e),i.fb_dtsg||co …⟨tainted span: 5178 chars⟩… ;let a=await se(r);window.postMessage({type:\"threads-fetch-response\",requestId:n,result:a},\"*\")}(s=e.data)==null||s.type«}});window.__threads…"
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "file": "injected",
+      "frame": "MAIN_injected",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_TEXT_CONTENT",
+        "remark": "script:not([src]):not([type])",
+        "file": "injected",
+        "loc": "L1:C19116 -> L1:C19133",
+        "line": 1,
+        "col": [
+          19116,
+          19133
+        ],
+        "spansTo": null,
+        "code": "…h.abs(f-p)<500){F(m,h,\"regex\");break}}}}}),document.querySelectorAll(\"script:not([src]):not([type])\").forEach(n=>{let r=»n.textContent||\"\"«;if(r.includes('\"pk\"')&&r.includes('\"username\"')){let a=[...r.matchAll(/\"pk\"\\s*:\\s*\"(\\d+)\"/g)],c=[...r.matchAll(/\"userna…"
+      },
+      "sinks": [
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "*",
+          "file": "injected",
+          "loc": "L1:C5729 -> L1:C5789",
+          "line": 1,
+          "col": [
+            5729,
+            5789
+          ],
+          "spansTo": null,
+          "code": "…22c55e; font-weight: bold;\")}});var j=null;function ae(){j&&clearTimeout(j),j=setTimeout(()=>{Object.keys(O).length>0&&(»window.postMessage({type:\"threads-new-user-ids\",data:O},\"*\")«,O={})},1e3)}function F(e,t,o=\"\"){return _.has(e)?!1:(_.set(e,t),O[e]=t,ae(),o&&console.log(`%c[Threads Extractor] Found…",
+          "frame": "MAIN_injected"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 444,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "injected",
+            "line": 1,
+            "ops": [
+              "ASSIGN:logical-left",
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ASSIGN:logical-right",
+              "ELEMENT:array-spread",
+              "ELEMENT:object.setProperty",
+              "ELEMENT:implicit.add",
+              "ITERATE:loop.iteration",
+              "ASSIGN:binary-left",
+              "ASSIGN:binary-right",
+              "RETURN:Math.abs",
+              "ASSIGN:template-literal"
+            ],
+            "code": "….keys(O).length>0&&(»window.postMessage({type:\"threads-new-user-ids\",data:O},\"*\"),O={})},1e3)}function F(e,t,o=\"\"){return _.has(e)?!1:(_.set( …⟨tainted span: 13669 chars⟩… for(let u of a){let d=u[1],l=u.index;for(let p of c){let h=p[1],g=p.index;if(Math.abs(g-l)<500){F(h,d,\"inline\");break}}}«}});let s=_.size;ret…"
+          }
+        ]
+      }
+    }
+  ]
+}

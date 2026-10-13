@@ -1,0 +1,286 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "jcocgejjjlnfddlhpbecfapicaajdibb",
+  "version": "1.6.0",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-0ae58e7804c4a7ee",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "FETCH_BODY",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:jcocgejjjlnfddlhpbecfapicaajdibb:1.6.0:97fed9bd72f1d3be:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:jcocgejjjlnfddlhpbecfapicaajdibb:1.6.0:97fed9bd72f1d3be:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "97fed9bd72f1d3befb4f916cbef20061537139f46a2fe71102714befb01cf215",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "HIGH",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content",
+              "loc": "L3:C6 -> L3:C22",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://gemini.google.com/*",
+                      "https://*.canva.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_BODY",
+              "remark": "https://urls.bark.us",
+              "file": "monitor",
+              "loc": "L11:C9 -> L17:C4",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "手工验证确认：在 gemini.google.com（或 *.canva.com）页面执行 window.postMessage({type:'GEMINI_PROMPT', payload:{messageText, email, runtimeId}}, location.origin) 后，content.js 仅校验 event.source===window 即原样转发 event.data，service worker 的 monitor.js 随即向 https://urls.bark.us 发出 POST，且 X-Bark-Email / X-Bark-Extension 请求头完全由页面指定。页面可控输入进入特权网络请求，REQUEST_FORGERY 成立。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 0.95,
+                  "detail": "人工复测确认页面 postMessage 的 GEMINI_PROMPT 消息被 content.js 原样转发，service worker 向 https://urls.bark.us 发出 POST，且 X-Bark-Email/X-Bark-Extension 完全由页面指定。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "UNCERTAIN",
+              "confidence": 0,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 2,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Verification error: Connection error.",
+              "path": "extensions/jcocgejjjlnfddlhpbecfapicaajdibb_1.6.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/jcocgejjjlnfddlhpbecfapicaajdibb_1.6.0/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T17:29:43.139Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/jcocgejjjlnfddlhpbecfapicaajdibb/1.6.0/dynamic-evidence/flow-0",
+              "files": [
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "source-contract.json",
+                "step-after-observation.png",
+                "step-after-trigger.png",
+                "step-final-state.png",
+                "step-source-open.png",
+                "storage-after-observation.json",
+                "storage-after-observation.png",
+                "storage-after-trigger.json",
+                "storage-after-trigger.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 0217870258703645e054c6d0ba743fab13ed8d72af4b8b24d0e77', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "UNCERTAIN",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/jcocgejjjlnfddlhpbecfapicaajdibb_1.6.0/final/final_report.json",
+              "report_mtime": "2026-08-18T04:04:29.120Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T00:48:16+08:00",
+                "observation": "手工验证确认：在 gemini.google.com（或 *.canva.com）页面执行 window.postMessage({type:'GEMINI_PROMPT', payload:{messageText, email, runtimeId}}, location.origin) 后，content.js 仅校验 event.source===window 即原样转发 event.data，service worker 的 monitor.js 随即向 https://urls.bark.us 发出 POST，且 X-Bark-Email / X-Bark-Extension 请求头完全由页面指定。页面可控输入进入特权网络请求，REQUEST_FORGERY 成立。",
+                "limitations": "记录操作者手工验证结论；本次未附截图/HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/jcocgejjjlnfddlhpbecfapicaajdibb_1.6.0/dynamic/evidence/flow-0/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-22T00:48:16+08:00",
+                "notes": "人工复测确认页面 postMessage 的 GEMINI_PROMPT 消息被 content.js 原样转发，service worker 向 https://urls.bark.us 发出 POST，且 X-Bark-Email/X-Bark-Extension 完全由页面指定。",
+                "report_path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/jcocgejjjlnfddlhpbecfapicaajdibb_1.6.0/dynamic/evidence/flow-0/manual/manual_validation.json",
+                "report_artifact": {
+                  "path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/jcocgejjjlnfddlhpbecfapicaajdibb_1.6.0/dynamic/evidence/flow-0/manual/manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-21T16:48:26.800Z",
+                  "entry": null
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "1.6.0",
+        "latest_version": "1.7.0",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\jcocgejjjlnfddlhpbecfapicaajdibb_1.7.0\\jcocgejjjlnfddlhpbecfapicaajdibb.1.7.0.crx",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:chrome:jcocgejjjlnfddlhpbecfapicaajdibb:1.6.0:97fed9bd72f1d3be:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "FETCH_BODY",
+            "revalidation_job_key": "chrome__jcocgejjjlnfddlhpbecfapicaajdibb__1.7.0__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\jcocgejjjlnfddlhpbecfapicaajdibb_1.7.0\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\jcocgejjjlnfddlhpbecfapicaajdibb_1.7.0\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 0.985,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 2,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "FETCH_BODY",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "monitor",
+                  "loc": "L402:C0 -> L429:C2",
+                  "code": "»chrome.runtime.onMessage.addListener(function(message) {«"
+                },
+                "sink": {
+                  "kind": "FETCH_BODY",
+                  "remark": "https://urls.bark.us",
+                  "file": "monitor",
+                  "loc": "L11:C9 -> L17:C4",
+                  "code": "return »fetch(url, {«"
+                },
+                "propagation_step_count": 17
+              }
+            ],
+            "tool_report_flow_count": 2,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "likely_unchanged",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 2,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 1.0,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 1.0,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:chrome:jcocgejjjlnfddlhpbecfapicaajdibb:1.6.0:97fed9bd72f1d3be:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

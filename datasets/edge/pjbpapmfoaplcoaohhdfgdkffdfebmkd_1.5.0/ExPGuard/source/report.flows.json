@@ -1,0 +1,308 @@
+{
+  "extensionId": "pjbpapmfoaplcoaohhdfgdkffdfebmkd",
+  "extensionVersion": "1.5.0",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 3,
+    "totalFiles": 3,
+    "distinctFlows": 2,
+    "rawIssueEntries": 2,
+    "sinklessSourcesSkipped": 5
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "monitor",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "DOCUMENT_LOCATION",
+        "remark": "location.href",
+        "file": "monitor",
+        "loc": "L103:C8 -> L103:C16",
+        "line": 103,
+        "col": [
+          8,
+          16
+        ],
+        "spansTo": null,
+        "code": "if (»location«) payload.location = location;"
+      },
+      "sinks": [
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "location.origin",
+          "file": "monitor",
+          "loc": "L106:C4 -> L106:C92",
+          "line": 106,
+          "col": [
+            4,
+            92
+          ],
+          "spansTo": null,
+          "code": "»window.postMessage({ type: \"CANVA_ACTIVITY\", payload: payload }, window.location.origin)«;",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 20,
+        "distinctLines": 4,
+        "steps": [
+          {
+            "n": 1,
+            "file": "monitor",
+            "line": 103,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (»location) payload.location = location«;"
+          },
+          {
+            "n": 2,
+            "file": "monitor",
+            "line": 122,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»post({ activityType: \"image\", message: \"\", mediaUrl: url })«;"
+          },
+          {
+            "n": 3,
+            "file": "monitor",
+            "line": 106,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»window.postMessage({ type: \"CANVA_ACTIVITY\", payload: payload }, window.location.origin)«;"
+          },
+          {
+            "n": 4,
+            "file": "monitor",
+            "line": 115,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»post({ activityType: \"message\", message: text })«;"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "monitor",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "monitor",
+        "loc": "L205:C0 -> L232:C2",
+        "line": 205,
+        "col": [
+          0,
+          2
+        ],
+        "spansTo": 232,
+        "code": "»chrome.runtime.onMessage.addListener(function(message) {«"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_BODY",
+          "remark": "https://urls.bark.us",
+          "file": "monitor",
+          "loc": "L11:C9 -> L17:C4",
+          "line": 11,
+          "col": [
+            9,
+            4
+          ],
+          "spansTo": 17,
+          "code": "return »fetch(url, {«",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 100,
+        "distinctLines": 17,
+        "steps": [
+          {
+            "n": 1,
+            "file": "monitor",
+            "line": 205,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»chrome.runtime.onMessage.addListener(function(message) {«",
+            "spansTo": 232,
+            "crossContextHop": "runtime.single.sender.message[content->monitor]"
+          },
+          {
+            "n": 2,
+            "file": "monitor",
+            "line": 206,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.type« === \"GEMINI_PROMPT\") {"
+          },
+          {
+            "n": 3,
+            "file": "monitor",
+            "line": 207,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "sendData(API_URL, »message.payload.email, message.payload.runtimeId, {«",
+            "spansTo": 212
+          },
+          {
+            "n": 4,
+            "file": "monitor",
+            "line": 208,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "message: »message.payload.messageText«,"
+          },
+          {
+            "n": 5,
+            "file": "monitor",
+            "line": 5,
+            "ops": [
+              "RETURN:json.stringify"
+            ],
+            "code": "const json = »JSON.stringify(payload)«;"
+          },
+          {
+            "n": 6,
+            "file": "monitor",
+            "line": 7,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "headers.append('X-Bark-Email', »email«);"
+          },
+          {
+            "n": 7,
+            "file": "monitor",
+            "line": 8,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "headers.append('X-Bark-Extension', »runtimeId«);"
+          },
+          {
+            "n": 8,
+            "file": "monitor",
+            "line": 15,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "body: »json«,"
+          },
+          {
+            "n": 9,
+            "file": "monitor",
+            "line": 11,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»  return fetch(url, {«",
+            "spansTo": 22
+          },
+          {
+            "n": 10,
+            "file": "monitor",
+            "line": 216,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.type« === \"CANVA_ACTIVITY\") {"
+          },
+          {
+            "n": 11,
+            "file": "monitor",
+            "line": 217,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "const p = »message.payload«;"
+          },
+          {
+            "n": 12,
+            "file": "monitor",
+            "line": 220,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "type: »p.activityType«,"
+          },
+          {
+            "n": 13,
+            "file": "monitor",
+            "line": 218,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    const payload = {«",
+            "spansTo": 222
+          },
+          {
+            "n": 14,
+            "file": "monitor",
+            "line": 221,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "message: »p.message«"
+          },
+          {
+            "n": 15,
+            "file": "monitor",
+            "line": 226,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»p.activityType === \"image\") payload.media_url = p.mediaUrl«;"
+          },
+          {
+            "n": 16,
+            "file": "monitor",
+            "line": 227,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "if (»p.location) payload.location = p.location«;"
+          },
+          {
+            "n": 17,
+            "file": "monitor",
+            "line": 229,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "sendData(API_URL, »p.email, p.runtimeId«, payload)"
+          }
+        ]
+      }
+    }
+  ]
+}

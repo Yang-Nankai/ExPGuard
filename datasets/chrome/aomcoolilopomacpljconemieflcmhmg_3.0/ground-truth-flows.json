@@ -1,0 +1,686 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "aomcoolilopomacpljconemieflcmhmg",
+  "version": "3.0",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-2cab87c391f35fe1",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_TABS_CREATE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:aomcoolilopomacpljconemieflcmhmg:3.0:03aab0f598af20d5:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:aomcoolilopomacpljconemieflcmhmg:3.0:03aab0f598af20d5:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "semantic_sha256": "03aab0f598af20d5e450f6998a0de663c3e1be96fcbb999c1ee1f6791e1781e6",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "From storage.local.set('SETTINGS') in background",
+              "file": "background",
+              "loc": "L387:C12 -> L387:C19",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "UNTRUSTED_STORAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_TABS_CREATE_OPTIONS",
+              "remark": "",
+              "file": "background",
+              "loc": "L263:C8 -> L263:C54",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": true,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "flow_index": 2,
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "User manually confirmed the external settings control notification text and clicked tab URL."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 3,
+              "source_provenance": "UNTRUSTED_STORAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have verified the complete chain against the raw source. Let me record the decision ledger. **(a) Who controls the source.** `chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => { switch (request.type) {...} })` at `background.js:384-394`. `externally_connectable.matches = [\"https://peanuts.pro/*\"]`, and there is **no sender check whatsoever** — no `sender.id` equality, no `sender.origin`/`sender.url` check, no allow-list. Any page loaded on `https://peanuts…",
+              "path": "extensions/aomcoolilopomacpljconemieflcmhmg_3.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.4,
+              "reproduced": false,
+              "basis": "non_decisive",
+              "usable_for_label": false,
+              "evidence_stage": "LISTENER_READY",
+              "evidence_artifact_count": 3,
+              "reasoning": "Companion extension sent message but no beacon hit and no sink tap activity.",
+              "notes": "",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\aomcoolilopomacpljconemieflcmhmg_3.0\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-23T02:49:05.902Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\aomcoolilopomacpljconemieflcmhmg_3.0\\dynamic\\evidence\\flow-2",
+              "files": [
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "step-final-state-fixture.png",
+                "step-final-state.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Request timed out.",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/aomcoolilopomacpljconemieflcmhmg_3.0/final/final_report.json",
+              "report_mtime": "2026-08-18T03:33:45.453Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-23T02:49:05.902Z",
+                "notes": "User manually confirmed the external settings control notification text and clicked tab URL.",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\aomcoolilopomacpljconemieflcmhmg_3.0\\dynamic\\evidence\\flow-2\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\aomcoolilopomacpljconemieflcmhmg_3.0\\dynamic\\evidence\\flow-2\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-23T02:49:05.902Z",
+                  "sha256": "49c93b7378bfaa39bf6747c48d7be5e902b99376e223c49bb38a9f04c81fc34a"
+                }
+              }
+            ],
+            "notes": [
+              "Latest manual attestation overrides the aggregate label while preserving the automated outcome for audit."
+            ],
+            "snapshot_drift": {
+              "static_verdict": {
+                "flow_summary": "",
+                "current_report": "TRUE_POSITIVE"
+              },
+              "dynamic_outcome": {
+                "flow_summary": "",
+                "current_report": "INCONCLUSIVE_AFTER_DEBUG"
+              },
+              "dynamic_final_verdict": {
+                "flow_summary": "",
+                "current_report": "UNCERTAIN"
+              }
+            },
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "extension_delisted",
+        "dataset_version": "3.0",
+        "latest_version": null,
+        "reason": "Chrome Web Store has no public details for this ID",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-2e03242863f8b0c7",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard",
+        "DoubleX"
+      ],
+      "match_region": "ExPGuard + DoubleX",
+      "match_basis": "normalized_signature_one_to_one",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:aomcoolilopomacpljconemieflcmhmg:3.0:5fec44e9f1ea7b55:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:aomcoolilopomacpljconemieflcmhmg:3.0:5fec44e9f1ea7b55:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "5fec44e9f1ea7b55109b45f64dde4073b92e59223de50b250df4113abab067e9",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L387:C12 -> L387:C19",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "SETTINGS",
+              "file": "background",
+              "loc": "L199:C4 -> L203:C5",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "confirmed_inventory_expagent_dynamic",
+                  "confidence": 0.85,
+                  "detail": "semanticFixture=true originalSenderIdentityNotClaimed=true semanticFixture=true originalSenderIdentityNotClaimed=true"
+                },
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "CONFIRMED",
+                  "basis": "runtime_reproduced",
+                  "confidence": 0.85,
+                  "detail": "A controlled companion extension reached the external-message listener and the exact privileged sink recorded the bounded test marker. If an ID allowlist existed, only the disposable manifest copy was patched and that semantic change is recorded."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 2,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Decision ledger **(a) Who controls the source?** `background.js` L384–394 registers `chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => …)`. The `request` object (specifically `request.type` and `request.data`) is supplied by the external message sender. Manifest `externally_connectable.matches = [\"https://peanuts.pro/*\"]`. No `sender.id`, `sender.url`, or `sender.origin` check exists anywhere in the listener (search for `sender.id|sender.url|sender.origin…",
+              "path": "extensions/aomcoolilopomacpljconemieflcmhmg_3.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.85,
+              "reproduced": true,
+              "basis": "runtime_reproduced",
+              "usable_for_label": true,
+              "evidence_stage": "MARKER_REACHED",
+              "evidence_artifact_count": 3,
+              "reasoning": "A controlled companion extension reached the external-message listener and the exact privileged sink recorded the bounded test marker. If an ID allowlist existed, only the disposable manifest copy was patched and that semantic change is recorded.",
+              "path": "extensions/aomcoolilopomacpljconemieflcmhmg_3.0/dynamic/dynamic_report.json",
+              "report_mtime": "2026-09-19T07:32:10.971Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/aomcoolilopomacpljconemieflcmhmg/3.0/dynamic-evidence/flow-0",
+              "files": [
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "step-final-state-fixture.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Request timed out.",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "UNCERTAIN",
+              "dynamic_outcome_snapshot": "NOT_ATTEMPTED",
+              "tool_reports_consulted": [
+                "primary",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/aomcoolilopomacpljconemieflcmhmg_3.0/final/final_report.json",
+              "report_mtime": "2026-08-18T03:33:45.453Z"
+            },
+            "manual_verification": [
+              {
+                "source": "ExPAgent",
+                "kind": "confirmed_inventory_expagent_dynamic",
+                "verification_origin": "expguard_opti_inventory",
+                "verdict": "TP",
+                "confidence": 0.85,
+                "confirmed_at": "2026-09-19T07:32:10.9712913Z",
+                "notes": "semanticFixture=true originalSenderIdentityNotClaimed=true semanticFixture=true originalSenderIdentityNotClaimed=true",
+                "report_path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/aomcoolilopomacpljconemieflcmhmg_3.0/dynamic/dynamic_report.json",
+                "report_artifact": {
+                  "path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/aomcoolilopomacpljconemieflcmhmg_3.0/dynamic/dynamic_report.json",
+                  "kind": "dynamic_report.json",
+                  "mtime": "2026-09-19T07:32:10.971Z",
+                  "entry": {
+                    "outcome": "CONFIRMED",
+                    "final_verdict": "TRUE_POSITIVE",
+                    "verdict": null,
+                    "confidence": 0.85,
+                    "reproduced": true
+                  }
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": {
+              "static_verdict": {
+                "flow_summary": "UNCERTAIN",
+                "current_report": "TRUE_POSITIVE"
+              },
+              "dynamic_outcome": {
+                "flow_summary": "NOT_ATTEMPTED",
+                "current_report": "CONFIRMED"
+              },
+              "dynamic_final_verdict": {
+                "flow_summary": "UNCERTAIN",
+                "current_report": "TRUE_POSITIVE"
+              }
+            },
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        },
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:aomcoolilopomacpljconemieflcmhmg:3.0:2c286640b846ecf7:01",
+          "flow": {
+            "flow_id": "doublex:chrome:aomcoolilopomacpljconemieflcmhmg:3.0:2c286640b846ecf7:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "2c286640b846ecf7dcb100c7f1fbb9df4c3e8e285c7df014b20619211d9df57c",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "background.js",
+              "loc": "L414",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "BACKGROUND",
+              "origin_context": "background.js",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "chrome.storage.local.set",
+              "file": "background.js",
+              "loc": "L217",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": false,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_chrome_r2_user_manual",
+                  "source": "Manual",
+                  "kind": "doublex_chrome_r2_user_manual",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证为 TP：peanuts.pro 可经 save-settings 写入扩展状态。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\aomcoolilopomacpljconemieflcmhmg_3.0\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "report_sha256": "7eb149d53bf07cbb0ea4906be53c0735b56559e14f2c0d5776acc819075a0e87"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence to render a verdict.\n\n## Analysis\n\n**1. Source — who controls it**\nThe report labels the source as `WINDOW_MESSAGE_EVENT` at `background.js:414`, but that anchor is stale/incorrect (line 414 is blank). The real source is the immediately evident external-message listener:\n\n```js\nchrome.runtime.onMessageExternal.addListener(\n  (request, sender, sendResponse) => {\n    switch (request.type) {\n      case \"save-settings\":\n        setStorageData({ SETTINGS: request.data });   // L389\n        ...\n```\n\nThis is attacker-controllable *external* input. The manifest sets `externally_connectable.matches: [\"https://peanuts.pro/*\"]`, so any web page running on `https://peanuts.pro` (or injected there via XSS/subdomain takeovers) can `chrome.runtime.sendMessage(EXT_ID, {...})` to this listener. The `request.type` switch value is fully attacker-chosen (`\"save-settings\"` is trivially satisfied), and `request.data` is arbitrary attacker data.\n\n**2. Path — unbroken source-to-sink**\n`request.data` is passed *directly*, with no sanitization, into:\n\n```js\nconst setStorageData = (data) =>\n  new Promise((resolve, reject) =>\n    chrome.storage.local.set(data, ...)   // L199\n```\n\nSo the",
+              "path": "extensions/aomcoolilopomacpljconemieflcmhmg_3.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/aomcoolilopomacpljconemieflcmhmg_3.0/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T16:09:06.946587Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "doublex_chrome_r2_user_manual",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-23T17:37:02.188711Z",
+                "notes": "人工验证为 TP：peanuts.pro 可经 save-settings 写入扩展状态。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\aomcoolilopomacpljconemieflcmhmg_3.0\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\aomcoolilopomacpljconemieflcmhmg_3.0\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-23T17:37:02.188711Z",
+                  "sha256": "7eb149d53bf07cbb0ea4906be53c0735b56559e14f2c0d5776acc819075a0e87"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "DoubleX Chrome r2 manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "extension_delisted",
+        "dataset_version": "3.0",
+        "latest_version": null,
+        "reason": "Chrome Web Store has no public details for this ID",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-94d15f59df5abc6c",
+      "verification": "TP",
+      "source_family": "storage",
+      "sink_family": "FETCH_RESOURCE",
+      "matched_tools": [
+        "CoCo"
+      ],
+      "match_region": "CoCo only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:aomcoolilopomacpljconemieflcmhmg:3.0:98e260e4645448ba:01",
+          "flow": {
+            "flow_id": "coco:chrome:aomcoolilopomacpljconemieflcmhmg:3.0:98e260e4645448ba:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "98e260e4645448bab2008ce114077be6d2b43490747ca5b35b1c3461be7e98ac",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "DATA_LEAK",
+            "rule_id": "coco-data_leak",
+            "severity": "HIGH",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "CoCo source evidence",
+              "file": "crx_headers/bg_header.js",
+              "loc": "L498:C1 -> L498:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "crx_headers/bg_header.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "CoCo sink evidence",
+              "file": "background.js",
+              "loc": "L435:C1 -> L435:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": true,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_chrome_user_manual",
+                  "source": "Manual",
+                  "kind": "coco_chrome_user_manual",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证为 TP：Peanuts.pro 外部消息可触发使用扩展存储 USERID 的通知状态回写请求。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\aomcoolilopomacpljconemieflcmhmg_3.0\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "report_sha256": "400bafd265d1f2c67553bc00b5de6a4a7eb8c822a005bcd9bc85e4c0de150c5c"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.96,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "",
+              "reasoning": "Deterministic CoCo calibration [COCO_IDENTIFIER_NETWORK_FLOW]: A persistent extension identifier (USER_ID/UUID) is placed in a network request.  The fixed vendor destination does not erase the concrete storage-to-network boundary in this review baseline. Original model verdict: FALSE_POSITIVE.",
+              "path": "extensions/aomcoolilopomacpljconemieflcmhmg_3.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 60s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/aomcoolilopomacpljconemieflcmhmg_3.0/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T03:03:58.542010Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "coco_chrome_user_manual",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-24T08:13:53.779592Z",
+                "notes": "人工验证为 TP：Peanuts.pro 外部消息可触发使用扩展存储 USERID 的通知状态回写请求。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\aomcoolilopomacpljconemieflcmhmg_3.0\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\aomcoolilopomacpljconemieflcmhmg_3.0\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-24T08:13:53.779592Z",
+                  "sha256": "400bafd265d1f2c67553bc00b5de6a4a7eb8c822a005bcd9bc85e4c0de150c5c"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "CoCo Chrome manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "extension_delisted",
+        "dataset_version": "3.0",
+        "latest_version": null,
+        "reason": "Chrome Web Store has no public details for this ID",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

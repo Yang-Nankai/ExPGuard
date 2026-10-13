@@ -1,0 +1,413 @@
+{
+  "extensionId": "zerodelay@joaogfc",
+  "extensionVersion": "1.5.0",
+  "sourceType": "XPI",
+  "stats": {
+    "filesWithIssues": 5,
+    "totalFiles": 11,
+    "distinctFlows": 3,
+    "rawIssueEntries": 3,
+    "sinklessSourcesSkipped": 8
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "content",
+      "frame": "CS_1",
+      "constraint": {
+        "matches": [
+          "https://www.youtube.com/*"
+        ]
+      },
+      "source": {
+        "kind": "TARGET_CUSTOM_EVENT",
+        "remark": "target.addEventListener(_live_catch_up_video_meta)",
+        "file": "content",
+        "loc": "L143:C94 -> L143:C102",
+        "line": 143,
+        "col": [
+          94,
+          102
+        ],
+        "spansTo": null,
+        "code": "document.addEventListener('_live_catch_up_video_meta', e => onChannelIdUpdate(common, »e.detail«));"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "unknown",
+          "file": "content",
+          "loc": "L443:C37 -> L443:C66",
+          "line": 443,
+          "col": [
+            37,
+            66
+          ],
+          "spansTo": null,
+          "code": "if (Object.keys(upd).length) »chrome.storage.local.set(upd)«;",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "https://www.youtube.com/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 42,
+        "distinctLines": 9,
+        "steps": [
+          {
+            "n": 1,
+            "file": "content",
+            "line": 143,
+            "ops": [
+              "ELEMENT:member-element"
+            ],
+            "code": "document.addEventListener('_live_catch_up_video_meta', e => onChannelIdUpdate(common, »e.detail«));"
+          },
+          {
+            "n": 2,
+            "file": "content",
+            "line": 433,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "const channelId = »detail && detail.channel_id«;"
+          },
+          {
+            "n": 3,
+            "file": "content",
+            "line": 434,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary",
+              "ASSIGN:logical-left"
+            ],
+            "code": "if (»!channelId || !extensionAlive()«) return;"
+          },
+          {
+            "n": 4,
+            "file": "content",
+            "line": 435,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "lastChannelId = »channelId«;"
+          },
+          {
+            "n": 5,
+            "file": "content",
+            "line": 438,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "if (data[common.currentChannelIdKey] !== »channelId) upd[common.currentChannelIdKey] = channelId«;"
+          },
+          {
+            "n": 6,
+            "file": "content",
+            "line": 437,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »upd = {}«;"
+          },
+          {
+            "n": 7,
+            "file": "content",
+            "line": 440,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const saved = common.getSuggestedModeForChannel(data, »channelId«);"
+          },
+          {
+            "n": 8,
+            "file": "content",
+            "line": 146,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»area === 'local' && changes[common.channelMemoryKey]?.newValue && lastChannelId«) {"
+          },
+          {
+            "n": 9,
+            "file": "content",
+            "line": 147,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»onChannelIdUpdate(common, { channel_id: lastChannelId })«;"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "TARGET_CUSTOM_EVENT",
+        "remark": "target.addEventListener(_zd_badge)",
+        "file": "background",
+        "loc": "L56:C0 -> L72:C2",
+        "line": 56,
+        "col": [
+          0,
+          2
+        ],
+        "spansTo": 72,
+        "code": "»chrome.runtime.onMessage.addListener((msg, sender) => {«"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_ACTION_BADGE_OPTIONS",
+          "remark": null,
+          "file": "background",
+          "loc": "L69:C8 -> L69:C79",
+          "line": 69,
+          "col": [
+            8,
+            79
+          ],
+          "spansTo": null,
+          "code": "»chrome.action.setBadgeText({ tabId: sender.tab.id, text: raw || null })«;",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 6,
+        "distinctLines": 4,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 56,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»chrome.runtime.onMessage.addListener((msg, sender) => {«",
+            "spansTo": 72,
+            "crossContextHop": "runtime.single.sender.message[content->background]"
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 68,
+            "ops": [
+              "ELEMENT:member-element-container"
+            ],
+            "code": "const raw = typeof msg.text === 'string' ? »msg.text.slice«(0, 4) : '';"
+          },
+          {
+            "n": 3,
+            "file": "background",
+            "line": 69,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.action.setBadgeText({ tabId: sender.tab.id, text: raw || null })«;"
+          },
+          {
+            "n": 4,
+            "file": "background",
+            "line": 70,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (»raw«) chrome.action.setBadgeBackgroundColor({ tabId: sender.tab.id, color: LATENCY_BADGE_COLOR });"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "file": "popup",
+      "frame": "OPTIONS_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "#band-slider",
+        "file": "popup",
+        "loc": "L285:C18 -> L285:C42",
+        "line": 285,
+        "col": [
+          18,
+          42
+        ],
+        "spansTo": null,
+        "code": "const v = »parseFloat(slider.value)«;"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "centerBuffer",
+          "file": "popup",
+          "loc": "L199:C4 -> L199:C44",
+          "line": 199,
+          "col": [
+            4,
+            44
+          ],
+          "spansTo": null,
+          "code": "»chrome.storage.local.set({ [key]: val })«;",
+          "frame": "OPTIONS_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 310,
+        "distinctLines": 13,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 285,
+            "ops": [
+              "RETURN:parseFloat"
+            ],
+            "code": "const v = »parseFloat(slider.value)«;"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 286,
+            "ops": [
+              "ASSIGN:identifier",
+              "RETURN:Number.toFixed",
+              "ASSIGN:binary-left"
+            ],
+            "code": "$('#band-value').textContent = »v.toFixed(1)« + 's';"
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 287,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "setOne('centerBuffer', »v«);"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 198,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "state[key] = »val«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 481,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    refresh();«",
+            "spansTo": 496
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 199,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.storage.local.set({ [key]: val })«;"
+          },
+          {
+            "n": 7,
+            "file": "vendor/qrcode",
+            "line": 524,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "rect = 'l' + cellSize + ',»0« 0,' + cellSize +"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 532,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "copyBtn.datas»e«t.code = code;"
+          },
+          {
+            "n": 9,
+            "file": "vendor/qrcode",
+            "line": 536,
+            "ops": [
+              "ASSIGN:identifier",
+              "RETURN:Math.max",
+              "RETURN:Math.min"
+            ],
+            "code": "qrSvg» += (alt.text) ? '<description id=\"' + esca«peXml(alt.id) + '\">' +"
+          },
+          {
+            "n": 10,
+            "file": "popup",
+            "line": 541,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "RETURN:Math.round"
+            ],
+            "code": "»         qrBox.append(parseSvg«(qr.createSvgTag({ cellSize: 4, scalable: true })));"
+          },
+          {
+            "n": 11,
+            "file": "popup",
+            "line": 509,
+            "ops": [
+              "ELEMENT:computed-member-unknown-alternative",
+              "ELEMENT:member-element-container",
+              "ASSIGN:unary"
+            ],
+            "code": "// ----- PIX» (Brazil): s«uggested amounts + \"copia e cola\" code + QR ----"
+          },
+          {
+            "n": 12,
+            "file": "popup",
+            "line": 503,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "RETURN:Math.abs"
+            ],
+            "code": "copyBtn.textContent =» L.supportCopy;«"
+          },
+          {
+            "n": 13,
+            "file": "popup",
+            "line": 510,
+            "ops": [
+              "ELEMENT:computed-member-unknown-alternative",
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-left"
+            ],
+            "code": "// Brazil's who»le d«onation theme is beer 🍺 — swap the header cup for a mug."
+          }
+        ]
+      }
+    }
+  ]
+}

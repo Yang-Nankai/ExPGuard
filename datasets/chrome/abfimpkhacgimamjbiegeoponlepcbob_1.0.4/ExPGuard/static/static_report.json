@@ -1,0 +1,592 @@
+{
+  "extension_id": "abfimpkhacgimamjbiegeoponlepcbob",
+  "extension_version": "1.0.4",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 7,
+  "verified_count": 7,
+  "verdicts": [
+    {
+      "flow_index": 1,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Ledger\n\n**(a) Who controls the source?**\nThe source is `chrome.runtime.onMessageExternal.addListener` (background.js L597) dispatching to `external_listener(request, sender, sendResponse)` at L593. The manifest restricts `externally_connectable.matches` to `*://*.seedr.cc/*`. There is **no** `sender.id`, `sender.origin`, or `sender.url` check in the listener (verified at L534–540). Any page able to run on a `*.seedr.cc` subdomain — via XSS on an existing subdomain or control/takeover of a subdomain — can send the message. `request.func == 'login'` is an attacker-chosen field, not a trust anchor. Source is attacker-controllable (with the seedr.cc-origin precondition).\n\n**(b) Exact source-to-sink path** (confirmed in real source):\n1. `background.js:597` `chrome.runtime.onMessageExternal.addListener` → `external_listener(request, …)` (L593).\n2. `background.js:535` `if (request.func == 'login')` — attacker-controlled branch.\n3. `background.js:536` `oauth.login(request.username, request.access_token, 3600*12, request.refresh_token)`.\n4. `oauth.js:181–183` `await s_storage.set('access_token', access_token)`, `'refresh_token'`, `'username'`.\n5. `storage.js:21` `chrome.stor",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L593:C26 -> L593:C33",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L593 C26-33:         external_listener(request, sender, sendResponse);"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L21:C5 -> L28:C7",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>    21|         chrome.runtime.sendMessage({type: 'keep_alive'});\n>>    22|         keepAlive()\n>>    23|     }, 1000 * 25);\n>>    24| }\n>>    25| function stopKeepAlive() {\n>>    26|     clearInterval(keepAliveInstance);\n>>    27| }\n>>    28| "
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.seedr.cc/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 2,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have confirmed the full chain in the raw source. The report's sink *loc* is mis-anchored (it points at the `keep_alive` interval block instead of the real storage write), but the propagation list and the actual code unambiguously identify the true sink: `s_storage.set('refresh_token', ...)` → `chrome.storage.local.set(...)` in `oauth.login`.\n\n## Decision ledger\n\n**(a) Who controls the source**\n`chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => external_listener(request, sender, sendResponse))` (background.js L591–600). The `request` object is fully attacker-controlled by any page on `*://*.seedr.cc/*` (the manifest's `externally_connectable.matches`). There is **no** `sender.id` allowlist, no `sender.origin`/`sender.url` check, and no token validation inside `external_listener`.\n\n**(b) Exact source-to-sink path (verified in source)**\n1. L597–598: `chrome.runtime.onMessageExternal.addListener` → `external_listener(request, ...)`.\n2. L535: `if (request.func == 'login')` — attacker-chosen action field, trivially satisfiable.\n3. L536: `await oauth.login(request.username, request.access_token, 3600 * 12, request.refresh_token)` — attacker fields passed th",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L593:C26 -> L593:C33",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L593 C26-33:         external_listener(request, sender, sendResponse);"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L21:C5 -> L28:C7",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>    21|         chrome.runtime.sendMessage({type: 'keep_alive'});\n>>    22|         keepAlive()\n>>    23|     }, 1000 * 25);\n>>    24| }\n>>    25| function stopKeepAlive() {\n>>    26|     clearInterval(keepAliveInstance);\n>>    27| }\n>>    28| "
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.seedr.cc/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 3,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #2 (Seedr extension, storage poisoning)\n\n### Four-part decision ledger\n\n**(a) Who controls the source?**\n`chrome.runtime.onMessageExternal.addListener` in `background.js` L597–599 forwards the raw `request` object to `external_listener`. The message payload is controlled by whatever web origin is allowed by `externally_connectable.matches: [\"*://*.seedr.cc/*\"]`. This is a web-origin restriction, not a browser-authenticated sender identity: there is **no** `sender.id`/`sender.origin`/`sender.url` check anywhere in `background.js` (verified via search — zero matches). `request.func === 'login'` is an attacker-chosen field, not a trust anchor.\n\n**(b) Exact source-to-sink path**\n- `background.js:597-599` `chrome.runtime.onMessageExternal.addListener` → `external_listener(request, sender, sendResponse)`\n- `background.js:534-536` `if (request.func == 'login') { await oauth.login(request.username, request.access_token, 3600*12, request.refresh_token); }`\n- `oauth.js:175-183` `login()` does `this.username = username` and `await s_storage.set('username', username)` (also `access_token`, `refresh_token`)\n- `storage.js:10-21` `set()` builds `i[setting] = value` and cal",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L593:C26 -> L593:C33",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L593 C26-33:         external_listener(request, sender, sendResponse);"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L21:C5 -> L28:C7",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>    21|         chrome.runtime.sendMessage({type: 'keep_alive'});\n>>    22|         keepAlive()\n>>    23|     }, 1000 * 25);\n>>    24| }\n>>    25| function stopKeepAlive() {\n>>    26|     clearInterval(keepAliveInstance);\n>>    27| }\n>>    28| "
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.seedr.cc/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 4,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #4 (STORAGE_POSOING)\n\n### 1. Source control\nThe source is `chrome.runtime.onMessageExternal.addListener` in the background service worker (background.js L597–598), which invokes `external_listener(request, sender, sendResponse)`.\n\n`request` here is the raw external message payload. Any page whose origin matches `externally_connectable.matches: [\"*://*.seedr.cc/*\"]` can call `chrome.runtime.sendMessage(<extension_id>, payload)` and fully control:\n\n- `request.func`\n- `request.username`\n- `request.access_token`\n- `request.refresh_token`\n\nThere is **no `sender.id` allowlist** and no origin/URL equality check inside `external_listener`. The only guard is the browser-enforced `externally_connectable` origin restriction, which is a real scope reduction but is not an unforgeable identity boundary: XSS on any `*.seedr.cc` origin (or a weakly controlled matching subdomain) satisfies it.\n\n### 2. Source-to-sink path (confirmed in source)\nThe propagation evidence is correct and unbroken:\n\n1. `background.js:598` — `external_listener(request, sender, sendResponse)` (external message).\n2. `background.js:535` — `if (request.func == 'login')` — attacker-satisfiable field chec",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L598:C26 -> L598:C33",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L598 C26-33:         external_listener(request, sender, sendResponse);"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L21:C5 -> L28:C7",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>    21|         chrome.runtime.sendMessage({type: 'keep_alive'});\n>>    22|         keepAlive()\n>>    23|     }, 1000 * 25);\n>>    24| }\n>>    25| function stopKeepAlive() {\n>>    26|     clearInterval(keepAliveInstance);\n>>    27| }\n>>    28| "
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.seedr.cc/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 5,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow Verification: Seedr — external login message → `chrome.storage.local` poisoning\n\n### (a) Who controls the source?\n`chrome.runtime.onMessageExternal.addListener` (background.js L597–600) is invoked by any page matching the manifest's `externally_connectable.matches: [\"*://*.seedr.cc/*\"]`. The message object `request` is fully attacker-influenced when code can run on that origin (XSS on seedr.cc or a subdomain). There is **no `sender.id` allowlist, no `sender.origin`/`sender.url` check, and no validation of the token fields** — `request.func`, `request.username`, `request.access_token`, and `request.refresh_token` are all taken verbatim from the message.\n\n### (b) Exact source→sink path\nConfirmed in raw source:\n\n1. **Source** — `background.js:597-598`:\n   `chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => { external_listener(request, sender, sendResponse); ... })`\n2. **Branch** — `background.js:535`:\n   `if (request.func == 'login')` (attacker-chosen action selector).\n3. **Call** — `background.js:536`:\n   `await oauth.login(request.username, request.access_token, 3600 * 12, request.refresh_token);`\n4. **Sink** — `oauth.js:181-183`:\n   ```js\n   awa",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L598:C26 -> L598:C33",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L598 C26-33:         external_listener(request, sender, sendResponse);"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L21:C5 -> L28:C7",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>    21|         chrome.runtime.sendMessage({type: 'keep_alive'});\n>>    22|         keepAlive()\n>>    23|     }, 1000 * 25);\n>>    24| }\n>>    25| function stopKeepAlive() {\n>>    26|     clearInterval(keepAliveInstance);\n>>    27| }\n>>    28| "
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.seedr.cc/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 6,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification analysis\n\n### (a) Who controls the source?\nThe source is `chrome.runtime.onMessageExternal.addListener` (background.js L597–598), which dispatches into `external_listener(request, sender, sendResponse)` (L534). The `request` object is supplied by any webpage/extension that the manifest allows to connect. The listener completely ignores `sender` — there is **no `sender.id` fixed-ID allowlist and no `sender.origin`/`sender.url` check**. The only gate is the manifest `externally_connectable.matches: [\"*://*.seedr.cc/*\"]`, a wildcard subdomain scope. A page on any `*.seedr.cc` subdomain (or XSS on one of those origins) can invoke the listener with attacker-chosen fields.\n\n### (b) Exact source-to-sink path\n1. `external_listener(request, ...)` — attacker message object.\n2. L535: `if (request.func == 'login')` — attacker sets `func: \"login\"`.\n3. L536: `await oauth.login(request.username, request.access_token, 3600 * 12, request.refresh_token)` — attacker fields passed through.\n4. oauth.js L175–183: `this.username = username; this.access_token = access_token; this.refresh_token = refresh_token;` then\n   - `s_storage.set('access_token', access_token)`\n   - `s_storage.set('re",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L598:C26 -> L598:C33",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L598 C26-33:         external_listener(request, sender, sendResponse);"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L21:C5 -> L28:C7",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>    21|         chrome.runtime.sendMessage({type: 'keep_alive'});\n>>    22|         keepAlive()\n>>    23|     }, 1000 * 25);\n>>    24| }\n>>    25| function stopKeepAlive() {\n>>    26|     clearInterval(keepAliveInstance);\n>>    27| }\n>>    28| "
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.seedr.cc/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 0,
+      "verdict": "PARTIAL",
+      "confidence": 0.7,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 (REQUEST_FORGERY: `WINDOW_MESSAGE_EVENT` → `FETCH_BODY` to `https://www.seedr.cc/api/token`)\n\n### 1. Who controls the source?\nThe source is `content.js` `receiveMessage` — `window.addEventListener(\"message\", receiveMessage, false)` at L239, with the tainted destructure at L215:\n\n```js\nif (event.origin !== \"https://www.seedr.cc\") return;\nconst { function: func, username, password } = event.data;\n```\n\n`username` and `password` are fully attacker-controlled *postMessage fields*. The only guard is `event.origin !== \"https://www.seedr.cc\"`, an exact web-origin equality check. Per the harness rules, this is **not** an unforgeable browser-authenticated boundary (`sender.id` is; `event.origin` is not). An attacker who can run JS on `https://www.seedr.cc` (XSS on the trusted partner, or control of a seedr.cc-origin frame/page) trivially satisfies it, because on seedr.cc the check degenerates to `event.origin === window.location.origin`. A random arbitrary page (e.g. `evil.com`) cannot set `event.origin` to seedr.cc, so the effective surface is narrowed — but it is not eliminated.\n\n### 2. Source-to-sink path\nThe data path is unbroken:\n\n1. `content.js` L215: attacke",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "The message listener accepts only an exact event.origin allowlist (https://www.seedr.cc). Exploitation requires control/XSS at that trusted web origin; arbitrary websites cannot invoke it.",
+      "pa_category": "PA_TRUSTED_WEB_ORIGIN",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L215:C9 -> L215:C23",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": "L215 C9-23: \tconst { function: func, username, password } = event.data;"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L116:C29 -> L119:C8",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   116|             chrome.tabs.sendMessage(tabs[0].id, {\n>>   117|                 type: \"add_torrent\",\n>>   118|                 url: url,\n>>   119|                 is_magnet: false"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content.js"
+            ],
+            "runAt": "document_end",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.seedr.cc/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [
+          "https://www.seedr.cc"
+        ],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "WINDOW_POSTMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "https://www.seedr.cc",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "PA_TRUSTED_WEB_ORIGIN: replay only with an operator-owned origin fixture."
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 7 flow(s): 6 true-positive, 0 false-positive, 1 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

@@ -1,0 +1,166 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "edge",
+  "extension_id": "nnkgneoiohoecpdiaponcejilbhhikei",
+  "version": "3.2.10",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-b3ce18cf780921b0",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "FETCH_BODY",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/edge/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:edge:nnkgneoiohoecpdiaponcejilbhhikei:3.2.10:786e75e76d35bc0a:01",
+          "flow": {
+            "flow_id": "expguard-opti:edge:nnkgneoiohoecpdiaponcejilbhhikei:3.2.10:786e75e76d35bc0a:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "semantic_sha256": "786e75e76d35bc0a3c92e6dd2c5fdd2a428eaba5e018e19695ea321d5c443a04",
+            "identity_occurrence": 1,
+            "source_report_id": 5,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content.bundle",
+              "loc": "L3:C1809 -> L3:C1810",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ],
+                    "excludeGlobs": [
+                      "https://www.google*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content.bundle",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_BODY",
+              "remark": "[Unknown URL]",
+              "file": "background.bundle",
+              "loc": "L1:C16322 -> L1:C16427",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content.bundle",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "flow_index": 2,
+                  "outcome": "CONFIRMED",
+                  "confidence": 0.85,
+                  "detail": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink fired with the controlled marker (sink tap / breakpoint)."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": {
+              "verdict": "FALSE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 5,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #5 — REQUEST_FORGERY (`attacker-input-network-send`) ### (a) Who controls the source? A webpage controls it. The content script runs on `<all_urls>` (excluding Google) and its `message` listener is: ```js function b(e){ if(!x()||!e||e.source!==window||typeof e.data!=\"object\")return; let t=e.data; if(t.source===I){ ... P(F,t) } } window.addEventListener(\"message\",b,!1); ``` The bridge constants are hardcoded in `content.bundle.js`: `c=\"@devtools-extension\"`, `I=\"@d…",
+              "path": "extensions/nnkgneoiohoecpdiaponcejilbhhikei_3.2.10/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.85,
+              "reproduced": true,
+              "basis": "runtime_reproduced",
+              "usable_for_label": true,
+              "evidence_stage": "MARKER_REACHED",
+              "evidence_artifact_count": 5,
+              "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink fired with the controlled marker (sink tap / breakpoint).",
+              "notes": "sinkTapKey=fetch sinkBreakpointHits=1 semanticFixture=true",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\nnkgneoiohoecpdiaponcejilbhhikei_3.2.10\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-23T07:07:58.252Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\nnkgneoiohoecpdiaponcejilbhhikei_3.2.10\\dynamic\\evidence\\flow-2",
+              "files": []
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787026272498770d3492782dd10cc0a489fec0a72ead6aeb52', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "FALSE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/edge/extensions/nnkgneoiohoecpdiaponcejilbhhikei_3.2.10/final/final_report.json",
+              "report_mtime": "2026-08-18T04:11:11.224Z"
+            },
+            "manual_verification": null,
+            "notes": [],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "3.2.10",
+        "latest_version": "3.2.10",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

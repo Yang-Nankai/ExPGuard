@@ -1,0 +1,91 @@
+{
+  "extension_id": "jkmpbdjckkgdaopigpfkahgomgcojlpg",
+  "extension_version": "2.3.3",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have sufficient evidence. Let me confirm the key facts from the source inspection:\n\n**Source (attacker-controlled):** `chrome.runtime.onMessageExternal.addListener((e,r,t)=>{ if(r.url&&r.url.includes(\"appbox.space\")) if(\"supabase-auth-adapter\"===e.source) switch(e.action){ ... case \"setItem\": try{ const{key:r,value:o}=e.data; return chrome.storage.sync.set({[r]:o}, ...) } ... }`.\n\n**Guard analysis:**\n- The only sender gate is `r.url.includes(\"appbox.space\")` — a substring check on `sender.url`, not a fixed `sender.id` equality. Per the browser trust rules, `sender.origin/url` restrictions are not unforgeable: they restrict scope but remain exploitable via XSS on `appbox.space` (which `externally_connectable.matches: [\"https://appbox.space/*\"]` permits).\n- `\"supabase-auth-adapter\"===e.source` and `e.action===\"setItem\"` are checks on attacker-chosen message *fields*, not trust anchors — a sender can set them arbitrarily.\n\n**Sink:** `chrome.storage.sync.set({[r]:o}, ...)` where `r` (key) and `o` (value) are destructured directly from `e.data`. Both the stored key and the stored value are fully attacker-controlled. This is not a boolean-gate-over-literal case; the actual persisted va",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C6676 -> L1:C6677",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C6676-6677: …,r,t)=>{if(r.url&&r.url.includes(\"appbox.space\"))if(\"supabase-auth-adapter\"===e.source)switch(e.action){case\"ping\":t({status:\"ok\"});break;case\"getItem\":try{const…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C7139 -> L1:C7415",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C7139-7415: …essage:e.message})}break;case\"setItem\":try{const{key:r,value:o}=e.data;return chrome.storage.sync.set({[r]:o},(()=>{if(chrome.runtime.lastError){const e=chrome.runtime.lastError.message;console.error(\"Storage error:\",e),t({status:\"error\",message:e})}else t({status:\"success\"}),a({type:\"storage_update\",action:\"set\",key:r,value:o,timestamp:Date.now()})})),!0}catch(e){console.error(\"Error in setItem:\",e),t({status:\"error\",message:e.mess…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://appbox.space/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

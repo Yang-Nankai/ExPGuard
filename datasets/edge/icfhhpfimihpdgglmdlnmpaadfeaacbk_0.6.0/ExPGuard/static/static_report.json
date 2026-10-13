@@ -1,0 +1,87 @@
+{
+  "extension_id": "icfhhpfimihpdgglmdlnmpaadfeaacbk",
+  "extension_version": "0.6.0",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "PARTIAL",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1\n\n### (a) Who controls the source\nThe source is `chrome.runtime.onMessageExternal` at `worker.js` L602. The manifest declares **no `externally_connectable`**, so (per Chrome default behavior) web pages cannot connect, but **other extensions can** reach the listener. The `request` object is fully attacker/caller-supplied. The listener does **not** read a page origin; it only inspects `sender.id`.\n\nThe decisive gate, at L603–L640:\n- `prefs.external_denied.indexOf(sender.id) !== -1` → reject\n- `prefs.external_allowed.indexOf(sender.id) !== -1` → **execute**\n- otherwise, if `prefs.exaccess` is true → prompt; the user must **type the exact `sender.id`** to approve (`v === sender.id` at L620)\n- otherwise (default: `exaccess: false`, `external_allowed: []`) → rejected\n\nSo any extension can *send* the message, but `execute()` only runs for a **user-approved sender ID**. `sender.id` is browser-populated from the sender's public key and cannot be chosen by a page-created extension. This is a browser-authenticated, user-managed sender allowlist — an unforgeable inter-extension trust boundary, not a page-controlled source.\n\n### (b) Source-to-sink path\nThe data path is",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "See preserved static analyst transcript.",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "worker",
+          "reportedLoc": "L612:C16 -> L612:C23",
+          "resolvedFile": "worker.js",
+          "resolved": true,
+          "snippet": "L612 C16-23:         execute(request.app, request.tab, request.selectionText, request.frameId || 0, request.extra);"
+        },
+        "sinkAnchor": {
+          "reportedFile": "worker",
+          "reportedLoc": "L142:C4 -> L164:C6",
+          "resolvedFile": "worker.js",
+          "resolved": true,
+          "snippet": ">>   142|     chrome.downloads.download({url}, id => {\n>>   143|       function observe(d) {\n>>   144|         if (d.id === id && d.state) {\n>>   145|           if (d.state.current === 'complete' || d.state.current === 'interrupted') {\n>>   146|             chrome.downloads.onChanged.removeListener(observe);\n>>   147|             if (d.state.current === 'complete') {\n>>   148|               chrome.downloads.search({id}, ([d]) => {\n>>   149|                 if (d) {\n>>   150|                   resolve(d);\n>>   151|                 }\n>>   152|                 else {\n>>   153|                   reject(Error('I am not able to find the downloaded file!'));\n>>   154|                 }\n>>   155|               });\n>>   156|             }\n>>   157|             else {\n>>   158|               reject(Error('The downloading job got interrupted'));\n>>   159|             }\n>>   160|           }\n>>   161|         }\n>>   162|       }\n>>   163|       chrome.downloads.onChanged.addListener(observe);\n>>   164|     });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 0 true-positive, 0 false-positive, 1 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

@@ -1,0 +1,46 @@
+{
+  "surface": "CUSTOM_EVENT",
+  "sourcePath": "popup.js",
+  "location": "L538:C63 -> L538:C73",
+  "eventNames": [
+    "AjaxLink",
+    "TestScheckPro",
+    "RequestWindow",
+    "ChangeDevice",
+    "OpenWindowCaptcha",
+    "OpenWindowTemp",
+    "OpenView",
+    "GetTabCount",
+    "RequestLink",
+    "ClearTabNotView"
+  ],
+  "eventTarget": "document",
+  "eventDetailKey": "detail",
+  "envelope": {},
+  "forwardField": "",
+  "scalarMessageValue": "",
+  "requirements": {},
+  "preconditionActions": [],
+  "selectors": [],
+  "mediaTags": [],
+  "snippet": "ustomEvent('OpenViewDone', true, false, evt.detail);\n    document.dispatchEvent(event);\n}));\n\ndocument.addEventListener('GetTabCount', function (evt) {\n    chrome.runtime.sendMessage({ type: \"GetTabCount\",obj:{}},function(resp){\n\t\tvar event = document.createEvent('CustomEvent');\n\t\tevent.initCustomEvent('GetTabCountResp', true, false, resp.response);\n\t\tdocument.dispatchEvent(event);\n\t});\n});\n//===========================\nvar requestLinkTemp = null;\ndocument.addEventListener('RequestLink', function (evt) {\n    if (evt.detail != null) {\n        requestLinkTemp = evt.detail;\n        RequestLinkFun()\n    }\n});\n\nfunction RequestLinkFun() {\n    var url = \"\";\n    var captcha = false;\n\ttempmobile=requestLinkTemp.mobile;\n    url = requestLinkTemp.url;\n    captcha = requestLinkTemp.captcha;\n    chrome.runtime.sendMessage({ type: \"RequestLink\", obj: url, captcha: captcha,mid:requestLinkTemp.mid, inc",
+  "notes": [
+    "已从 sink 文件推导消息分发字段 `type` 及候选值。",
+    "已从 sink 调用推导 URL 承载字段 `url`。",
+    "已提取页面可达事件名。"
+  ],
+  "discriminatorField": "type",
+  "discriminatorValues": [
+    "RequestLink"
+  ],
+  "urlField": "url",
+  "sinkTapKey": "fetch",
+  "messageAlias": "request",
+  "messageEventKey": "",
+  "jsonMessageField": "",
+  "eventDetailIsJson": false,
+  "sinkDataFields": [],
+  "runtimeMessageKeyPrefix": "",
+  "contractConfidence": "HIGH",
+  "contractWarnings": []
+}

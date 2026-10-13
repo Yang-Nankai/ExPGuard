@@ -1,0 +1,184 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "edge",
+  "extension_id": "pjbpapmfoaplcoaohhdfgdkffdfebmkd",
+  "version": "1.5.0",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-8023f4fc668806fd",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "FETCH_BODY",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/edge/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:edge:pjbpapmfoaplcoaohhdfgdkffdfebmkd:1.5.0:97fed9bd72f1d3be:01",
+          "flow": {
+            "flow_id": "expguard-opti:edge:pjbpapmfoaplcoaohhdfgdkffdfebmkd:1.5.0:97fed9bd72f1d3be:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "97fed9bd72f1d3befb4f916cbef20061537139f46a2fe71102714befb01cf215",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "HIGH",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content",
+              "loc": "L3:C6 -> L3:C22",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://gemini.google.com/*",
+                      "https://*.canva.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_BODY",
+              "remark": "https://urls.bark.us",
+              "file": "monitor",
+              "loc": "L11:C9 -> L17:C4",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "flow_index": 0,
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "User manually confirmed the page message reaches the Bark network sink."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 2,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #2 (REQUEST_FORGERY) ### 1. Source — who controls it `content.js` L1–9 (confirmed by reading the raw source): ```js window.addEventListener(\"message\", function(event) { if (event.source !== window) return; if (event.data?.type === \"GEMINI_PROMPT\") { chrome.runtime.sendMessage(event.data); } if (event.data?.type === \"CANVA_ACTIVITY\") { chrome.runtime.sendMessage(event.data); } }); ``` - This is a **PAGE_TO_CONTENT_SCRIPT** bridge: any script running in the page con…",
+              "path": "extensions/pjbpapmfoaplcoaohhdfgdkffdfebmkd_1.5.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "PARTIAL",
+              "final_verdict": "FALSE_POSITIVE",
+              "recorded_label": null,
+              "confidence": 0.72,
+              "reproduced": false,
+              "basis": "non_decisive",
+              "usable_for_label": false,
+              "evidence_stage": "SINK_REACHED",
+              "evidence_artifact_count": 11,
+              "reasoning": "The exact static sink recorded a call, but the controlled marker/beacon was not observed in its security-relevant argument.",
+              "notes": "sinkTapKey=fetch sourceBridgeReached=true",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\pjbpapmfoaplcoaohhdfgdkffdfebmkd_1.5.0\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-23T07:07:58.252Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\pjbpapmfoaplcoaohhdfgdkffdfebmkd_1.5.0\\dynamic\\evidence\\flow-0",
+              "files": []
+            },
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787026289915031cf6218c12fc0ace26887030dd7ea8e4063c', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/edge/extensions/pjbpapmfoaplcoaohhdfgdkffdfebmkd_1.5.0/final/final_report.json",
+              "report_mtime": "2026-08-18T04:11:28.653Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-23T07:07:58.252Z",
+                "notes": "User manually confirmed the page message reaches the Bark network sink.",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\pjbpapmfoaplcoaohhdfgdkffdfebmkd_1.5.0\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\pjbpapmfoaplcoaohhdfgdkffdfebmkd_1.5.0\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-23T07:07:58.252Z",
+                  "sha256": "510fe36e1ba52378c5307bab7f3ec620467b952051651c491c51bb467325e6ed"
+                }
+              }
+            ],
+            "notes": [
+              "Latest manual attestation overrides the aggregate label while preserving the automated outcome for audit."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.5.0",
+        "latest_version": "1.5.0",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,1728 @@
+{
+  "extension_id": "ghdbmcfiemkndpbhfeifkneiolehkcli",
+  "extension_version": "7.4.320.0",
+  "browser": "chrome",
+  "runtime_extension_id": "nebfdhfjcnchjhfclncdmndkpcbepegb",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "tested_count": 10,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "outcome": "CONFIRMED",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.95,
+      "reproduced": true,
+      "trajectory": [
+        {
+          "action": "instrument_sink",
+          "detail": "all",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_4890b5ff95944117\", \"targetId\": \"E624697ED11BF53EC91E1467AD73D121\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+        },
+        {
+          "action": "new_page",
+          "detail": "http://127.0.0.1:63181/page",
+          "result": "{\"openedUrl\": \"http://127.0.0.1:63181/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:9222/devtools/pa"
+        },
+        {
+          "action": "contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2429, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_75ee3764e682\"]}, {\"bytes\": 2984, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_75ee3764e682\"]}], \"result\": {\"scheduled\""
+        },
+        {
+          "action": "observe",
+          "detail": "sink tap + local beacon",
+          "result": "{\"sink_type\": \"windows.update\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_4890b5ff95944117\", \"actualGeneration\": \"ob"
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 0,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:63181/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: http://127.0.0.1:63181/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_WINDOWS_UPDATE_OPTIONS; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"csWindowManagement.js\", \"location\": \"L55:C0 -> L63:C6\", \"eventNames\": [\"windowManagerEventEx\"], \"eventTarget\": \"document\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"request\", \"scalarMessageValue\": \"\", \"requirements\": {}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"// Copyright ©2022-2025 FUJIFILM Healthcare Americas Corporation., All rights reserved.\\n// Reproduction or transmission in whole or in part, in any form or by any means, electronic, mechanical or otherwise, is prohibited without the prior written consent of the copyright owner.\\n// Filename: csWindowManagement.js\\n\\nconst backgroundMessageResponseTypes = [\\n    \\\"onPollingSuccess\\\",\\n    \\\"windowPositionOnWindowClose\\\",\\n    \\\"onApplicationWindowRemoved\\\",\\n    \\\"onApplicationWindowOpened\\\"\\n];\\n\\nfunction logExtError(err) {\\n    if (err) {\\n        console.log(`[Messaging Extension]: ${err.message}`);\\n    }\\n};\\n\\ndocument.addEventListener(\\n    \\\"windowManagerEventEx\\\",\\n    ((globalThis.__expagentSemanticHandlers=globalThis.__expagentSemanticHandlers||{})[\\\"windowManagerEventEx\\\"]=function (evt) {\\n        const request = evt?.detail?.request;\\n        if (!request) return;\\n\\n        request.listenerId = evt?.detail\", \"notes\": [\"已从 sink 文件推导消息分发字段 `type` 及候选值。\", \"已从 sink 调用推导 URL 承载字段 `data.url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"type\", \"discriminatorValues\": [\"openwindow\"], \"urlField\": \"data.url\", \"sinkTapKey\": \"windows.update\", \"messageAlias\": \"request\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [\"request\", \"id\", \"listenerId\", \"isWindowManagement\", \"storageKey\", \"opener\", \"isMaster\"], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"HIGH\", \"contractWarnings\": []}\npage-target={\"targetId\": \"4552B77ADB1EA9D3C23632955EF00E3D\", \"url\": \"http://127.0.0.1:63181/page\"}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_4890b5ff95944117\", \"targetId\": \"E624697ED11BF53EC91E1467AD73D121\", \"lifecycle\": {\"ok\": true, \"targetId\": \"E624697ED11BF53EC91E1467AD73D121\", \"targetType\": \"service_worker\", \"targetUrl\": \"chrome-extension://fopahoikbmpiikfghccfihmmplgiijgn/bsWrapper.js\", \"attachCou\nsource-bridge-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_46bcfad99bfe4455\", \"targetId\": \"4552B77ADB1EA9D3C23632955EF00E3D\", \"pageUrl\": \"http://127.0.0.1:63181/page\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\",\\\"observerToken\\\":\\\"observer_46bcfad99bfe4455\\\"}\"}\nstimulus-batch={\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2429, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_75ee3764e682\"]}, {\"bytes\": 2984, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_75ee3764e682\"]}], \"result\": {\"scheduled\": true, \"count\": 2, \"surface\": \"CustomEvent\", \"spacingMs\": 300}}\nsink-tap={\"sink_type\": \"windows.update\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_4890b5ff95944117\", \"actualGeneration\": \"observer_4890b5ff95944117\", \"previousTargetId\": \"E624697ED11BF53EC91E1467AD73D121\", \"currentTargetId\": \"E624697ED11BF53EC91E1467AD73D121\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"windows.update\\\",\\\"calls\\\":[{\\\"ts\\\":1790045278579,\\\"arg\\\":{\\\"left\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_75ee3764e682\\\"},\\\"top\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_75ee3764e682\\\"},\\\"width\\\":1,\\\"height\\\":1,\\\"__expagentTestMarker\\\":\\\"EXPAGENT_TEST_expa_75ee3764e682\\\"}}],\\\"observerToken\\\":\\\"observer_4890b5ff95944117\\\"}\"}\nbeacon={\"token\": \"expa_10259ff068a2\", \"hit\": false, \"count\": 0}\nsource-bridge-tap={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_46bcfad99bfe4455\", \"actualGeneration\": \"observer_46bcfad99bfe4455\", \"recoveryReason\": \"\", \"targetId\": \"4552B77ADB1EA9D3C23632955EF00E3D\", \"pageUrl\": \"http://127.0.0.1:63181/page\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"runtime.sendMessage\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__dom_innerHTML__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__runtime_sendMessage__\\\":true,\\\"runtime.sendMessage\\\":[{\\\"ts\\\":1790045278577,\\\"arg\\\":{\\\"marker\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_75ee3764e682\\\"},\\\"url\\\":{\\\"testMarker\\\":\\\"expa_10259ff068a2\\\"},\\\"data\\\":{\\\"url\\\":{\\\"testMark",
+      "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+      "evidence_stage": "MARKER_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": false,
+        "semanticFixtureKinds": [
+          "content-script-scope-semantic-fixture",
+          "custom-event-handler-semantic-fixture",
+          "service-worker-startup-semantic-fixture"
+        ],
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "HIGH",
+        "sourceContractReady": true,
+        "runtimeSourceContractProven": true,
+        "sourceReached": true,
+        "bridgeReached": true,
+        "sinkReached": true,
+        "markerReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[{\"request\": {\"marker\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"url\": \"http://127.0.0.1:63181/beacon/expa_10259ff068a2\", \"data\": {\"url\": \"http://127.0.0.1:63181/beacon/expa_10259ff068a2\"}, \"value\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"message\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"title\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"text\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"number\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"listenerKey\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"pollingUrl\": \"http://127.0.0.1:63181/beacon/expa_10259ff068a2\", \"pollingInterval\": 1000, \"pollingAuthorization\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"pollingContentType\": \"text/plain\", \"storageKey\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"name\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"id\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"key\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"type\": \"openwindow\", \"action\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"cmd\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"Action\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"Message\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"fun\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"auth\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"phone\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"email\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"version\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"token\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"content\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"payload\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"kind\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"requestId\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"revision\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"guid\": \"EXPAGENT_TEST_expa_75ee3764e682\", \"initiatingPage\": \"EXPAGENT_TEST_expa_75ee3764e",
+      "evidence_artifacts": [
+        {
+          "kind": "screenshot",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-0\\step-source-open.png",
+          "description": "Step `source-open`: http://127.0.0.1:63181/page",
+          "stage": "source-open",
+          "captured_at": "2026-09-22T02:47:58.571228+00:00",
+          "target_url": "http://127.0.0.1:63181/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-0\\step-after-trigger.png",
+          "description": "Step `after-trigger`: http://127.0.0.1:63181/page",
+          "stage": "after-trigger",
+          "captured_at": "2026-09-22T02:47:58.668048+00:00",
+          "target_url": "http://127.0.0.1:63181/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-0\\storage-after-trigger.json",
+          "description": "Storage state at `after-trigger` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-0\\storage-after-trigger.png",
+          "description": "Storage panel (DevTools-style) at `after-trigger`",
+          "stage": "storage-after-trigger",
+          "captured_at": "2026-09-22T02:47:58.809370+00:00",
+          "target_url": "http://127.0.0.1:63181/page",
+          "sha256": "e595d682428435244832bc361927d91bdfaa81568280a011aea2a79a42dfc2c0"
+        },
+        {
+          "kind": "screenshot",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-0\\step-after-observation.png",
+          "description": "Step `after-observation`: http://127.0.0.1:63181/page",
+          "stage": "after-observation",
+          "captured_at": "2026-09-22T02:47:58.929169+00:00",
+          "target_url": "http://127.0.0.1:63181/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-0\\storage-after-observation.json",
+          "description": "Storage state at `after-observation` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-0\\storage-after-observation.png",
+          "description": "Storage panel (DevTools-style) at `after-observation`",
+          "stage": "storage-after-observation",
+          "captured_at": "2026-09-22T02:47:59.073714+00:00",
+          "target_url": "http://127.0.0.1:63181/page",
+          "sha256": "e0caf299af1d9c87644053c846641cc1511da01755b85a8b382f7be3b92dde44"
+        },
+        {
+          "kind": "transcript",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-0\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-0\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-0\\step-final-state.png",
+          "description": "Step `final-state`: http://127.0.0.1:63181/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-22T02:47:59.176303+00:00",
+          "target_url": "http://127.0.0.1:63181/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-0\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": "sinkTapKey=windows.update sourceBridgeReached=true"
+    },
+    {
+      "flow_index": 1,
+      "outcome": "CONFIRMED",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.95,
+      "reproduced": true,
+      "trajectory": [
+        {
+          "action": "instrument_sink",
+          "detail": "all",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_50b0356cef5346ae\", \"targetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+        },
+        {
+          "action": "new_page",
+          "detail": "http://127.0.0.1:50776/page",
+          "result": "{\"openedUrl\": \"http://127.0.0.1:50776/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:9222/devtools/pa"
+        },
+        {
+          "action": "contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2429, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\"]}, {\"bytes\": 2984, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\"]}], \"result\": {\"scheduled\""
+        },
+        {
+          "action": "observe",
+          "detail": "sink tap + local beacon",
+          "result": "{\"sink_type\": \"windows.update\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_50b0356cef5346ae\", \"actualGeneration\": \"ob"
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 1,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:50776/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: http://127.0.0.1:50776/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_WINDOWS_UPDATE_OPTIONS; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"csWindowManagement.js\", \"location\": \"L55:C0 -> L63:C6\", \"eventNames\": [\"windowManagerEventEx\"], \"eventTarget\": \"document\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"request\", \"scalarMessageValue\": \"\", \"requirements\": {}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"// Copyright ©2022-2025 FUJIFILM Healthcare Americas Corporation., All rights reserved.\\n// Reproduction or transmission in whole or in part, in any form or by any means, electronic, mechanical or otherwise, is prohibited without the prior written consent of the copyright owner.\\n// Filename: csWindowManagement.js\\n\\nconst backgroundMessageResponseTypes = [\\n    \\\"onPollingSuccess\\\",\\n    \\\"windowPositionOnWindowClose\\\",\\n    \\\"onApplicationWindowRemoved\\\",\\n    \\\"onApplicationWindowOpened\\\"\\n];\\n\\nfunction logExtError(err) {\\n    if (err) {\\n        console.log(`[Messaging Extension]: ${err.message}`);\\n    }\\n};\\n\\ndocument.addEventListener(\\n    \\\"windowManagerEventEx\\\",\\n    ((globalThis.__expagentSemanticHandlers=globalThis.__expagentSemanticHandlers||{})[\\\"windowManagerEventEx\\\"]=function (evt) {\\n        const request = evt?.detail?.request;\\n        if (!request) return;\\n\\n        request.listenerId = evt?.detail\", \"notes\": [\"已从 sink 文件推导消息分发字段 `type` 及候选值。\", \"已从 sink 调用推导 URL 承载字段 `data.url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"type\", \"discriminatorValues\": [\"openwindow\"], \"urlField\": \"data.url\", \"sinkTapKey\": \"windows.update\", \"messageAlias\": \"request\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [\"request\", \"id\", \"listenerId\", \"isWindowManagement\", \"storageKey\", \"opener\", \"isMaster\"], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"HIGH\", \"contractWarnings\": []}\npage-target={\"targetId\": \"427B9B93677BAC0573B9E2E1B868DD9C\", \"url\": \"http://127.0.0.1:50776/page\"}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_50b0356cef5346ae\", \"targetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"lifecycle\": {\"ok\": true, \"targetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"targetType\": \"service_worker\", \"targetUrl\": \"chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/bsWrapper.js\", \"attachCou\nsource-bridge-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_add9230674ef46d1\", \"targetId\": \"427B9B93677BAC0573B9E2E1B868DD9C\", \"pageUrl\": \"http://127.0.0.1:50776/page\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\",\\\"observerToken\\\":\\\"observer_add9230674ef46d1\\\"}\"}\nstimulus-batch={\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2429, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\"]}, {\"bytes\": 2984, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\"]}], \"result\": {\"scheduled\": true, \"count\": 2, \"surface\": \"CustomEvent\", \"spacingMs\": 300}}\nsink-tap={\"sink_type\": \"windows.update\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_50b0356cef5346ae\", \"actualGeneration\": \"observer_50b0356cef5346ae\", \"previousTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"currentTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"windows.update\\\",\\\"calls\\\":[{\\\"ts\\\":1790075091211,\\\"arg\\\":{\\\"left\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"top\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"width\\\":1,\\\"height\\\":1,\\\"__expagentTestMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"}}],\\\"observerToken\\\":\\\"observer_50b0356cef5346ae\\\"}\"}\nbeacon={\"token\": \"expa_dd502a0af2fb\", \"hit\": false, \"count\": 0}\nsource-bridge-tap={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_add9230674ef46d1\", \"actualGeneration\": \"observer_add9230674ef46d1\", \"recoveryReason\": \"\", \"targetId\": \"427B9B93677BAC0573B9E2E1B868DD9C\", \"pageUrl\": \"http://127.0.0.1:50776/page\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"runtime.sendMessage\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__dom_innerHTML__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__runtime_sendMessage__\\\":true,\\\"runtime.sendMessage\\\":[{\\\"ts\\\":1790075091209,\\\"arg\\\":{\\\"marker\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"url\\\":{\\\"testMarker\\\":\\\"expa_dd502a0af2fb\\\"},\\\"data\\\":{\\\"url\\\":{\\\"testMark",
+      "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+      "evidence_stage": "MARKER_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": false,
+        "semanticFixtureKinds": [
+          "content-script-scope-semantic-fixture",
+          "custom-event-handler-semantic-fixture",
+          "service-worker-startup-semantic-fixture"
+        ],
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "HIGH",
+        "sourceContractReady": true,
+        "runtimeSourceContractProven": true,
+        "sourceReached": true,
+        "bridgeReached": true,
+        "sinkReached": true,
+        "markerReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[{\"request\": {\"marker\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"url\": \"http://127.0.0.1:50776/beacon/expa_dd502a0af2fb\", \"data\": {\"url\": \"http://127.0.0.1:50776/beacon/expa_dd502a0af2fb\"}, \"value\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"message\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"title\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"text\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"number\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"listenerKey\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"pollingUrl\": \"http://127.0.0.1:50776/beacon/expa_dd502a0af2fb\", \"pollingInterval\": 1000, \"pollingAuthorization\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"pollingContentType\": \"text/plain\", \"storageKey\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"name\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"id\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"key\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"type\": \"openwindow\", \"action\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"cmd\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"Action\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"Message\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"fun\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"auth\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"phone\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"email\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"version\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"token\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"content\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"payload\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"kind\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"requestId\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"revision\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"guid\": \"EXPAGENT_TEST_expa_ffaf5fd3c4e6\", \"initiatingPage\": \"EXPAGENT_TEST_expa_ffaf5fd3c",
+      "evidence_artifacts": [
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-1\\step-source-open.png",
+          "description": "Step `source-open`: http://127.0.0.1:50776/page",
+          "stage": "source-open",
+          "captured_at": "2026-09-22T11:04:51.202465+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-1\\step-after-trigger.png",
+          "description": "Step `after-trigger`: http://127.0.0.1:50776/page",
+          "stage": "after-trigger",
+          "captured_at": "2026-09-22T11:04:51.289242+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-1\\storage-after-trigger.json",
+          "description": "Storage state at `after-trigger` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-1\\storage-after-trigger.png",
+          "description": "Storage panel (DevTools-style) at `after-trigger`",
+          "stage": "storage-after-trigger",
+          "captured_at": "2026-09-22T11:04:51.432744+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "28fd844d7bd55ad5c6e86952faff267e90c8336441737faf8a78961073efb1e6"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-1\\step-after-observation.png",
+          "description": "Step `after-observation`: http://127.0.0.1:50776/page",
+          "stage": "after-observation",
+          "captured_at": "2026-09-22T11:04:51.582922+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-1\\storage-after-observation.json",
+          "description": "Storage state at `after-observation` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-1\\storage-after-observation.png",
+          "description": "Storage panel (DevTools-style) at `after-observation`",
+          "stage": "storage-after-observation",
+          "captured_at": "2026-09-22T11:04:51.730753+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "66b806eb7c8f4e24e9353724efb37478ffd47cfb2f7afc2114bb24b264b04d80"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-1\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-1\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-1\\step-final-state.png",
+          "description": "Step `final-state`: http://127.0.0.1:50776/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-22T11:04:51.823203+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-1\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": "sinkTapKey=windows.update sourceBridgeReached=true"
+    },
+    {
+      "flow_index": 2,
+      "outcome": "TOOL_LIMITATION",
+      "final_verdict": "UNCERTAIN",
+      "confidence": 0.0,
+      "reproduced": false,
+      "trajectory": [],
+      "planned_trajectory": {
+        "flow_index": 2,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:49683/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source fixture only: http://127.0.0.1:49683/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_TABS_CREATE_OPTIONS; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "",
+      "reasoning": "The bounded dynamic trajectory did not produce a verdict within 60 seconds; recorded as a tooling limitation rather than treating the absence of an observation as a negative result.",
+      "payload_used": "",
+      "evidence_artifacts": [
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\Temp\\dynamic_workspace\\runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-2\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence."
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": ""
+    },
+    {
+      "flow_index": 3,
+      "outcome": "CONFIRMED",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.85,
+      "reproduced": true,
+      "trajectory": [
+        {
+          "action": "instrument_sink",
+          "detail": "all",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_82ac2e3e0a0b45f2\", \"targetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+        },
+        {
+          "action": "new_page",
+          "detail": "http://127.0.0.1:50776/page",
+          "result": "{\"openedUrl\": \"http://127.0.0.1:50776/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:9222/devtools/pa"
+        },
+        {
+          "action": "contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2429, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_120e8ed74b1b\"]}, {\"bytes\": 2984, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_120e8ed74b1b\"]}], \"result\": {\"scheduled\""
+        },
+        {
+          "action": "observe",
+          "detail": "sink tap + local beacon",
+          "result": "{\"sink_type\": \"windows.update\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_82ac2e3e0a0b45f2\", \"actualGeneration\": \"ob"
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 3,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:50776/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: http://127.0.0.1:50776/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_WINDOWS_UPDATE_OPTIONS; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"csWindowManagement.js\", \"location\": \"L55:C0 -> L63:C6\", \"eventNames\": [\"windowManagerEventEx\"], \"eventTarget\": \"document\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"request\", \"scalarMessageValue\": \"\", \"requirements\": {}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"// Copyright ©2022-2025 FUJIFILM Healthcare Americas Corporation., All rights reserved.\\n// Reproduction or transmission in whole or in part, in any form or by any means, electronic, mechanical or otherwise, is prohibited without the prior written consent of the copyright owner.\\n// Filename: csWindowManagement.js\\n\\nconst backgroundMessageResponseTypes = [\\n    \\\"onPollingSuccess\\\",\\n    \\\"windowPositionOnWindowClose\\\",\\n    \\\"onApplicationWindowRemoved\\\",\\n    \\\"onApplicationWindowOpened\\\"\\n];\\n\\nfunction logExtError(err) {\\n    if (err) {\\n        console.log(`[Messaging Extension]: ${err.message}`);\\n    }\\n};\\n\\ndocument.addEventListener(\\n    \\\"windowManagerEventEx\\\",\\n    ((globalThis.__expagentSemanticHandlers=globalThis.__expagentSemanticHandlers||{})[\\\"windowManagerEventEx\\\"]=function (evt) {\\n        const request = evt?.detail?.request;\\n        if (!request) return;\\n\\n        request.listenerId = evt?.detail\", \"notes\": [\"已从 sink 文件推导消息分发字段 `type` 及候选值。\", \"已从 sink 调用推导 URL 承载字段 `data.url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"type\", \"discriminatorValues\": [\"openwindow\"], \"urlField\": \"data.url\", \"sinkTapKey\": \"windows.update\", \"messageAlias\": \"request\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [\"request\", \"id\", \"listenerId\", \"isWindowManagement\", \"storageKey\", \"opener\", \"isMaster\"], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"HIGH\", \"contractWarnings\": []}\npage-target={\"targetId\": \"B8213AEE561DE23029674F6651993947\", \"url\": \"http://127.0.0.1:50776/page\"}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_82ac2e3e0a0b45f2\", \"targetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"lifecycle\": {\"ok\": true, \"targetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"targetType\": \"service_worker\", \"targetUrl\": \"chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/bsWrapper.js\", \"attachCou\nsource-bridge-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_a5e0ff17545e417c\", \"targetId\": \"B8213AEE561DE23029674F6651993947\", \"pageUrl\": \"http://127.0.0.1:50776/page\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\",\\\"observerToken\\\":\\\"observer_a5e0ff17545e417c\\\"}\"}\nstimulus-batch={\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2429, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_120e8ed74b1b\"]}, {\"bytes\": 2984, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_120e8ed74b1b\"]}], \"result\": {\"scheduled\": true, \"count\": 2, \"surface\": \"CustomEvent\", \"spacingMs\": 300}}\nsink-tap={\"sink_type\": \"windows.update\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_82ac2e3e0a0b45f2\", \"actualGeneration\": \"observer_82ac2e3e0a0b45f2\", \"previousTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"currentTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"windows.update\\\",\\\"calls\\\":[{\\\"ts\\\":1790075091211,\\\"arg\\\":{\\\"left\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"top\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"width\\\":1,\\\"height\\\":1,\\\"__expagentTestMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"}},{\\\"ts\\\":1790075091517,\\\"arg\\\":{\\\"left\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"top\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"width\\\":1,\\\"height\\\":1,\\\"__e\nbeacon={\"token\": \"expa_1aa968b9f4cd\", \"hit\": false, \"count\": 0}\nsource-bridge-tap={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_a5e0ff17545e417c\", \"actualGeneration\": \"observer_a5e0ff17545e417c\", \"recoveryReason\": \"\", \"targetId\": \"B8213AEE561DE23029674F6651993947\", \"pageUrl\": \"http://127.0.0.1:50776/page\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__dom_innerHTML__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__runtime_sendMessage__\\\":true},\\\"observerToken\\\":\\\"observer_a5e0ff17545e417c\\\"}\"}",
+      "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+      "evidence_stage": "MARKER_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": false,
+        "semanticFixtureKinds": [
+          "content-script-scope-semantic-fixture",
+          "custom-event-handler-semantic-fixture",
+          "service-worker-startup-semantic-fixture"
+        ],
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "HIGH",
+        "sourceContractReady": true,
+        "runtimeSourceContractProven": true,
+        "sourceReached": true,
+        "bridgeReached": true,
+        "sinkReached": true,
+        "markerReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[{\"request\": {\"marker\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"url\": \"http://127.0.0.1:50776/beacon/expa_1aa968b9f4cd\", \"data\": {\"url\": \"http://127.0.0.1:50776/beacon/expa_1aa968b9f4cd\"}, \"value\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"message\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"title\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"text\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"number\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"listenerKey\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"pollingUrl\": \"http://127.0.0.1:50776/beacon/expa_1aa968b9f4cd\", \"pollingInterval\": 1000, \"pollingAuthorization\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"pollingContentType\": \"text/plain\", \"storageKey\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"name\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"id\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"key\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"type\": \"openwindow\", \"action\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"cmd\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"Action\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"Message\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"fun\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"auth\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"phone\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"email\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"version\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"token\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"content\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"payload\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"kind\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"requestId\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"revision\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"guid\": \"EXPAGENT_TEST_expa_120e8ed74b1b\", \"initiatingPage\": \"EXPAGENT_TEST_expa_120e8ed74",
+      "evidence_artifacts": [
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-3\\step-source-open.png",
+          "description": "Step `source-open`: http://127.0.0.1:50776/page",
+          "stage": "source-open",
+          "captured_at": "2026-09-22T11:04:53.325745+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-3\\step-after-trigger.png",
+          "description": "Step `after-trigger`: http://127.0.0.1:50776/page",
+          "stage": "after-trigger",
+          "captured_at": "2026-09-22T11:04:53.433396+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-3\\storage-after-trigger.json",
+          "description": "Storage state at `after-trigger` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-3\\storage-after-trigger.png",
+          "description": "Storage panel (DevTools-style) at `after-trigger`",
+          "stage": "storage-after-trigger",
+          "captured_at": "2026-09-22T11:04:53.572145+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "0c2e9d52d2ec60a69cd46ebf540c8d94903c922c6bb8713836e1c96e013e9bfa"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-3\\step-after-observation.png",
+          "description": "Step `after-observation`: http://127.0.0.1:50776/page",
+          "stage": "after-observation",
+          "captured_at": "2026-09-22T11:04:53.687999+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-3\\storage-after-observation.json",
+          "description": "Storage state at `after-observation` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-3\\storage-after-observation.png",
+          "description": "Storage panel (DevTools-style) at `after-observation`",
+          "stage": "storage-after-observation",
+          "captured_at": "2026-09-22T11:04:53.774410+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "48946d1b9622efded24e300d9e1ceb483fd5862093434fd6b319882e55471a72"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-3\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-3\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-3\\step-final-state.png",
+          "description": "Step `final-state`: http://127.0.0.1:50776/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-22T11:04:53.871650+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-3\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": "sinkTapKey=windows.update sourceBridgeReached=false semanticFixture=true originalPageBoundaryNotClaimed=true"
+    },
+    {
+      "flow_index": 4,
+      "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.0,
+      "reproduced": false,
+      "trajectory": [],
+      "planned_trajectory": {
+        "flow_index": 4,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:49683/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source fixture only: http://127.0.0.1:49683/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe FETCH_RESOURCE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "deep-trace=source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"csWindowManagement.js\", \"location\": \"L55:C0 -> L63:C6\", \"eventNames\": [\"windowManagerEventEx\"], \"eventTarget\": \"document\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"request\", \"requirements\": {}, \"selectors\": [], \"mediaTags\": [], \"snippet\": \"﻿// Copyright ©2022-2026 FUJIFILM Healthcare Americas Corporation. All rights reserved.\\n// Reproduction or transmission in whole or in part, in any form or by any means, electronic, mechanical or otherwise, is prohibited without the prior written consent of the copyright owner.\\n// Filename: csNativeMessage.js\\n\\nfunction logExtError(err) {\\n    err && console.log(`[Messaging Extension]:${err.message}`);\\n}\\n\\nwindow.onerror = function (e, source, line, col, err) {\\n    console.log(`[ERR]: at ${source} (${line},${col})\\\\n${err.message}`);\\n    logExtError(chrome.runtime.las",
+      "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+      "payload_used": "",
+      "evidence_artifacts": [
+        {
+          "kind": "manual-attestation",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\ghdbmcfiemkndpbhfeifkneiolehkcli_7.4.320.0\\dynamic\\evidence\\flow-4\\manual\\manual_validation.json",
+          "description": "人工复测确认 windowManagerEventEx 的 onStartPolling 请求接受页面可控的 pollingUrl，并由后台 initializePolling -> fetchUrl -> fetch 发起请求。",
+          "stage": "manual-confirmation",
+          "captured_at": "2026-09-21T16:15:06.547346Z",
+          "target_url": "",
+          "sha256": "1e9d9769bf1cd7f4dc16cdbc9e28d19f76e42f24a389da56f33e7b359b327dec"
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": "manualValidation=true; automatedOutcomePreserved=INCONCLUSIVE_AFTER_DEBUG",
+      "manual_validation": {
+        "extension_id": "ghdbmcfiemkndpbhfeifkneiolehkcli",
+        "extension_version": "7.4.320.0",
+        "flow_index": 4,
+        "source_type": "TARGET_CUSTOM_EVENT",
+        "sink_type": "FETCH_RESOURCE",
+        "observation": "人工复测确认 windowManagerEventEx 的 onStartPolling 请求接受页面可控的 pollingUrl，并由后台 initializePolling -> fetchUrl -> fetch 发起请求。",
+        "verdict": "TP",
+        "operator": "user-provided manual validation",
+        "validated_at": "2026-09-21T16:15:06.547346Z",
+        "evidence_type": "operator_attestation",
+        "attestation_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\ghdbmcfiemkndpbhfeifkneiolehkcli_7.4.320.0\\dynamic\\evidence\\flow-4\\manual\\manual_validation.json"
+      }
+    },
+    {
+      "flow_index": 5,
+      "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.0,
+      "reproduced": false,
+      "trajectory": [],
+      "planned_trajectory": {
+        "flow_index": 5,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:49683/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source fixture only: http://127.0.0.1:49683/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe FETCH_HEADERS; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "deep-trace=source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"csWindowManagement.js\", \"location\": \"L55:C0 -> L63:C6\", \"eventNames\": [\"windowManagerEventEx\"], \"eventTarget\": \"document\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"request\", \"requirements\": {}, \"selectors\": [], \"mediaTags\": [], \"snippet\": \"﻿// Copyright ©2022-2026 FUJIFILM Healthcare Americas Corporation. All rights reserved.\\n// Reproduction or transmission in whole or in part, in any form or by any means, electronic, mechanical or otherwise, is prohibited without the prior written consent of the copyright owner.\\n// Filename: csNativeMessage.js\\n\\nfunction logExtError(err) {\\n    err && console.log(`[Messaging Extension]:${err.message}`);\\n}\\n\\nwindow.onerror = function (e, source, line, col, err) {\\n    console.log(`[ERR]: at ${source} (${line},${col})\\\\n${err.message}`);\\n    logExtError(chrome.runtime.las",
+      "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+      "payload_used": "",
+      "evidence_artifacts": [
+        {
+          "kind": "manual-attestation",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\ghdbmcfiemkndpbhfeifkneiolehkcli_7.4.320.0\\dynamic\\evidence\\flow-5\\manual\\manual_validation.json",
+          "description": "同一人工验证确认 pollingAuthorization 和 pollingContentType 也被原样送入 后台 fetch 请求头，重复 Flow 同样成立。",
+          "stage": "manual-confirmation",
+          "captured_at": "2026-09-21T16:15:06.547346Z",
+          "target_url": "",
+          "sha256": "e4c4b643948cffd260855349e52d349b55b575ec88bea35c284084b385b5a6a4"
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": "manualValidation=true; automatedOutcomePreserved=INCONCLUSIVE_AFTER_DEBUG",
+      "manual_validation": {
+        "extension_id": "ghdbmcfiemkndpbhfeifkneiolehkcli",
+        "extension_version": "7.4.320.0",
+        "flow_index": 5,
+        "source_type": "TARGET_CUSTOM_EVENT",
+        "sink_type": "FETCH_HEADERS",
+        "observation": "同一人工验证确认 pollingAuthorization 和 pollingContentType 也被原样送入 后台 fetch 请求头，重复 Flow 同样成立。",
+        "verdict": "TP",
+        "operator": "user-provided manual validation",
+        "validated_at": "2026-09-21T16:15:06.547346Z",
+        "evidence_type": "operator_attestation",
+        "attestation_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\ghdbmcfiemkndpbhfeifkneiolehkcli_7.4.320.0\\dynamic\\evidence\\flow-5\\manual\\manual_validation.json"
+      }
+    },
+    {
+      "flow_index": 7,
+      "outcome": "CONFIRMED",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.85,
+      "reproduced": true,
+      "trajectory": [
+        {
+          "action": "instrument_sink",
+          "detail": "all",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_e67c0d82245441ff\", \"targetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+        },
+        {
+          "action": "new_page",
+          "detail": "http://127.0.0.1:50776/page",
+          "result": "{\"openedUrl\": \"http://127.0.0.1:50776/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:9222/devtools/pa"
+        },
+        {
+          "action": "contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2405, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_499f4a075647\"]}, {\"bytes\": 2960, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_499f4a075647\"]}], \"result\": {\"scheduled\""
+        },
+        {
+          "action": "observe",
+          "detail": "sink tap + local beacon",
+          "result": "{\"sink_type\": \"windows.update\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_e67c0d82245441ff\", \"actualGeneration\": \"ob"
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 7,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:50776/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: http://127.0.0.1:50776/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_WINDOWS_UPDATE_OPTIONS; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"csWindowManagement.js\", \"location\": \"L55:C0 -> L63:C6\", \"eventNames\": [\"windowManagerEventEx\"], \"eventTarget\": \"document\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"request\", \"scalarMessageValue\": \"\", \"requirements\": {}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"// Copyright ©2022-2025 FUJIFILM Healthcare Americas Corporation., All rights reserved.\\n// Reproduction or transmission in whole or in part, in any form or by any means, electronic, mechanical or otherwise, is prohibited without the prior written consent of the copyright owner.\\n// Filename: csWindowManagement.js\\n\\nconst backgroundMessageResponseTypes = [\\n    \\\"onPollingSuccess\\\",\\n    \\\"windowPositionOnWindowClose\\\",\\n    \\\"onApplicationWindowRemoved\\\",\\n    \\\"onApplicationWindowOpened\\\"\\n];\\n\\nfunction logExtError(err) {\\n    if (err) {\\n        console.log(`[Messaging Extension]: ${err.message}`);\\n    }\\n};\\n\\ndocument.addEventListener(\\n    \\\"windowManagerEventEx\\\",\\n    ((globalThis.__expagentSemanticHandlers=globalThis.__expagentSemanticHandlers||{})[\\\"windowManagerEventEx\\\"]=function (evt) {\\n        const request = evt?.detail?.request;\\n        if (!request) return;\\n\\n        request.listenerId = evt?.detail\", \"notes\": [\"已从 sink 文件推导消息分发字段 `type` 及候选值。\", \"已从 sink 调用推导 URL 承载字段 `url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"type\", \"discriminatorValues\": [\"openwindow\"], \"urlField\": \"url\", \"sinkTapKey\": \"windows.update\", \"messageAlias\": \"request\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [\"request\", \"id\", \"listenerId\", \"isWindowManagement\", \"storageKey\", \"opener\", \"isMaster\"], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"HIGH\", \"contractWarnings\": []}\npage-target={\"targetId\": \"25B1FDB3DCF4935D9B644A063B833ECA\", \"url\": \"http://127.0.0.1:50776/page\"}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_e67c0d82245441ff\", \"targetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"lifecycle\": {\"ok\": true, \"targetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"targetType\": \"service_worker\", \"targetUrl\": \"chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/bsWrapper.js\", \"attachCou\nsource-bridge-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_6873ef1620d74aa1\", \"targetId\": \"25B1FDB3DCF4935D9B644A063B833ECA\", \"pageUrl\": \"http://127.0.0.1:50776/page\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\",\\\"observerToken\\\":\\\"observer_6873ef1620d74aa1\\\"}\"}\nstimulus-batch={\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2405, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_499f4a075647\"]}, {\"bytes\": 2960, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_499f4a075647\"]}], \"result\": {\"scheduled\": true, \"count\": 2, \"surface\": \"CustomEvent\", \"spacingMs\": 300}}\nsink-tap={\"sink_type\": \"windows.update\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_e67c0d82245441ff\", \"actualGeneration\": \"observer_e67c0d82245441ff\", \"previousTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"currentTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"windows.update\\\",\\\"calls\\\":[{\\\"ts\\\":1790075091211,\\\"arg\\\":{\\\"left\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"top\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"width\\\":1,\\\"height\\\":1,\\\"__expagentTestMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"}},{\\\"ts\\\":1790075091517,\\\"arg\\\":{\\\"left\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"top\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"width\\\":1,\\\"height\\\":1,\\\"__e\nbeacon={\"token\": \"expa_6d4720a47261\", \"hit\": false, \"count\": 0}\nsource-bridge-tap={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_6873ef1620d74aa1\", \"actualGeneration\": \"observer_6873ef1620d74aa1\", \"recoveryReason\": \"\", \"targetId\": \"25B1FDB3DCF4935D9B644A063B833ECA\", \"pageUrl\": \"http://127.0.0.1:50776/page\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__dom_innerHTML__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__runtime_sendMessage__\\\":true},\\\"observerToken\\\":\\\"observer_6873ef1620d74aa1\\\"}\"}",
+      "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+      "evidence_stage": "MARKER_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": false,
+        "semanticFixtureKinds": [
+          "content-script-scope-semantic-fixture",
+          "custom-event-handler-semantic-fixture",
+          "service-worker-startup-semantic-fixture"
+        ],
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "HIGH",
+        "sourceContractReady": true,
+        "runtimeSourceContractProven": true,
+        "sourceReached": true,
+        "bridgeReached": true,
+        "sinkReached": true,
+        "markerReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[{\"request\": {\"marker\": \"EXPAGENT_TEST_expa_499f4a075647\", \"url\": \"http://127.0.0.1:50776/beacon/expa_6d4720a47261\", \"data\": \"EXPAGENT_TEST_expa_499f4a075647\", \"value\": \"EXPAGENT_TEST_expa_499f4a075647\", \"message\": \"EXPAGENT_TEST_expa_499f4a075647\", \"title\": \"EXPAGENT_TEST_expa_499f4a075647\", \"text\": \"EXPAGENT_TEST_expa_499f4a075647\", \"number\": \"EXPAGENT_TEST_expa_499f4a075647\", \"listenerKey\": \"EXPAGENT_TEST_expa_499f4a075647\", \"pollingUrl\": \"http://127.0.0.1:50776/beacon/expa_6d4720a47261\", \"pollingInterval\": 1000, \"pollingAuthorization\": \"EXPAGENT_TEST_expa_499f4a075647\", \"pollingContentType\": \"text/plain\", \"storageKey\": \"EXPAGENT_TEST_expa_499f4a075647\", \"name\": \"EXPAGENT_TEST_expa_499f4a075647\", \"id\": \"EXPAGENT_TEST_expa_499f4a075647\", \"key\": \"EXPAGENT_TEST_expa_499f4a075647\", \"type\": \"openwindow\", \"action\": \"EXPAGENT_TEST_expa_499f4a075647\", \"cmd\": \"EXPAGENT_TEST_expa_499f4a075647\", \"Action\": \"EXPAGENT_TEST_expa_499f4a075647\", \"Message\": \"EXPAGENT_TEST_expa_499f4a075647\", \"fun\": \"EXPAGENT_TEST_expa_499f4a075647\", \"auth\": \"EXPAGENT_TEST_expa_499f4a075647\", \"phone\": \"EXPAGENT_TEST_expa_499f4a075647\", \"email\": \"EXPAGENT_TEST_expa_499f4a075647\", \"version\": \"EXPAGENT_TEST_expa_499f4a075647\", \"token\": \"EXPAGENT_TEST_expa_499f4a075647\", \"content\": \"EXPAGENT_TEST_expa_499f4a075647\", \"payload\": \"EXPAGENT_TEST_expa_499f4a075647\", \"kind\": \"EXPAGENT_TEST_expa_499f4a075647\", \"requestId\": \"EXPAGENT_TEST_expa_499f4a075647\", \"revision\": \"EXPAGENT_TEST_expa_499f4a075647\", \"guid\": \"EXPAGENT_TEST_expa_499f4a075647\", \"initiatingPage\": \"EXPAGENT_TEST_expa_499f4a075647\", \"referringPage\": \"E",
+      "evidence_artifacts": [
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-7\\step-source-open.png",
+          "description": "Step `source-open`: http://127.0.0.1:50776/page",
+          "stage": "source-open",
+          "captured_at": "2026-09-22T11:04:55.362140+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-7\\step-after-trigger.png",
+          "description": "Step `after-trigger`: http://127.0.0.1:50776/page",
+          "stage": "after-trigger",
+          "captured_at": "2026-09-22T11:04:55.458084+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-7\\storage-after-trigger.json",
+          "description": "Storage state at `after-trigger` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-7\\storage-after-trigger.png",
+          "description": "Storage panel (DevTools-style) at `after-trigger`",
+          "stage": "storage-after-trigger",
+          "captured_at": "2026-09-22T11:04:55.579696+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "395a5e24cf88a243ac2c71c5c9bea7620dae49b3028733b122dfcad86b2b7af5"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-7\\step-after-observation.png",
+          "description": "Step `after-observation`: http://127.0.0.1:50776/page",
+          "stage": "after-observation",
+          "captured_at": "2026-09-22T11:04:55.674668+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-7\\storage-after-observation.json",
+          "description": "Storage state at `after-observation` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-7\\storage-after-observation.png",
+          "description": "Storage panel (DevTools-style) at `after-observation`",
+          "stage": "storage-after-observation",
+          "captured_at": "2026-09-22T11:04:55.781032+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "b2a4d8a1e3223b2fc9b033b9c57ab04afd5138ad0dd119da21ab49acea350fcf"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-7\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-7\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-7\\step-final-state.png",
+          "description": "Step `final-state`: http://127.0.0.1:50776/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-22T11:04:55.874597+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-7\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": "sinkTapKey=windows.update sourceBridgeReached=false semanticFixture=true originalPageBoundaryNotClaimed=true"
+    },
+    {
+      "flow_index": 8,
+      "outcome": "CONFIRMED",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.85,
+      "reproduced": true,
+      "trajectory": [
+        {
+          "action": "new_page",
+          "detail": "http://127.0.0.1:50776/page",
+          "result": "{\"openedUrl\": \"http://127.0.0.1:50776/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:9222/devtools/pa"
+        },
+        {
+          "action": "set_source_breakpoint",
+          "detail": "csNativeMessage L55:C0 -> L63:C6",
+          "result": "{\"ok\": true, \"sourceFile\": \"csNativeMessage.js\", \"url\": \"chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/csNativeMessage.js\", \"line\": 55, \"column\": 0, \"targetHint\": \"content\", \"breakpointId\": \"br:1:54:0:chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/csNativeMessage.js\", \"resolved\": true, \"locations\": [{\"scriptId\": \"3\", \"lineNumber\": 54, \"columnNumber\": 0}], \"targetType\": \"page\", \"targetUrl\": \"http://127.0.0."
+        },
+        {
+          "action": "source_contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2405, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_53cac4b3d314\"]}, {\"bytes\": 2960, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_53cac4b3d314\"]}], \"result\": {\"scheduled\""
+        },
+        {
+          "action": "isolated_world_semantic_fixture_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"isolatedWorldCustomEventBatch\", \"semanticFixture\": true, \"targetId\": \"BACC2F3C617B98EB4949FCDE6D0EA4B8\", \"targetUrl\": \"http://127.0.0.1:50776/page\", \"result\": {\"scheduled\": true, \"semanticFixture\": true, \"count\": 2}}"
+        },
+        {
+          "action": "set_sink_breakpoint",
+          "detail": "bsWindowManagement L350:C8 -> L358:C10",
+          "result": "{\"ok\": true, \"sourceFile\": \"bsWindowManagement.js\", \"url\": \"chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/bsWindowManagement.js\", \"line\": 350, \"column\": 8, \"targetHint\": \"background\", \"breakpointId\": \"1:349:8:chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/bsWindowManagement.js\", \"resolved\": true, \"locations\": [{\"scriptId\": \"5\", \"lineNumber\": 349, \"columnNumber\": 8}], \"targetType\": \"service_worker\", \"target"
+        },
+        {
+          "action": "sink_contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2405, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_53cac4b3d314\"]}, {\"bytes\": 2960, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_53cac4b3d314\"]}], \"result\": {\"scheduled\""
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 8,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:50776/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: http://127.0.0.1:50776/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_WINDOWS_CREATE_OPTIONS; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"csWindowManagement.js\", \"location\": \"L55:C0 -> L63:C6\", \"eventNames\": [\"windowManagerEventEx\"], \"eventTarget\": \"document\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"request\", \"scalarMessageValue\": \"\", \"requirements\": {}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"// Copyright ©2022-2025 FUJIFILM Healthcare Americas Corporation., All rights reserved.\\n// Reproduction or transmission in whole or in part, in any form or by any means, electronic, mechanical or otherwise, is prohibited without the prior written consent of the copyright owner.\\n// Filename: csWindowManagement.js\\n\\nconst backgroundMessageResponseTypes = [\\n    \\\"onPollingSuccess\\\",\\n    \\\"windowPositionOnWindowClose\\\",\\n    \\\"onApplicationWindowRemoved\\\",\\n    \\\"onApplicationWindowOpened\\\"\\n];\\n\\nfunction logExtError(err) {\\n    if (err) {\\n        console.log(`[Messaging Extension]: ${err.message}`);\\n    }\\n};\\n\\ndocument.addEventListener(\\n    \\\"windowManagerEventEx\\\",\\n    ((globalThis.__expagentSemanticHandlers=globalThis.__expagentSemanticHandlers||{})[\\\"windowManagerEventEx\\\"]=function (evt) {\\n        const request = evt?.detail?.request;\\n        if (!request) return;\\n\\n        request.listenerId = evt?.detail\", \"notes\": [\"已从 sink 文件推导消息分发字段 `type` 及候选值。\", \"已从 sink 调用推导 URL 承载字段 `url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"type\", \"discriminatorValues\": [\"openwindow\"], \"urlField\": \"url\", \"sinkTapKey\": \"windows.create\", \"messageAlias\": \"request\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [\"request\", \"id\", \"listenerId\", \"isWindowManagement\", \"storageKey\", \"opener\", \"isMaster\"], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"HIGH\", \"contractWarnings\": []}\nisolated-context={\"origin\": \"http://127.0.0.1:50776\", \"dsShell\": \"undefined\", \"dsCommon\": \"undefined\", \"jquery\": \"undefined\", \"shellFrame\": false}\nsource-breakpoint=armed\nsource-pause={\"paused\": false, \"reason\": \"\", \"target\": {\"type\": \"page\", \"url\": \"http://127.0.0.1:50776/page\"}, \"frames\": []}\nisolated-source-pause={\"paused\": false, \"reason\": \"\", \"target\": {\"type\": \"page\", \"url\": \"http://127.0.0.1:50776/page\"}, \"frames\": []}\nsink-breakpoint=armed\nsink-pause={\"paused\": false, \"reason\": \"\", \"target\": {\"type\": \"service_worker\", \"url\": \"chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/bsWrapper.js\"}, \"frames\": []}\ndeep-observe-window={\"elapsedSeconds\": 8.312, \"pollAttempts\": 17, \"firstObservedSeconds\": null, \"sinkObserved\": false, \"beaconObserved\": false, \"observerRecoveredDuringWindow\": false}\nisolated-sink-fixture=['{\"action\": \"isolatedWorldCustomEvent\", \"semanticFixture\": true, \"targetId\": \"BACC2F3C617B98EB4949FCDE6D0EA4B8\", \"targetUrl\": \"http://127.0.0.1:50776/page\", \"result\": {\"dispatched\": true, \"semanticFixture\": true}}', '{\"action\": \"isolatedWorldCustomEvent\", \"semanticFixture\": true, \"targetId\": \"BACC2F3C617B98EB4949FCDE6D0EA4B8\", \"targetUrl\": \"http://127.0.0.1:50776/page\", \"result\": {\"dispatched\": true, \"semanticFixture\": true}}']\nisolated-sink-tap={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_7a1c7b6bf8394030\", \"actualGeneration\": \"observer_7a1c7b6bf8394030\", \"previousTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"currentTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"runtime.connectNative\\\",\\\"storage.local.set\\\",\\\"tabs.sendMessage\\\",\\\"storage.sync.set\\\",\\\"storage.onChanged\\\",\\\"windows.update\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__tabs_create__\\\":true,\\\"__tabs_update__\\\":true,\\\"__tabs_remove__\\\":true,\\\"__tabs_sendMessage__\\\":true,\\\"__windows_create__\\\":true,\\\"__windows_update__\\\":true,\\\"__windows_remove__\\\":true,\\\"__runtime_sendMessage__\\\":true,\\\"__runtime_sendNa\nsink-tap={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_7a1c7b6bf8394030\", \"actualGeneration\": \"observer_7a1c7b6bf8394030\", \"previousTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"currentTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"runtime.connectNative\\\",\\\"storage.local.set\\\",\\\"tabs.sendMessage\\\",\\\"storage.sync.set\\\",\\\"storage.onChanged\\\",\\\"windows.update\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__tabs_create__\\\":true,\\\"__tabs_update__\\\":true,\\\"__tabs_remove__\\\":true,\\\"__tabs_sendMessage__\\\":true,\\\"__windows_create__\\\":true,\\\"__win\nbeacon={\"token\": \"expa_ce6f73671b55\", \"hit\": false, \"count\": 0, \"hits\": []}",
+      "reasoning": "The labelled isolated-world semantic fixture reached the exact content-script source and privileged sink with the controlled marker. This confirms the extension-internal path but does not claim that the original page-world CustomEvent boundary succeeded in this browser build.",
+      "evidence_stage": "MARKER_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": true,
+        "semanticFixtureKinds": [
+          "content-script-scope-semantic-fixture",
+          "custom-event-handler-semantic-fixture",
+          "service-worker-startup-semantic-fixture"
+        ],
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "HIGH",
+        "sourceContractReady": true,
+        "runtimeSourceContractProven": true,
+        "sourceReached": true,
+        "bridgeReached": true,
+        "sinkReached": true,
+        "markerReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[{\"request\": {\"marker\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"url\": \"http://127.0.0.1:50776/beacon/expa_ce6f73671b55\", \"data\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"value\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"message\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"title\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"text\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"number\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"listenerKey\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"pollingUrl\": \"http://127.0.0.1:50776/beacon/expa_ce6f73671b55\", \"pollingInterval\": 1000, \"pollingAuthorization\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"pollingContentType\": \"text/plain\", \"storageKey\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"name\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"id\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"key\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"type\": \"openwindow\", \"action\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"cmd\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"Action\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"Message\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"fun\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"auth\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"phone\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"email\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"version\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"token\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"content\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"payload\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"kind\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"requestId\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"revision\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"guid\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"initiatingPage\": \"EXPAGENT_TEST_expa_53cac4b3d314\", \"referringPage\": \"E",
+      "evidence_artifacts": [
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-8\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-8\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "debug",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-8\\extension-debug.json",
+          "description": "Persistent CDP extension debugger breakpoint/pause state.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-8\\step-final-state.png",
+          "description": "Step `final-state`: http://127.0.0.1:50776/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-22T11:05:50.173557+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-8\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "Extension debugger recorded 2 breakpoint(s); see artifact for line-level state.",
+      "notes": "sinkTapKey=windows.create sinkBreakpointHits=0 semanticFixture=true originalPageBoundaryNotClaimed=true semanticFixture=true originalPageBoundaryNotClaimed=true"
+    },
+    {
+      "flow_index": 9,
+      "outcome": "CONFIRMED",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.85,
+      "reproduced": true,
+      "trajectory": [
+        {
+          "action": "new_page",
+          "detail": "http://127.0.0.1:50776/page",
+          "result": "{\"openedUrl\": \"http://127.0.0.1:50776/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:9222/devtools/pa"
+        },
+        {
+          "action": "set_source_breakpoint",
+          "detail": "csNativeMessage L55:C0 -> L63:C6",
+          "result": "{\"ok\": true, \"sourceFile\": \"csNativeMessage.js\", \"url\": \"chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/csNativeMessage.js\", \"line\": 55, \"column\": 0, \"targetHint\": \"content\", \"breakpointId\": \"br:1:54:0:chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/csNativeMessage.js\", \"resolved\": true, \"locations\": [{\"scriptId\": \"3\", \"lineNumber\": 54, \"columnNumber\": 0}], \"targetType\": \"page\", \"targetUrl\": \"http://127.0.0."
+        },
+        {
+          "action": "source_contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2405, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_21b465a2ce04\"]}, {\"bytes\": 2960, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_21b465a2ce04\"]}], \"result\": {\"scheduled\""
+        },
+        {
+          "action": "isolated_world_semantic_fixture_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"isolatedWorldCustomEventBatch\", \"semanticFixture\": true, \"targetId\": \"368906041FC7F3AE89A05CE5B59620BA\", \"targetUrl\": \"http://127.0.0.1:50776/page\", \"result\": {\"scheduled\": true, \"semanticFixture\": true, \"count\": 2}}"
+        },
+        {
+          "action": "set_sink_breakpoint",
+          "detail": "bsWindowManagement L389:C12 -> L397:C14",
+          "result": "{\"ok\": true, \"sourceFile\": \"bsWindowManagement.js\", \"url\": \"chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/bsWindowManagement.js\", \"line\": 389, \"column\": 12, \"targetHint\": \"background\", \"breakpointId\": \"1:388:12:chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/bsWindowManagement.js\", \"resolved\": true, \"locations\": [{\"scriptId\": \"5\", \"lineNumber\": 388, \"columnNumber\": 12}], \"targetType\": \"service_worker\", \"tar"
+        },
+        {
+          "action": "sink_contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2405, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_21b465a2ce04\"]}, {\"bytes\": 2960, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_21b465a2ce04\"]}], \"result\": {\"scheduled\""
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 9,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:50776/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: http://127.0.0.1:50776/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_WINDOWS_CREATE_OPTIONS; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"csWindowManagement.js\", \"location\": \"L55:C0 -> L63:C6\", \"eventNames\": [\"windowManagerEventEx\"], \"eventTarget\": \"document\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"request\", \"scalarMessageValue\": \"\", \"requirements\": {}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"// Copyright ©2022-2025 FUJIFILM Healthcare Americas Corporation., All rights reserved.\\n// Reproduction or transmission in whole or in part, in any form or by any means, electronic, mechanical or otherwise, is prohibited without the prior written consent of the copyright owner.\\n// Filename: csWindowManagement.js\\n\\nconst backgroundMessageResponseTypes = [\\n    \\\"onPollingSuccess\\\",\\n    \\\"windowPositionOnWindowClose\\\",\\n    \\\"onApplicationWindowRemoved\\\",\\n    \\\"onApplicationWindowOpened\\\"\\n];\\n\\nfunction logExtError(err) {\\n    if (err) {\\n        console.log(`[Messaging Extension]: ${err.message}`);\\n    }\\n};\\n\\ndocument.addEventListener(\\n    \\\"windowManagerEventEx\\\",\\n    ((globalThis.__expagentSemanticHandlers=globalThis.__expagentSemanticHandlers||{})[\\\"windowManagerEventEx\\\"]=function (evt) {\\n        const request = evt?.detail?.request;\\n        if (!request) return;\\n\\n        request.listenerId = evt?.detail\", \"notes\": [\"已从 sink 文件推导消息分发字段 `type` 及候选值。\", \"已从 sink 调用推导 URL 承载字段 `url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"type\", \"discriminatorValues\": [\"openwindow\"], \"urlField\": \"url\", \"sinkTapKey\": \"windows.create\", \"messageAlias\": \"request\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [\"request\", \"id\", \"listenerId\", \"isWindowManagement\", \"storageKey\", \"opener\", \"isMaster\"], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"HIGH\", \"contractWarnings\": []}\nisolated-context={\"origin\": \"http://127.0.0.1:50776\", \"dsShell\": \"undefined\", \"dsCommon\": \"undefined\", \"jquery\": \"undefined\", \"shellFrame\": false}\nsource-breakpoint=armed\nsource-pause={\"paused\": false, \"reason\": \"\", \"target\": {\"type\": \"page\", \"url\": \"http://127.0.0.1:50776/page\"}, \"frames\": []}\nisolated-source-pause={\"paused\": false, \"reason\": \"\", \"target\": {\"type\": \"page\", \"url\": \"http://127.0.0.1:50776/page\"}, \"frames\": []}\nsink-breakpoint=armed\nsink-pause={\"paused\": false, \"reason\": \"\", \"target\": {\"type\": \"service_worker\", \"url\": \"chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/bsWrapper.js\"}, \"frames\": []}\ndeep-observe-window={\"elapsedSeconds\": 8.266, \"pollAttempts\": 17, \"firstObservedSeconds\": null, \"sinkObserved\": false, \"beaconObserved\": false, \"observerRecoveredDuringWindow\": false}\nisolated-sink-fixture=['{\"action\": \"isolatedWorldCustomEvent\", \"semanticFixture\": true, \"targetId\": \"368906041FC7F3AE89A05CE5B59620BA\", \"targetUrl\": \"http://127.0.0.1:50776/page\", \"result\": {\"dispatched\": true, \"semanticFixture\": true}}', '{\"action\": \"isolatedWorldCustomEvent\", \"semanticFixture\": true, \"targetId\": \"368906041FC7F3AE89A05CE5B59620BA\", \"targetUrl\": \"http://127.0.0.1:50776/page\", \"result\": {\"dispatched\": true, \"semanticFixture\": true}}']\nisolated-sink-tap={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_c7492fdd44ed4a58\", \"actualGeneration\": \"observer_c7492fdd44ed4a58\", \"previousTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"currentTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"runtime.connectNative\\\",\\\"storage.local.set\\\",\\\"tabs.sendMessage\\\",\\\"storage.sync.set\\\",\\\"storage.onChanged\\\",\\\"windows.update\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__tabs_create__\\\":true,\\\"__tabs_update__\\\":true,\\\"__tabs_remove__\\\":true,\\\"__tabs_sendMessage__\\\":true,\\\"__windows_create__\\\":true,\\\"__windows_update__\\\":true,\\\"__windows_remove__\\\":true,\\\"__runtime_sendMessage__\\\":true,\\\"__runtime_sendNa\nsink-tap={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_c7492fdd44ed4a58\", \"actualGeneration\": \"observer_c7492fdd44ed4a58\", \"previousTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"currentTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"runtime.connectNative\\\",\\\"storage.local.set\\\",\\\"tabs.sendMessage\\\",\\\"storage.sync.set\\\",\\\"storage.onChanged\\\",\\\"windows.update\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__tabs_create__\\\":true,\\\"__tabs_update__\\\":true,\\\"__tabs_remove__\\\":true,\\\"__tabs_sendMessage__\\\":true,\\\"__windows_create__\\\":true,\\\"__win\nbeacon={\"token\": \"expa_1b93164c015b\", \"hit\": false, \"count\": 0, \"hits\": []}",
+      "reasoning": "The labelled isolated-world semantic fixture reached the exact content-script source and privileged sink with the controlled marker. This confirms the extension-internal path but does not claim that the original page-world CustomEvent boundary succeeded in this browser build.",
+      "evidence_stage": "MARKER_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": true,
+        "semanticFixtureKinds": [
+          "content-script-scope-semantic-fixture",
+          "custom-event-handler-semantic-fixture",
+          "service-worker-startup-semantic-fixture"
+        ],
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "HIGH",
+        "sourceContractReady": true,
+        "runtimeSourceContractProven": true,
+        "sourceReached": true,
+        "bridgeReached": true,
+        "sinkReached": true,
+        "markerReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[{\"request\": {\"marker\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"url\": \"http://127.0.0.1:50776/beacon/expa_1b93164c015b\", \"data\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"value\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"message\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"title\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"text\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"number\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"listenerKey\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"pollingUrl\": \"http://127.0.0.1:50776/beacon/expa_1b93164c015b\", \"pollingInterval\": 1000, \"pollingAuthorization\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"pollingContentType\": \"text/plain\", \"storageKey\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"name\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"id\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"key\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"type\": \"openwindow\", \"action\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"cmd\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"Action\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"Message\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"fun\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"auth\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"phone\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"email\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"version\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"token\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"content\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"payload\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"kind\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"requestId\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"revision\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"guid\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"initiatingPage\": \"EXPAGENT_TEST_expa_21b465a2ce04\", \"referringPage\": \"E",
+      "evidence_artifacts": [
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-9\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-9\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "debug",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-9\\extension-debug.json",
+          "description": "Persistent CDP extension debugger breakpoint/pause state.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-9\\step-final-state.png",
+          "description": "Step `final-state`: http://127.0.0.1:50776/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-22T11:06:44.436363+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-9\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "Extension debugger recorded 4 breakpoint(s); see artifact for line-level state.",
+      "notes": "sinkTapKey=windows.create sinkBreakpointHits=0 semanticFixture=true originalPageBoundaryNotClaimed=true semanticFixture=true originalPageBoundaryNotClaimed=true"
+    },
+    {
+      "flow_index": 10,
+      "outcome": "CONFIRMED",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.85,
+      "reproduced": true,
+      "trajectory": [
+        {
+          "action": "instrument_sink",
+          "detail": "all",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_fbc59a0314a34cac\", \"targetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+        },
+        {
+          "action": "new_page",
+          "detail": "http://127.0.0.1:50776/page",
+          "result": "{\"openedUrl\": \"http://127.0.0.1:50776/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:9222/devtools/pa"
+        },
+        {
+          "action": "contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2429, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_7989fcf3ab0c\"]}, {\"bytes\": 2984, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_7989fcf3ab0c\"]}], \"result\": {\"scheduled\""
+        },
+        {
+          "action": "observe",
+          "detail": "sink tap + local beacon",
+          "result": "{\"sink_type\": \"windows.update\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_fbc59a0314a34cac\", \"actualGeneration\": \"ob"
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 10,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:50776/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: http://127.0.0.1:50776/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_WINDOWS_UPDATE_OPTIONS; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"csWindowManagement.js\", \"location\": \"L55:C0 -> L63:C6\", \"eventNames\": [\"windowManagerEventEx\"], \"eventTarget\": \"document\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"request\", \"scalarMessageValue\": \"\", \"requirements\": {}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"// Copyright ©2022-2025 FUJIFILM Healthcare Americas Corporation., All rights reserved.\\n// Reproduction or transmission in whole or in part, in any form or by any means, electronic, mechanical or otherwise, is prohibited without the prior written consent of the copyright owner.\\n// Filename: csWindowManagement.js\\n\\nconst backgroundMessageResponseTypes = [\\n    \\\"onPollingSuccess\\\",\\n    \\\"windowPositionOnWindowClose\\\",\\n    \\\"onApplicationWindowRemoved\\\",\\n    \\\"onApplicationWindowOpened\\\"\\n];\\n\\nfunction logExtError(err) {\\n    if (err) {\\n        console.log(`[Messaging Extension]: ${err.message}`);\\n    }\\n};\\n\\ndocument.addEventListener(\\n    \\\"windowManagerEventEx\\\",\\n    ((globalThis.__expagentSemanticHandlers=globalThis.__expagentSemanticHandlers||{})[\\\"windowManagerEventEx\\\"]=function (evt) {\\n        const request = evt?.detail?.request;\\n        if (!request) return;\\n\\n        request.listenerId = evt?.detail\", \"notes\": [\"已从 sink 文件推导消息分发字段 `type` 及候选值。\", \"已从 sink 调用推导 URL 承载字段 `data.url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"type\", \"discriminatorValues\": [\"openwindow\"], \"urlField\": \"data.url\", \"sinkTapKey\": \"windows.update\", \"messageAlias\": \"request\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [\"request\", \"id\", \"listenerId\", \"isWindowManagement\", \"storageKey\", \"opener\", \"isMaster\"], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"HIGH\", \"contractWarnings\": []}\npage-target={\"targetId\": \"02A7D68EC09996AEDE3D573DE063CEBD\", \"url\": \"http://127.0.0.1:50776/page\"}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_fbc59a0314a34cac\", \"targetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"lifecycle\": {\"ok\": true, \"targetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"targetType\": \"service_worker\", \"targetUrl\": \"chrome-extension://ebebamffbdihgjjdpmoafakjjbjampep/bsWrapper.js\", \"attachCou\nsource-bridge-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_710c1da46fe14712\", \"targetId\": \"02A7D68EC09996AEDE3D573DE063CEBD\", \"pageUrl\": \"http://127.0.0.1:50776/page\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\",\\\"observerToken\\\":\\\"observer_710c1da46fe14712\\\"}\"}\nstimulus-batch={\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"windowManagerEventEx\", \"eventTarget\": \"document\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 2429, \"topLevelKeys\": [\"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_7989fcf3ab0c\"]}, {\"bytes\": 2984, \"topLevelKeys\": [\"data\", \"request\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_7989fcf3ab0c\"]}], \"result\": {\"scheduled\": true, \"count\": 2, \"surface\": \"CustomEvent\", \"spacingMs\": 300}}\nsink-tap={\"sink_type\": \"windows.update\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_fbc59a0314a34cac\", \"actualGeneration\": \"observer_fbc59a0314a34cac\", \"previousTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"currentTargetId\": \"D2E0055F9E20E209CCD9FEEAE5DE7E26\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"windows.update\\\",\\\"calls\\\":[{\\\"ts\\\":1790075091211,\\\"arg\\\":{\\\"left\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"top\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"width\\\":1,\\\"height\\\":1,\\\"__expagentTestMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"}},{\\\"ts\\\":1790075091517,\\\"arg\\\":{\\\"left\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"top\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_ffaf5fd3c4e6\\\"},\\\"width\\\":1,\\\"height\\\":1,\\\"__e\nbeacon={\"token\": \"expa_a13f76d36c8d\", \"hit\": false, \"count\": 0}\nsource-bridge-tap={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_710c1da46fe14712\", \"actualGeneration\": \"observer_710c1da46fe14712\", \"recoveryReason\": \"\", \"targetId\": \"02A7D68EC09996AEDE3D573DE063CEBD\", \"pageUrl\": \"http://127.0.0.1:50776/page\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__dom_innerHTML__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__runtime_sendMessage__\\\":true},\\\"observerToken\\\":\\\"observer_710c1da46fe14712\\\"}\"}",
+      "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+      "evidence_stage": "MARKER_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": false,
+        "semanticFixtureKinds": [
+          "content-script-scope-semantic-fixture",
+          "custom-event-handler-semantic-fixture",
+          "service-worker-startup-semantic-fixture"
+        ],
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "HIGH",
+        "sourceContractReady": true,
+        "runtimeSourceContractProven": true,
+        "sourceReached": true,
+        "bridgeReached": true,
+        "sinkReached": true,
+        "markerReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[{\"request\": {\"marker\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"url\": \"http://127.0.0.1:50776/beacon/expa_a13f76d36c8d\", \"data\": {\"url\": \"http://127.0.0.1:50776/beacon/expa_a13f76d36c8d\"}, \"value\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"message\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"title\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"text\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"number\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"listenerKey\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"pollingUrl\": \"http://127.0.0.1:50776/beacon/expa_a13f76d36c8d\", \"pollingInterval\": 1000, \"pollingAuthorization\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"pollingContentType\": \"text/plain\", \"storageKey\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"name\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"id\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"key\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"type\": \"openwindow\", \"action\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"cmd\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"Action\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"Message\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"fun\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"auth\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"phone\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"email\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"version\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"token\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"content\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"payload\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"kind\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"requestId\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"revision\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"guid\": \"EXPAGENT_TEST_expa_7989fcf3ab0c\", \"initiatingPage\": \"EXPAGENT_TEST_expa_7989fcf3a",
+      "evidence_artifacts": [
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-10\\step-source-open.png",
+          "description": "Step `source-open`: http://127.0.0.1:50776/page",
+          "stage": "source-open",
+          "captured_at": "2026-09-22T11:06:45.933078+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-10\\step-after-trigger.png",
+          "description": "Step `after-trigger`: http://127.0.0.1:50776/page",
+          "stage": "after-trigger",
+          "captured_at": "2026-09-22T11:06:46.026617+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-10\\storage-after-trigger.json",
+          "description": "Storage state at `after-trigger` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-10\\storage-after-trigger.png",
+          "description": "Storage panel (DevTools-style) at `after-trigger`",
+          "stage": "storage-after-trigger",
+          "captured_at": "2026-09-22T11:06:46.118858+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9dae4234964e77c8ce55b380d79e3344ec3cc1867107f71800375d4187af8b37"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-10\\step-after-observation.png",
+          "description": "Step `after-observation`: http://127.0.0.1:50776/page",
+          "stage": "after-observation",
+          "captured_at": "2026-09-22T11:06:46.277874+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-10\\storage-after-observation.json",
+          "description": "Storage state at `after-observation` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-10\\storage-after-observation.png",
+          "description": "Storage panel (DevTools-style) at `after-observation`",
+          "stage": "storage-after-observation",
+          "captured_at": "2026-09-22T11:06:46.368051+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "c85e60a88a57b8b5fac477535797615f281aca66bf59163206cb59fdc3b42fa9"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-10\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-10\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "debug",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-10\\extension-debug.json",
+          "description": "Persistent CDP extension debugger breakpoint/pause state.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-10\\step-final-state.png",
+          "description": "Step `final-state`: http://127.0.0.1:50776/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-22T11:06:46.462422+00:00",
+          "target_url": "http://127.0.0.1:50776/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r3\\_runs\\chrome\\ghdbmcfiemkndpbhfeifkneiolehkcli\\7.4.320.0\\dynamic-evidence\\flow-10\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "Extension debugger recorded 4 breakpoint(s); see artifact for line-level state.",
+      "notes": "sinkTapKey=windows.update sourceBridgeReached=false semanticFixture=true originalPageBoundaryNotClaimed=true"
+    }
+  ],
+  "environment": {
+    "browserUrl": "http://127.0.0.1:9222",
+    "runtimeExtensionId": "nebfdhfjcnchjhfclncdmndkpcbepegb",
+    "beaconBaseUrl": "http://127.0.0.1:49683",
+    "headless": true,
+    "safety": {
+      "mode": "isolated-controlled-validation",
+      "allowedTestOrigins": [
+        "http://127.0.0.1",
+        "http://[::1]",
+        "http://localhost"
+      ],
+      "network": "loopback and explicitly configured controlled origins only",
+      "testInput": "bounded JSON with harmless EXPAGENT_TEST_* markers",
+      "sensitiveData": "credentials, cookies, tokens, and personal data are not read or collected"
+    },
+    "networkIsolation": true
+  },
+  "summary": "Dynamically tested 3 flow(s): 0 CONFIRMED, 0 PARTIAL, 1 TOOL_LIMITATION, 2 INCONCLUSIVE_AFTER_DEBUG.",
+  "skipped_reason": ""
+}

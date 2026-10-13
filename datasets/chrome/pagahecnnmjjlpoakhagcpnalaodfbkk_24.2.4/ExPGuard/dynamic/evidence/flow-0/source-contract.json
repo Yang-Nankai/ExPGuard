@@ -1,0 +1,41 @@
+{
+  "surface": "WINDOW_MESSAGE",
+  "sourcePath": "src/content-script.js",
+  "location": "L402:C61 -> L402:C70",
+  "eventNames": [],
+  "eventTarget": "window",
+  "eventDetailKey": "data",
+  "envelope": {},
+  "forwardField": "",
+  "scalarMessageValue": "",
+  "requirements": {
+    "type": "send-link",
+    "name": "activateChatwork"
+  },
+  "preconditionActions": [],
+  "selectors": [],
+  "mediaTags": [],
+  "snippet": "remove_listener, create_modal,\n            toggle_modal, close_modal, $sa_overlay, $sa_selector, $sa_content_wrap;\n\n        on_complete = function(data) {\n            if (service === 'gmail' && composeView && data) {\n                const attachment = create_attachment_tag_ele(data);\n                if (attachment) {\n                    composeView.insertHTMLIntoBodyAtCursor(document.createElement('br'));\n                    composeView.insertHTMLIntoBodyAtCursor(document.createElement('br'));\n                    composeView.insertHTMLIntoBodyAtCursor(attachment);\n                    composeView.insertHTMLIntoBodyAtCursor(document.createElement('br'));    \n                }\n            } else if (service === 'editable' && data && right_click_ele) {\n                const input_id = right_click_ele.element;\n\n                if (right_click_ele.insert_type === 'value') {\n                   ",
+  "notes": [
+    "已从 source/sink 附近提取字面量分支。",
+    "已从 sink 文件推导消息分发字段 `type` 及候选值。",
+    "已从 sink 调用推导 URL 承载字段 `url`。"
+  ],
+  "discriminatorField": "type",
+  "discriminatorValues": [
+    "send-link",
+    "close-extension",
+    "update-setting",
+    "load_embedded_webapp"
+  ],
+  "urlField": "url",
+  "sinkTapKey": "storage.sync.set",
+  "messageAlias": "msg",
+  "messageEventKey": "",
+  "jsonMessageField": "",
+  "eventDetailIsJson": false,
+  "sinkDataFields": [],
+  "runtimeMessageKeyPrefix": "",
+  "contractConfidence": "HIGH",
+  "contractWarnings": []
+}

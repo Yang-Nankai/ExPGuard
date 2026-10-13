@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "provider": "deepseek-compatible",
+  "model": "deepseek-v4.1-flash",
+  "generated_at_utc": "2026-10-13T08:31:35Z",
+  "report_sha256": "e1957839b5ead50b32dd61cd758f6444175e928f4d9ad1f47c04a4ec011219f8",
+  "input_sha256": "2b63c8984b91be9306dcdf49989cf726d20caa8df82ec6e9c69ab34284e9db48",
+  "flow_ids": [
+    "gtf-30d0a40f000a4f09"
+  ],
+  "narrative": {
+    "summary": "Ground Truth review of version 10.7 identified one Flow in which an externally connectable message source reaches a privileged cookie-write sink in the background script. The recorded issue is Unauthorized Cookie Modification: an externally delivered message can drive chrome.cookies.set for the shellsCounter cookie without sender validation.",
+    "findings": {
+      "gtf-30d0a40f000a4f09": "The recorded flow runs from chrome.runtime.onMessageExternal.addListener in the background script to chrome.cookies.set({url:\"https://oceanhero.today\", name:\"shellsCounter\", ...}). Because the extension declares externally_connectable for https://oceanhero.today/* and the listener performs no sender.id or sender.origin check, a message whose type field is \"addShells\" and whose amount field is sender-controlled reaches the cookie write; the e.type gate is an attacker-chosen message field rather than a trust anchor. Static analysis recorded TRUE_POSITIVE at confidence 0.6 and manual review recorded TP (confirmed_tp, confidence 0.95), confirming the Flow is reachable and produces its privileged effect. The dynamic run reported EXTERNAL_CONDITION_REQUIRED with reproduced=false because a matching controlled sender page is a precondition, so no unconditional runtime reproduction was recorded; this inconclusive dynamic result does not contradict the static and manual verdicts."
+    },
+    "recommendations": [
+      "Validate the external sender before acting on any message: check sender.id/sender.origin against a strict allowlist in the onMessageExternal listener rather than relying on the e.type value as a trust anchor.",
+      "Treat the amount field as untrusted input: parse it strictly, reject non-integers and out-of-range or negative values, and clamp it before arithmetic and before passing it to chrome.cookies.set.",
+      "Constrain the cookie write to the minimum required scope (exact url, cookie name, path, and expiry) and avoid writing values derived from page-supplied content.",
+      "Consider removing externally_connectable exposure for this functionality or moving the shells-counter update to an internal, extension-initiated channel so external pages cannot reach the privileged cookie API."
+    ],
+    "impact": "An externally connectable sender page can make the extension's background context write the shellsCounter cookie on oceanhero.today without sender authentication, altering persisted extension state within the scope of that single cookie write; no runtime reproduction, account compromise, or broader data access is claimed."
+  }
+}

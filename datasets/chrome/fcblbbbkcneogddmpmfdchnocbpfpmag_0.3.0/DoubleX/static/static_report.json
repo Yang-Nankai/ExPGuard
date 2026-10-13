@@ -1,0 +1,91 @@
+{
+  "extension_id": "fcblbbbkcneogddmpmfdchnocbpfpmag",
+  "extension_version": "0.3.0",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification ledger\n\n**(a) Who controls the reported source?**\nThe report claims a `WINDOW_MESSAGE_EVENT` source at `background.js:141` in the background/service-worker frame. There is no `background.js` in the unpacked extension; the MV3 background is `worker.js` (a service worker), which has no `window` and no `window.addEventListener('message', ...)`. A project-wide search found no window `message` listener anywhere. Therefore the reported `WINDOW_MESSAGE_EVENT` source does not exist and is not attacker-controllable through the reported mechanism.\n\n**(b) Source-to-sink path**\nThe only external-ish message inputs are:\n\n- `worker.js:142` — `chrome.runtime.onConnectExternal.addListener(eport => eport.onMessage.addListener(request => ...))`\n- `worker.js:199` — `chrome.runtime.onMessageExternal.addListener(...)`\n- `context.js:214` — `chrome.runtime.onMessage.addListener(...)` (internal extension messaging only)\n\nWithin `worker.js`, a real branch does write request-derived data:\n\n```js\nelse if (request.cmd === 'set-level') {\n  chrome.storage.local.set({\n    level: request.level,\n    aggressive: request.aggressive || false\n  });\n}\n```\n\nSo a *latent* `request.level`/`request.aggressi",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": null,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "DoubleX matched external input to a sensitive API parameter.",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L141",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L171",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "Source report file could not be resolved in the unpacked CRX/XPI.",
+          "Sink report file could not be resolved in the unpacked CRX/XPI."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 0 true-positive, 1 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

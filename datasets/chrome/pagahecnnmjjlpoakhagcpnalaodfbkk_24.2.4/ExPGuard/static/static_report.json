@@ -1,0 +1,109 @@
+{
+  "extension_id": "pagahecnnmjjlpoakhagcpnalaodfbkk",
+  "extension_version": "24.2.4",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #3 — STORAGE_POSOING (attacker → `chrome.storage.sync.set`)\n\n### (a) Who controls the source?\nThe source is a `window` message event received by the content script. Confirmed in `src/content-script.js`:\n\n- L503: `window.addEventListener('message', on_message, false);` — a page-origin `postMessage` reaches this isolated-world listener.\n- L402: `if (msg.source !== $sa_selector.contentWindow && !msg.data) return;` — this guard is **attacker-satisfiable**: a page `postMessage` carrying a truthy `data` object passes even though `event.source` is the top page, not the iframe (`!msg.data` is false, so the `&&` does not trigger the early return).\n- L406–412: `data.type === 'update-setting'` → `sendBackgroundMessage(data)`.\n- L537–538: `chrome.runtime.sendMessage(chrome.runtime.id, msg, ...)`.\n\nSo the page (or XSS on the matched domain) controls `msg.value` end-to-end. The manifest matches `*://*.slack.com/*`, `*://mail.google.com/*`, `*://inbox.google.com/*`, `*://*.chatwork.com/*`, so a page running on those origins can drive it.\n\n### (b) Source-to-sink path\nPage `postMessage` → content-script `on_message` (L401–413) → `sendBackgroundMessage` (L537) → `chrome.runti",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "src/content-script",
+          "reportedLoc": "L402:C61 -> L402:C70",
+          "resolvedFile": "src/content-script.js",
+          "resolved": true,
+          "snippet": "L402 C61-70:             if (msg.source !== $sa_selector.contentWindow && !msg.data) return;"
+        },
+        "sinkAnchor": {
+          "reportedFile": "src/service_worker",
+          "reportedLoc": "L156:C6 -> L156:C42",
+          "resolvedFile": "src/service_worker.js",
+          "resolved": true,
+          "snippet": "L156 C6-42:       chrome.storage.sync.set({ options });"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://*.slack.com/*",
+              "*://mail.google.com/*",
+              "*://inbox.google.com/*",
+              "*://*.chatwork.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "/lib/jquery-3.4.1.min.js",
+              "/lib/inboxsdk.js",
+              "/src/consts.js",
+              "/src/utils.js",
+              "/src/content-script.js"
+            ],
+            "runAt": "document_end",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

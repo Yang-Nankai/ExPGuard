@@ -1,0 +1,346 @@
+{
+  "extension_id": "ohjgplijcfdlhdmmdlkigbelaonpdach",
+  "extension_version": "1.0.7",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 7,
+  "verified_count": 4,
+  "verdicts": [
+    {
+      "flow_index": 3,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #3 (STORAGE_POSOING: `better-xiaoheihe-ai-bot-runtime-request` → `chrome.storage.local.set`)\n\n### (a) Who controls the source?\nThe source is `window.addEventListener(AI_BOT_RUNTIME_REQUEST_EVENT, …)` in the content script `src/ai-bridge.js` (L459, `world: ISOLATED`, matches `https://www.xiaoheihe.cn/*`). `AI_BOT_RUNTIME_REQUEST_EVENT` is the fixed string `\"better-xiaoheihe-ai-bot-runtime-request\"` (L47). A page script on a matching xiaoheihe.cn URL can dispatch this `CustomEvent` on the shared DOM `window`; the isolated-world listener receives it. `parseEventDetail` (L244–254) accepts a raw object or JSON string, so `event.detail` is fully page-controlled.\n\n### (b) Exact source → sink path\nConfirmed by raw source:\n\n1. `src/ai-bridge.js:459` → `requestAiBotRuntime(parseEventDetail(event.detail))`.\n2. `requestAiBotRuntime` (L373–391) does **not** constrain the action:\n   ```js\n   const type = String(detail?.type || \"\");\n   ...\n   sendRuntimeMessageSafely({ type, detail: detail?.detail || {} }, ...)\n   ```\n   The page controls both the message `type` and `detail`. This is the `runtime.single.sender.message[src/ai-bridge->src/background]` HOP.\n3. `src/background",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "src/ai-bridge",
+          "reportedLoc": "L459:C104 -> L459:C116",
+          "resolvedFile": "src/ai-bridge.js",
+          "resolved": true,
+          "snippet": "L459 C104-116: …r(AI_BOT_RUNTIME_REQUEST_EVENT, (event) => requestAiBotRuntime(parseEventDetail(event.detail)));"
+        },
+        "sinkAnchor": {
+          "reportedFile": "src/background",
+          "reportedLoc": "L370:C6 -> L386:C17",
+          "resolvedFile": "src/background.js",
+          "resolved": true,
+          "snippet": ">>   370|       chrome.storage.local.set({\n>>   371|         [AI_MODEL_CACHE_STORAGE_KEY]: {\n>>   372|           ...cache,\n>>   373|           [getModelCacheKey(normalizedSettings)]: {\n>>   374|             provider: normalizedSettings.provider,\n>>   375|             baseUrl: normalizedSettings.baseUrl,\n>>   376|             models: normalizedModels,\n>>   377|             updatedAt: Date.now()\n>>   378|           },\n>>   379|           [getProviderModelCacheKey(normalizedSettings)]: {\n>>   380|             provider: normalizedSettings.provider,\n>>   381|             baseUrl: normalizedSettings.baseUrl,\n>>   382|             models: normalizedModels,\n>>   383|             updatedAt: Date.now()\n>>   384|           }\n>>   385|         }\n>>   386|       }, resolve);"
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://www.xiaoheihe.cn/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "src/ai-bridge.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 4,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: The propagation report confirms the storage path: step 26 (`listModels(message.detail?.settings)`) → step 27 (`normalizeAiSettings`) → step 28 (`getModelCacheKey` template `${provider}:${baseUrl}`) → step 29 (`chrome.storage.local.set`). This matches my direct source inspection exactly.\n\nFinal assessment:\n\n- **Source is untrusted**: a MAIN-world page script on `https://www.xiaoheihe.cn/*` can forge `better-xiaoheihe-ai-model-list-request`; `ai-bridge.js` has no `event.source`/origin check and `parseEventDetail` accepts arbitrary objects.\n- **Path is unbroken**: page CustomEvent → `requestModelList` → `chrome.runtime.sendMessage` → background `onMessage` (sender ignored) → `listModels` → `writeModelListCache` → `chrome.storage.local.set`.\n- **Attacker-controlled sink argument**: `baseUrl` (only trimmed, no scheme/host validation) is stored both as a value field and inside the cache key. `provider` is allow-listed but `baseUrl` is not.\n- **No effective guard/trust boundary**: no sender.id/origin allowlist, no fixed-action allowlist, no baseUrl validation.\n\nThis is a real page→extension-storage privilege crossing.\n\nVERDICT: TRUE_POSITIVE",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "src/ai-bridge",
+          "reportedLoc": "L3702:C2 -> L3766:C4",
+          "resolvedFile": "src/ai-bridge.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "src/background",
+          "reportedLoc": "L370:C6 -> L386:C17",
+          "resolvedFile": "src/background.js",
+          "resolved": true,
+          "snippet": ">>   370|       chrome.storage.local.set({\n>>   371|         [AI_MODEL_CACHE_STORAGE_KEY]: {\n>>   372|           ...cache,\n>>   373|           [getModelCacheKey(normalizedSettings)]: {\n>>   374|             provider: normalizedSettings.provider,\n>>   375|             baseUrl: normalizedSettings.baseUrl,\n>>   376|             models: normalizedModels,\n>>   377|             updatedAt: Date.now()\n>>   378|           },\n>>   379|           [getProviderModelCacheKey(normalizedSettings)]: {\n>>   380|             provider: normalizedSettings.provider,\n>>   381|             baseUrl: normalizedSettings.baseUrl,\n>>   382|             models: normalizedModels,\n>>   383|             updatedAt: Date.now()\n>>   384|           }\n>>   385|         }\n>>   386|       }, resolve);"
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://www.xiaoheihe.cn/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "src/ai-bridge.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 6,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #6 (STORAGE_POSOING, attacker-input-storage-write)\n\n### 1. Source control — confirmed attacker-controlled\n\nThe source is `src/ai-bridge.js` L448–455:\n\n```js\nwindow.addEventListener(AI_SETTINGS_SAVE_EVENT, (event) => {\n  const nextSettings = normalizeAiSettings(parseEventDetail(event.detail)); // L450\n  dispatchSettings(nextSettings);\n  writeStorageLocalSafely({ [AI_SETTINGS_STORAGE_KEY]: nextSettings });    // L452-454\n});\n```\n\n`AI_SETTINGS_SAVE_EVENT` is `\"better-xiaoheihe-ai-settings-save\"` and there is **no `event.source` / `event.origin` / action allow-list** check. The content script runs on `https://www.xiaoheihe.cn/*` (`document_start`, isolated world), so page code on that host (or XSS on it) can dispatch the CustomEvent with arbitrary `detail`.\n\n`parseEventDetail` (L244–254) returns the object or `JSON.parse` result, so `event.detail.baseUrl`, `provider`, `model`, etc. are fully page-controlled.\n\n### 2. Source → sink path — connected (with one modeling nuance)\n\nThe report's storagePassing hop is real at the settings-write level:\n\n- Page dispatches `better-xiaoheihe-ai-settings-save` → content script writes `chrome.storage.local` key `better-xiaoheih",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 4,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "src/ai-bridge",
+          "reportedLoc": "L450:C62 -> L450:C74",
+          "resolvedFile": "src/ai-bridge.js",
+          "resolved": true,
+          "snippet": "L450 C62-74:     const nextSettings = normalizeAiSettings(parseEventDetail(event.detail));"
+        },
+        "sinkAnchor": {
+          "reportedFile": "src/background",
+          "reportedLoc": "L370:C6 -> L386:C17",
+          "resolvedFile": "src/background.js",
+          "resolved": true,
+          "snippet": ">>   370|       chrome.storage.local.set({\n>>   371|         [AI_MODEL_CACHE_STORAGE_KEY]: {\n>>   372|           ...cache,\n>>   373|           [getModelCacheKey(normalizedSettings)]: {\n>>   374|             provider: normalizedSettings.provider,\n>>   375|             baseUrl: normalizedSettings.baseUrl,\n>>   376|             models: normalizedModels,\n>>   377|             updatedAt: Date.now()\n>>   378|           },\n>>   379|           [getProviderModelCacheKey(normalizedSettings)]: {\n>>   380|             provider: normalizedSettings.provider,\n>>   381|             baseUrl: normalizedSettings.baseUrl,\n>>   382|             models: normalizedModels,\n>>   383|             updatedAt: Date.now()\n>>   384|           }\n>>   385|         }\n>>   386|       }, resolve);"
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://www.xiaoheihe.cn/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "src/ai-bridge.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.0,
+      "reasoning": "Verification error: Connection error.",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "src/ai-bridge",
+          "reportedLoc": "L459:C104 -> L459:C116",
+          "resolvedFile": "src/ai-bridge.js",
+          "resolved": true,
+          "snippet": "L459 C104-116: …r(AI_BOT_RUNTIME_REQUEST_EVENT, (event) => requestAiBotRuntime(parseEventDetail(event.detail)));"
+        },
+        "sinkAnchor": {
+          "reportedFile": "src/background",
+          "reportedLoc": "L781:C27 -> L781:C46",
+          "resolvedFile": "src/background.js",
+          "resolved": true,
+          "snippet": "L781 C27-46:     const response = await fetch(url, options);"
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://www.xiaoheihe.cn/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "src/ai-bridge.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Verifier exception; no final semantic judgement was produced.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 4 flow(s): 3 true-positive, 0 false-positive, 0 partial-available (PA), 1 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

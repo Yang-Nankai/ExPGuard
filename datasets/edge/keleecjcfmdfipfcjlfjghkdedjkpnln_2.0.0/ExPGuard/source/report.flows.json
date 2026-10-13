@@ -1,0 +1,213 @@
+{
+  "extensionId": "keleecjcfmdfipfcjlfjghkdedjkpnln",
+  "extensionVersion": "2.0.0",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 3,
+    "totalFiles": 3,
+    "distinctFlows": 1,
+    "rawIssueEntries": 1,
+    "sinklessSourcesSkipped": 3
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+        "file": "background",
+        "loc": "L276:C67 -> L276:C74",
+        "line": 276,
+        "col": [
+          67,
+          74
+        ],
+        "spansTo": null,
+        "code": "console.log(\"external message received: \" + JSON.stringify(»request«));"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeTemplate",
+          "file": "background",
+          "loc": "L298:C10 -> L298:C66",
+          "line": 298,
+          "col": [
+            10,
+            66
+          ],
+          "spansTo": null,
+          "code": "await »chrome.storage.local.set({themeTemplate: themeTemplate})«;",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 40,
+        "distinctLines": 16,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 276,
+            "ops": [
+              "ASSIGN:identifier",
+              "RETURN:json.stringify",
+              "ASSIGN:binary-right"
+            ],
+            "code": "console.log(\"external message received: \" + »JSON.stringify(request)«);"
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 277,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "let response = await handleConfigMessage(»request«);"
+          },
+          {
+            "n": 3,
+            "file": "background",
+            "line": 284,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left"
+            ],
+            "code": "let themeTemplate = »request.themeTemplate || 'totoro'«;// 兼容老版本"
+          },
+          {
+            "n": 4,
+            "file": "background",
+            "line": 294,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if(»themeTemplate« == 'teto'){"
+          },
+          {
+            "n": 5,
+            "file": "background",
+            "line": 295,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»request«[LOGO_BLOB_KEY] = false;"
+          },
+          {
+            "n": 6,
+            "file": "background",
+            "line": 297,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "let savetask = saveThemeConfig(»request«);"
+          },
+          {
+            "n": 7,
+            "file": "background",
+            "line": 298,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»await chrome.storage.local.set({themeTemplate: themeTemplate})«;"
+          },
+          {
+            "n": 8,
+            "file": "background",
+            "line": 311,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (»themeTemplate«) {"
+          },
+          {
+            "n": 9,
+            "file": "background",
+            "line": 312,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "if(oldThemeTemplate != »themeTemplate«){"
+          },
+          {
+            "n": 10,
+            "file": "background",
+            "line": 314,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "changeTheme(tab.id, oldThemeTemplate, »themeTemplate«, stg);"
+          },
+          {
+            "n": 11,
+            "file": "background",
+            "line": 160,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if ( »newTheme« ){"
+          },
+          {
+            "n": 12,
+            "file": "background",
+            "line": 162,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right",
+              "ASSIGN:binary-left"
+            ],
+            "code": "files: [ »\"themes/\" + newTheme« + \"/styles.css\"],"
+          },
+          {
+            "n": 13,
+            "file": "background",
+            "line": 161,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.scripting.insertCSS({«",
+            "spansTo": 165
+          },
+          {
+            "n": 14,
+            "file": "background",
+            "line": 168,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if(»newTheme« != 'teto'){"
+          },
+          {
+            "n": 15,
+            "file": "background",
+            "line": 178,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "args  : [ »newTheme« ],"
+          },
+          {
+            "n": 16,
+            "file": "background",
+            "line": 176,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»\t    chrome.scripting.executeScript({«",
+            "spansTo": 182
+          }
+        ]
+      }
+    }
+  ]
+}

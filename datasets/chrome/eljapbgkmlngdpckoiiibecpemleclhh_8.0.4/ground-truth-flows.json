@@ -1,0 +1,957 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "eljapbgkmlngdpckoiiibecpemleclhh",
+  "version": "8.0.4",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-913a1ce527e25462",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_SYNC_STORAGE",
+      "matched_tools": [
+        "CoCo",
+        "DoubleX"
+      ],
+      "match_region": "CoCo + DoubleX",
+      "match_basis": "explicit_reuse_and_normalized_signature",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:e26e0cb5ba9164a0:01",
+          "flow": {
+            "flow_id": "coco:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:e26e0cb5ba9164a0:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "e26e0cb5ba9164a065b98c2921c49c6c1b71bf1c84128fca190872fc98739561",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "coco-storage_posoing",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "CoCo source evidence",
+              "file": "contentScript.bundle.js",
+              "loc": "L1:C1 -> L1:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "contentScript.bundle.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "CoCo sink evidence",
+              "file": "contentScript.bundle.js",
+              "loc": "L1:C1 -> L1:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "contentScript.bundle.js",
+              "message_sender_provenance": "UNKNOWN",
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Reused/DoubleX"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_reused_doublex",
+                  "source": "Reused/DoubleX",
+                  "kind": "coco_reused_doublex",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "Reused DoubleX F001 (flow_index=0) via source_type_normalized_sink_type_exact/all_candidates_agree.",
+                  "reused_flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:ba481a93c647be29:01",
+                  "package_sha256": "d672aa9d333b8638c7244a080904df9d5f067f99343dd6aa95bf61711fb9da05"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "reused_confirmation_match",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've confirmed the full minified source. Let me map the flow against the actual code.\n\n## Analysis\n\n### (a) Who controls the source\n`contentScript.bundle.js` registers:\n\n```js\nwindow.addEventListener(\"message\", (t => {\n  if (t.data) {\n    const o = t.data.message ? t.data.message : t.data;\n    ...\n    \"save_storage\"===o.type && ((e,n,t)=>{...})(o.key,o.attributes,o.values),\n    ...\n  }\n}));\n```\n\n`t` is the `MessageEvent`, and `t.data` is directly attacker-controlled: the content script runs on `http://*/*` and `https://*/*` (allFrames: true, ISOLATED world), and the listener performs **no `event.origin`, `event.source`, or sender.id check**. Any page in whose context the content script is injected can postMessage to itself and drive this source.\n\n### (b) Source-to-sink path\nThe relevant branch executes when `o.type === \"save_storage\"`:\n\n```js\n\"save_storage\"===o.type && ((e,n,t)=>{\n  chrome.storage.sync.get(e, (s=>{\n    const o = s && s[e] ? s[e] : {};\n    n.forEach((e,n)=>{ o[e] = t[n] });\n    chrome.storage.sync.set({[e]: o});\n  }))\n})(o.key, o.attributes, o.values)\n```\n\nSo:\n- `o.key` (attacker message field) → storage key `e`\n- `o.attributes` (attacker array) and `o.values` (atta",
+              "path": "extensions/eljapbgkmlngdpckoiiibecpemleclhh_8.0.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "SINK_NOT_FIRED",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.85,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 4,
+              "reasoning": "A message reached the background (some instrumented sink fired), but the exact static sink did not execute under any contract candidate — a real rebuttal of the static routing.",
+              "path": "extensions/eljapbgkmlngdpckoiiibecpemleclhh_8.0.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T04:52:14.139063Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": {
+              "source_dataset": "DoubleX",
+              "extension_key": "eljapbgkmlngdpckoiiibecpemleclhh@8.0.4",
+              "flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:ba481a93c647be29:01",
+              "flow_index": 0,
+              "flow_label": "F001",
+              "verification": "TP",
+              "verification_source": [
+                "Manual"
+              ],
+              "match_mode": "source_type_normalized_sink_type_exact",
+              "match_reason": "all_candidates_agree",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_loc": "L48",
+              "source_file": "content_scripts.js",
+              "sink_type": "CHROME_SYNC_STORAGE",
+              "sink_loc": "L87",
+              "sink_file": "content_scripts.js",
+              "package_evidence": {
+                "same_package": true,
+                "same_crx": true,
+                "same_manifest": true,
+                "same_source_manifest": true,
+                "coco_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\eljapbgkmlngdpckoiiibecpemleclhh_8.0.4\\crx\\eljapbgkmlngdpckoiiibecpemleclhh.8.0.4.crx",
+                "external_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\eljapbgkmlngdpckoiiibecpemleclhh_8.0.4\\crx\\8.0.4\\eljapbgkmlngdpckoiiibecpemleclhh.8.0.4.crx",
+                "coco_package_sha256": "d672aa9d333b8638c7244a080904df9d5f067f99343dd6aa95bf61711fb9da05",
+                "external_package_sha256": "d672aa9d333b8638c7244a080904df9d5f067f99343dd6aa95bf61711fb9da05",
+                "coco_manifest_sha256": "c671217a09d392b9ab7cbdcd0457936dc458e95df2ca3925ff0a4e607b29766f",
+                "external_manifest_sha256": "c671217a09d392b9ab7cbdcd0457936dc458e95df2ca3925ff0a4e607b29766f",
+                "coco_source_manifest_sha256": "e914c2feceb94beac1bb9a60a3bbaa878185f0c2e18d91249657e08a19727181",
+                "external_source_manifest_sha256": "e914c2feceb94beac1bb9a60a3bbaa878185f0c2e18d91249657e08a19727181"
+              },
+              "supporting_matches": []
+            },
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: SINK_NOT_FIRED; final_verdict=UNCERTAIN."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        },
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:ba481a93c647be29:01",
+          "flow": {
+            "flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:ba481a93c647be29:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "ba481a93c647be29f59aa19d0d8f540bf02d2fca978ebe8a37f405d66bdba451",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L48",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "chrome.storage.sync.set",
+              "file": "content_scripts.js",
+              "loc": "L87",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": false,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_chrome_r3_user_manual",
+                  "source": "Manual",
+                  "kind": "doublex_chrome_r3_user_manual",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证：Flow 0、2 为 TP，页面消息可写/读扩展 sync storage；Flow 1 为 FP，fetch 路径未形成可控提升。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\eljapbgkmlngdpckoiiibecpemleclhh_8.0.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "report_sha256": "483685804075b83c27bfaae2b38deb5dd457efe78b8b6356b89303ccaa632021"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow Verification: Fonts Ninja `WINDOW_MESSAGE_EVENT` → `chrome.storage.sync.set`\n\n### Evidence obtained\n\nThe reported file `content_scripts.js` is the source-map name for the actual bundle `contentScript.bundle.js` (single minified line). I extracted the exact minified range containing both the source listener and the storage sink.\n\nThe content script contains this top-level listener (columns 0–3000 of line 1):\n\n```js\nwindow.addEventListener(\"message\",(t=>{\n  if(t.data){\n    const o=t.data.message?t.data.message:t.data;\n    ...\n    \"save_storage\"===o.type&&((e,n,t)=>{\n      chrome.storage.sync.get(e,(s=>{\n        const o=s&&s[e]?s[e]:{};\n        n.forEach(((e,n)=>{o[e]=t[n]})),\n        chrome.storage.sync.set({[e]:o})\n      }))\n    })(o.key,o.attributes,o.values),\n    ...\n  }\n  var s\n}));\n```\n\n### Four-part decision ledger\n\n**(a) Who controls the source?**  \nThe page does. `window.addEventListener(\"message\", ...)` reads `t.data` directly from any `window.postMessage`. There is **no** `event.source`, `event.origin`, or `sender.id` check. The manifest injects `contentScript.bundle.js` into `http://*/*` and `https://*/*` with `allFrames: true`, so any website (or an iframe on any ",
+              "path": "extensions/eljapbgkmlngdpckoiiibecpemleclhh_8.0.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "SINK_NOT_FIRED",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.85,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 4,
+              "reasoning": "A message reached the background (some instrumented sink fired), but the exact static sink did not execute under any contract candidate — a real rebuttal of the static routing.",
+              "path": "extensions/eljapbgkmlngdpckoiiibecpemleclhh_8.0.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T05:03:28.414062Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "doublex_chrome_r3_user_manual",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-24T02:22:09.900918Z",
+                "notes": "人工验证：Flow 0、2 为 TP，页面消息可写/读扩展 sync storage；Flow 1 为 FP，fetch 路径未形成可控提升。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\eljapbgkmlngdpckoiiibecpemleclhh_8.0.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\eljapbgkmlngdpckoiiibecpemleclhh_8.0.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-24T02:22:09.900918Z",
+                  "sha256": "483685804075b83c27bfaae2b38deb5dd457efe78b8b6356b89303ccaa632021"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: SINK_NOT_FIRED; final_verdict=UNCERTAIN.",
+              "DoubleX Chrome r3 manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "partial_tool_failure",
+        "dataset_version": "8.0.4",
+        "latest_version": "9.0.3",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eljapbgkmlngdpckoiiibecpemleclhh_9.0.3\\eljapbgkmlngdpckoiiibecpemleclhh.9.0.3.crx",
+        "tool_assessments": [
+          {
+            "tool": "CoCo",
+            "original_source_flow_id": "coco:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:e26e0cb5ba9164a0:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_SYNC_STORAGE",
+            "revalidation_job_key": "chrome__eljapbgkmlngdpckoiiibecpemleclhh__9.0.3__CoCo",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eljapbgkmlngdpckoiiibecpemleclhh_9.0.3\\revalidation\\CoCo\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eljapbgkmlngdpckoiiibecpemleclhh_9.0.3\\revalidation\\CoCo\\attempt-01\\report.flows.json",
+            "duration_seconds": 1.578,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "disappeared",
+            "comparison": "no_exact_source_and_sink_api_pair",
+            "candidate_match_count": 0,
+            "same_source_candidates": [],
+            "same_sink_candidates": [],
+            "tool_report_flow_count": 0,
+            "source_review_required": true,
+            "interpretation": "The original source/sink pair was not reported in the successful rerun; this alone does not prove a security fix."
+          },
+          {
+            "tool": "DoubleX",
+            "original_source_flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:ba481a93c647be29:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_SYNC_STORAGE",
+            "revalidation_job_key": "chrome__eljapbgkmlngdpckoiiibecpemleclhh__9.0.3__DoubleX",
+            "run_status": "timeout",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eljapbgkmlngdpckoiiibecpemleclhh_9.0.3\\revalidation\\DoubleX\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eljapbgkmlngdpckoiiibecpemleclhh_9.0.3\\revalidation\\DoubleX\\attempt-01\\report.flows.json",
+            "duration_seconds": 600.11,
+            "error": null,
+            "tool_summary_status": null,
+            "outcome": "tool_failure",
+            "reason": "The original tool did not complete successfully with a valid flow report."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "mixed_or_inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_no_matching_candidate",
+            "basis": "No same-source/sink candidate was available in the successful new report; source absence is not proof of a fix.",
+            "candidate_count": 0,
+            "tool": "CoCo",
+            "original_flow_id": "coco:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:e26e0cb5ba9164a0:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          },
+          {
+            "status": "not_reviewable_tool_failure",
+            "basis": "The reporting tool did not produce a completed report that can identify the original Flow.",
+            "candidate_count": 0,
+            "tool": "DoubleX",
+            "original_flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:ba481a93c647be29:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-cca5c5198308e40a",
+      "verification": "TP",
+      "source_family": "storage",
+      "sink_family": "WINDOW_POSTMESSAGE",
+      "matched_tools": [
+        "CoCo",
+        "DoubleX"
+      ],
+      "match_region": "CoCo + DoubleX",
+      "match_basis": "explicit_reuse_and_normalized_signature",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:4c9e4668eca359a9:01",
+          "flow": {
+            "flow_id": "coco:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:4c9e4668eca359a9:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "4c9e4668eca359a97cd6cc0797e2c056d3da5953d000f1adb086588a20867f89",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "DATA_LEAK",
+            "rule_id": "coco-data_leak",
+            "severity": "HIGH",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "CoCo source evidence",
+              "file": "crx_headers/cs_header.js",
+              "loc": "L142:C1 -> L142:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "crx_headers/cs_header.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "CoCo sink evidence",
+              "file": "contentScript.bundle.js",
+              "loc": "L1:C1 -> L1:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": true,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Reused/DoubleX"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_reused_doublex",
+                  "source": "Reused/DoubleX",
+                  "kind": "coco_reused_doublex",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "Reused DoubleX F003 (flow_index=2) via source_type_normalized_sink_type_exact/all_candidates_agree.",
+                  "reused_flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:6253f10d6e618527:01",
+                  "package_sha256": "d672aa9d333b8638c7244a080904df9d5f067f99343dd6aa95bf61711fb9da05"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "reused_confirmation_match",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 2,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #2 — DATA_LEAK (storage `machineId` → page `postMessage`)\n\n### 1. Who controls the source\nThe source is `chrome.storage.sync` data — specifically a JSON object containing `machineId` (and possibly `authToken`) read with `chrome.storage.sync.get(s)`. The **value** is extension-persisted sensitive data (a legacy Fonts Ninja user/install identifier), not attacker-supplied. The **read trigger and the storage key** are page-controlled: the content script assigns `s = o.key` from an arbitrary `window.postMessage` payload.\n\n### 2. Exact source-to-sink path (confirmed in raw source)\nFrom `contentScript.bundle.js` (single minified line, reproduced by `read_minified_range`):\n\n```js\nwindow.addEventListener(\"message\", t => {\n  if (t.data) {\n    const o = t.data.message ? t.data.message : t.data;\n    ...\n    \"get_machine_id\" === o.type && o.key &&\n      (s = o.key,\n       chrome.storage.sync.get(s, e => {\n         const n = e && e[s] && JSON.parse(e[s]),           // <- propagation step 1\n               t = n && n.machineId.replaceAll('\"', \"\"),    // <- propagation step 2 / sink arg\n               o = n && n.authToken && JSON.parse(n.authToken).email;\n         if (t)\n   ",
+              "path": "extensions/eljapbgkmlngdpckoiiibecpemleclhh_8.0.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.45,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 4,
+              "reasoning": "已按源码契约（含跨 message 分发的判别字段/值）重放最小候选输入，但没有任何 instrumented sink 记录到调用。",
+              "path": "extensions/eljapbgkmlngdpckoiiibecpemleclhh_8.0.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T04:52:14.139063Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": {
+              "source_dataset": "DoubleX",
+              "extension_key": "eljapbgkmlngdpckoiiibecpemleclhh@8.0.4",
+              "flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:6253f10d6e618527:01",
+              "flow_index": 2,
+              "flow_label": "F003",
+              "verification": "TP",
+              "verification_source": [
+                "Manual"
+              ],
+              "match_mode": "source_type_normalized_sink_type_exact",
+              "match_reason": "all_candidates_agree",
+              "source_type": "STORAGE_ALL_ITEMS",
+              "source_loc": "L57",
+              "source_file": "content_scripts.js",
+              "sink_type": "WINDOW_POSTMESSAGE",
+              "sink_loc": "L68",
+              "sink_file": "content_scripts.js",
+              "package_evidence": {
+                "same_package": true,
+                "same_crx": true,
+                "same_manifest": true,
+                "same_source_manifest": true,
+                "coco_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\eljapbgkmlngdpckoiiibecpemleclhh_8.0.4\\crx\\eljapbgkmlngdpckoiiibecpemleclhh.8.0.4.crx",
+                "external_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\eljapbgkmlngdpckoiiibecpemleclhh_8.0.4\\crx\\8.0.4\\eljapbgkmlngdpckoiiibecpemleclhh.8.0.4.crx",
+                "coco_package_sha256": "d672aa9d333b8638c7244a080904df9d5f067f99343dd6aa95bf61711fb9da05",
+                "external_package_sha256": "d672aa9d333b8638c7244a080904df9d5f067f99343dd6aa95bf61711fb9da05",
+                "coco_manifest_sha256": "c671217a09d392b9ab7cbdcd0457936dc458e95df2ca3925ff0a4e607b29766f",
+                "external_manifest_sha256": "c671217a09d392b9ab7cbdcd0457936dc458e95df2ca3925ff0a4e607b29766f",
+                "coco_source_manifest_sha256": "e914c2feceb94beac1bb9a60a3bbaa878185f0c2e18d91249657e08a19727181",
+                "external_source_manifest_sha256": "e914c2feceb94beac1bb9a60a3bbaa878185f0c2e18d91249657e08a19727181"
+              },
+              "supporting_matches": []
+            },
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        },
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:6253f10d6e618527:01",
+          "flow": {
+            "flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:6253f10d6e618527:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "semantic_sha256": "6253f10d6e61852775fa9ec22debeeaee972b09c0bc7ab52bc05ce5bd535bcfa",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "DATA_LEAK",
+            "rule_id": "doublex-sensitive-api-egress",
+            "severity": "HIGH",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "chrome.storage.sync.get",
+              "file": "content_scripts.js",
+              "loc": "L57",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "{\n\t\t\t\t\t\t\t\t\ttype: \"send_machine_id\",\n\t\t\t\t\t\t\t\t\tmachineId: t\n\t\t\t\t\t\t\t\t}",
+              "file": "content_scripts.js",
+              "loc": "L68",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "Sensitive extension data is returned to a web-accessible channel."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_chrome_r3_user_manual",
+                  "source": "Manual",
+                  "kind": "doublex_chrome_r3_user_manual",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证：Flow 0、2 为 TP，页面消息可写/读扩展 sync storage；Flow 1 为 FP，fetch 路径未形成可控提升。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\eljapbgkmlngdpckoiiibecpemleclhh_8.0.4\\dynamic\\evidence\\flow-2\\manual\\manual_validation.json",
+                  "report_sha256": "406b9253be3ec1463a07e5fa95d865bcb5f6974e73a154c813c96e555b1ca630"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "UNCERTAIN",
+              "confidence": 0,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Verification error: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+              "path": "extensions/eljapbgkmlngdpckoiiibecpemleclhh_8.0.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "SINK_NOT_FIRED",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.85,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 4,
+              "reasoning": "A message reached the background (some instrumented sink fired), but the exact static sink did not execute under any contract candidate — a real rebuttal of the static routing.",
+              "path": "extensions/eljapbgkmlngdpckoiiibecpemleclhh_8.0.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T05:03:28.414062Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "doublex_chrome_r3_user_manual",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-24T02:22:09.900918Z",
+                "notes": "人工验证：Flow 0、2 为 TP，页面消息可写/读扩展 sync storage；Flow 1 为 FP，fetch 路径未形成可控提升。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\eljapbgkmlngdpckoiiibecpemleclhh_8.0.4\\dynamic\\evidence\\flow-2\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\eljapbgkmlngdpckoiiibecpemleclhh_8.0.4\\dynamic\\evidence\\flow-2\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-24T02:22:09.900918Z",
+                  "sha256": "406b9253be3ec1463a07e5fa95d865bcb5f6974e73a154c813c96e555b1ca630"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: UNCERTAIN (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: SINK_NOT_FIRED; final_verdict=UNCERTAIN.",
+              "DoubleX Chrome r3 manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "partial_tool_failure",
+        "dataset_version": "8.0.4",
+        "latest_version": "9.0.3",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eljapbgkmlngdpckoiiibecpemleclhh_9.0.3\\eljapbgkmlngdpckoiiibecpemleclhh.9.0.3.crx",
+        "tool_assessments": [
+          {
+            "tool": "CoCo",
+            "original_source_flow_id": "coco:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:4c9e4668eca359a9:01",
+            "original_source_type": "STORAGE_ALL_ITEMS",
+            "original_sink_type": "WINDOW_POSTMESSAGE",
+            "revalidation_job_key": "chrome__eljapbgkmlngdpckoiiibecpemleclhh__9.0.3__CoCo",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eljapbgkmlngdpckoiiibecpemleclhh_9.0.3\\revalidation\\CoCo\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eljapbgkmlngdpckoiiibecpemleclhh_9.0.3\\revalidation\\CoCo\\attempt-01\\report.flows.json",
+            "duration_seconds": 1.578,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "disappeared",
+            "comparison": "no_exact_source_and_sink_api_pair",
+            "candidate_match_count": 0,
+            "same_source_candidates": [],
+            "same_sink_candidates": [],
+            "tool_report_flow_count": 0,
+            "source_review_required": true,
+            "interpretation": "The original source/sink pair was not reported in the successful rerun; this alone does not prove a security fix."
+          },
+          {
+            "tool": "DoubleX",
+            "original_source_flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:6253f10d6e618527:01",
+            "original_source_type": "STORAGE_ALL_ITEMS",
+            "original_sink_type": "WINDOW_POSTMESSAGE",
+            "revalidation_job_key": "chrome__eljapbgkmlngdpckoiiibecpemleclhh__9.0.3__DoubleX",
+            "run_status": "timeout",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eljapbgkmlngdpckoiiibecpemleclhh_9.0.3\\revalidation\\DoubleX\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eljapbgkmlngdpckoiiibecpemleclhh_9.0.3\\revalidation\\DoubleX\\attempt-01\\report.flows.json",
+            "duration_seconds": 600.11,
+            "error": null,
+            "tool_summary_status": null,
+            "outcome": "tool_failure",
+            "reason": "The original tool did not complete successfully with a valid flow report."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "mixed_or_inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_no_matching_candidate",
+            "basis": "No same-source/sink candidate was available in the successful new report; source absence is not proof of a fix.",
+            "candidate_count": 0,
+            "tool": "CoCo",
+            "original_flow_id": "coco:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:4c9e4668eca359a9:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          },
+          {
+            "status": "not_reviewable_tool_failure",
+            "basis": "The reporting tool did not produce a completed report that can identify the original Flow.",
+            "candidate_count": 0,
+            "tool": "DoubleX",
+            "original_flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:6253f10d6e618527:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-dbf765434bb4f3cd",
+      "verification": "TP",
+      "source_family": "storage",
+      "sink_family": "WINDOW_POSTMESSAGE",
+      "matched_tools": [
+        "CoCo"
+      ],
+      "match_region": "CoCo only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:1938a6e328ff8444:01",
+          "flow": {
+            "flow_id": "coco:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:1938a6e328ff8444:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "semantic_sha256": "1938a6e328ff844437d411cc7c6e035bedb8011dd0e601f431ea75c3e9c0ff69",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "DATA_LEAK",
+            "rule_id": "coco-data_leak",
+            "severity": "HIGH",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "CoCo source evidence",
+              "file": "crx_headers/cs_header.js",
+              "loc": "L142:C1 -> L142:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "crx_headers/cs_header.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "CoCo sink evidence",
+              "file": "crx_headers/cs_header.js",
+              "loc": "L142:C1 -> L142:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": true,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Reused/DoubleX"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_reused_doublex",
+                  "source": "Reused/DoubleX",
+                  "kind": "coco_reused_doublex",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "Reused DoubleX F003 (flow_index=2) via source_type_normalized_sink_type_exact/all_candidates_agree.",
+                  "reused_flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:6253f10d6e618527:01",
+                  "package_sha256": "d672aa9d333b8638c7244a080904df9d5f067f99343dd6aa95bf61711fb9da05"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "reused_confirmation_match",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 3,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've reconstructed the actual flow from the real content-script bundle. The report's file name (`crx_headers/cs_header.js`) is unresolved/mangled, but the concrete code path it flags exists verbatim in `contentScript.bundle.js`.\n\n## Four-part decision ledger\n\n**(a) Who controls the source?**\nThe \"source\" is `chrome.storage.sync` extension data (`SENSITIVE_DATA`). The read is triggered by the *page*: the content script registers a `window.addEventListener(\"message\", …)` listener with **no origin/context check** and handles `{type:\"get_storage\", key: <attacker-chosen key>}`. Any webpage the content script runs on can choose the storage key and receive the value.\n\n**(b) Source-to-sink path**\n```js\n\"get_storage\"===o.type && o.key &&\n  (e => {\n    chrome.storage.sync.get(e, n => {\n      const t = n && n[e];\n      window.postMessage({type:\"send_storage\", storage:t})   // ← sink\n    })\n  })(o.key)\n```\n`o` is `t.data.message ? t.data.message : t.data` from the incoming page `postMessage`. Path: page message → `o.key` → `chrome.storage.sync.get(key)` → callback value → `window.postMessage({storage: value})`. Unbroken, single context (content script).\n\n**(c) Security-relevant argument**\nThe ",
+              "path": "extensions/eljapbgkmlngdpckoiiibecpemleclhh_8.0.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "SINK_NOT_FIRED",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.85,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 4,
+              "reasoning": "A message reached the background (some instrumented sink fired), but the exact static sink did not execute under any contract candidate — a real rebuttal of the static routing.",
+              "path": "extensions/eljapbgkmlngdpckoiiibecpemleclhh_8.0.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T04:52:14.139063Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": {
+              "source_dataset": "DoubleX",
+              "extension_key": "eljapbgkmlngdpckoiiibecpemleclhh@8.0.4",
+              "flow_id": "doublex:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:6253f10d6e618527:01",
+              "flow_index": 2,
+              "flow_label": "F003",
+              "verification": "TP",
+              "verification_source": [
+                "Manual"
+              ],
+              "match_mode": "source_type_normalized_sink_type_exact",
+              "match_reason": "all_candidates_agree",
+              "source_type": "STORAGE_ALL_ITEMS",
+              "source_loc": "L57",
+              "source_file": "content_scripts.js",
+              "sink_type": "WINDOW_POSTMESSAGE",
+              "sink_loc": "L68",
+              "sink_file": "content_scripts.js",
+              "package_evidence": {
+                "same_package": true,
+                "same_crx": true,
+                "same_manifest": true,
+                "same_source_manifest": true,
+                "coco_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\eljapbgkmlngdpckoiiibecpemleclhh_8.0.4\\crx\\eljapbgkmlngdpckoiiibecpemleclhh.8.0.4.crx",
+                "external_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\eljapbgkmlngdpckoiiibecpemleclhh_8.0.4\\crx\\8.0.4\\eljapbgkmlngdpckoiiibecpemleclhh.8.0.4.crx",
+                "coco_package_sha256": "d672aa9d333b8638c7244a080904df9d5f067f99343dd6aa95bf61711fb9da05",
+                "external_package_sha256": "d672aa9d333b8638c7244a080904df9d5f067f99343dd6aa95bf61711fb9da05",
+                "coco_manifest_sha256": "c671217a09d392b9ab7cbdcd0457936dc458e95df2ca3925ff0a4e607b29766f",
+                "external_manifest_sha256": "c671217a09d392b9ab7cbdcd0457936dc458e95df2ca3925ff0a4e607b29766f",
+                "coco_source_manifest_sha256": "e914c2feceb94beac1bb9a60a3bbaa878185f0c2e18d91249657e08a19727181",
+                "external_source_manifest_sha256": "e914c2feceb94beac1bb9a60a3bbaa878185f0c2e18d91249657e08a19727181"
+              },
+              "supporting_matches": []
+            },
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: SINK_NOT_FIRED; final_verdict=UNCERTAIN."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "disappeared",
+        "dataset_version": "8.0.4",
+        "latest_version": "9.0.3",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eljapbgkmlngdpckoiiibecpemleclhh_9.0.3\\eljapbgkmlngdpckoiiibecpemleclhh.9.0.3.crx",
+        "tool_assessments": [
+          {
+            "tool": "CoCo",
+            "original_source_flow_id": "coco:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:1938a6e328ff8444:01",
+            "original_source_type": "STORAGE_ALL_ITEMS",
+            "original_sink_type": "WINDOW_POSTMESSAGE",
+            "revalidation_job_key": "chrome__eljapbgkmlngdpckoiiibecpemleclhh__9.0.3__CoCo",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eljapbgkmlngdpckoiiibecpemleclhh_9.0.3\\revalidation\\CoCo\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eljapbgkmlngdpckoiiibecpemleclhh_9.0.3\\revalidation\\CoCo\\attempt-01\\report.flows.json",
+            "duration_seconds": 1.578,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "disappeared",
+            "comparison": "no_exact_source_and_sink_api_pair",
+            "candidate_match_count": 0,
+            "same_source_candidates": [],
+            "same_sink_candidates": [],
+            "tool_report_flow_count": 0,
+            "source_review_required": true,
+            "interpretation": "The original source/sink pair was not reported in the successful rerun; this alone does not prove a security fix."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_no_matching_candidate",
+            "basis": "No same-source/sink candidate was available in the successful new report; source absence is not proof of a fix.",
+            "candidate_count": 0,
+            "tool": "CoCo",
+            "original_flow_id": "coco:chrome:eljapbgkmlngdpckoiiibecpemleclhh:8.0.4:1938a6e328ff8444:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

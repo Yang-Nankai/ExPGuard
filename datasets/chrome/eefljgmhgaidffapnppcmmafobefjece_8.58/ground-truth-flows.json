@@ -1,0 +1,194 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "eefljgmhgaidffapnppcmmafobefjece",
+  "version": "8.58",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-8faf958c7707295d",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "DoubleX"
+      ],
+      "match_region": "DoubleX only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:eefljgmhgaidffapnppcmmafobefjece:8.58:9d818da808ec9c59:01",
+          "flow": {
+            "flow_id": "doublex:chrome:eefljgmhgaidffapnppcmmafobefjece:8.58:9d818da808ec9c59:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "9d818da808ec9c59a9bacf3dd36cb00df00510bfc966dbbf0894b35d5617c5ef",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "background.js",
+              "loc": "L318",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "BACKGROUND",
+              "origin_context": "background.js",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "chrome.storage.local.set",
+              "file": "background.js",
+              "loc": "L273",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": false,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_chrome_r3_user_manual",
+                  "source": "Manual",
+                  "kind": "doublex_chrome_r3_user_manual",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证为 TP：允许来源页面可经 TITANS_LOGIN 伪造扩展登录和 token 状态。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\eefljgmhgaidffapnppcmmafobefjece_8.58\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "report_sha256": "b5756e2a1b49413e4d4a6fad9c20804c186db2baadf94c6a06859d1e78a35e08"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification: STORAGE_POSOING (`background.js` external message → `chrome.storage.local.set`)\n\n### Decision ledger\n\n**(a) Who controls the source?**\nThe normalized report labels the source `WINDOW_MESSAGE_EVENT` at `background.js:318`, but there is no `window`/`onmessage` listener in this MV3 service worker. The actual reachable source is:\n\n```js\nchrome.runtime.onMessageExternal.addListener(\n  (request, sender, sendResponse) => {\n    chromeExternalMessage(request, sendResponse);\n  }\n);\n```\n\n`onMessageExternal` receives messages from any page matching the manifest's `externally_connectable.matches`, which is `*://*.selfpublishingtitans.com/*`. `request` is attacker/web-controlled from those origins (with an XSS prerequisite on that domain — see below).\n\n**(b) Source-to-sink path**\n`onMessageExternal` → `chromeExternalMessage(request)`:\n\n```js\nconst chromeExternalMessage = (message, sendResponse) => {\n  const type = message.type;\n  const payload = message.payload;\n  switch (type) {\n    case \"TITANS_LOGIN\":\n      chrome.storage.local.set(\n        {\n          userStatus: true,\n          userInfo: payload.user,   // attacker-controlled\n          token: payload.token,     // atta",
+              "path": "extensions/eefljgmhgaidffapnppcmmafobefjece_8.58/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/eefljgmhgaidffapnppcmmafobefjece_8.58/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T16:30:16.132615Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "doublex_chrome_r3_user_manual",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-24T02:22:09.900918Z",
+                "notes": "人工验证为 TP：允许来源页面可经 TITANS_LOGIN 伪造扩展登录和 token 状态。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\eefljgmhgaidffapnppcmmafobefjece_8.58\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\eefljgmhgaidffapnppcmmafobefjece_8.58\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-24T02:22:09.900918Z",
+                  "sha256": "b5756e2a1b49413e4d4a6fad9c20804c186db2baadf94c6a06859d1e78a35e08"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "DoubleX Chrome r3 manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "tool_failure",
+        "dataset_version": "8.58",
+        "latest_version": "8.60",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eefljgmhgaidffapnppcmmafobefjece_8.60\\eefljgmhgaidffapnppcmmafobefjece.8.60.crx",
+        "tool_assessments": [
+          {
+            "tool": "DoubleX",
+            "original_source_flow_id": "doublex:chrome:eefljgmhgaidffapnppcmmafobefjece:8.58:9d818da808ec9c59:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "chrome__eefljgmhgaidffapnppcmmafobefjece__8.60__DoubleX",
+            "run_status": "failed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eefljgmhgaidffapnppcmmafobefjece_8.60\\revalidation\\DoubleX\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\eefljgmhgaidffapnppcmmafobefjece_8.60\\revalidation\\DoubleX\\attempt-01\\report.flows.json",
+            "duration_seconds": 11.109,
+            "error": "Tool summary status was 'partial'; analysis did not fully succeed.",
+            "tool_summary_status": "partial",
+            "outcome": "tool_failure",
+            "reason": "The original tool did not complete successfully with a valid flow report."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "not_reviewable_tool_failure",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "not_reviewable_tool_failure",
+            "basis": "The reporting tool did not produce a completed report that can identify the original Flow.",
+            "candidate_count": 1,
+            "tool": "DoubleX",
+            "original_flow_id": "doublex:chrome:eefljgmhgaidffapnppcmmafobefjece:8.58:9d818da808ec9c59:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

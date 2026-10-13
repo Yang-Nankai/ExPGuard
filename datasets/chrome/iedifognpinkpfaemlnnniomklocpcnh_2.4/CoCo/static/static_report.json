@@ -1,0 +1,189 @@
+{
+  "extension_id": "iedifognpinkpfaemlnnniomklocpcnh",
+  "extension_version": "2.4",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 2,
+  "verified_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've located the exact code in the minified `js/background.js`. Let me summarize the analysis.\n\n## (a) Who controls the source\n\nThe listener is `chrome.runtime.onMessageExternal.addListener(async(t,e,n)=>{var i,o,r=t.payload; ...})`. This fires for messages from any origin allowed by `externally_connectable.matches: [\"https://*.app-sorteos.com/*\"]`.\n\n- The handler destructures `r = t.payload` and, in the `\"comments\"` branch, does `t = r`, then reads `t.media_id` and `t.min_id`.\n- There is **no `sender.id` check and no `sender.url`/`sender.origin` check** anywhere in the handler; `e` (the sender) is never inspected.\n- The `t.type === \"comments\"` check is an attacker-chosen message field, not a trust anchor.\n\nSo the source is genuinely attacker-controllable (a page on `*.app-sorteos.com`, or any XSS on that domain, can send a crafted message). The specific-host externally_connectable reduces scope but does not eliminate it.\n\n## (b) Source-to-sink path\n\nThe exact code (minified, `js/background.js:1`, columns ~1900-2100):\n\n```js\nt && \"comments\" === t.type) {\n  t = r; var a = n;\n  let e = \"https://www.instagram.com/api/v1/media/\" + t.media_id + \"/comments/?can_support_threading=true&per",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "CoCo reported cross-boundary flow; verify with source",
+      "report_evidence": {
+        "tool": "coco",
+        "sourceCapability": "ATTACKER_INPUT",
+        "sinkCapability": "NETWORK_SEND",
+        "flowMeta": {
+          "totalSteps": 4,
+          "omitted": 0
+        },
+        "propagation": "t.media_id | e=\"https://www.instagram.com/api/v1/media/\"+t.media_id+\"/comments/?can_support_threading=true&permalink_enabled=false\""
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/background.js",
+          "reportedLoc": "L1:C1 -> L1:C1",
+          "resolvedFile": "js/background.js",
+          "resolved": true,
+          "snippet": "L1 C1-1: var EXTID=\"iedifognpinkpfaemlnnniomklocpcnh\",ISPROD=chrome.runtime.id===EXTID;!fu…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js/background.js",
+          "reportedLoc": "L1:C1 -> L1:C1",
+          "resolvedFile": "js/background.js",
+          "resolved": true,
+          "snippet": "L1 C1-1: var EXTID=\"iedifognpinkpfaemlnnniomklocpcnh\",ISPROD=chrome.runtime.id===EXTID;!fu…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://*.app-sorteos.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Ledger\n\n**(a) Who controls the source?**\nThe reported source is `FETCH_RESPONSE` at `crx_headers/bg_header.js L12:C1`, with code context literally:\n```js\nresponseText = 'data_from_fetch'\n```\nThat is a hard-coded string literal (`'data_from_fetch'`), not a `fetch(...)`/`xhr` response object. `list_files()` confirms the extension contains **no `crx_headers/` directory and no `bg_header.js`** — the real background file is `js/background.js`. Both harness warnings corroborate this: *\"Source report file could not be resolved in the unpacked CRX/XPI\"* and *\"Sink report file could not be resolved.\"*\n\n**(b) Source-to-sink path**\nThe propagation evidence contains a single step (source == sink, `L12:C1 -> L12:C1`) with the same placeholder assignment on both ends and no cross-context HOP. There is no demonstrated data movement from a network response into a message response. `get_propagation()` returns the identical placeholder, confirming the report did not resolve a real path.\n\n**(c) Security-relevant argument**\nThe sink `CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE` is a `MESSAGE_RESPONSE` capability, not a `PRIVILEGED_OPERATION`; and even the tainted span (`'data_from_fe",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "CoCo reported cross-boundary flow; verify with source",
+      "report_evidence": {
+        "tool": "coco",
+        "sourceCapability": "NETWORK_RESPONSE",
+        "sinkCapability": "MESSAGE_RESPONSE",
+        "flowMeta": {
+          "totalSteps": 1,
+          "omitted": 0
+        },
+        "propagation": ""
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "crx_headers/bg_header.js",
+          "reportedLoc": "L12:C1 -> L12:C1",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "crx_headers/bg_header.js",
+          "reportedLoc": "L12:C1 -> L12:C1",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://*.app-sorteos.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "NEEDS_SEMANTIC_CLASSIFICATION",
+          "rule": "Inspect the invoked API and the precise tainted argument before assigning a security label."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "Source report file could not be resolved in the unpacked CRX/XPI.",
+          "Sink report file could not be resolved in the unpacked CRX/XPI."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "NETWORK_RESPONSE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 2 flow(s): 1 true-positive, 1 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 1 flagged triggerable for dynamic testing."
+}

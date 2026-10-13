@@ -1,0 +1,197 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "bfbameneiokkgbdmiekhjnmfkcnldhhm",
+  "version": "3.0.1",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-851b4be4e5471f84",
+      "verification": "TP",
+      "source_family": "DOCUMENT_URL",
+      "sink_family": "CHROME_HISTORY_ADD_URL",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:bfbameneiokkgbdmiekhjnmfkcnldhhm:3.0.1:456184b14e33bedb:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:bfbameneiokkgbdmiekhjnmfkcnldhhm:3.0.1:456184b14e33bedb:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "456184b14e33bedbf1bfcb986e615b7655192c6300a8d70353f955b1338aa04c",
+            "identity_occurrence": 1,
+            "source_report_id": 9,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "web-content-privileged-operation",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "DOCUMENT_URL",
+              "remark": "document.documentURI",
+              "file": "content/content",
+              "loc": "L1421:C6 -> L1421:C29",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content/content",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_HISTORY_ADD_URL",
+              "remark": "",
+              "file": "overlay/js/overlay",
+              "loc": "L2287:C2 -> L2287:C38",
+              "frame": "POPUP_1",
+              "frames": [
+                {
+                  "id": "POPUP_1",
+                  "family": "EX"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content/content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 0.85,
+                  "detail": "semanticFixture=true originalUiTriggerNotClaimed=true directCallResult=called semanticFixture=true"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 9,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Decision ledger **(a) Who controls the source.** The taint originates in the content script `content/content.js`, which runs on `<all_urls>` (`world: ISOLATED`, `runAt` default). The operative value reaching the sink is the page's own DOM: `getLinks()` iterates `contentDocument.links` and pushes `documentAllLinks[j].href` into the response (`content/content.js:2127,2136,2152`), plus `document.documentURI` (`L2121/L2130`). A malicious page fully controls its anchors' `href` values; the…",
+              "path": "extensions/bfbameneiokkgbdmiekhjnmfkcnldhhm_3.0.1/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "NOT_REPRODUCED",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.45,
+              "reproduced": false,
+              "basis": "runtime_not_reproduced",
+              "usable_for_label": true,
+              "evidence_stage": "ENVIRONMENT_READY",
+              "evidence_artifact_count": 6,
+              "reasoning": "DOM source replay and observer completed, but the exact sink did not record the controlled marker. This is a runtime non-reproduction after an actual attempt, not NOT_ATTEMPTED.",
+              "path": "extensions/bfbameneiokkgbdmiekhjnmfkcnldhhm_3.0.1/dynamic/dynamic_report.json",
+              "report_mtime": "2026-09-19T09:12:27.561Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/bfbameneiokkgbdmiekhjnmfkcnldhhm/3.0.1/dynamic-evidence/flow-0",
+              "files": [
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "step-final-state.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Request timed out.",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "UNCERTAIN",
+              "dynamic_outcome_snapshot": "NOT_ATTEMPTED",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/bfbameneiokkgbdmiekhjnmfkcnldhhm_3.0.1/final/final_report.json",
+              "report_mtime": "2026-08-18T03:38:29.951Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.85,
+                "confirmed_at": "2026-09-21T07:02:41.0895143Z",
+                "notes": "semanticFixture=true originalUiTriggerNotClaimed=true directCallResult=called semanticFixture=true",
+                "report_path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/dynamic-fix-audit/final75/web-developer/dynamic_report.json",
+                "report_artifact": {
+                  "path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/dynamic-fix-audit/final75/web-developer/dynamic_report.json",
+                  "kind": "dynamic_report.json",
+                  "mtime": "2026-09-21T07:02:41.09Z",
+                  "entry": {
+                    "outcome": "CONFIRMED",
+                    "final_verdict": "TRUE_POSITIVE",
+                    "verdict": null,
+                    "confidence": 0.85,
+                    "reproduced": true
+                  }
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": {
+              "static_verdict": {
+                "flow_summary": "UNCERTAIN",
+                "current_report": "TRUE_POSITIVE"
+              },
+              "dynamic_outcome": {
+                "flow_summary": "NOT_ATTEMPTED",
+                "current_report": "NOT_REPRODUCED"
+              }
+            },
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "3.0.1",
+        "latest_version": "3.0.1",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

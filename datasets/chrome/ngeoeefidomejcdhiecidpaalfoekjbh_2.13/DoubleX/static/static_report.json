@@ -1,0 +1,92 @@
+{
+  "extension_id": "ngeoeefidomejcdhiecidpaalfoekjbh",
+  "extension_version": "2.13",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow Verification — STORAGE_POSOING\n\n### What the report claims vs. what the source shows\n\nThe normalized flow labels the source as `WINDOW_MESSAGE_EVENT` at `background.js:318` with `codeContext: \"request\"`, and the sink as `chrome.storage.local.set({'tier':'request.payload','username':'request.payload'}, …)` at `background.js:336`.\n\nThe literal line anchors are **stale/mismatched** in the current bundle:\n\n- `L318` is `.then(profile => {` inside `fetchUserProfile`, not a message listener.\n- `L336` is `chrome.storage.local.set({ tier: data.tier })` where `data` is the backend response to the Google-auth fetch — not attacker message data.\n\nHowever, the sink `codeContext` (`request.payload` → `tier` / `username`) unambiguously identifies the real code the finding is pointing at:\n\n```js\n// background.js:259-269\nchrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {\n  if (request.type === \"SYNC_AUTH\") {\n    const { authToken, authExp, userEmail, tier, username } = request.payload;\n    if (authToken && authExp && userEmail) {\n      const updateData = { authToken, authExp, userEmail };\n      if (tier) updateData.tier = tier;\n      if (username) updateData.us",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": null,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "DoubleX matched external input to a sensitive API parameter.",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L318",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L336",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://guidera.tilantra.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

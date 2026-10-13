@@ -1,0 +1,161 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "jgphnjokjhjlcnnajmfjlacjnjkhleah",
+  "version": "5.17.3",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-8d558c0903c5b362",
+      "verification": "TP",
+      "source_family": "ELEMENT_TEXT_CONTENT",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "CoCo"
+      ],
+      "match_region": "CoCo only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:jgphnjokjhjlcnnajmfjlacjnjkhleah:5.17.3:3d2c439b70deed89:01",
+          "flow": {
+            "flow_id": "coco:chrome:jgphnjokjhjlcnnajmfjlacjnjkhleah:5.17.3:3d2c439b70deed89:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "3d2c439b70deed893901ecfc8354a162cac4620be9c036db8ed802f017ea2467",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "coco-storage_posoing",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "ELEMENT_TEXT_CONTENT",
+              "remark": "CoCo source evidence",
+              "file": "crx_headers/jquery_header.js",
+              "loc": "L27:C1 -> L27:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "crx_headers/jquery_header.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "CoCo sink evidence",
+              "file": "js/main.js",
+              "loc": "L247:C1 -> L247:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_chrome_user_manual_r2",
+                  "source": "Manual",
+                  "kind": "coco_chrome_user_manual_r2",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证为 TP：页面 Cookie 和 DOM 用户信息可写入扩展 local storage。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\jgphnjokjhjlcnnajmfjlacjnjkhleah_5.17.3\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "report_sha256": "51463d6fd8b5e4d09ac812013c38e888955adf299bdda7ffffc2c12b40f4f9d0"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification: Flow #1 (ELEMENT_TEXT_CONTENT → CHROME_LOCAL_STORAGE)\n\n### 1. Source control (a)\nThe reported source anchor is **spurious**: `crx_headers/jquery_header.js L27 ... new Object()` does not exist in the unpacked CRX (`list_files()` shows no such file; it's a synthetic header artifact, and `new Object()` is not a DOM read). However, the *semantic* source is real and lives inside `js/main.js` itself:\n\n- `getCookie()` (L231) reads page-controlled data:\n  - `info['name'] = document.querySelector('#login_status span a.orange') && document.querySelector('#login_status span a.orange').innerText` (L239) — **DOM text content**, an `ELEMENT_TEXT_CONTENT` source.\n  - `info['email']` / `info['id']` from `document.cookie` (`plt_user_email` / `plt_user_id`) (L233–L243).\n\n`getCookie()` is invoked unconditionally via `setTimeout(...,100)` at L454–456 in the content script. The content script matches `http://*/*` / `https://*/*` (excluding a list of specific domains) with `allFrames: true`, `runAt: document_end`. So on any attacker-owned non-excluded domain, the page can:\n- set `plt_user_email` / `plt_user_id` cookies (non-httpOnly), and\n- inject `<div id=\"login_status\"><span><a class=",
+              "path": "extensions/jgphnjokjhjlcnnajmfjlacjnjkhleah_5.17.3/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "TOOL_LIMITATION",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 3,
+              "reasoning": "The bounded dynamic trajectory did not produce a verdict within 60 seconds; recorded as a tooling limitation rather than treating the absence of an observation as a negative result.",
+              "path": "extensions/jgphnjokjhjlcnnajmfjlacjnjkhleah_5.17.3/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T03:23:05.058411Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "coco_chrome_user_manual_r2",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-24T08:46:12.279679Z",
+                "notes": "人工验证为 TP：页面 Cookie 和 DOM 用户信息可写入扩展 local storage。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\jgphnjokjhjlcnnajmfjlacjnjkhleah_5.17.3\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\jgphnjokjhjlcnnajmfjlacjnjkhleah_5.17.3\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-24T08:46:12.279679Z",
+                  "sha256": "51463d6fd8b5e4d09ac812013c38e888955adf299bdda7ffffc2c12b40f4f9d0"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: TOOL_LIMITATION; final_verdict=UNCERTAIN.",
+              "CoCo Chrome r2 manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "5.17.3",
+        "latest_version": "5.17.3",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

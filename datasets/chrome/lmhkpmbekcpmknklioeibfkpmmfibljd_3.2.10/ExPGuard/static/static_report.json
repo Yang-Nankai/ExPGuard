@@ -1,0 +1,260 @@
+{
+  "extension_id": "lmhkpmbekcpmknklioeibfkpmmfibljd",
+  "extension_version": "3.2.10",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "flow_count": 3,
+  "verified_count": 3,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence. Let me set out the verified decision ledger.\n\n## Decision ledger\n\n**(a) Who controls the source?**\n`page.bundle.js` (frame `CS_2`, manifest declares it as a content script with `\"world\": \"MAIN\"`). The taint enters at:\n```\nfunction Ce(e){if(!e||e.source!==window)return;let t=e.data;!t||t.source!==\"@devtools-extension\"||Object.keys(G).forEach(...)}\n...\nfunction Le(e,t){G[t]=e,window.addEventListener(\"message\",Ce,!1)}\n```\n`event.source === window` and `t.source === \"@devtools-extension\"` are attacker-satisfiable fields (the harness confirms this: same-page origin checks and message `source`/`type` fields are not authentication). So a **same-window page script can forge the message**. Source provenance `CONTENT_SCRIPT` is correct. → item (a) *proven*.\n\n**(b) The source-to-sink path.** The report claims a 479-step chain from `L6` (`e.data`) into `L1` (the `new Function` sinks) with only generic `ASSIGN/ELEMENT/RETURN` ops and a 4841-char \"tainted span\" on the source line. Inspecting the sink region:\n```\nC7700..: ...function qe(e,t=...){...}function se(e){...} var Ge=e=>new Function(\"return \"+e)();\n         function Ft(e,t){let r=e.map(Ge);...} function He(e,t){if",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 4,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "page.bundle",
+          "reportedLoc": "L6:C1219 -> L6:C1220",
+          "resolvedFile": "page.bundle.js",
+          "resolved": true,
+          "snippet": "L6 C1219-1220: …alize,r.serialize)}function Ce(e){if(!e||e.source!==window)return;let t=e.data;!t||t.source!==\"@devtools-extension\"||Object.keys(G).forEach(r=>{if(t.id&&r!==t.id…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "page.bundle",
+          "reportedLoc": "L1:C8071 -> L1:C8096",
+          "resolvedFile": "page.bundle.js",
+          "resolved": true,
+          "snippet": "L1 C8071-8096: …ew Error(\"rest must be an array\")}function He(e,t){if(typeof e==\"string\")return new Function(\"return \"+e)();let r=t[e.selected].func,n=Ft(e.args,e.rest);return r(...n)}var Bt=typeof glo…"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "ids": [
+            "*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "WINDOW_POSTMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Decision ledger\n\n**(a) Who controls the source?**\n`page.bundle.js` L6 C1219 is the body of `Ce`, the `window` \"message\" listener:\n\n```js\nfunction Ce(e){ if(!e||e.source!==window) return; let t=e.data;\n  !t||t.source!==\"@devtools-extension\"||Object.keys(G).forEach(r=>{\n     if(t.id&&r!==t.id) return; let n=G[r];\n     typeof n==\"function\" ? n(t) : n.forEach(o=>{o(t)}) }) }\n```\nBoth checks are attacker-satisfiable in a page→page bridge: `e.source === window` is satisfied by the page posting to *its own* window (`window.postMessage` sets `source = window`), and `t.source === \"@devtools-extension\"` is a plain message *field* the page can forge (harness rule: \"message action/type fields are not authentication\"). With `id` omitted, the `t.id && r!==t.id` filter passes and **every** subscriber in `G` receives the raw message. So the source is genuinely untrusted-controllable (by a script already running in that page).\n\n**(b) Source→sink path — verified in the real source (not just the report).**\nThe report's chain is real and I traced the missing link in the bundle:\n- `function I(){ Le(A,i), … }` with `function Le(e,t){ G[t]=e; window.addEventListener(\"message\",Ce,!1) }` ⇒ subscriber `G",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 4,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "page.bundle",
+          "reportedLoc": "L6:C1219 -> L6:C1220",
+          "resolvedFile": "page.bundle.js",
+          "resolved": true,
+          "snippet": "L6 C1219-1220: …alize,r.serialize)}function Ce(e){if(!e||e.source!==window)return;let t=e.data;!t||t.source!==\"@devtools-extension\"||Object.keys(G).forEach(r=>{if(t.id&&r!==t.id…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "page.bundle",
+          "reportedLoc": "L1:C7854 -> L1:C7879",
+          "resolvedFile": "page.bundle.js",
+          "resolved": true,
+          "snippet": "L1 C7854-7879: …at(qe(o,t+n+\".\")))}),r}function se(e){return Array.isArray(e)?e:qe(e)}var Ge=e=>new Function(\"return \"+e)();function Ft(e,t){let r=e.map(Ge);if(!t)return r;let n=Ge(t);if(Array.isArray(…"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "ids": [
+            "*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "WINDOW_POSTMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 2,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification\n\n**Harness check.** The harness resolved the reported source anchor to `content.bundle.js` and warned the minified text match was loose. I therefore anchored the decision on the actual code, which fully corroborates the report.\n\n**(a) Who controls the source.** `content.bundle.js` (CS_1, matches `<all_urls>`) registers a window bridge:\n```\nL3: var c=\"@devtools-extension\", I=\"@devtools-page\", ...\n    function b(e){ if(!x()||!e||e.source!==window||typeof e.data!=\"object\")return;\n                   let t=e.data; if(t.source===I){ ...; P(F,t) } }\n    window.addEventListener(\"message\",b,!1);\n    function F(e){ h||w(); e.type===\"INIT_INSTANCE\" ? (...) : E({name:\"RELAY\",message:e}) }\n    function E(e){ s.postMessage(e) }   // s = chrome.runtime.connect({name:\"tab\"})\n```\nAny page script can `window.postMessage({source:\"@devtools-page\",...},\"*\")`. `e.source===window` (same-page postMessage), `typeof e.data==\"object\"`, and `t.source===I` (the public constant `\"@devtools-page\"`) are all attacker-satisfiable; `x()` is the per-site injection switch and defaults to `inject:true`. No message-type allow-list exists in `P`/`F`. So the source is **attacker-controlled from any webpage",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 5,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content.bundle",
+          "reportedLoc": "L3:C1809 -> L3:C1810",
+          "resolvedFile": "content.bundle.js",
+          "resolved": true,
+          "snippet": "L3 C1809-1810: …{if(!x()||!e||e.source!==window||typeof e.data!=\"object\")return;let t=e.data;if(t.source===I){if(t.type===\"DISCONNECT\"){s&&(s.disconnect(),h=!1);return}P(F,t)}}C…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.bundle",
+          "reportedLoc": "L1:C16322 -> L1:C16427",
+          "resolvedFile": "background.bundle.js",
+          "resolved": true,
+          "snippet": "L1 C16322-16427: …urn;let r=`${o[\"s:secure\"]?\"https\":\"http\"}://${o[\"s:hostname\"]}:${o[\"s:port\"]}`;fetch(r,{method:\"POST\",headers:{\"content-type\":\"application/json\"},body:JSON.stringify({op:\"get\",id:e})}).then(s=>s.json()).then(s=>{let{payload:i,preloadedState:a}=s;i&&p.dispatch({typ…"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "ids": [
+            "*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "WINDOW_POSTMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 3 flow(s): 1 true-positive, 2 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 3 flagged triggerable for dynamic testing."
+}

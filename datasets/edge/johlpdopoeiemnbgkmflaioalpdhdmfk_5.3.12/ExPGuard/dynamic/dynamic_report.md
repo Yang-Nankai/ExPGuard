@@ -1,0 +1,51 @@
+# ExPAgent Dynamic Test — johlpdopoeiemnbgkmflaioalpdhdmfk v5.3.12
+
+- Browser: `edge`  |  LLM: `deepseek` / `deepseek-v4-pro`
+- Runtime extension id: `jjbnhocodapkkailipmmaeaglpcemgeh`
+- Environment: `{'browserUrl': 'http://127.0.0.1:9222', 'runtimeExtensionId': 'jjbnhocodapkkailipmmaeaglpcemgeh', 'beaconBaseUrl': 'http://127.0.0.1:54335', 'headless': True, 'safety': {'mode': 'isolated-controlled-validation', 'allowedTestOrigins': ['http://127.0.0.1', 'http://[::1]', 'http://localhost'], 'network': 'loopback and explicitly configured controlled origins only', 'testInput': 'bounded JSON with harmless EXPAGENT_TEST_* markers', 'sensitiveData': 'credentials, cookies, tokens, and personal data are not read or collected'}, 'networkIsolation': True}`
+
+**Assessment:** Dynamically tested 1 flow(s): 0 CONFIRMED, 1 PARTIAL.
+
+---
+
+## Flow #2 — 🟠 PARTIAL  (reproduced=False, confidence 0.60)
+
+**Reasoning:** The exact static sink recorded a call, but the controlled marker/beacon was not observed in its security-relevant argument.
+
+**Payload:** `[{"type": "BUYER_LOGINID1688", "hostname": "detail.1688.com", "marker": "EXPAGENT_TEST_expa_4736a87faa0c", "url": "http://127.0.0.1:54335/beacon/expa_3ddccb470565", "data": "EXPAGENT_TEST_expa_4736a87faa0c", "value": "EXPAGENT_TEST_expa_4736a87faa0c", "message": "EXPAGENT_TEST_expa_4736a87faa0c", "title": "EXPAGENT_TEST_expa_4736a87faa0c", "text": "EXPAGENT_TEST_expa_4736a87faa0c", "number": "EXPAGENT_TEST_expa_4736a87faa0c", "name": "EXPAGENT_TEST_expa_4736a87faa0c", "id": "EXPAGENT_TEST_expa_4736a87faa0c", "key": "EXPAGENT_TEST_expa_4736a87faa0c", "action": "EXPAGENT_TEST_expa_4736a87faa0c", "cmd": "EXPAGENT_TEST_expa_4736a87faa0c", "Action": "EXPAGENT_TEST_expa_4736a87faa0c", "Message": "EXPAGENT_TEST_expa_4736a87faa0c", "fun": "EXPAGENT_TEST_expa_4736a87faa0c", "auth": "EXPAGENT_TEST_expa_4736a87faa0c", "phone": "EXPAGENT_TEST_expa_4736a87faa0c", "email": "EXPAGENT_TEST_expa_4736a87faa0c", "version": "EXPAGENT_TEST_expa_4736a87faa0c", "token": "EXPAGENT_TEST_expa_4736a87faa0c", "content": "EXPAGENT_TEST_expa_4736a87faa0c", "payload": "EXPAGENT_TEST_expa_4736a87faa0c", "kind": "EXPAGENT_TEST_expa_4736a87faa0c", "requestId": "EXPAGENT_TEST_expa_4736a87faa0c", "revision": "EXPAGENT_TEST_expa_4736a87faa0c", "buyerLoginId1688": "EXPAGENT_TEST_expa_4736a87faa0c", "ask": "EXPAGENT_TEST_expa_4736a87faa0c", "versionTip": "EXPAGENT_TEST_expa_4736a87faa0c", "login": "EXPAGENT_TEST_expa_4736a87faa0c"}, {"type": "USER_TOKEN", "hostname": "detail.1688.com", "marker": "EXPAGENT_TEST_expa_4736a87faa0c", "url": "http://127.0.0.1:54335/beacon/expa_3ddccb470565", "data": "EXPAGENT_TEST_ex`
+
+**Runtime evidence:** source-contract={"surface": "WINDOW_MESSAGE", "sourcePath": "scripts/content.js", "location": "L15:C8 -> L15:C23", "eventNames": [], "eventTarget": "window", "eventDetailKey": "data", "envelope": {"type": "FROM_PAGE", "hostname": "detail.1688.com"}, "forwardField": "", "requirements": {"type": "FROM_PAGE"}, "selectors": [], "mediaTags": [], "snippet": "loadCSS('libs/layui/css/layui.css');\nversion='5.3.12';\nlet initCnt = 0;\nbuyerLoginId1688='';\nCpsOption = null;\nUserInfo = null;\nGetUserInfo();\nwindow.addEventListener('message', function(event) {\n    // 确保消息来自当前网页\n    if (event.source !== window) {\n        return;\n    }\n\n    // 确保消息的类型是我们期望的\n    if (event.data.type && (event.data.type === 'FROM_PAGE')) {\n       console.log(event.data); \n       buyerLoginId1688 = event.data.buyerLoginId1688;\n//\t\talert(buyerLoginId1688);\n     //向后台脚本发送消息\n     chrome.runtime.sendMessage(\n     \t{ type: \"BUYER_LOGINID1688\", data: buyerLoginId1688 },\n     \tfunction(response) {\n     \t\tconsole.log(\"Response from background:\", response);\n     \t}\n     );\n    }\n});\nif (window.location.hostname === 'detail.1688.com') { \n\tloadJs('scripts/1688.js');\n//\t$(function(){\t\t\n\t\tinit();\n//\t})\n//\tlet tiemr = setInterval(() => {\n//\t\tif(document.querySelector(\"#detail-main-video-", "notes": ["已从 source/sink 附近提取字面量分支。", "已从 sink 文件推导消息分发字段 `type` 及候选值。", "已从 sink 调用推导 URL 承载字段 `url`。", "已识别信封桥接（外层字段 + 转发字段）。"], "discriminatorField": "type", "discriminatorValues": ["BUYER_LOGINID1688", "USER_TOKEN", "JUMP_FLAG"], "urlField": "url", "sinkTapKey": "fetch", "messageAlias": "request", "messageEventKey": "", "jsonMessageField": "", "sinkDataFields": ["type", "buyerLoginId1688", "ask", "data", "versionTip", "message", "login"]}
+sink-tap-instrument={"sink_type": "all", "target_hint": "background", "result": "{\"tapped\":\"all\",\"keys\":[],\"tapVar\":\"self.__expagentSinks\"}"}
+stimulus={"action": "postMessage", "targetUrl": "http://127.0.0.1:54335/page", "input": {"bytes": 1352, "topLevelKeys": ["Action", "Message", "action", "ask", "auth", "buyerLoginId1688", "cmd", "content", "data", "email", "fun", "hostname", "id", "key", "kind", "login", "marker", "message", "name", "number"], "testMarkers": ["EXPAGENT_TEST_expa_4736a87faa0c"]}, "result": {"posted": true, "origin": "http://127.0.0.1:54335"}}
+stimulus={"action": "postMessage", "targetUrl": "http://127
+
+**Trajectory:**
+1. `instrument_sink` all -> {"sink_type": "all", "target_hint": "background", "result": "{\"tapped\":\"all\",\"keys\":[],\"tapVar\":\"self.__expagentSinks\"}"}
+2. `new_page` http://127.0.0.1:54335/page -> [{"type": "text", "text": "# new_page response\n## Pages\nShowing 1-2 of 2 (Page 1 of 1).\n0: http://127.0.0.1:54335/page [selected]\n1: chrome-error://chromewebdata/", "id": "lc_342183ec-e18b-4b9e-92fe-69fa2334abd9"}]
+3. `contract_stimulus` WINDOW_MESSAGE -> {"action": "postMessage", "targetUrl": "http://127.0.0.1:54335/page", "input": {"bytes": 1352, "topLevelKeys": ["Action", "Message", "action", "ask", "auth", "buyerLoginId1688", "cmd", "content", "data", "email", "fun", "hostname", "id", "key", "kind", "login", "marker", "message", "name", "number"], "testMarkers": ["EXPAGENT_TEST_expa_4736a87faa0c"]}, "res
+4. `contract_stimulus` WINDOW_MESSAGE -> {"action": "postMessage", "targetUrl": "http://127.0.0.1:54335/page", "input": {"bytes": 1345, "topLevelKeys": ["Action", "Message", "action", "ask", "auth", "buyerLoginId1688", "cmd", "content", "data", "email", "fun", "hostname", "id", "key", "kind", "login", "marker", "message", "name", "number"], "testMarkers": ["EXPAGENT_TEST_expa_4736a87faa0c"]}, "res
+5. `contract_stimulus` WINDOW_MESSAGE -> {"action": "postMessage", "targetUrl": "http://127.0.0.1:54335/page", "input": {"bytes": 1344, "topLevelKeys": ["Action", "Message", "action", "ask", "auth", "buyerLoginId1688", "cmd", "content", "data", "email", "fun", "hostname", "id", "key", "kind", "login", "marker", "message", "name", "number"], "testMarkers": ["EXPAGENT_TEST_expa_4736a87faa0c"]}, "res
+6. `contract_stimulus` WINDOW_MESSAGE -> {"action": "postMessage", "targetUrl": "http://127.0.0.1:54335/page", "input": {"bytes": 1747, "topLevelKeys": ["Action", "Message", "action", "ask", "auth", "buyerLoginId1688", "cmd", "content", "data", "email", "fun", "hostname", "id", "key", "kind", "login", "marker", "message", "name", "number"], "testMarkers": ["EXPAGENT_TEST_expa_4736a87faa0c"]}, "res
+7. `contract_stimulus` WINDOW_MESSAGE -> {"action": "postMessage", "targetUrl": "http://127.0.0.1:54335/page", "input": {"bytes": 1740, "topLevelKeys": ["Action", "Message", "action", "ask", "auth", "buyerLoginId1688", "cmd", "content", "data", "email", "fun", "hostname", "id", "key", "kind", "login", "marker", "message", "name", "number"], "testMarkers": ["EXPAGENT_TEST_expa_4736a87faa0c"]}, "res
+8. `contract_stimulus` WINDOW_MESSAGE -> {"action": "postMessage", "targetUrl": "http://127.0.0.1:54335/page", "input": {"bytes": 1739, "topLevelKeys": ["Action", "Message", "action", "ask", "auth", "buyerLoginId1688", "cmd", "content", "data", "email", "fun", "hostname", "id", "key", "kind", "login", "marker", "message", "name", "number"], "testMarkers": ["EXPAGENT_TEST_expa_4736a87faa0c"]}, "res
+9. `observe` sink tap + local beacon -> {"sink_type": "all", "result": "{\"keys\":[\"fetch\",\"storage.onChanged\"],\"data\":{\"__fetch__\":true,\"__function__\":true,\"__eval__\":true,\"__storage_local_set__\":true,\"__storage_sync_set__\":true,\"__storage_onChanged__\":true,\"_
+
+**Planned trajectory:**
+1. `list_cdp_targets` Confirm extension target/background/service-worker exists.
+2. `get_extension_runtime_state` Snapshot pre-trigger badge/storage/runtime state.
+3. `new_page/navigate_page` Open approved source fixture only: http://127.0.0.1:54335/page
+4. `list_scripts/search_in_sources` Confirm relevant content script/listener is injected.
+5. `post_controlled_message/set_controlled_dom/dispatch_controlled_event` Inject a JSON test marker through the matching local source surface.
+6. `observe` Check beacon/network/console/runtime state/screenshot.
+7. `ReAct-adjust` If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.
+
+**Evidence artifacts:**
+- `screenshot`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\Temp\dynamic_workspace\runs\edge\johlpdopoeiemnbgkmflaioalpdhdmfk\5.3.12\dynamic-evidence\flow-2\step-source-open.png` — Step `source-open`: http://127.0.0.1:54335/page
+- `transcript`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\Temp\dynamic_workspace\runs\edge\johlpdopoeiemnbgkmflaioalpdhdmfk\5.3.12\dynamic-evidence\flow-2\storage-after-trigger.json` — Storage state at `after-trigger` (markers shown, others redacted)
+- `screenshot`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\Temp\dynamic_workspace\runs\edge\johlpdopoeiemnbgkmflaioalpdhdmfk\5.3.12\dynamic-evidence\flow-2\storage-after-trigger.png` — Storage panel (DevTools-style) at `after-trigger`
+- `transcript`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\Temp\dynamic_workspace\runs\edge\johlpdopoeiemnbgkmflaioalpdhdmfk\5.3.12\dynamic-evidence\flow-2\trajectory.txt` — Bounded ReAct trajectory and tool evidence.
+- `source-contract`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\Temp\dynamic_workspace\runs\edge\johlpdopoeiemnbgkmflaioalpdhdmfk\5.3.12\dynamic-evidence\flow-2\source-contract.json` — Source-adjacent literal guards and generated local-input contract.
+
+**Notes:** sinkTapKey=fetch
+
+---

@@ -1,0 +1,169 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "edge",
+  "extension_id": "ejaindakgejdajkmloekijigfpabbioe",
+  "version": "2.0.1",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-c7761aadf1648cf2",
+      "verification": "TP",
+      "source_family": "storage",
+      "sink_family": "WINDOW_POSTMESSAGE",
+      "matched_tools": [
+        "DoubleX"
+      ],
+      "match_region": "DoubleX only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/edge/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:edge:ejaindakgejdajkmloekijigfpabbioe:2.0.1:9afcab8b589eb18e:01",
+          "flow": {
+            "flow_id": "doublex:edge:ejaindakgejdajkmloekijigfpabbioe:2.0.1:9afcab8b589eb18e:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "9afcab8b589eb18e437c60117f68ad5babd25d76efffae81bb4ed428891e4efa",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "DATA_LEAK",
+            "rule_id": "doublex-sensitive-api-egress",
+            "severity": "HIGH",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "chrome.storage.sync.get",
+              "file": "background.js",
+              "loc": "L3",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "BACKGROUND",
+              "origin_context": "background.js",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "{\n\t\t\t\tuserId: xiaoqiuserid\n\t\t\t}",
+              "file": "background.js",
+              "loc": "L17",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "Sensitive extension data is returned to a web-accessible channel."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_edge_r2_user_manual",
+                  "source": "Manual",
+                  "kind": "doublex_edge_r2_user_manual",
+                  "flow_index": 0,
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证该扩展为 TP。",
+                  "confirmed_at": "2026-09-24T06:35:50.615800Z",
+                  "run_id": "round-doublex-edge-unconfirmed-21-r2"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I inspected the actual `background.js`. The report's source/sink line numbers are offset (the file is minified), but the code contexts match exactly and the full flow is visible in lines 1–2.\n\n## Four-part decision ledger\n\n**(a) Who controls the source**\nThe source is `chrome.storage.sync.get('_xiaoqiaiuserid', cb)`. This reads a persistent identifier (the extension's user ID) from extension storage into a module-scoped variable `xiaoqiuserid`. It is not attacker web input; it is the extension's stored sensitive state (`SENSITIVE_DATA` source). For a `DATA_LEAK` flow this is the correct source class — sensitive extension-held data being egressed.\n\n**(b) Exact source-to-sink path**\n```\nchrome.storage.sync.get('_xiaoqiaiuserid', function(items) {\n    if (items['_xiaoqiaiuserid']) { xiaoqiuserid = items['_xiaoqiaiuserid']; }\n});\n...\nchrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {\n    ...\n    if (request.action === 'getUserId') {\n        if (xiaoqiuserid) { sendResponse({userId: xiaoqiuserid}); }\n        else { sendResponse({error: '用户ID尚未获取'}); }\n    }\n});\n```\nThe stored value is assigned to `xiaoqiuserid`, and that same variable is placed direct",
+              "path": "extensions/ejaindakgejdajkmloekijigfpabbioe_2.0.1/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.75,
+              "reproduced": false,
+              "usable_for_label": false,
+              "evidence_stage": "ENVIRONMENT_READY",
+              "reasoning": "The transcript shows only target discovery and an attempted source search for '_xiaoqiaiuserid', which returned no matches. The actual handler contract/field names were never read or determined, and no payload was injected into the message/detail path. No sink firing, network beacon, or console evidence of privileged data flow is present, so the result cannot be confirmed or rebutted as SINK_NOT_F",
+              "notes": "",
+              "run_id": "doublex-edge-r1",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\round-doublex-edge-unconfirmed-21-r2\\dynamic\\doublex-edge-r2\\summary.json"
+            },
+            "dynamic_run_evidence": {
+              "run_id": "doublex-edge-r1",
+              "summary_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\round-doublex-edge-unconfirmed-21-r2\\dynamic\\doublex-edge-r2\\summary.json",
+              "out_dir": null,
+              "log_path": null,
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "confidence": 0.75,
+              "reproduced": false,
+              "evidence_stage": "ENVIRONMENT_READY",
+              "notes": "",
+              "reasoning": "The transcript shows only target discovery and an attempted source search for '_xiaoqiaiuserid', which returned no matches. The actual handler contract/field names were never read or determined, and no payload was injected into the message/detail path. No sink firing, network beacon, or console evidence of privileged data flow is present, so the result cannot be confirmed or rebutted as SINK_NOT_F"
+            },
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "doublex_edge_r2_user_manual",
+                "verification_origin": "user_manual_round_r1",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-24T06:35:50.615800Z",
+                "notes": "用户人工验证该扩展为 TP。",
+                "run_id": "round-doublex-edge-unconfirmed-21-r2"
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "DoubleX Edge r1 ExPAgent dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "DoubleX Edge r1 user manual verdict: TP. 用户人工验证该扩展为 TP。"
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "extension_delisted",
+        "dataset_version": "2.0.1",
+        "latest_version": null,
+        "reason": "Edge Add-ons returned HTTP 404",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

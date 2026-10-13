@@ -1,0 +1,366 @@
+{
+  "extension_id": "iekecadicdlboncnocjmnkajchdafecb",
+  "extension_version": "2.7.1",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 15,
+  "verified_count": 4,
+  "verdicts": [
+    {
+      "flow_index": 1,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #5 (DOCUMENT_TITLE → CHROME_ACTION_BADGE_OPTIONS)\n\n### (a) Source control\nThe reported source is genuine and attacker-controllable:\n\n- `js/content-script.js:282` — `event.data.title = event.data.title ?? document.title ?? new Date().getTime().toString();`\n- The content script runs on `http://*/*` and `https://*/*` at `document_start`, `allFrames: true`. A page can control `document.title` (and can also supply `event.data.title` directly via the window message the content script is listening for).\n- So **source controllability: TRUE**.\n\n### (b) Exact source-to-sink path\nThe tainted `title` field leaves the content script in the `catCatchFFmpeg` branch:\n\n- `js/content-script.js:290-291`: `data = { ...event.data, ...data }; chrome.runtime.sendMessage(data);`\n- `data.Message` becomes `event.data.action` (`\"catCatchFFmpeg\"`), and `data.title` is the page/document title.\n\nIn the background:\n\n- `js/background.js:516-534` (`if (Message.Message == \"catCatchFFmpeg\")`) does **not** touch `chrome.action` at all. It builds `{...Message, Message:\"ffmpeg\", ...}` and forwards it to the online ffmpeg page via `chrome.tabs.sendMessage` / `G.ffmpegConfig.cacheData`. It never c",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 5,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/content-script",
+          "reportedLoc": "L282:C31 -> L282:C65",
+          "resolvedFile": "js/content-script.js",
+          "resolved": true,
+          "snippet": "L282 C31-65:             event.data.title = event.data.title ?? document.title ?? new Date().getTime().toString();"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js/background",
+          "reportedLoc": "L930:C8 -> L930:C137",
+          "resolvedFile": "js/background.js",
+          "resolved": true,
+          "snippet": "L930 C8-137:         chrome.action.setBadgeText({ text: \"\", tabId: obj?.tabId ?? G.tabId }, function () { if (chrome.runtime.lastError) { return; } });"
+        },
+        "sourceExpectedMarkers": [
+          "document.title"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://*/*",
+              "http://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "js/content-script.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "PRIVILEGED_EXTENSION_UI_CONTROL",
+          "rule": "Treat attacker-controlled badge/title/icon/notification content or state as a privilege escalation: it controls browser/extension UI outside the page principal. Still prove the untrusted value reaches the actual API argument; a literal, browser-derived value, or disconnected action branch is not a flow."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 4,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence from the report plus the focused source reads to decide. Here is my verification.\n\n## Four-part decision ledger\n\n**(a) Who controls the source?**\nThe page itself. `js/content-script.js` runs on every `http://*/*` / `https://*/*` page (ISOLATED world) and registers:\n\n```js\nwindow.addEventListener(\"message\", (event) => {\n    const action = [\"catCatchAddMedia\", \"catCatchAddKey\", \"catCatchFFmpeg\", \"catCatchFFmpegResult\", \"catCatchCloseScript\"];\n    if (!event.data || !event.data.action || event.origin !== window.location.origin || !action.includes(event.data.action)) { return; }\n```\n\n`event.origin !== window.location.origin` is satisfied by the page's own `window.postMessage` (the page is same-origin with itself), and the `action` allowlist is attacker-satisfiable by choosing `\"catCatchFFmpegResult\"`. So `event.data` (including arbitrary `Message` and `tabId` fields) is page-controlled.\n\n**(b) Exact source→sink path**\nConfirmed in raw source:\n\n- Content script L293–L295:\n  ```js\n  if (event.data.action == \"catCatchFFmpegResult\") {\n      if (!event.data.state || !event.data.tabId) { return; }\n      chrome.runtime.sendMessage({ Message: \"catCatchFFmpegResult\", ...e",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/content-script",
+          "reportedLoc": "L236:C12 -> L236:C23",
+          "resolvedFile": "js/content-script.js",
+          "resolved": true,
+          "snippet": "L236 C12-23:         if (!event.data || !event.data.action || event.origin !== window.location.origin || !action.inc…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js/background",
+          "reportedLoc": "L944:C8 -> L961:C10",
+          "resolvedFile": "js/background.js",
+          "resolved": true,
+          "snippet": ">>   944|         chrome.declarativeNetRequest.updateSessionRules({\n>>   945|             removeRuleIds: [tabId],\n>>   946|             addRules: [{\n>>   947|                 \"id\": tabId,\n>>   948|                 \"action\": {\n>>   949|                     \"type\": \"modifyHeaders\",\n>>   950|                     \"requestHeaders\": [{\n>>   951|                         \"header\": \"User-Agent\",\n>>   952|                         \"operation\": \"set\",\n>>   953|                         \"value\": G.MobileUserAgent\n>>   954|                     }]\n>>   955|                 },\n>>   956|                 \"condition\": {\n>>   957|                     \"tabIds\": [tabId],\n>>   958|                     \"resourceTypes\": Object.values(chrome.declarativeNetRequest.ResourceType)\n>>   959|                 }\n>>   960|             }]\n>>   961|         });"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://*/*",
+              "http://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "js/content-script.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 5,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #5 (DOCUMENT_TITLE → chrome.declarativeNetRequest.updateSessionRules)\n\n### Four-part ledger\n\n**(a) Who controls the source?**\nThe source `document.title` is genuinely page-controllable in principle. It is used only as a *fallback* at `js/content-script.js:282`:\n```js\nevent.data.title = event.data.title ?? document.title ?? new Date().getTime().toString();\n```\nSo a page can control it either directly (`event.data.title`) or by setting `document.title`. Source controllability is real.\n\n**(b) Exact source→sink data path**\nThe `document.title` value is assigned to `event.data.title` only inside the `catCatchFFmpeg` branch (`L276-L292`). That branch builds a message with `Message: \"catCatchFFmpeg\"` and spreads `event.data` (including `title`) into it before `chrome.runtime.sendMessage(data)`.\n\nIn the background, the `catCatchFFmpeg` branch is at `js/background.js:516-536`. It spreads `Message` into `data` and then only:\n- sends `data` to the ffmpeg page via `chrome.tabs.sendMessage`, or\n- caches it in `G.ffmpegConfig.cacheData`, or\n- creates a tab with a **constant** URL `G.ffmpegConfig.url`.\n\nIt **never** calls `mobileUserAgent()` and never touches `chrome.decla",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 5,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/content-script",
+          "reportedLoc": "L282:C31 -> L282:C65",
+          "resolvedFile": "js/content-script.js",
+          "resolved": true,
+          "snippet": "L282 C31-65:             event.data.title = event.data.title ?? document.title ?? new Date().getTime().toString();"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js/background",
+          "reportedLoc": "L944:C8 -> L961:C10",
+          "resolvedFile": "js/background.js",
+          "resolved": true,
+          "snippet": ">>   944|         chrome.declarativeNetRequest.updateSessionRules({\n>>   945|             removeRuleIds: [tabId],\n>>   946|             addRules: [{\n>>   947|                 \"id\": tabId,\n>>   948|                 \"action\": {\n>>   949|                     \"type\": \"modifyHeaders\",\n>>   950|                     \"requestHeaders\": [{\n>>   951|                         \"header\": \"User-Agent\",\n>>   952|                         \"operation\": \"set\",\n>>   953|                         \"value\": G.MobileUserAgent\n>>   954|                     }]\n>>   955|                 },\n>>   956|                 \"condition\": {\n>>   957|                     \"tabIds\": [tabId],\n>>   958|                     \"resourceTypes\": Object.values(chrome.declarativeNetRequest.ResourceType)\n>>   959|                 }\n>>   960|             }]\n>>   961|         });"
+        },
+        "sourceExpectedMarkers": [
+          "document.title"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://*/*",
+              "http://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "js/content-script.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 8,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #8 (sourceReportId 3)\n\n### (a) Who controls the source?\nThe source is a `window.addEventListener(\"message\", ...)` handler in `js/content-script.js` (L234–302), which runs on `http://*/*` and `https://*/*` in `document_start`/`allFrames`. The guard at L236 is:\n\n```js\nif (!event.data || !event.data.action || event.origin !== window.location.origin || !action.includes(event.data.action)) { return; }\n```\n\n`event.origin === window.location.origin` and the `action` allowlist are **attacker-satisfiable**: a malicious page posts to itself from the same origin with `action: \"catCatchFFmpeg\"`. So the source is genuinely web-controllable. ✅\n\n### (b) The source-to-sink path\nThe `catCatchFFmpeg` branch (L276–291) validates `event.data.use` and `files`, then does:\n\n```js\nlet data = { Message: event.data.action, action: event.data.use, files: event.data.files, url: event.data.href ?? event.source.location.href };\ndata = { ...event.data, ...data };\nchrome.runtime.sendMessage(data);\n```\n\nAny extra field in `event.data` — including `active` — is preserved in the spread and sent to the background. The background handler at L516 checks `Message.Message == \"catCatchFFmpeg\"`, and",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/content-script",
+          "reportedLoc": "L236:C12 -> L236:C23",
+          "resolvedFile": "js/content-script.js",
+          "resolved": true,
+          "snippet": "L236 C12-23:         if (!event.data || !event.data.action || event.origin !== window.location.origin || !action.inc…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js/background",
+          "reportedLoc": "L520:C16 -> L524:C18",
+          "resolvedFile": "js/background.js",
+          "resolved": true,
+          "snippet": ">>   520|                 chrome.tabs.create({ url: G.ffmpegConfig.url, active: Message.active ?? true }, function (tab) {\n>>   521|                     if (chrome.runtime.lastError) { return; }\n>>   522|                     G.ffmpegConfig.tab = tab.id;\n>>   523|                     G.ffmpegConfig.cacheData.push(data);\n>>   524|                 });"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://*/*",
+              "http://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "js/content-script.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 4 flow(s): 1 true-positive, 3 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

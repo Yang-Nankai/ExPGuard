@@ -1,0 +1,231 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "nglbhlefjhcjockellmeclkcijildjhi",
+  "version": "3.1.2",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-75281defa736e362",
+      "verification": "TP",
+      "source_family": "DOCUMENT_TITLE",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:nglbhlefjhcjockellmeclkcijildjhi:3.1.2:497036e2fce83e9b:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:nglbhlefjhcjockellmeclkcijildjhi:3.1.2:497036e2fce83e9b:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "497036e2fce83e9b2f0b3755e22dbdfad57a394549e301bae08533c46d8b721c",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "web-content-storage-write",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "DOCUMENT_TITLE",
+              "remark": "document.title",
+              "file": "content",
+              "loc": "L94:C153 -> L94:C162",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ],
+                    "excludeMatches": [
+                      "https://lingualeo.com/*",
+                      "https://lingualeo-beta.com/*",
+                      "https://app.slack.com/*",
+                      "https://*.atlassian.net/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "pageTitle",
+              "file": "content",
+              "loc": "L94:C16 -> L94:C164",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ],
+                    "excludeMatches": [
+                      "https://lingualeo.com/*",
+                      "https://lingualeo-beta.com/*",
+                      "https://app.slack.com/*",
+                      "https://*.atlassian.net/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "CONFIRMED",
+                  "basis": "runtime_reproduced",
+                  "confidence": 0.9,
+                  "detail": "受控 DOM 值（页面可控）被内容脚本读入并流入特权 sink，携带受控 marker。"
+                },
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工判定：页面上下文可进入扩展 popup innerHTML 路径，全部 Flow 均为 TP。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "人工判定：页面上下文可进入扩展 popup innerHTML 路径，全部 Flow 均为 TP。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification — Flow #1 (STORAGE_POSOING, DOCUMENT_TITLE → chrome.storage.local) **Four-part ledger** **(a) Who controls the source.** `content.js:88` — `const pageTitle = document.title;`. `document.title` is the current page's title, fully controllable by any page the content script runs on. The manifest registers this content script on `matches: [\"<all_urls>\"]` (with only lingualeo/slack/atlassian excluded), `runAt: document_start`. So *any* arbitrary web page (e.g. `https://attacke…",
+              "path": "extensions/nglbhlefjhcjockellmeclkcijildjhi_3.1.2/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.9,
+              "reproduced": true,
+              "basis": "runtime_reproduced",
+              "usable_for_label": true,
+              "evidence_stage": "MARKER_REACHED",
+              "evidence_artifact_count": 8,
+              "reasoning": "受控 DOM 值（页面可控）被内容脚本读入并流入特权 sink，携带受控 marker。",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\nglbhlefjhcjockellmeclkcijildjhi_3.1.2\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-21T17:11:47.947200Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\nglbhlefjhcjockellmeclkcijildjhi_3.1.2\\dynamic\\evidence\\flow-0",
+              "files": []
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787025987885770d3492782dd10cc0a489fec0a72ead481cae', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/nglbhlefjhcjockellmeclkcijildjhi_3.1.2/final/final_report.json",
+              "report_mtime": "2026-08-18T04:06:27.117Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T20:36:06+08:00",
+                "observation": "人工判定：页面上下文可进入扩展 popup innerHTML 路径，全部 Flow 均为 TP。",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/nglbhlefjhcjockellmeclkcijildjhi_3.1.2/dynamic/evidence/flow-0/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-22T12:36:06.877Z",
+                "notes": "人工判定：页面上下文可进入扩展 popup innerHTML 路径，全部 Flow 均为 TP。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\nglbhlefjhcjockellmeclkcijildjhi_3.1.2\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\nglbhlefjhcjockellmeclkcijildjhi_3.1.2\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T12:36:06.877Z",
+                  "sha256": "9e05b7af59d385b16007fe1f8474cb0b1af040402296737105ed5172720a5e9e"
+                }
+              }
+            ],
+            "notes": [
+              "Raw ExPAgent run evidence exists for this flow (runs/chrome/.../dynamic-evidence) but dynamic_report.json has no verdict for this flow_index.",
+              "Flow is absent from dynamic_report.json: no ExPAgent dynamic record for this flow."
+            ],
+            "snapshot_drift": {
+              "static_verdict": {
+                "flow_summary": "",
+                "current_report": "TRUE_POSITIVE"
+              }
+            },
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "3.1.2",
+        "latest_version": "3.1.2",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

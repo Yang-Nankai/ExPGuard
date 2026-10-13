@@ -1,0 +1,215 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "apcnhnfabpjbhehcnlebhdpidhmdhlon",
+  "version": "2.0.4",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-e85a2e20df5563dd",
+      "verification": "TP",
+      "source_family": "custom",
+      "sink_family": "FETCH_RESOURCE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:apcnhnfabpjbhehcnlebhdpidhmdhlon:2.0.4:d3ef12fdb26d378a:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:apcnhnfabpjbhehcnlebhdpidhmdhlon:2.0.4:d3ef12fdb26d378a:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "d3ef12fdb26d378adbe3f3bf2ed5f040d0a3efe102fc3e846ccfef6f13d9c4b7",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "TARGET_CUSTOM_EVENT",
+              "remark": "target.addEventListener(emailActivation)",
+              "file": "contentScript",
+              "loc": "L1:C68872 -> L1:C68880",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "http://*/*",
+                      "https://*/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "contentScript",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "background",
+              "loc": "L1:C115897 -> L1:C115905",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "FULL"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "contentScript",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "confirmed_inventory_expagent_dynamic",
+                  "confidence": 0.95,
+                  "detail": "sinkTapKey=fetch sourceBridgeReached=true"
+                },
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "CONFIRMED",
+                  "basis": "runtime_reproduced",
+                  "confidence": 0.95,
+                  "detail": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification **(a) Who controls the source — attacker-controlled.** The content script registers a DOM listener on `document` for a *page-dispatchable* custom event: ```js document.addEventListener(\"emailActivation\", e => function(e=!1,t=null,n=null){ chrome.runtime.sendMessage({type:\"startEmailActivation\",updateUser:e,oldUserId:t,email:n}) } (e.detail.updateUser, e.detail.oldUserId, e.detail.email)) ``` No `event.origin`/`source` check, no structure validation, no sender/type gate. A…",
+              "path": "extensions/apcnhnfabpjbhehcnlebhdpidhmdhlon_2.0.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.95,
+              "reproduced": true,
+              "basis": "runtime_reproduced",
+              "usable_for_label": true,
+              "evidence_stage": "MARKER_REACHED",
+              "evidence_artifact_count": 11,
+              "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+              "path": "extensions/apcnhnfabpjbhehcnlebhdpidhmdhlon_2.0.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-09-19T06:42:10.343Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/apcnhnfabpjbhehcnlebhdpidhmdhlon/2.0.4/dynamic-evidence/flow-0",
+              "files": [
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "source-contract.json",
+                "step-after-observation.png",
+                "step-after-trigger.png",
+                "step-final-state.png",
+                "step-source-open.png",
+                "storage-after-observation.json",
+                "storage-after-observation.png",
+                "storage-after-trigger.json",
+                "storage-after-trigger.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. ReAct response omitted the required FINAL_VERDICT marker.",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "TOOL_LIMITATION",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/apcnhnfabpjbhehcnlebhdpidhmdhlon_2.0.4/final/final_report.json",
+              "report_mtime": "2026-08-18T03:34:22.027Z"
+            },
+            "manual_verification": [
+              {
+                "source": "ExPAgent",
+                "kind": "confirmed_inventory_expagent_dynamic",
+                "verification_origin": "expguard_opti_inventory",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-19T06:42:10.3429021Z",
+                "notes": "sinkTapKey=fetch sourceBridgeReached=true",
+                "report_path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/apcnhnfabpjbhehcnlebhdpidhmdhlon_2.0.4/dynamic/dynamic_report.json",
+                "report_artifact": {
+                  "path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/apcnhnfabpjbhehcnlebhdpidhmdhlon_2.0.4/dynamic/dynamic_report.json",
+                  "kind": "dynamic_report.json",
+                  "mtime": "2026-09-19T06:42:10.343Z",
+                  "entry": {
+                    "outcome": "CONFIRMED",
+                    "final_verdict": "TRUE_POSITIVE",
+                    "verdict": null,
+                    "confidence": 0.95,
+                    "reproduced": true
+                  }
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": {
+              "dynamic_outcome": {
+                "flow_summary": "TOOL_LIMITATION",
+                "current_report": "CONFIRMED"
+              },
+              "dynamic_final_verdict": {
+                "flow_summary": "UNCERTAIN",
+                "current_report": "TRUE_POSITIVE"
+              }
+            },
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "2.0.4",
+        "latest_version": "2.0.4",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

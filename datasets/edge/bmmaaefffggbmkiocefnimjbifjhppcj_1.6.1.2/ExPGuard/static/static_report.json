@@ -1,0 +1,226 @@
+{
+  "extension_id": "bmmaaefffggbmkiocefnimjbifjhppcj",
+  "extension_version": "1.6.1.2",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 13,
+  "verified_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 12,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've verified the flow against the actual extension source. Here is my analysis.\n\n## Four-part decision ledger\n\n**(a) Who controls the source — GENUINELY WEB-CONTROLLED**\n`js/shops/jdwindow.js` is registered by the extension as a **MAIN-world** content script (background.js L38, `world:\"MAIN\"`, `id:\"jd-monitor\"`). It monkey-patches `window.XMLHttpRequest` and, when the page's own XHR to `functionId=soa_queryStock&appid=mro-ic` returns 200, dispatches:\n\n```js\nwindow.dispatchEvent(new CustomEvent(\"jd_item_ic_res\",{detail:{data:{skuId:f,url:a,skuObj:g,body:c,requestBody:d}}}))\n```\n\nwhere `url:a` is the page's XHR URL and `skuId` is parsed from the `body` query parameter. So a page (or XSS on a matched jd.com origin) controls `detail.data.url` and `detail.data.skuId`. Source is real.\n\n**(b) The actual source-to-sink path — MISMATCHED FIELD**\n- Isolated-world `js/shops/jd.js` L288-290 listens for `jd_item_ic_res` and stores:\n  - `g.GoodsId = a.skuId` (L289)\n  - `g.jdSoaQueryStock = {skuId, skuObj, url:a.url, body:a.body}` (L289-290)\n- The **raw `url` field** (`a.detail.data.url`) is stored only in `g.jdSoaQueryStock.url` and is consumed only by `getSoaQueryStock` (jd.js L212) → backgrou",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 5,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/shops/jd",
+          "reportedLoc": "L289:C107 -> L289:C115",
+          "resolvedFile": "js/shops/jd.js",
+          "resolved": true,
+          "snippet": "L289 C107-115: …ig)){var d=await g.sendMessageAsync({method:\"globalconfig\"});g.GlobalConfig=d}a=a.detail.data;g.GoodsId=a.skuId;g.VenderId=a.body.venderId||\"0\";g.Cat=a.body.cat||\"\";d=g…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js/background",
+          "reportedLoc": "L26:C289 -> L26:C463",
+          "resolvedFile": "js/background.js",
+          "resolved": true,
+          "snippet": "L26 C289-463: …))}).then(d=>c(d)).catch(d=>c(\"error\")),!0;if(\"open_jd_m_login_page\"===b)return chrome.windows.create({url:a.url,type:\"popup\",left:a.winLeft,width:a.winWidht,top:a.winTop,height:a.winHeight,focused:!0},function(d,f){checkJdMLoginSuccess(d.tabs[0].id,c)}),!0;if(\"open_jd_union_ev_page\"===b)return chrome.windows.create({url:a.url,"
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://item.jd.com/*",
+              "*://ic-item.jd.com/*",
+              "*://npcitem.jd.hk/*",
+              "*://item.jingdonghealth.cn/*",
+              "*://search.jd.com/*",
+              "*://list.jd.com/*",
+              "*://list.jd.hk/*",
+              "*://*.jd.com/list*",
+              "*://order.jd.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "js/lib/jquery-1.11.3.min.js",
+              "js/lib/jquery.extend.min.js",
+              "js/lib/jquery-ui.min.js",
+              "js/lib/jquery.liMarquee.js",
+              "js/lib/highcharts.js",
+              "js/lib/clipboard.min.js",
+              "js/lib/moment.min.js",
+              "js/lib/jquery.toast.js",
+              "js/lib/jquery.cookie.js",
+              "js/lib/jquery.qrcode.min.js",
+              "js/lib/crypto-js.js",
+              "js/lib/decimal.min.js",
+              "js/lib/encoding.min.js",
+              "js/common.js",
+              "js/shops/base.js",
+              "js/shops/jd.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 0,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #0 — `WINDOW_CUSTOM_EVENT (jd_item_res)` → `FETCH_RESOURCE getMviewContent`\n\n### 1. Source control\nThe source anchor is real and attacker-controllable. In `js/shops/jd.js` L287–288, the content script registers:\n\n```js\nwindow.addEventListener(\"jd_item_res\", function(a){\n  a = a.detail.data;\n  ...\n  g.jdItemDetails = {skuId:a.skuId, skuObj:a.skuObj, body:a.body, url:a.url};\n  g.ReSetInfo();\n});\n```\n\nA page running on the matched JD domains (e.g. `item.jd.com`, `list.jd.com`, `*.jd.com/list*`) can dispatch `new CustomEvent(\"jd_item_res\", {detail:{data:{url:\"...\", skuId:...}}})` and fully control `a.url`, `a.skuId`, etc. So the **source** is genuinely page-controlled.\n\n### 2. Source-to-sink path — **broken at the message bridge**\nThe flagged sink in `js/background.js` L25 is:\n\n```js\nif(\"getMviewContent\"===b) return fetch(a.url,{mode:\"cors\",credentials:\"include\"})...\n```\n\nwhere `b = a.method` in `chrome.runtime.onMessage` (L15). For this branch to run, some frame must send `{method:\"getMviewContent\", url:<attacker value>}`.\n\nI searched the entire extension for the action string:\n\n- `getMviewContent` / `MviewContent` appears **only** in `js/background.js` L25.\n- ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/shops/jd",
+          "reportedLoc": "L287:C450 -> L287:C458",
+          "resolvedFile": "js/shops/jd.js",
+          "resolved": true,
+          "snippet": "L287 C450-458: …Coupons=[];g.ShowPcBtns()}};window.addEventListener(\"jd_item_res\",function(a){a=a.detail.data;let d=a.body.area,e=g.jdItemDetails.body?"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js/background",
+          "reportedLoc": "L25:C197 -> L25:C245",
+          "resolvedFile": "js/background.js",
+          "resolved": true,
+          "snippet": "L25 C197-245: …arse(f)}).then(d=>c(d)).catch(d=>c(\"error\")),!0;if(\"getMviewContent\"===b)return fetch(a.url,{mode:\"cors\",credentials:\"include\"}).then(d=>d.text()).then(d=>c(d)).catch(d=>c(\"error\")),!0;if(\"checkMIsLogin\"===b)…"
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://item.jd.com/*",
+              "*://ic-item.jd.com/*",
+              "*://npcitem.jd.hk/*",
+              "*://item.jingdonghealth.cn/*",
+              "*://search.jd.com/*",
+              "*://list.jd.com/*",
+              "*://list.jd.hk/*",
+              "*://*.jd.com/list*",
+              "*://order.jd.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "js/lib/jquery-1.11.3.min.js",
+              "js/lib/jquery.extend.min.js",
+              "js/lib/jquery-ui.min.js",
+              "js/lib/jquery.liMarquee.js",
+              "js/lib/highcharts.js",
+              "js/lib/clipboard.min.js",
+              "js/lib/moment.min.js",
+              "js/lib/jquery.toast.js",
+              "js/lib/jquery.cookie.js",
+              "js/lib/jquery.qrcode.min.js",
+              "js/lib/crypto-js.js",
+              "js/lib/decimal.min.js",
+              "js/lib/encoding.min.js",
+              "js/common.js",
+              "js/shops/base.js",
+              "js/shops/jd.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 2 flow(s): 0 true-positive, 2 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

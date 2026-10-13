@@ -1,0 +1,248 @@
+{
+  "extension_id": "lkijhlbancniebghpfjcfakajaejgppn",
+  "extension_version": "1.0.4",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 5,
+  "verified_count": 3,
+  "verdicts": [
+    {
+      "flow_index": 1,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.0,
+      "reasoning": "Verification error: Connection error.",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 4,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background/chrome",
+          "reportedLoc": "L21:C4144 -> L21:C4151",
+          "resolvedFile": "background/chrome.js",
+          "resolved": true,
+          "snippet": "L21 C4144-4151: …nMessageExternal.addListener((message,sender,sendResponse)=>{let{type,data,api}=message;return sender.origin===\"https://www.threads.net\"?(type===\"threads_searchResults…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background/chrome",
+          "reportedLoc": "L21:C5380 -> L21:C5496",
+          "resolvedFile": "background/chrome.js",
+          "resolved": true,
+          "snippet": "L21 C5380-5496: …,newArr=(reels_media||[]).filter(i=>!jsonData.reels_media.find(j=>j.id===i.id));chrome.storage.local.set({reels:Object.assign({},reels,data.reels),reels_media:[...newArr,...jsonData.reels_media]});break}}catch{}sendResponse()})(),!0)});})();"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://www.instagram.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Verifier exception; no final semantic judgement was produced.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 4,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #4 — STORAGE_POSOING (external message → `chrome.storage.local.set`)\n\n### 1. Who controls the source?\nThe source is `chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => …)` in `background/chrome.js` (L21). `message` is an externally-sent message. The manifest declares `externally_connectable.matches: [\"https://www.instagram.com/*\"]`, so a page running in the `https://www.instagram.com` origin can invoke `chrome.runtime.sendMessage(EXT_ID, msg)`. There is no fixed `sender.id` extension-ID allowlist anywhere in the listener. The only origin check is `sender.origin === \"https://www.threads.net\"`, and that check gates **only** the threads branch — the storage-write branch is the *else* branch and has no unforgeable guard.\n\nThis is the classic \"externally_connectable with a specific host is exploitable via XSS\" case: an XSS (or any script executing in `instagram.com` origin) supplies arbitrary `message.data`.\n\n### 2. Source → sink data path\nFrom the minified source (verified with `read_minified_range`):\n\n```\nonMessageExternal.addListener((message, sender, sendResponse) => {\n  let {type, data, api} = message;\n  return sender.origin === ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 4,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "UNTRUSTED_STORAGE",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background/chrome",
+          "reportedLoc": "L21:C3136 -> L21:C3531",
+          "resolvedFile": "background/chrome.js",
+          "resolved": true,
+          "snippet": "L21 C3136-3531: …er(()=>{chrome.storage.local.set({stories_user_ids:[],id_to_username_map:[]})});chrome.runtime.onMessage.addListener((message,sender,sendResponse)=>{let{type,data}=message;if(type===\"open_url\")return chrome.tabs.create({url:data,index:sender.tab.index+1}),!1;if(type===\"open-payment-page\"){try{ExtPay2(\"ig-download\").openPaymentPage(),console.log(\"Payment page opened via background script\")}catch(error){console.error(\"Error opening payment page:\",error)}return!0}return!1});async function addThreads(data){let{threads}=await chrome.storage.local.get([\"t…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background/chrome",
+          "reportedLoc": "L21:C5380 -> L21:C5496",
+          "resolvedFile": "background/chrome.js",
+          "resolved": true,
+          "snippet": "L21 C5380-5496: …,newArr=(reels_media||[]).filter(i=>!jsonData.reels_media.find(j=>j.id===i.id));chrome.storage.local.set({reels:Object.assign({},reels,data.reels),reels_media:[...newArr,...jsonData.reels_media]});break}}catch{}sendResponse()})(),!0)});})();"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://www.instagram.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've confirmed the full chain in the actual source. Here is my analysis.\n\n## 1. Source controllability — CONFIRMED (with XSS prerequisite)\n\nThe real source is `chrome.runtime.onMessageExternal` in `background/chrome.js` L21 (C4144–4151), not the internal `onMessage` handler that the summary anchor initially pointed at:\n\n```js\nchrome.runtime.onMessageExternal.addListener((message,sender,sendResponse)=>{\n  let{type,data,api}=message;\n  return sender.origin===\"https://www.threads.net\"\n    ? (threads branch…)\n    : (async()=>{\n        if(type===\"stories\"){…}\n        else try{\n          let jsonData=JSON.parse(data);\n          switch(api){\n            …\n            case\"/api/v1/feed/reels_media/?reel_ids=\":\n              let{reels,reels_media}=await chrome.storage.local.get([\"reels\",\"reels_media\"]),\n              newArr=(reels_media||[]).filter(i=>!jsonData.reels_media.find(j=>j.id===i.id));\n              chrome.storage.local.set({reels:Object.assign({},reels,data.reels),\n                reels_media:[...newArr,...jsonData.reels_media]});\n              break;\n          }\n        }catch{}\n        sendResponse()\n      })(), !0)\n});\n```\n\n- `externally_connectable.matches = [\"https://www.ins",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background/chrome",
+          "reportedLoc": "L21:C3136 -> L21:C3531",
+          "resolvedFile": "background/chrome.js",
+          "resolved": true,
+          "snippet": "L21 C3136-3531: …er(()=>{chrome.storage.local.set({stories_user_ids:[],id_to_username_map:[]})});chrome.runtime.onMessage.addListener((message,sender,sendResponse)=>{let{type,data}=message;if(type===\"open_url\")return chrome.tabs.create({url:data,index:sender.tab.index+1}),!1;if(type===\"open-payment-page\"){try{ExtPay2(\"ig-download\").openPaymentPage(),console.log(\"Payment page opened via background script\")}catch(error){console.error(\"Error opening payment page:\",error)}return!0}return!1});async function addThreads(data){let{threads}=await chrome.storage.local.get([\"t…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "content/index",
+          "reportedLoc": "L70:C3230 -> L70:C3300",
+          "resolvedFile": "content/index.js",
+          "resolved": true,
+          "snippet": "L70 C3230-3300: …atch(error=>{console.error(\"Error incrementing download count:\",error)});return}fetch(url,{headers:new Headers({Origin:location.origin}),mode:\"cors\"}).then(response=>response.blob()).then(blob=>{let extension=blob.type.split(\"/\").…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://www.instagram.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 3 flow(s): 2 true-positive, 0 false-positive, 0 partial-available (PA), 1 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

@@ -1,0 +1,241 @@
+{
+  "extension_id": "{7de8b44c-076f-4727-a783-bd783e84f40f}",
+  "extension_version": "15.11",
+  "browser": "firefox",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 3,
+  "verified_count": 3,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.3,
+      "reasoning": "Structured extraction unavailable; preserved analyst notes: ## Verification of Flow #0 — STORAGE_POSOING (WINDOW_MESSAGE_EVENT → chrome.storage.sync.set)\n\n### Evidence assessment\n\nThe normalized record points at a file named `content_scripts.js`, which does **not** exist in the unpacked CRX/XPI (the real content script is `content.min.js`, loaded on `https://*.youtube.com/*`). The `get_propagation()`/report-source lookups returned no source-level entry. I therefore verified directly against the minified bundle, and the semantic chain is present and concrete.\n\n### (a) Who controls the source\n\n`content.min.js` (module `5031`) defines:\n\n```js\naddMessageListener:function(e,t){\n  window.addEventListener(\"message\", n => {\n    n.source && n.source === window &&\n    n.data && n.data.direction &&\n    void 0 !== n.data.exId && n.data.exId === e && t(n.data)\n  })\n}\n```\n\nThis is a page-to-content-script bridge. The content script later registers it with a 20-char random `exId` (`u = d(20)`, i.e. `generateId(20)`). The gate `n.source === window` and `n.data.exId === e` is **attacker-satisfiable**:\n\n- any script executing in the same page main world trivially has `event.source === window`;\n- `exId` is not a browser-authenticated sender id. It is a per-se",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": null,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "DoubleX matched external input to a sensitive API parameter.",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content_scripts.js",
+          "reportedLoc": "L325",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "content_scripts.js",
+          "reportedLoc": "L2540",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "Source report file could not be resolved in the unpacked CRX/XPI.",
+          "Sink report file could not be resolved in the unpacked CRX/XPI."
+        ]
+      },
+      "verdict_basis": "No structured verdict or explicit labelled transcript verdict was available.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.0,
+      "reasoning": "Verification error: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": null,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "Sensitive extension data is returned to a web-accessible channel.",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content_scripts.js",
+          "reportedLoc": "L2438",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "content_scripts.js",
+          "reportedLoc": "L2439",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "NEEDS_SEMANTIC_CLASSIFICATION",
+          "rule": "Inspect the invoked API and the precise tainted argument before assigning a security label."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "Source report file could not be resolved in the unpacked CRX/XPI.",
+          "Sink report file could not be resolved in the unpacked CRX/XPI."
+        ]
+      },
+      "verdict_basis": "Verifier exception; no final semantic judgement was produced.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 2,
+      "verdict": "DUPLICATE",
+      "confidence": 0.0,
+      "reasoning": "Semantically identical to flow #1. Inherited analysis: Verification error: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}...",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": 1,
+      "report_disposition": "SUMMARY",
+      "source_report_id": null,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "Sensitive extension data is returned to a web-accessible channel.",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content_scripts.js",
+          "reportedLoc": "L2438",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "content_scripts.js",
+          "reportedLoc": "L2439",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "NEEDS_SEMANTIC_CLASSIFICATION",
+          "rule": "Inspect the invoked API and the precise tainted argument before assigning a security label."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "Source report file could not be resolved in the unpacked CRX/XPI.",
+          "Sink report file could not be resolved in the unpacked CRX/XPI."
+        ]
+      },
+      "verdict_basis": "Inherited from representative flow #1. Verifier exception; no final semantic judgement was produced.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 3 flow(s): 0 true-positive, 0 false-positive, 0 partial-available (PA), 2 uncertain, 1 duplicate; 2 flagged triggerable for dynamic testing."
+}

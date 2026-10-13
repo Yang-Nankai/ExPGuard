@@ -1,0 +1,188 @@
+{
+  "extensionId": "scamblocker_extensiondevelopers@pcmatic.com",
+  "extensionVersion": "1.20",
+  "sourceType": "XPI",
+  "stats": {
+    "filesWithIssues": 4,
+    "totalFiles": 4,
+    "distinctFlows": 2,
+    "rawIssueEntries": 2,
+    "sinklessSourcesSkipped": 7
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "service-worker",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "TARGET_CUSTOM_EVENT",
+        "remark": "target.addEventListener(contentEvent)",
+        "file": "service-worker",
+        "loc": "L8:C0 -> L39:C2",
+        "line": 8,
+        "col": [
+          0,
+          2
+        ],
+        "spansTo": 39,
+        "code": "»brow.onMessage.addListener((message, sender, sendResponse) =>  {«"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "service-worker",
+          "loc": "L20:C31 -> L26:C11",
+          "line": 20,
+          "col": [
+            31,
+            11
+          ],
+          "spansTo": 26,
+          "code": "const response = await »fetch(message.url, {«",
+          "urlControl": "FULL",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 28,
+        "distinctLines": 7,
+        "steps": [
+          {
+            "n": 1,
+            "file": "service-worker",
+            "line": 8,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»brow.onMessage.addListener((message, sender, sendResponse) =>  {«",
+            "spansTo": 39,
+            "crossContextHop": "runtime.single.sender.message[override->service-worker]"
+          },
+          {
+            "n": 2,
+            "file": "service-worker",
+            "line": 9,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.callingFunc« === 'isMalicious') {"
+          },
+          {
+            "n": 3,
+            "file": "service-worker",
+            "line": 35,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "sw_blockingPost(»message«);"
+          },
+          {
+            "n": 4,
+            "file": "service-worker",
+            "line": 16,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "for (const [key, value] of Object.entries(»message.form«)) {"
+          },
+          {
+            "n": 5,
+            "file": "service-worker",
+            "line": 20,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "const response = await fetch(»message.url«, {"
+          },
+          {
+            "n": 6,
+            "file": "service-worker",
+            "line": 28,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»message«.data = data;"
+          },
+          {
+            "n": 7,
+            "file": "service-worker",
+            "line": 29,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "sendResponse(»message«);"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "settings/options",
+      "frame": "OPTIONS_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "whitelist",
+        "file": "settings/options",
+        "loc": "L12:C31 -> L12:C40",
+        "line": 12,
+        "col": [
+          31,
+          40
+        ],
+        "spansTo": null,
+        "code": "await LS.setItem(\"whitelist\",»whitelist«);"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "whitelist",
+          "file": "settings/options",
+          "loc": "L5:C25 -> L5:C63",
+          "line": 5,
+          "col": [
+            25,
+            63
+          ],
+          "spansTo": null,
+          "code": "setItem: (key, val) => »chrome.storage.local.set({[key]: val})«,",
+          "frame": "OPTIONS_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 3,
+        "distinctLines": 2,
+        "steps": [
+          {
+            "n": 1,
+            "file": "settings/options",
+            "line": 12,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "await LS.setItem(\"whitelist\",»whitelist«);"
+          },
+          {
+            "n": 2,
+            "file": "settings/options",
+            "line": 5,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "setItem: (key, val) => chrome.storage.local.set({[key]: »val«}),"
+          }
+        ]
+      }
+    }
+  ]
+}

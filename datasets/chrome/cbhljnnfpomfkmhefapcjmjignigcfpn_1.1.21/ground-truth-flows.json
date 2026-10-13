@@ -1,0 +1,342 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "cbhljnnfpomfkmhefapcjmjignigcfpn",
+  "version": "1.1.21",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-35c7f49a4a2e84d9",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_DOWNLOADS_OPTIONS",
+      "matched_tools": [
+        "ExPGuard",
+        "DoubleX"
+      ],
+      "match_region": "ExPGuard + DoubleX",
+      "match_basis": "explicit_reuse_and_normalized_signature",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:cbhljnnfpomfkmhefapcjmjignigcfpn:1.1.21:eda831f1ae5fb336:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:cbhljnnfpomfkmhefapcjmjignigcfpn:1.1.21:eda831f1ae5fb336:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "eda831f1ae5fb3363b5dce6534d643755129fbe2c069a123db85580c2e9d09c8",
+            "identity_occurrence": 1,
+            "source_report_id": 4,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content",
+              "loc": "L1:C4279 -> L1:C4290",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*/*",
+                      "http://*/*",
+                      "file://*/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_DOWNLOADS_OPTIONS",
+              "remark": "",
+              "file": "background",
+              "loc": "L1:C14619 -> L1:C14696",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "flow_index": 0,
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "User manually confirmed the page message reaches chrome.downloads.download."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "UNCERTAIN",
+              "confidence": 0.3,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 4,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; preserved analyst notes: ## Verification of Flow #4 — `WINDOW_MESSAGE_EVENT` → `chrome.downloads.download` ### Decision ledger **(a) Who controls the source?** The source is `window.addEventListener(\"message\", ...)` in `content.js`, which runs in an ISOLATED content-script world but listens on the shared `window` event target. The manifest mounts it on `https://*/*`, `http://*/*`, and `file://*/*`, so **any webpage the user visits** can dispatch `window.postMessage` into this listener. The guard is: ```js if (e.source === window && \"SP_DOWNLOAD_FILE\" === e.d…",
+              "path": "extensions/cbhljnnfpomfkmhefapcjmjignigcfpn_1.1.21/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.55,
+              "reproduced": false,
+              "basis": "non_decisive",
+              "usable_for_label": false,
+              "evidence_stage": "LISTENER_READY",
+              "evidence_artifact_count": 4,
+              "reasoning": "The transcript shows only reconnaissance and instrumentation: the agent enumerated CDP targets, confirmed the background service worker (kehifhpelfoffpehlcjjbpcefkkldibn), instrumented chrome.downloads.download (observer_ad09a893761f474b, observerReady=true), and minted a beacon URL (expa_e02d16464aef). It never read the handler source (search_extension_file was an invalid tool and returned an error), so the exact message/detail field names the handler consumes were never determined. No triggering window 'message' event or payload was ever dispatched, no sink tap (read_sink_tap/observe_sink_window) was ever read, and no beacon hit was observed. Because there is no observed sink firing, no attacker-controlled data reaching the privileged downloads.download sink, and no beacon/network/console confirmation, CONFIRMED/PARTIAL are unsupported. SINK_NOT_FIRED cannot be asserted since the required handler field names were never established and no correctly-formed payload was actually delivered to test the sink; the run simply never completed the trigger phase.",
+              "notes": "",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\cbhljnnfpomfkmhefapcjmjignigcfpn_1.1.21\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-22T16:37:59.090Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\cbhljnnfpomfkmhefapcjmjignigcfpn_1.1.21\\dynamic\\evidence\\flow-0",
+              "files": [
+                "extension-debug.json",
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "step-final-state.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. ReAct response omitted the required FINAL_VERDICT marker.",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "UNCERTAIN",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/cbhljnnfpomfkmhefapcjmjignigcfpn_1.1.21/final/final_report.json",
+              "report_mtime": "2026-08-18T03:43:21.972Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-22T16:37:59.090Z",
+                "notes": "User manually confirmed the page message reaches chrome.downloads.download.",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\cbhljnnfpomfkmhefapcjmjignigcfpn_1.1.21\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\cbhljnnfpomfkmhefapcjmjignigcfpn_1.1.21\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T16:37:59.090Z",
+                  "sha256": "066c777ebcdf667cbdfe24fb94c46aee5427800a8839cfcfda67bed60a4bc426"
+                }
+              }
+            ],
+            "notes": [
+              "Latest manual attestation overrides the aggregate label while preserving the automated outcome for audit."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        },
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:cbhljnnfpomfkmhefapcjmjignigcfpn:1.1.21:b10bf01286ee6155:01",
+          "flow": {
+            "flow_id": "doublex:chrome:cbhljnnfpomfkmhefapcjmjignigcfpn:1.1.21:b10bf01286ee6155:01",
+            "flow_index": 3,
+            "flow_order": 4,
+            "flow_label": "F004",
+            "semantic_sha256": "b10bf01286ee6155832f71768585abf1c04d4198c5d78d135a8d5f1bfd163b5a",
+            "identity_occurrence": 1,
+            "source_report_id": 4,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L244",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_DOWNLOADS_OPTIONS",
+              "remark": "chrome.downloads.download",
+              "file": "background.js",
+              "loc": "L391",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content_scripts.js",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Reused/ExPGuard-Opti"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_reused_expguard",
+                  "source": "Reused/ExPGuard-Opti",
+                  "kind": "doublex_reused_expguard",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "Reused ExPGuard-Opti F001 (flow_index=0) via source_sink_type_exact/all_candidates_agree.",
+                  "reused_flow_id": "expguard-opti:chrome:cbhljnnfpomfkmhefapcjmjignigcfpn:1.1.21:eda831f1ae5fb336:01",
+                  "package_sha256": "29711e431b1c510ad7db0489ff0d800c3c88c850bc88c1975ca1aab20be1b16b"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "reused_expguard_match",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I found the full chain in the raw source. Here is my analysis.\n\n## Decision ledger\n\n**(a) Who controls the source?**\nThe actual content script is `content.js` (the reported `content_scripts.js` is a normalized/renamed artifact; `content.js` is the only content script in `manifest.json` matching `http/https/file://*/*`). It contains:\n\n```js\nwindow.addEventListener(\"message\", async e => {\n  if (e.source === window && \"SP_DOWNLOAD_FILE\" === e.data.type) {\n    let t = false;\n    t = !!(await chrome.runtime.sendMessage({action:\"checkPermission\", data:{permissions:e.data.permissions}})).hasPermission\n      || (await chrome.runtime.sendMessage({action:\"REQUEST_PERMISSION_DIRECT\", data:{permissions:e.data.permissions}})).granted;\n    t ? chrome.runtime.sendMessage({action:\"SP_DOWNLOAD_FILE\", data:{downloadData:e.data.downloadData}}) ...\n```\n\n`e.source === window` is trivially satisfied by a page posting to its own window, and `e.data.type` is an attacker-chosen field. So `e.data.downloadData` is fully page-controlled.\n\n**(b) Source-to-sink path**\nPage `window.postMessage` → `content.js` `window.addEventListener(\"message\")` → `chrome.runtime.sendMessage({action:\"SP_DOWNLOAD_FILE\", data:{dow",
+              "path": "extensions/cbhljnnfpomfkmhefapcjmjignigcfpn_1.1.21/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.45,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 4,
+              "reasoning": "sink 断点已就绪且候选输入已重放，但 sink 断点/ tap 均未命中；source 可能未到达后台，或需要额外的页面前置条件。",
+              "path": "extensions/cbhljnnfpomfkmhefapcjmjignigcfpn_1.1.21/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T05:02:11.891703Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": {
+              "source_dataset": "ExPGuard-Opti",
+              "extension_key": "cbhljnnfpomfkmhefapcjmjignigcfpn@1.1.21",
+              "flow_id": "expguard-opti:chrome:cbhljnnfpomfkmhefapcjmjignigcfpn:1.1.21:eda831f1ae5fb336:01",
+              "flow_index": 0,
+              "flow_label": "F001",
+              "verification": "TP",
+              "verification_source": [
+                "ExPAgent",
+                "Manual"
+              ],
+              "match_mode": "source_sink_type_exact",
+              "match_reason": "all_candidates_agree",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_loc": "L1:C4279 -> L1:C4290",
+              "sink_type": "CHROME_DOWNLOADS_OPTIONS",
+              "sink_loc": "L1:C14619 -> L1:C14696",
+              "package_evidence": {
+                "same_crx": true,
+                "same_manifest": false,
+                "same_package": true,
+                "doublex_crx_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\cbhljnnfpomfkmhefapcjmjignigcfpn_1.1.21\\crx\\cbhljnnfpomfkmhefapcjmjignigcfpn.1.1.21.crx",
+                "expaguard_crx_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\cbhljnnfpomfkmhefapcjmjignigcfpn_1.1.21\\crx\\cbhljnnfpomfkmhefapcjmjignigcfpn.1.1.21.crx",
+                "doublex_crx_sha256": "29711e431b1c510ad7db0489ff0d800c3c88c850bc88c1975ca1aab20be1b16b",
+                "expaguard_crx_sha256": "29711e431b1c510ad7db0489ff0d800c3c88c850bc88c1975ca1aab20be1b16b",
+                "doublex_manifest_sha256": "023a0da05d513b2a714e451364f5982bf963eb4642c102cdd9239afa24c52d4f",
+                "expaguard_manifest_sha256": "0675558ae367629669bff524e1425f12ff3562b3a8661ccb873e1443de4ea5b1"
+              }
+            },
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.1.21",
+        "latest_version": "1.1.21",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,593 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "abfimpkhacgimamjbiegeoponlepcbob",
+  "version": "1.0.4",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-8f7796ee3d2e8915",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:abfimpkhacgimamjbiegeoponlepcbob:1.0.4:269b698e53473a37:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:abfimpkhacgimamjbiegeoponlepcbob:1.0.4:269b698e53473a37:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "269b698e53473a3753e2c2b312521138f9e189b96595c1711f6439428253fbfd",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L593:C26 -> L593:C33",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "access_token",
+              "file": "background",
+              "loc": "L21:C5 -> L28:C7",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "confirmed_inventory_expagent_dynamic",
+                  "confidence": 0.85,
+                  "detail": "semanticFixture=true originalSenderIdentityNotClaimed=true semanticFixture=true originalSenderIdentityNotClaimed=true"
+                },
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "CONFIRMED",
+                  "basis": "runtime_reproduced",
+                  "confidence": 0.85,
+                  "detail": "A controlled companion extension reached the external-message listener and the exact privileged sink recorded the bounded test marker. If an ID allowlist existed, only the disposable manifest copy was patched and that semantic change is recorded."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 2,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Ledger **(a) Who controls the source?** The source is `chrome.runtime.onMessageExternal.addListener` (background.js L597) dispatching to `external_listener(request, sender, sendResponse)` at L593. The manifest restricts `externally_connectable.matches` to `*://*.seedr.cc/*`. There is **no** `sender.id`, `sender.origin`, or `sender.url` check in the listener (verified at L534–540). Any page able to run on a `*.seedr.cc` subdomain — via XSS on an existing subdomain or contr…",
+              "path": "extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.85,
+              "reproduced": true,
+              "basis": "runtime_reproduced",
+              "usable_for_label": true,
+              "evidence_stage": "MARKER_REACHED",
+              "evidence_artifact_count": 3,
+              "reasoning": "A controlled companion extension reached the external-message listener and the exact privileged sink recorded the bounded test marker. If an ID allowlist existed, only the disposable manifest copy was patched and that semantic change is recorded.",
+              "path": "extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-09-19T05:59:51.804Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/abfimpkhacgimamjbiegeoponlepcbob/1.0.4/dynamic-evidence/flow-1",
+              "files": [
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "step-final-state.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Request timed out.",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/final/final_report.json",
+              "report_mtime": "2026-08-18T03:21:28.179Z"
+            },
+            "manual_verification": [
+              {
+                "source": "ExPAgent",
+                "kind": "confirmed_inventory_expagent_dynamic",
+                "verification_origin": "expguard_opti_inventory",
+                "verdict": "TP",
+                "confidence": 0.85,
+                "confirmed_at": "2026-09-19T05:59:51.8037786Z",
+                "notes": "semanticFixture=true originalSenderIdentityNotClaimed=true semanticFixture=true originalSenderIdentityNotClaimed=true",
+                "report_path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/dynamic/dynamic_report.json",
+                "report_artifact": {
+                  "path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/dynamic/dynamic_report.json",
+                  "kind": "dynamic_report.json",
+                  "mtime": "2026-09-19T05:59:51.804Z",
+                  "entry": {
+                    "outcome": "CONFIRMED",
+                    "final_verdict": "TRUE_POSITIVE",
+                    "verdict": null,
+                    "confidence": 0.85,
+                    "reproduced": true
+                  }
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": {
+              "static_verdict": {
+                "flow_summary": "",
+                "current_report": "TRUE_POSITIVE"
+              },
+              "dynamic_outcome": {
+                "flow_summary": "",
+                "current_report": "CONFIRMED"
+              },
+              "dynamic_final_verdict": {
+                "flow_summary": "",
+                "current_report": "TRUE_POSITIVE"
+              }
+            },
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.0.4",
+        "latest_version": "1.0.4",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-e97f646c3c64948f",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "FETCH_BODY",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:abfimpkhacgimamjbiegeoponlepcbob:1.0.4:137679e43d374a71:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:abfimpkhacgimamjbiegeoponlepcbob:1.0.4:137679e43d374a71:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "137679e43d374a7155ca5658f1c90d12c1a07392f154962a09ad85bc4ee40c40",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content",
+              "loc": "L215:C9 -> L215:C23",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "http://*/*",
+                      "https://*/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_BODY",
+              "remark": "https://www.seedr.cc/api/token",
+              "file": "background",
+              "loc": "L116:C29 -> L119:C8",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工验证确认 WINDOW_MESSAGE_EVENT 输入进入 Fetch Body；该确认仅针对 FETCH_BODY 参数，不扩展解释为 URL 可控。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "PARTIAL",
+              "confidence": 0.7,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 (REQUEST_FORGERY: `WINDOW_MESSAGE_EVENT` → `FETCH_BODY` to `https://www.seedr.cc/api/token`) ### 1. Who controls the source? The source is `content.js` `receiveMessage` — `window.addEventListener(\"message\", receiveMessage, false)` at L239, with the tainted destructure at L215: ```js if (event.origin !== \"https://www.seedr.cc\") return; const { function: func, username, password } = event.data; ``` `username` and `password` are fully attacker-controlled *postMess…",
+              "path": "extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.4,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": "LISTENER_READY",
+              "evidence_artifact_count": 6,
+              "reasoning": "A message reached the background (some instrumented sink fired), but the exact static sink did not execute under any contract candidate — a real rebuttal of the static routing. Semantic-fixture non-observation (SINK_NOT_FIRED) cannot rebut the original extension boundary.",
+              "path": "extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-09-19T05:59:51.804Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/abfimpkhacgimamjbiegeoponlepcbob/1.0.4/dynamic-evidence/flow-0",
+              "files": [
+                "extension-debug.json",
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "source-contract.json",
+                "step-after-observation.png",
+                "step-after-trigger.png",
+                "step-final-state.png",
+                "step-source-open.png",
+                "storage-after-observation.json",
+                "storage-after-observation.png",
+                "storage-after-trigger.json",
+                "storage-after-trigger.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Request timed out.",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/final/final_report.json",
+              "report_mtime": "2026-08-18T03:21:28.179Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-19T13:59:51.788712+08:00",
+                "observation": "人工验证确认 WINDOW_MESSAGE_EVENT 输入进入 Fetch Body；该确认仅针对 FETCH_BODY 参数，不扩展解释为 URL 可控。",
+                "limitations": "No screenshot/HAR bytes were supplied in this conversation; this artifact records the operator's stated observation only.",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/dynamic/evidence/flow-0/manual/manual_validation.json"
+              }
+            ],
+            "notes": [
+              "ExPAgent recorded TRUE_POSITIVE with non-decisive outcome INCONCLUSIVE_AFTER_DEBUG; recorded value is preserved but not promoted to a TP/FP label."
+            ],
+            "snapshot_drift": {
+              "static_verdict": {
+                "flow_summary": "TRUE_POSITIVE",
+                "current_report": "PARTIAL"
+              },
+              "dynamic_final_verdict": {
+                "flow_summary": "UNCERTAIN",
+                "current_report": "TRUE_POSITIVE"
+              }
+            },
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.0.4",
+        "latest_version": "1.0.4",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-f6333cfb565f3be8",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:abfimpkhacgimamjbiegeoponlepcbob:1.0.4:8b3b41511e1ae48c:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:abfimpkhacgimamjbiegeoponlepcbob:1.0.4:8b3b41511e1ae48c:01",
+            "flow_index": 4,
+            "flow_order": 5,
+            "flow_label": "F005",
+            "semantic_sha256": "8b3b41511e1ae48cd6ff785fe7e58a450b6ac2132ae147976d7877df10cf464c",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L598:C26 -> L598:C33",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "access_token",
+              "file": "background",
+              "loc": "L21:C5 -> L28:C7",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "confirmed_inventory_expagent_dynamic",
+                  "confidence": 0.85,
+                  "detail": "semanticFixture=true originalSenderIdentityNotClaimed=true semanticFixture=true originalSenderIdentityNotClaimed=true"
+                },
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "CONFIRMED",
+                  "basis": "runtime_reproduced",
+                  "confidence": 0.85,
+                  "detail": "A controlled companion extension reached the external-message listener and the exact privileged sink recorded the bounded test marker. If an ID allowlist existed, only the disposable manifest copy was patched and that semantic change is recorded."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 3,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #4 (STORAGE_POSOING) ### 1. Source control The source is `chrome.runtime.onMessageExternal.addListener` in the background service worker (background.js L597–598), which invokes `external_listener(request, sender, sendResponse)`. `request` here is the raw external message payload. Any page whose origin matches `externally_connectable.matches: [\"*://*.seedr.cc/*\"]` can call `chrome.runtime.sendMessage(<extension_id>, payload)` and fully control: - `request.func` - `…",
+              "path": "extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.85,
+              "reproduced": true,
+              "basis": "runtime_reproduced",
+              "usable_for_label": true,
+              "evidence_stage": "MARKER_REACHED",
+              "evidence_artifact_count": 3,
+              "reasoning": "A controlled companion extension reached the external-message listener and the exact privileged sink recorded the bounded test marker. If an ID allowlist existed, only the disposable manifest copy was patched and that semantic change is recorded.",
+              "path": "extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-09-19T05:59:51.804Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/abfimpkhacgimamjbiegeoponlepcbob/1.0.4/dynamic-evidence/flow-4",
+              "files": [
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "step-final-state.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Request timed out.",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/final/final_report.json",
+              "report_mtime": "2026-08-18T03:21:28.179Z"
+            },
+            "manual_verification": [
+              {
+                "source": "ExPAgent",
+                "kind": "confirmed_inventory_expagent_dynamic",
+                "verification_origin": "expguard_opti_inventory",
+                "verdict": "TP",
+                "confidence": 0.85,
+                "confirmed_at": "2026-09-19T05:59:51.8037786Z",
+                "notes": "semanticFixture=true originalSenderIdentityNotClaimed=true semanticFixture=true originalSenderIdentityNotClaimed=true",
+                "report_path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/dynamic/dynamic_report.json",
+                "report_artifact": {
+                  "path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/abfimpkhacgimamjbiegeoponlepcbob_1.0.4/dynamic/dynamic_report.json",
+                  "kind": "dynamic_report.json",
+                  "mtime": "2026-09-19T05:59:51.804Z",
+                  "entry": {
+                    "outcome": "CONFIRMED",
+                    "final_verdict": "TRUE_POSITIVE",
+                    "verdict": null,
+                    "confidence": 0.85,
+                    "reproduced": true
+                  }
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": {
+              "static_verdict": {
+                "flow_summary": "",
+                "current_report": "TRUE_POSITIVE"
+              },
+              "dynamic_outcome": {
+                "flow_summary": "",
+                "current_report": "CONFIRMED"
+              },
+              "dynamic_final_verdict": {
+                "flow_summary": "",
+                "current_report": "TRUE_POSITIVE"
+              }
+            },
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.0.4",
+        "latest_version": "1.0.4",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

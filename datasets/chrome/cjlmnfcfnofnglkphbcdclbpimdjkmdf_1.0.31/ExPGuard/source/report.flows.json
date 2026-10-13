@@ -1,0 +1,188 @@
+{
+  "extensionId": "cjlmnfcfnofnglkphbcdclbpimdjkmdf",
+  "extensionVersion": "1.0.31",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 3,
+    "totalFiles": 4,
+    "distinctFlows": 2,
+    "rawIssueEntries": 2,
+    "sinklessSourcesSkipped": 6
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "isolated-bridge",
+      "frame": "CS_2",
+      "constraint": {
+        "matches": [
+          "https://gemini.google.com/app",
+          "https://gemini.google.com/app/*",
+          "https://gemini.google.com/*",
+          "https://business.gemini.google/app",
+          "https://business.gemini.google/app/*",
+          "https://business.gemini.google/*"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "isolated-bridge",
+        "loc": "L1:C302 -> L1:C312",
+        "line": 1,
+        "col": [
+          302,
+          312
+        ],
+        "spansTo": null,
+        "code": "…storage.local.get({[N]:!0},e=>{E(e?.[N]!==!1)})}window.addEventListener(\"message\",E=>{if(E.source!==window)return;let e=»E.data||{}«;if(e.type===r&&e.requestId){o(t=>{window.postMessage({type:S,requestId:e.requestId,enabled:t},\"*\")});return}e.type!==s|…"
+      },
+      "sinks": [
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "*",
+          "file": "isolated-bridge",
+          "loc": "L1:C347 -> L1:C411",
+          "line": 1,
+          "col": [
+            347,
+            411
+          ],
+          "spansTo": null,
+          "code": "…})}window.addEventListener(\"message\",E=>{if(E.source!==window)return;let e=E.data||{};if(e.type===r&&e.requestId){o(t=>{»window.postMessage({type:S,requestId:e.requestId,enabled:t},\"*\")«});return}e.type!==s||!e.requestId||chrome.runtime.sendMessage({type:s,requestId:e.requestId,request:e.request||{}},t=>{…",
+          "frame": "CS_2",
+          "constraint": {
+            "matches": [
+              "https://gemini.google.com/app",
+              "https://gemini.google.com/app/*",
+              "https://gemini.google.com/*",
+              "https://business.gemini.google/app",
+              "https://business.gemini.google/app/*",
+              "https://business.gemini.google/*"
+            ]
+          }
+        },
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "*",
+          "file": "isolated-bridge",
+          "loc": "L1:C531 -> L1:C713",
+          "line": 1,
+          "col": [
+            531,
+            713
+          ],
+          "spansTo": null,
+          "code": "…});return}e.type!==s||!e.requestId||chrome.runtime.sendMessage({type:s,requestId:e.requestId,request:e.request||{}},t=>{»window.postMessage({type:_,requestId:e.requestId,response:t||{ok:!1,status:0,statusText:\"\",headers:{},bytes:[],error:chrome.runtime.lastError?.message||\"No extension response\"}},\"*\")«})});})();",
+          "frame": "CS_2",
+          "constraint": {
+            "matches": [
+              "https://gemini.google.com/app",
+              "https://gemini.google.com/app/*",
+              "https://gemini.google.com/*",
+              "https://business.gemini.google/app",
+              "https://business.gemini.google/app/*",
+              "https://business.gemini.google/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 39,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "isolated-bridge",
+            "line": 1,
+            "ops": [
+              "ASSIGN:logical-left",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left",
+              "ASSIGN:logical-right",
+              "ELEMENT:object.setProperty",
+              "ASSIGN:unary",
+              "MESSAGE"
+            ],
+            "code": "…window)return;let e=»E.data||{};if(e.type===r&&e.requestId){o(t=>{window.postMessage({type:S,requestId:e.requestId,enabled:t},\"*\")});return}e …⟨tainted span: 413 chars⟩… :!1,status:0,statusText:\"\",headers:{},bytes:[],error:chrome.runtime.lastError?.message||\"No extension response\"}},\"*\")})«});})();",
+            "crossContextHop": "runtime.single.response.message[service-worker->isolated-bridge]"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "service-worker",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "service-worker",
+        "loc": "L1:C186 -> L1:C717",
+        "line": 1,
+        "col": [
+          186,
+          717
+        ],
+        "spansTo": null,
+        "code": "…])=>[_,String(r)]))}»chrome.runtime.onMessage.addListener((e,_,r)=>{if(!e||e.type!==a)return!1;let E=e.request||{};return fetch(E.url,{method …⟨tainted span: 531 chars⟩… }).catch(t=>{r({ok:!1,finalUrl:E.url||\"\",status:0,statusText:\"\",headers:{},bytes:[],error:String(t?.message||t)})}),!0})«;})();"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "service-worker",
+          "loc": "L1:C287 -> L1:C402",
+          "line": 1,
+          "col": [
+            287,
+            402
+          ],
+          "spansTo": null,
+          "code": "…)=>[_,String(r)]))}chrome.runtime.onMessage.addListener((e,_,r)=>{if(!e||e.type!==a)return!1;let E=e.request||{};return »fetch(E.url,{method:E.method||\"GET\",headers:n(E.headers),body:E.data??void 0,credentials:\"omit\",redirect:\"follow\"})«.then(async t=>{let S=await t.arrayBuffer();r({ok:t.ok,finalUrl:t.url,status:t.status,statusText:t.statusText,headers:Ob…",
+          "urlControl": "FULL",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_BODY",
+          "remark": "[Unknown URL]",
+          "file": "service-worker",
+          "loc": "L1:C287 -> L1:C402",
+          "line": 1,
+          "col": [
+            287,
+            402
+          ],
+          "spansTo": null,
+          "code": "…)=>[_,String(r)]))}chrome.runtime.onMessage.addListener((e,_,r)=>{if(!e||e.type!==a)return!1;let E=e.request||{};return »fetch(E.url,{method:E.method||\"GET\",headers:n(E.headers),body:E.data??void 0,credentials:\"omit\",redirect:\"follow\"})«.then(async t=>{let S=await t.arrayBuffer();r({ok:t.ok,finalUrl:t.url,status:t.status,statusText:t.statusText,headers:Ob…",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 23,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "service-worker",
+            "line": 1,
+            "ops": [
+              "MESSAGE",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left",
+              "ELEMENT:object.setProperty",
+              "ASSIGN:identifier"
+            ],
+            "code": "…ries(Object.entries(»e).filter(([_,r])=>_&&r!=null).map(([_,r])=>[_,String(r)]))}chrome.runtime.onMessage.addListener((e,_,r)=>{if(!e||e.type …⟨tainted span: 591 chars⟩… }).catch(t=>{r({ok:!1,finalUrl:E.url||\"\",status:0,statusText:\"\",headers:{},bytes:[],error:String(t?.message||t)})}),!0})«;})();",
+            "crossContextHop": "runtime.single.sender.message[isolated-bridge->service-worker]"
+          }
+        ]
+      }
+    }
+  ]
+}

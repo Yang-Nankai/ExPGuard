@@ -1,0 +1,198 @@
+{
+  "extension_id": "odpdkefpnfejbfnmdilmfhephfffmfoh",
+  "extension_version": "0.9.36",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 3,
+  "verified_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ### Flow verification — REQUEST_FORGERY (attacker input → background `fetch`)\n\n**1. Who controls the source?**\nThe actual untrusted source is `src/contentScript.js` L20:\n\n```js\ndata = JSON.parse(event.data);\n```\n\nThe content script is injected only on `https://readlang.com/*`, `https://test.readlang.com/*`, and `http://localhost/*` (manifest + the origin check at L45–51). A script running on any of those pages can call `window.postMessage(...)` and fully control `event.data`. The checks at L28–38 (`type === \"readlangMessage\"`, `to === \"extension\"`, `message === \"backgroundPageMessage\"`) are all attacker-supplied fields, not authentication. There is no `event.origin` or `event.source` validation that could block a same-origin page.\n\n**2. Is the path unbroken?**\nYes. The content script forwards the attacker payload at L52–53:\n\n```js\nchrome.runtime.sendMessage({ message, data }, ...)\n```\n\nThe background listener at `src/background.js` L105 receives it and, for `request.message === \"serverRequest\"`, does:\n\n```js\nconst data = request.data?.data;                 // attacker-controlled\nconst queryStringSuffix =\n  data.method === \"GET\" && data.data\n    ? `?${new URLSearchParams(data.data)}",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "src/contentScript",
+          "reportedLoc": "L20:C13 -> L20:C35",
+          "resolvedFile": "src/contentScript.js",
+          "resolved": true,
+          "snippet": "L20 C13-35:       data = JSON.parse(event.data);"
+        },
+        "sinkAnchor": {
+          "reportedFile": "src/background",
+          "reportedLoc": "L159:C27 -> L170:C12",
+          "resolvedFile": "src/background.js",
+          "resolved": true,
+          "snippet": ">>   159|           response = await fetch(url, {\n>>   160|             method: data.method,\n>>   161|             headers: {\n>>   162|               Client: \"readlang-chrome-extension\",\n>>   163|               \"X-Extension-Version\": chrome.runtime.getManifest().version,\n>>   164|               ...(data.data ? { \"Content-Type\": \"application/json\" } : {}),\n>>   165|             },\n>>   166|             body:\n>>   167|               data.method !== \"GET\" && data.data\n>>   168|                 ? JSON.stringify(data.data)\n>>   169|                 : undefined,\n>>   170|           });"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://readlang.com/*",
+              "https://test.readlang.com/*",
+              "http://localhost/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "src/extensionConfig.js",
+              "src/contentScript.js"
+            ],
+            "runAt": null,
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification: Flow #1 — REQUEST_FORGERY (attacker input → background fetch)\n\n### (a) Who controls the source?\nThe source is `src/contentScript.js` L16–20: a `window.addEventListener(\"message\", ...)` handler that does `JSON.parse(event.data)`. The content script runs on `https://readlang.com/*`, `https://test.readlang.com/*`, and `http://localhost/*` (manifest `content_scripts`, `allFrames: true`). A page on those origins can `window.postMessage` arbitrary JSON to itself; the isolated-world content script receives it. The fields `data.type === \"readlangMessage\"`, `data.to === \"extension\"`, and `data.message === \"backgroundPageMessage\"` are all page-chosen and attacker-satisfiable — not authentication.\n\n### (b) Source-to-sink path\n- `contentScript.js` L41: `handler(data.data.message, data.data, event, data.requestId)` — the page controls both the action (`data.data.message`) and the payload (`data.data`).\n- L52–53: `chrome.runtime.sendMessage({ message, data }, ...)` — the attacker-chosen action/payload cross into the background.\n- `background.js` L105: `chrome.runtime.onMessage.addListener(...)`.\n- L115: `const data = request.data?.data;` — the payload object.\n- L150: `case \"serv",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "src/contentScript",
+          "reportedLoc": "L20:C13 -> L20:C35",
+          "resolvedFile": "src/contentScript.js",
+          "resolved": true,
+          "snippet": "L20 C13-35:       data = JSON.parse(event.data);"
+        },
+        "sinkAnchor": {
+          "reportedFile": "src/background",
+          "reportedLoc": "L159:C27 -> L170:C12",
+          "resolvedFile": "src/background.js",
+          "resolved": true,
+          "snippet": ">>   159|           response = await fetch(url, {\n>>   160|             method: data.method,\n>>   161|             headers: {\n>>   162|               Client: \"readlang-chrome-extension\",\n>>   163|               \"X-Extension-Version\": chrome.runtime.getManifest().version,\n>>   164|               ...(data.data ? { \"Content-Type\": \"application/json\" } : {}),\n>>   165|             },\n>>   166|             body:\n>>   167|               data.method !== \"GET\" && data.data\n>>   168|                 ? JSON.stringify(data.data)\n>>   169|                 : undefined,\n>>   170|           });"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://readlang.com/*",
+              "https://test.readlang.com/*",
+              "http://localhost/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "src/extensionConfig.js",
+              "src/contentScript.js"
+            ],
+            "runAt": null,
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 2 flow(s): 2 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

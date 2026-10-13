@@ -1,0 +1,310 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "firefox",
+  "extension_id": "extension@oceanhero.today",
+  "version": "10.7",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-30d0a40f000a4f09",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_COOKIES_SET_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:extension@oceanhero.today:10.7:4762ef40da8b1575:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:extension@oceanhero.today:10.7:4762ef40da8b1575:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "4762ef40da8b1575defb76b8adb87fb9b2ee9409e97bda26eee4b115937972f9",
+            "semantic_key": {
+              "rule_id": "attacker-input-privileged-operation",
+              "flow_type": "PRIVILEGE_ESCALATION",
+              "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "source_file": "background",
+              "source_loc": "1723417235",
+              "source_frame": "BG_1",
+              "sink_type": "CHROME_COOKIES_SET_OPTIONS",
+              "sink_file": "background",
+              "sink_loc": "1709317195",
+              "sink_frame": "BG_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "rule_description": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://oceanhero.today/*"
+            ],
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L1:C7234 -> L1:C7235",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG",
+              "constraint": null,
+              "code_preview": "xFocus\"===e.type?(f=>>>e<<<.payload,r({success:"
+            },
+            "sink": {
+              "type": "CHROME_COOKIES_SET_OPTIONS",
+              "remark": null,
+              "file": "background",
+              "loc": "L1:C7093 -> L1:C7195",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "parseInt(t.value):0;>>>chrome.cookies.set({url:\"https://oceanhero.today\",name:\"shellsCounter\",value:(r+e.amount).toString()})<<<})),\"setNtpSearchBox"
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": null,
+                  "confidence": 0.9,
+                  "detail": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。"
+                },
+                {
+                  "tier": "expagent_final",
+                  "source": "ExPAgent",
+                  "kind": "final_report",
+                  "verdict": "TP",
+                  "confidence": 0.88,
+                  "detail": "Dynamic phase supplied positive runtime evidence for the reported path.",
+                  "trust": "dynamic_confirmed"
+                },
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 (`addShells` → `chrome.cookies.set`)\n\n### (a) Who controls the source\nThe source is `chrome.runtime.onMessageExternal.addListener(g)` in `background.js` (confirmed at minified range C7700–C8100: `chrome.runtime.onMessageExternal.addListener(g)`). There is **no `sender.id` check, no sender.origin/url check, and no allowlist** — the listener is registered directly.\n\nThe manifest sets `externally_connectable.matches: [\"https://oceanhero.today/*\"]`. That means any page running under `https://oceanhero.today/*` (or script injected via XSS on that origin) can call `chrome.runtime.sendMessage(<extensionId>, payload)` and fully control the message object `e`, including `e.type` and `e.amount`. The `e.type === \"addShells\"` gate is an attacker-chosen message field, not a trust anchor.\n\n### (b) Source-to-sink path\nConfirmed directly in the minified source:\n\n```js\ng = function(e,t,r){\n  return \"addShells\" === e.type &&\n    chrome.cookies.get({url:\"https://oceanhero.today\",name:\"shellsCounter\"},\n      (function(t){\n        var r = t ? parseInt(t.value) : 0;\n        chrome.cookies.set({url:\"https://oceanhero.today\",\n                            name:\"shellsCounter\",\n   ",
+              "dynamic_guidance": {
+                "triggerable": false,
+                "trigger_mechanism": "OTHER",
+                "injection_context": "",
+                "origin_requirement": "",
+                "trigger_surface": "",
+                "target_urls": [],
+                "payload_sketch": "",
+                "dom_forgery": "",
+                "beacon_pointable": false,
+                "beacon_param": "",
+                "observation": "",
+                "notes": ""
+              },
+              "path": "extensions/extension@oceanhero.today_10.7/static/static_report.json",
+              "report_mtime": "2026-08-14T02:15:48.529Z"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.9,
+              "reproduced": false,
+              "basis": null,
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 1,
+              "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+              "evidence": "",
+              "path": "extensions/extension@oceanhero.today_10.7/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T12:48:22.807Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.88,
+              "reasoning": "Dynamic phase supplied positive runtime evidence for the reported path.",
+              "evidence_summary": "Dynamic phase supplied positive runtime evidence for the reported path.",
+              "conflict_resolution": "Strict final decision table applied.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "EXTERNAL_CONDITION_REQUIRED",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "dynamic_confirmed",
+              "usable_for_label": true,
+              "path": "../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/firefox/extensions/extension@oceanhero.today_10.7/final-verified-v2/final_report.json",
+              "report_mtime": "2026-08-20T13:27:48.919Z"
+            },
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user-provided manual validation",
+              "validated_at_utc": "2026-09-22T14:39:11.083860Z",
+              "vulnerability_summary": "网页发送 {type:'addShells', amount} 后，后台无 sender.id 校验，执行 chrome.cookies.set 写入 shellsCounter。",
+              "target_sites": [
+                "https://oceanhero.today/*"
+              ],
+              "preconditions": [
+                "临时加载 OceanHero 的 unpacked 目录。",
+                "扩展 ID 为 extension@oceanhero.today。"
+              ],
+              "payloads": [
+                {
+                  "surface": "web_page_console",
+                  "language": "javascript",
+                  "purpose": "从 externally_connectable 匹配站点写入 cookie。",
+                  "code": "chrome.runtime.sendMessage(\n  \"extension@oceanhero.today\",\n  { type: \"addShells\", amount: 1337 },\n  response => console.log(\"OceanHero response:\", response)\n);"
+                }
+              ],
+              "steps": [
+                {
+                  "step": 1,
+                  "action": "打开匹配网页",
+                  "detail": "打开 https://oceanhero.today/ 并在该页面打开 DevTools Console。",
+                  "expected": "网页 origin 与 manifest 的 externally_connectable.matches 一致。"
+                },
+                {
+                  "step": 2,
+                  "action": "发送 payload",
+                  "detail": "执行 payload。",
+                  "expected": "响应返回 success 或至少无 extension-not-found 错误。"
+                },
+                {
+                  "step": 3,
+                  "action": "检查 cookie",
+                  "detail": "在 Storage Inspector 查看 https://oceanhero.today 下的 shellsCounter。",
+                  "expected": "shellsCounter 按现有值 + 1337 更新。"
+                }
+              ],
+              "expected_effect": "匹配 origin 的页面可调用扩展特权 cookies.set，修改 OceanHero 自身 cookie。",
+              "observation_points": [
+                "sendMessage response",
+                "Cookie Storage",
+                "后台 Console"
+              ],
+              "false_positive_checks": [
+                "若浏览器要求用户手势或页面未暴露 runtime messaging，则记录为环境限制。",
+                "未观察到 cookies.set 副作用不能判 TP。"
+              ],
+              "safety_notes": [
+                "amount 使用固定小值并在测试后恢复/删除 cookie。"
+              ],
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user as a manual validation result. No screenshot or HAR bytes were supplied with this conversation."
+              },
+              "plan_kind": "curated",
+              "selected_flow_id": "expguard-opti:firefox:extension@oceanhero.today:10.7:4762ef40da8b1575:01",
+              "source_report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\firefox\\extensions\\extension@oceanhero.today_10.7\\source\\summary.json",
+              "static_report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\firefox\\extensions\\extension@oceanhero.today_10.7\\static\\static_report.json",
+              "dynamic_report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\firefox\\extensions\\extension@oceanhero.today_10.7\\dynamic\\dynamic_report.json",
+              "operator_input_template": {
+                "verdict_options": [
+                  "TP",
+                  "FP",
+                  "PARTIAL",
+                  "UNCONFIRMED"
+                ],
+                "result_fields": [
+                  "verdict",
+                  "confidence",
+                  "reproduced",
+                  "observed_effect",
+                  "evidence_paths",
+                  "limitations",
+                  "operator",
+                  "validated_at_utc"
+                ]
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_report",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-22T14:39:11.083860Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "ExPAgent dynamic evidence depends on an external precondition that was not satisfied at runtime.",
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "10.7",
+        "latest_version": "10.7",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

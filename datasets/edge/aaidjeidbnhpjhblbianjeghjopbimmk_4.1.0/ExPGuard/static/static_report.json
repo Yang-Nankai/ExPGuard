@@ -1,0 +1,92 @@
+{
+  "extension_id": "aaidjeidbnhpjhblbianjeghjopbimmk",
+  "extension_version": "4.1.0",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 5,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 4,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.3,
+      "reasoning": "Structured extraction unavailable; preserved analyst notes: I've confirmed the listener and the sink directly from source. Here's my analysis.\n\n## Four-part decision ledger\n\n**(a) Who controls the source?**\n`chrome.runtime.onMessageExternal.addListener(async function (msg, sender, sendResponse) {...})` at `extras/background.js:661`. `msg` is the external message payload, fully attacker-controlled by any sender the browser permits. `externally_connectable.matches` is `[\"https://scratch.mit.edu/*\"]`, so the message must originate from a `scratch.mit.edu` page (or be relayed through it). No fixed-extension-ID allowlist exists (`authenticatedExtensionAllowlist: null`), and there is **no** `sender.id`/`sender.url`/`sender.origin` check anywhere in the listener. The restriction to `scratch.mit.edu` reduces scope but does not neutralize the attack surface (XSS on that domain can send the message), consistent with the MEDIUM severity.\n\n**(b) Exact source-to-sink path**\nDirect data flow, no message/storage bridge hop:\n- L661: external message enters listener.\n- L723: `if (typeof msg === \"object\")` — trivially satisfied.\n- L724: `if (msg.message === \"storageSet\")` — an attacker-chosen message field, not a trust anchor; attacker simply sets it.\n- L725",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "extras/background",
+          "reportedLoc": "L666:C6 -> L666:C9",
+          "resolvedFile": "extras/background.js",
+          "resolved": true,
+          "snippet": "L666 C6-9:   if (msg.msg === \"openSupportChat\") {"
+        },
+        "sinkAnchor": {
+          "reportedFile": "extras/background",
+          "reportedLoc": "L725:C12 -> L725:C61",
+          "resolvedFile": "extras/background.js",
+          "resolved": true,
+          "snippet": "L725 C12-61:       await chrome.storage.sync.set({ [msg.key]: msg.value });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://scratch.mit.edu/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "No structured verdict or explicit labelled transcript verdict was available.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 0 true-positive, 0 false-positive, 0 partial-available (PA), 1 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

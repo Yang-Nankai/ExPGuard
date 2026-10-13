@@ -1,0 +1,102 @@
+{
+  "extension_id": "{c98e042b-917d-4bdb-b125-dd3ace21ab71}",
+  "extension_version": "4.0.1",
+  "browser": "firefox",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.3,
+      "reasoning": "Structured extraction unavailable; preserved analyst notes: I've traced the full chain in the real source. Here is my verification.\n\n## Decision ledger\n\n**(a) Who controls the source?**\n`content/hotmail_bridge.js` (ISOLATED world) listens for `window.addEventListener(\"message\")` on `https://outlook.live.com/*`. The guard is:\n\n```js\nif (event.source !== window || event.origin !== ORIGIN) return;\nconst data = event.data;\nif (!data || data.source !== SOURCE || data.type !== \"token\" || typeof data.token !== \"string\") return;\nextApi.runtime.sendMessage({ cmd: \"hotmailToken\", token: data.token });\n```\n\n`SOURCE` is a message *field* (`\"xnotifier-hotmail\"`), `type` is a message *field*, and `event.origin === \"https://outlook.live.com\"` is satisfiable by any script executing in the outlook.live.com page (the page's own `postMessage` sets `event.origin` to its own origin). These are attacker-satisfiable, not authentication. The `token` value is fully attacker-controlled.\n\n**(b) Source-to-sink path**\n`page postMessage → hotmail_bridge (CS) → runtime.sendMessage({cmd:\"hotmailToken\", token}) → background onMessage case \"hotmailToken\" → storeHotmailToken(req.token)`.\n\nThe background handler's checks are:\n```js\n!sender || sender.id !== extApi.runtime.id |",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content/hotmail_bridge",
+          "reportedLoc": "L16:C7 -> L16:C11",
+          "resolvedFile": "content/hotmail_bridge.js",
+          "resolved": true,
+          "snippet": "L16 C7-11:       !data ||"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L69:C10 -> L69:C39",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L69 C10-39:     await exlib.savePrefsA(\"scriptInfo\", si);"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://outlook.live.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content/hotmail_bridge.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "No structured verdict or explicit labelled transcript verdict was available.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 0 true-positive, 0 false-positive, 0 partial-available (PA), 1 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

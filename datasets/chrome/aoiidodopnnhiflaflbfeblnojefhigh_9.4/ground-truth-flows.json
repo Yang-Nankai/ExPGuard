@@ -1,0 +1,422 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "aoiidodopnnhiflaflbfeblnojefhigh",
+  "version": "9.4",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-57718048bb0e7953",
+      "verification": "TP",
+      "source_family": "custom",
+      "sink_family": "CHROME_TABS_CREATE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:aoiidodopnnhiflaflbfeblnojefhigh:9.4:2a75a24ba2c8d8c1:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:aoiidodopnnhiflaflbfeblnojefhigh:9.4:2a75a24ba2c8d8c1:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "2a75a24ba2c8d8c12b1e67198393215655734aac5bb6c5a9c7113743a697aa64",
+            "identity_occurrence": 1,
+            "source_report_id": 4,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "TARGET_CUSTOM_EVENT",
+              "remark": "target.addEventListener(pb1_OpenUrl_Event)",
+              "file": "js/app",
+              "loc": "L1:C154929 -> L1:C154937",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "http://*/*",
+                      "https://*/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/app",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_TABS_CREATE_OPTIONS",
+              "remark": "",
+              "file": "js/coupons_popup",
+              "loc": "L1:C226906 -> L1:C226991",
+              "frame": "POPUP_1",
+              "frames": [
+                {
+                  "id": "POPUP_1",
+                  "family": "EX"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "js/app",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工判定：页面自定义事件可进入扩展 tabs.create 分支并由页面控制 URL。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "人工判定：页面自定义事件可进入扩展 tabs.create 分支并由页面控制 URL。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 4,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Ledger **(a) Who controls the source — page (attacker), via a content script on a wildcard surface.** The flow is a `TARGET_CUSTOM_EVENT` in `js/app.js`, whose remark is `target.addEventListener(pb1_OpenUrl_Event)`. The harness classifies reachability as `PAGE_TO_CONTENT_SCRIPT` and states: *\"A page can forge window.postMessage/CustomEvent fields… event.source === window, same-page origin checks, and message action/type fields are not authentication.\"* The manifest injects `js/app.js`…",
+              "path": "extensions/aoiidodopnnhiflaflbfeblnojefhigh_9.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": "BLOCKED",
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 45s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/aoiidodopnnhiflaflbfeblnojefhigh_9.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-09-19T07:31:35.368Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/aoiidodopnnhiflaflbfeblnojefhigh/9.4/dynamic-evidence/flow-1",
+              "files": [
+                "flow-result.json"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.82,
+              "reasoning": "Dynamic phase performed a source-contract-aware sink rebuttal. ReAct response omitted the required FINAL_VERDICT marker.",
+              "evidence_summary": "Dynamic phase performed a source-contract-aware sink rebuttal.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "UNCERTAIN",
+              "dynamic_outcome_snapshot": "SINK_NOT_FIRED",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/aoiidodopnnhiflaflbfeblnojefhigh_9.4/final/final_report.json",
+              "report_mtime": "2026-08-18T03:34:02.959Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T18:39:43+08:00",
+                "observation": "人工判定：页面自定义事件可进入扩展 tabs.create 分支并由页面控制 URL。",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/aoiidodopnnhiflaflbfeblnojefhigh_9.4/dynamic/evidence/flow-1/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-22T10:39:43.036Z",
+                "notes": "人工判定：页面自定义事件可进入扩展 tabs.create 分支并由页面控制 URL。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\aoiidodopnnhiflaflbfeblnojefhigh_9.4\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\aoiidodopnnhiflaflbfeblnojefhigh_9.4\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T10:39:43.036Z",
+                  "sha256": "d2ed4749d534eea501b3ffff74a023bea0fa08a2517970f42db9f7d581c370c0"
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": {
+              "static_verdict": {
+                "flow_summary": "UNCERTAIN",
+                "current_report": "TRUE_POSITIVE"
+              },
+              "dynamic_outcome": {
+                "flow_summary": "SINK_NOT_FIRED",
+                "current_report": "INCONCLUSIVE_AFTER_DEBUG"
+              }
+            },
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "extension_delisted",
+        "dataset_version": "9.4",
+        "latest_version": null,
+        "reason": "Chrome Web Store has no public details for this ID",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-b475efd28dfd0317",
+      "verification": "TP",
+      "source_family": "custom",
+      "sink_family": "CHROME_TABS_CREATE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:aoiidodopnnhiflaflbfeblnojefhigh:9.4:50c603908dfbbbc5:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:aoiidodopnnhiflaflbfeblnojefhigh:9.4:50c603908dfbbbc5:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "50c603908dfbbbc54fd42146e17ce13332210a5eb074e4d496171fe21fa1ef51",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "TARGET_CUSTOM_EVENT",
+              "remark": "target.addEventListener(pb1_OpenUrl_Event)",
+              "file": "js/app",
+              "loc": "L1:C154929 -> L1:C154937",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "http://*/*",
+                      "https://*/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/app",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_TABS_CREATE_OPTIONS",
+              "remark": "",
+              "file": "js/background",
+              "loc": "L1:C236576 -> L1:C236661",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "js/app",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工判定：页面自定义事件可进入扩展 tabs.create 分支并由页面控制 URL。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "人工判定：页面自定义事件可进入扩展 tabs.create 分支并由页面控制 URL。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 3,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence. Let me lay out the verified chain. **Source-level evidence (confirmed in raw source, not just the report):** 1. **Attacker-reachable page↔content-script bridge (js/iframe.js, CS on `http://*/*`, `https://*/*`):** ```js window.addEventListener(\"message\",pb_receiveMessage,false); function pb_receiveMessage(e){ ... else if(e.data && (\"\"+e.data).indexOf(\"openUrl\")===0){ let ev=new CustomEvent(\"pb1_OpenUrl_Event\",{detail:e.data}); document.dispatchEvent(ev)} else if(e.…",
+              "path": "extensions/aoiidodopnnhiflaflbfeblnojefhigh_9.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "TOOL_LIMITATION",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": "BLOCKED",
+              "evidence_artifact_count": 4,
+              "reasoning": "The bounded dynamic trajectory did not produce a verdict within 90 seconds; recorded as a tooling limitation rather than treating the absence of an observation as a negative result.",
+              "path": "extensions/aoiidodopnnhiflaflbfeblnojefhigh_9.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-09-19T07:31:35.368Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/aoiidodopnnhiflaflbfeblnojefhigh/9.4/dynamic-evidence/flow-0",
+              "files": [
+                "extension-debug.json",
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "step-final-state-fixture.png",
+                "step-source-open.png",
+                "storage-after-observation.json",
+                "storage-after-trigger.json",
+                "storage-after-trigger.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. ReAct response omitted the required FINAL_VERDICT marker.",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/aoiidodopnnhiflaflbfeblnojefhigh_9.4/final/final_report.json",
+              "report_mtime": "2026-08-18T03:34:02.959Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T18:39:43+08:00",
+                "observation": "人工判定：页面自定义事件可进入扩展 tabs.create 分支并由页面控制 URL。",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/aoiidodopnnhiflaflbfeblnojefhigh_9.4/dynamic/evidence/flow-0/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-22T10:39:43.036Z",
+                "notes": "人工判定：页面自定义事件可进入扩展 tabs.create 分支并由页面控制 URL。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\aoiidodopnnhiflaflbfeblnojefhigh_9.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\aoiidodopnnhiflaflbfeblnojefhigh_9.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T10:39:43.036Z",
+                  "sha256": "5327246e89dfd163d8baaa3698afcb1adc2779b776b520f386e7ea1ff63a1155"
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": {
+              "static_verdict": {
+                "flow_summary": "",
+                "current_report": "TRUE_POSITIVE"
+              },
+              "dynamic_outcome": {
+                "flow_summary": "",
+                "current_report": "TOOL_LIMITATION"
+              },
+              "dynamic_final_verdict": {
+                "flow_summary": "",
+                "current_report": "UNCERTAIN"
+              }
+            },
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "extension_delisted",
+        "dataset_version": "9.4",
+        "latest_version": null,
+        "reason": "Chrome Web Store has no public details for this ID",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

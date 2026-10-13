@@ -1,0 +1,1554 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "oihbmmeelledioenpfcfehdjhdnlfibj",
+  "version": "1.7.14",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-268038d0dbf634c2",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "FETCH_RESOURCE",
+      "matched_tools": [
+        "ExPGuard",
+        "DoubleX"
+      ],
+      "match_region": "ExPGuard + DoubleX",
+      "match_basis": "explicit_reuse_and_normalized_signature",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:ea53703976eb22eb:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:ea53703976eb22eb:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "semantic_sha256": "ea53703976eb22eb44c2592ea01f6aadbcbc911b877fcc16e7b423c7cee16dec",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "load_embeds",
+              "loc": "L1:C465 -> L1:C624",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "load_embeds",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "service_worker",
+              "loc": "L1:C3114 -> L1:C3323",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "PARTIAL"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "load_embeds",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 3,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've confirmed the full chain from the primary evidence and the raw source. Here's my analysis. ## Decision ledger **(a) Who controls the source?** The source is a `WINDOW_MESSAGE_EVENT` in `load_embeds.js` (content script on `<all_urls>`): ```js window.addEventListener(\"message\",(e=>{ e.origin===window.location.origin ? chrome.runtime.sendMessage(e.data, ...) : console.warn(\"Blocked message from unauthorized origin:\", e.origin) })) ``` Any page matching `<all_urls>` can post a message t…",
+              "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T15:11:17.385Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/oihbmmeelledioenpfcfehdjhdnlfibj/1.7.14/dynamic-evidence/flow-2",
+              "files": [
+                "extension-debug.json",
+                "key-state.png",
+                "source-contract.json",
+                "step-after-trigger.png",
+                "step-source-open.png",
+                "storage-after-trigger.json",
+                "storage-after-trigger.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountRateLimitExceeded', 'message': 'Requests are too frequent. Please reduce your request frequency, wait a short moment, and retry your request. Request id: 021787026020930fd0de7354b348b065f00b895e07126b8ce1de2', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/final/final_report.json",
+              "report_mtime": "2026-08-18T04:06:59.918Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T18:39:43+08:00",
+                "observation": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/dynamic/evidence/flow-2/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-22T10:39:43.036Z",
+                "notes": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-2\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-2\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T10:39:43.036Z",
+                  "sha256": "3b51d04e0e8439aa5b683122e674233557821c50af4e6b687901cbae47dafb58"
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        },
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:6f7ff94a28dd859d:01",
+          "flow": {
+            "flow_id": "doublex:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:6f7ff94a28dd859d:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "semantic_sha256": "6f7ff94a28dd859d624a1f8e894f38cf79085b7fe893375cfdf7b2c2fb61a01f",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "HIGH",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L12",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "fetch",
+              "file": "background.js",
+              "loc": "L168",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": false,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content_scripts.js",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Reused/ExPGuard-Opti"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_reused_expguard",
+                  "source": "Reused/ExPGuard-Opti",
+                  "kind": "doublex_reused_expguard",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "Reused ExPGuard-Opti F003 (flow_index=2) via source_sink_type_exact/all_candidates_agree.",
+                  "reused_flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:ea53703976eb22eb:01",
+                  "package_sha256": "52d1c2c4b53ae1775d065c461d96546b45eedc70189e7bff76441228c941f21a"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "reused_expguard_match",
+            "static": {
+              "verdict": "UNCERTAIN",
+              "confidence": 0,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Verification error: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+              "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.45,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 4,
+              "reasoning": "已按源码契约（含跨 message 分发的判别字段/值）重放最小候选输入，但没有任何 instrumented sink 记录到调用。",
+              "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T05:11:12.453035Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": {
+              "source_dataset": "ExPGuard-Opti",
+              "extension_key": "oihbmmeelledioenpfcfehdjhdnlfibj@1.7.14",
+              "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:ea53703976eb22eb:01",
+              "flow_index": 2,
+              "flow_label": "F003",
+              "verification": "TP",
+              "verification_source": [
+                "Manual"
+              ],
+              "match_mode": "source_sink_type_exact",
+              "match_reason": "all_candidates_agree",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_loc": "L1:C465 -> L1:C624",
+              "sink_type": "FETCH_RESOURCE",
+              "sink_loc": "L1:C3114 -> L1:C3323",
+              "package_evidence": {
+                "same_crx": true,
+                "same_manifest": true,
+                "same_package": true,
+                "doublex_crx_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\crx\\oihbmmeelledioenpfcfehdjhdnlfibj.1.7.14.crx",
+                "expaguard_crx_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\crx\\oihbmmeelledioenpfcfehdjhdnlfibj.1.7.14.crx",
+                "doublex_crx_sha256": "52d1c2c4b53ae1775d065c461d96546b45eedc70189e7bff76441228c941f21a",
+                "expaguard_crx_sha256": "52d1c2c4b53ae1775d065c461d96546b45eedc70189e7bff76441228c941f21a",
+                "doublex_manifest_sha256": "95717f98cdeaaff92f2ad23af3c42fe732ff26d364238e2db095bf8dcd576e2d",
+                "expaguard_manifest_sha256": "95717f98cdeaaff92f2ad23af3c42fe732ff26d364238e2db095bf8dcd576e2d"
+              }
+            },
+            "notes": [
+              "DoubleX static verdict snapshot: UNCERTAIN (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.7.14",
+        "latest_version": "1.7.14",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-4c684bcbcd04bcc8",
+      "verification": "TP",
+      "source_family": "storage",
+      "sink_family": "WINDOW_POSTMESSAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:21f18253d7bc85e9:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:21f18253d7bc85e9:01",
+            "flow_index": 6,
+            "flow_order": 7,
+            "flow_label": "F007",
+            "semantic_sha256": "21f18253d7bc85e90d43e9b5b0f8fca4893e375d6fbc4fcc8cbd807e666f1925",
+            "identity_occurrence": 1,
+            "source_report_id": 11,
+            "flow_type": "DATA_LEAK",
+            "rule_id": "storage-data-message-egress",
+            "rule_description": "Data read from chrome.storage being exfiltrated through a message channel.",
+            "severity": "LOW",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "storage.dynamic.items[local]",
+              "file": "load_embeds",
+              "loc": "L1:C465 -> L1:C624",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "load_embeds",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "location.origin",
+              "file": "load_embeds",
+              "loc": "L1:C577 -> L1:C621",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "UNKNOWN",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "load_embeds",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "Manual replay on an allowed http(s) page used the call-extension storage set/get bridge. The page received the get-response and the unique marker, confirming storage disclosure through postMessage. TP."
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "Manual replay on an allowed http(s) page used the call-extension storage set/get bridge. The page received the get-response and the unique marker, confirming storage disclosure through postMessage. TP."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": null,
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.6,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": "ENVIRONMENT_READY",
+              "evidence_artifact_count": 3,
+              "reasoning": "Transcript shows only reconnaissance: CDP target enumeration, extension runtime state for service worker oihbmmeelledioenpfcfehdjhdnlfibj, an invalid tool call (list_extension_files), and list_scripts returning no scripts. No source was read to identify the field names the load_embeds sink reads from message/detail, no beacon/marker was minted, no controlled frame/message/stimulus was injected, and no sink tap or beacon hit was observed. The privileged sink was never exercised with attacker-controlled data, so no hard proof exists. Because the required payload fields were never determined and nothing was injected, this cannot be graded SINK_NOT_FIRED; it is an incomplete debugging effort.",
+              "notes": "",
+              "round": "oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-26T04:00:04.386Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-10",
+              "files": []
+            },
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-26T16:06:57+08:00",
+                "observation": "Manual replay on an allowed http(s) page used the call-extension storage set/get bridge. The page received the get-response and the unique marker, confirming storage disclosure through postMessage. TP.",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/dynamic/evidence/flow-10/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-26T08:06:57.364Z",
+                "notes": "Manual replay on an allowed http(s) page used the call-extension storage set/get bridge. The page received the get-response and the unique marker, confirming storage disclosure through postMessage. TP.",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-10\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-10\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-26T08:06:57.364Z",
+                  "sha256": "5639317c5a8d90bbe3cba6f62e54da32f3b419481422059862f53c9a6702678f"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "Restricted DATA_LEAK rerun; source/sink allowlist matched.",
+              "Manual verdict applied from operator attestation."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+rerun-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.7.14",
+        "latest_version": "1.7.14",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-512d54a12884fb1a",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "FETCH_RESOURCE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:72e3860b911682d1:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:72e3860b911682d1:01",
+            "flow_index": 8,
+            "flow_order": 9,
+            "flow_label": "F009",
+            "semantic_sha256": "72e3860b911682d1d71d42828b35111516f200188311aaf15049e6268d170ede",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "load_embeds",
+              "loc": "L1:C465 -> L1:C624",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "load_embeds",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "service_worker",
+              "loc": "L1:C4741 -> L1:C4895",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "PARTIAL"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "load_embeds",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": false,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": null,
+            "dynamic_detail": null,
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 0217870260211330b63b37cbca791937f2f41fb0469576db45559', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/final/final_report.json",
+              "report_mtime": "2026-08-18T04:06:59.918Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T18:39:43+08:00",
+                "observation": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/dynamic/evidence/flow-8/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-22T10:39:43.036Z",
+                "notes": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-8\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-8\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T10:39:43.036Z",
+                  "sha256": "f0d0f8aeeefd1bff65294baeb96219e403c24818f5e30a76e03b14256831d9d0"
+                }
+              }
+            ],
+            "notes": [
+              "Flow is absent from dynamic_report.json: no ExPAgent dynamic record for this flow."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.7.14",
+        "latest_version": "1.7.14",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-cec86c5775d717eb",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:1cc349e144741f5b:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:1cc349e144741f5b:01",
+            "flow_index": 4,
+            "flow_order": 5,
+            "flow_label": "F005",
+            "semantic_sha256": "1cc349e144741f5bcbdfd4cf72e1191bcfda8120850e69d4238817901cca190e",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "load_embeds",
+              "loc": "L1:C465 -> L1:C624",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "load_embeds",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "dashboardUserEmail",
+              "file": "service_worker",
+              "loc": "L1:C3483 -> L1:C3531",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "load_embeds",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": false,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": null,
+            "dynamic_detail": null,
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/oihbmmeelledioenpfcfehdjhdnlfibj/1.7.14/dynamic-evidence/flow-4",
+              "files": [
+                "extension-debug.json",
+                "key-state.png",
+                "source-contract.json",
+                "step-after-trigger.png",
+                "step-source-open.png",
+                "storage-after-trigger.json",
+                "storage-after-trigger.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787026020860b531818cd979bd70c39b690ac6f23902c8a8d1', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/final/final_report.json",
+              "report_mtime": "2026-08-18T04:06:59.918Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T18:39:43+08:00",
+                "observation": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/dynamic/evidence/flow-4/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-22T10:39:43.036Z",
+                "notes": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-4\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-4\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T10:39:43.036Z",
+                  "sha256": "adfecafed96a6fbb934d14ef44bf927c2ad24f3dad371668969ea68f7d80859b"
+                }
+              }
+            ],
+            "notes": [
+              "Raw ExPAgent run evidence exists for this flow (runs/chrome/.../dynamic-evidence) but dynamic_report.json has no verdict for this flow_index.",
+              "Flow is absent from dynamic_report.json: no ExPAgent dynamic record for this flow."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.7.14",
+        "latest_version": "1.7.14",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-f13d8e0f6f58b5a9",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "FETCH_RESOURCE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:23b7a108e2bb92e7:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:23b7a108e2bb92e7:01",
+            "flow_index": 5,
+            "flow_order": 6,
+            "flow_label": "F006",
+            "semantic_sha256": "23b7a108e2bb92e71b64380ecfad990e1737b40a5cad246ba8b290cab85a5f24",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "load_embeds",
+              "loc": "L1:C465 -> L1:C624",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "load_embeds",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "service_worker",
+              "loc": "L1:C4398 -> L1:C4572",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "FULL"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "load_embeds",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": false,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": null,
+            "dynamic_detail": null,
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787026020868de824baea9702e17bffa39e9c3bdc4f696c664', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/final/final_report.json",
+              "report_mtime": "2026-08-18T04:06:59.918Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T18:39:43+08:00",
+                "observation": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/dynamic/evidence/flow-5/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-22T10:39:43.036Z",
+                "notes": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-5\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-5\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T10:39:43.036Z",
+                  "sha256": "1cb55c95f6389b3ce13d08e258b323357ccb4530630022c9f665a8c7b9b40042"
+                }
+              }
+            ],
+            "notes": [
+              "Flow is absent from dynamic_report.json: no ExPAgent dynamic record for this flow."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.7.14",
+        "latest_version": "1.7.14",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-f72effd6df960637",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "FETCH_BODY",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:88cc5d24c3f9c132:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:88cc5d24c3f9c132:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "88cc5d24c3f9c1321edebf66bdcf8b469e3756811fc134880ebed7b0027f99bb",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "load_embeds",
+              "loc": "L1:C465 -> L1:C624",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "load_embeds",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_BODY",
+              "remark": "https://us.i.posthog.com/capture",
+              "file": "service_worker",
+              "loc": "L1:C558 -> L1:C741",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "load_embeds",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 3,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence to verify the flow. Here is the structured verdict. ## Four-part decision ledger **(a) Who controls the source — ATTACKER** - `load_embeds.js` runs as an ISOLATED content script on `<all_urls>` (any page). - Its `window.addEventListener(\"message\", …)` listener forwards the entire `e.data` object into `chrome.runtime.sendMessage`. - The only guard is `e.origin === window.location.origin`, which the malicious page satisfies trivially by posting to itself (`window.pos…",
+              "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T15:11:17.385Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/oihbmmeelledioenpfcfehdjhdnlfibj/1.7.14/dynamic-evidence/flow-1",
+              "files": [
+                "extension-debug.json",
+                "key-state.png",
+                "source-contract.json",
+                "step-after-trigger.png",
+                "step-source-open.png",
+                "storage-after-trigger.json",
+                "storage-after-trigger.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787026020897fd0de7354b348b065f00b895e07126b8694a9e', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/final/final_report.json",
+              "report_mtime": "2026-08-18T04:06:59.918Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T18:39:43+08:00",
+                "observation": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/dynamic/evidence/flow-1/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-22T10:39:43.036Z",
+                "notes": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T10:39:43.036Z",
+                  "sha256": "2d694b12d14446dee7889ba757c1a11a28bf4ca8da5a667f1d6e35d04b034c41"
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.7.14",
+        "latest_version": "1.7.14",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-fbdb5c2962dde8c4",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard",
+        "DoubleX"
+      ],
+      "match_region": "ExPGuard + DoubleX",
+      "match_basis": "explicit_reuse_and_normalized_signature",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:bd43915ed2a44c8f:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:bd43915ed2a44c8f:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "bd43915ed2a44c8f6d2bce08e40665de09447c35e6617145014405fdfb7521a5",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "load_embeds",
+              "loc": "L1:C465 -> L1:C624",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "load_embeds",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "unknown",
+              "file": "service_worker",
+              "loc": "L1:C1363 -> L1:C1396",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "load_embeds",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": false,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": null,
+            "dynamic_detail": null,
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787026020875fa871229fec4115dc08043e38393b8b528606a', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/final/final_report.json",
+              "report_mtime": "2026-08-18T04:06:59.918Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T18:39:43+08:00",
+                "observation": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/dynamic/evidence/flow-0/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-22T10:39:43.036Z",
+                "notes": "人工判定：任意页面可通过 window.postMessage 到达扩展 storage、token、email、MeetEmily 和 Strapi 特权分支，全部 Flow 均为 TP。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T10:39:43.036Z",
+                  "sha256": "3181dfda7f03917d28410735cfe83e082de71581540fc3c848cace7620090c48"
+                }
+              }
+            ],
+            "notes": [
+              "Flow is absent from dynamic_report.json: no ExPAgent dynamic record for this flow."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        },
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:cf437c6bd39888c1:01",
+          "flow": {
+            "flow_id": "doublex:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:cf437c6bd39888c1:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "cf437c6bd39888c166de15c5b9255c0191b5e2cee790dc595ea31081780e9f6f",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L12",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "chrome.storage.local.set",
+              "file": "background.js",
+              "loc": "L184",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": false,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content_scripts.js",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Reused/ExPGuard-Opti"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_reused_expguard",
+                  "source": "Reused/ExPGuard-Opti",
+                  "kind": "doublex_reused_expguard",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "Reused ExPGuard-Opti F001 (flow_index=0) via source_sink_type_exact/all_candidates_agree.",
+                  "reused_flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:bd43915ed2a44c8f:01",
+                  "package_sha256": "52d1c2c4b53ae1775d065c461d96546b45eedc70189e7bff76441228c941f21a"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "reused_expguard_match",
+            "static": {
+              "verdict": "UNCERTAIN",
+              "confidence": 0,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Verification error: Error code: 402 - {'error': {'message': 'Insufficient Balance', 'type': 'unknown_error', 'param': None, 'code': 'invalid_request_error'}}",
+              "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.45,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 4,
+              "reasoning": "已按源码契约（含跨 message 分发的判别字段/值）重放最小候选输入，但没有任何 instrumented sink 记录到调用。",
+              "path": "extensions/oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T05:11:12.453035Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": {
+              "source_dataset": "ExPGuard-Opti",
+              "extension_key": "oihbmmeelledioenpfcfehdjhdnlfibj@1.7.14",
+              "flow_id": "expguard-opti:chrome:oihbmmeelledioenpfcfehdjhdnlfibj:1.7.14:bd43915ed2a44c8f:01",
+              "flow_index": 0,
+              "flow_label": "F001",
+              "verification": "TP",
+              "verification_source": [
+                "Manual"
+              ],
+              "match_mode": "source_sink_type_exact",
+              "match_reason": "all_candidates_agree",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_loc": "L1:C465 -> L1:C624",
+              "sink_type": "CHROME_LOCAL_STORAGE",
+              "sink_loc": "L1:C1363 -> L1:C1396",
+              "package_evidence": {
+                "same_crx": true,
+                "same_manifest": true,
+                "same_package": true,
+                "doublex_crx_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\crx\\oihbmmeelledioenpfcfehdjhdnlfibj.1.7.14.crx",
+                "expaguard_crx_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\oihbmmeelledioenpfcfehdjhdnlfibj_1.7.14\\crx\\oihbmmeelledioenpfcfehdjhdnlfibj.1.7.14.crx",
+                "doublex_crx_sha256": "52d1c2c4b53ae1775d065c461d96546b45eedc70189e7bff76441228c941f21a",
+                "expaguard_crx_sha256": "52d1c2c4b53ae1775d065c461d96546b45eedc70189e7bff76441228c941f21a",
+                "doublex_manifest_sha256": "95717f98cdeaaff92f2ad23af3c42fe732ff26d364238e2db095bf8dcd576e2d",
+                "expaguard_manifest_sha256": "95717f98cdeaaff92f2ad23af3c42fe732ff26d364238e2db095bf8dcd576e2d"
+              }
+            },
+            "notes": [
+              "DoubleX static verdict snapshot: UNCERTAIN (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.7.14",
+        "latest_version": "1.7.14",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

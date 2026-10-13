@@ -1,0 +1,179 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "pabnknalmhfecdheflmcaehlepmhjlaa",
+  "version": "0.7.1",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-263100cc99b35e92",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_WINDOWS_CREATE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:pabnknalmhfecdheflmcaehlepmhjlaa:0.7.1:a836bb3ab3f816ba:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:pabnknalmhfecdheflmcaehlepmhjlaa:0.7.1:a836bb3ab3f816ba:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "a836bb3ab3f816baf18b8322d5c6f1e1d7dba3b75cb49ac31d049f952c3852ec",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "worker",
+              "loc": "L254:C6 -> L254:C13",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "worker",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_WINDOWS_CREATE_OPTIONS",
+              "remark": "",
+              "file": "worker",
+              "loc": "L82:C4 -> L89:C6",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工复测确认：另一扩展经 chrome.runtime.sendMessage(extId, {method:'add-jobs',jobs:[...]}) 可触发 onMessageExternal 分支，攻击者可控的 jobs[].link 经内容处理器进入 chrome.windows.create 打开弹窗，页面/扩展可控数据跨越权限边界，判定为 TP。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "人工复测确认：另一扩展经 chrome.runtime.sendMessage(extId, {method:'add-jobs',jobs:[...]}) 可触发 onMessageExternal 分支，攻击者可控的 jobs[].link 经内容处理器进入 chrome.windows.create 打开弹窗，页面/扩展可控数据跨越权限边界，判定为 TP。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "FALSE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification ### (a) Who controls the source The source is `chrome.runtime.onMessageExternal.addListener` in the MV3 service worker (`worker.js`). Because `externally_connectable` is missing, other extensions can reach this listener by default. The `request` object is therefore attacker/external-extension controlled at L254. This part is genuine. ### (b) Exact source-to-sink path The reported sink is `chrome.windows.create({...})` inside the local `job()` helper: ```js const job …",
+              "path": "extensions/pabnknalmhfecdheflmcaehlepmhjlaa_0.7.1/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.4,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": "LISTENER_READY",
+              "evidence_artifact_count": 3,
+              "reasoning": "Companion extension sent message but no beacon hit and no sink tap activity.",
+              "notes": "",
+              "round": "r2",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\pabnknalmhfecdheflmcaehlepmhjlaa_0.7.1\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-22T02:41:33.725172Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\pabnknalmhfecdheflmcaehlepmhjlaa_0.7.1\\dynamic\\evidence\\flow-0",
+              "files": []
+            },
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T12:09:37+08:00",
+                "observation": "人工复测确认：另一扩展经 chrome.runtime.sendMessage(extId, {method:'add-jobs',jobs:[...]}) 可触发 onMessageExternal 分支，攻击者可控的 jobs[].link 经内容处理器进入 chrome.windows.create 打开弹窗，页面/扩展可控数据跨越权限边界，判定为 TP。",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/pabnknalmhfecdheflmcaehlepmhjlaa_0.7.1/dynamic/evidence/flow-0/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-22T04:09:37.245Z",
+                "notes": "人工复测确认：另一扩展经 chrome.runtime.sendMessage(extId, {method:'add-jobs',jobs:[...]}) 可触发 onMessageExternal 分支，攻击者可控的 jobs[].link 经内容处理器进入 chrome.windows.create 打开弹窗，页面/扩展可控数据跨越权限边界，判定为 TP。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\pabnknalmhfecdheflmcaehlepmhjlaa_0.7.1\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\pabnknalmhfecdheflmcaehlepmhjlaa_0.7.1\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T04:09:37.245Z",
+                  "sha256": "b9f12eed21c3aa1c951553742d2c4037e5b815b9aa578a2f21ac1efafa3053c4"
+                }
+              }
+            ],
+            "notes": [
+              "Extension has no dynamic_report.json."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "0.7.1",
+        "latest_version": "0.7.1",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

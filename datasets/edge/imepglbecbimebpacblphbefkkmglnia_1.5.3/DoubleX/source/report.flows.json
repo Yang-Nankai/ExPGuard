@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "DATA_LEAK",
+      "ruleId": "doublex-sensitive-api-egress",
+      "ruleDescription": "DoubleX detected permission-gated data sent to a web-accessible channel.",
+      "sourceType": "CHROME_IDENTITY_PROFILE",
+      "sourceRemark": "chrome.identity.getProfileUserInfo",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L275",
+      "sourceCode": "chrome.identity.getProfileUserInfo(None, <pdg_js.node.FunctionExpression object at 0x7fcf7eed4550>)",
+      "sinkType": "WINDOW_POSTMESSAGE",
+      "sinkRemark": "userInfo",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L278",
+      "sinkCode": "userInfo",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": "window.postMessage",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": true,
+      "privilegeReason": "Sensitive extension data is returned to a web-accessible channel.",
+      "doublexCategory": "exfiltration_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L253",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7fcf7ef34640>, <pdg_js.node.FunctionExpression object at 0x7fcf7ef34670>)",
+        "sink-param1": "{ // Version 1.5.0 - Manifest V3\n\t\t\t\ttarget: {\n\t\t\t\t\ttabId: tabs[i].id,\n\t\t\t\t\tallFrames: true\n\t\t\t\t},\n\t\t\t\tfiles: ['fontsize2.js', 'storage.js'],\n\t\t\t}",
+        "sink-param2": "function() {\n\t\t\t\tif (chrome.runtime.lastError) {\n\t\t\t\t\tconsole.log(chrome.runtime.lastError.message);\n\t\t\t\t}\n\t\t\t}",
+        "line": "253 - 263",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_imepglbecbimebpacblphbefkkmglnia_b9633d3b3221/dx_xqqp5s9p/unpacked/imepglbecbimebpacblphbefkkmglnia.1.5.3/background.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": true,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.identity.getProfileUserInfo",
+      "sinkFile": "background.js",
+      "sinkLoc": "L275",
+      "legacy": {
+        "danger": "chrome.identity.getProfileUserInfo",
+        "value": "chrome.identity.getProfileUserInfo(None, <pdg_js.node.FunctionExpression object at 0x7fcf7eed4550>)",
+        "sink-param1": null,
+        "sink-param2": "function(userInfo) {\n\t\t\t\t\tconsole.log(userInfo);\n\t\t\t\t\tinfo = userInfo;\n\t\t\t\t\tsendResponse(info);\n\t\t\t\t}",
+        "line": "275 - 279",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_imepglbecbimebpacblphbefkkmglnia_b9633d3b3221/dx_xqqp5s9p/unpacked/imepglbecbimebpacblphbefkkmglnia.1.5.3/background.js",
+        "dataflow": true,
+        "sent_to_wa_1": {
+          "wa": "userInfo",
+          "line": "278 - 278",
+          "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_imepglbecbimebpacblphbefkkmglnia_b9633d3b3221/dx_xqqp5s9p/unpacked/imepglbecbimebpacblphbefkkmglnia.1.5.3/background.js",
+          "where": "userInfo"
+        }
+      }
+    }
+  ]
+}

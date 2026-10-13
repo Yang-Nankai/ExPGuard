@@ -1,0 +1,46 @@
+{
+  "surface": "WINDOW_MESSAGE",
+  "sourcePath": "contentScript.js",
+  "location": "L8:C8 -> L8:C23",
+  "eventNames": [],
+  "eventTarget": "window",
+  "eventDetailKey": "data",
+  "envelope": {
+    "type": "ESMART_WEB_EXTENSION_REQUEST"
+  },
+  "forwardField": "",
+  "scalarMessageValue": "",
+  "requirements": {
+    "type": "ESMART_WEB_EXTENSION_REQUEST"
+  },
+  "preconditionActions": [],
+  "selectors": [],
+  "mediaTags": [],
+  "snippet": "document.documentElement.setAttribute('esmartextension-installed', true);\ndocument.documentElement.setAttribute('esmartextension-version', browser.runtime.getManifest().version);\n\nwindow.addEventListener(\"message\", function (event) {\n    if (event.source != window)\n        return;\n\n    if (event.data.type && (event.data.type == \"ESMART_WEB_EXTENSION_REQUEST\")) {\n        browser.runtime.sendMessage({\n            operation: event.data.operation,\n            data: event.data.data,\n            method: event.data.method\n        }).then(function (response) {\n            window.postMessage({ type: \"ESMART_WEB_EXTENSION_RESPONSE\", requestId: event.data.requestId, response: response }, \"*\");\n        });\n    }\n}, false);",
+  "notes": [
+    "已从 source/sink 附近提取字面量分支。",
+    "已从 sink 文件推导消息分发字段 `type` 及候选值。",
+    "已从 sink 调用推导 URL 承载字段 `url`。",
+    "已识别信封桥接（外层字段 + 转发字段）。"
+  ],
+  "discriminatorField": "type",
+  "discriminatorValues": [
+    "ESMART_WEB_EXTENSION_REQUEST"
+  ],
+  "urlField": "url",
+  "sinkTapKey": "fetch",
+  "messageAlias": "",
+  "messageEventKey": "",
+  "jsonMessageField": "",
+  "eventDetailIsJson": false,
+  "sinkDataFields": [
+    "type",
+    "operation",
+    "data",
+    "method",
+    "requestId"
+  ],
+  "runtimeMessageKeyPrefix": "",
+  "contractConfidence": "HIGH",
+  "contractWarnings": []
+}

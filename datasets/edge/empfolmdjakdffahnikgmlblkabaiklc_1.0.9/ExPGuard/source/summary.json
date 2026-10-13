@@ -1,0 +1,1065 @@
+{
+  "extensionId": "empfolmdjakdffahnikgmlblkabaiklc",
+  "extensionVersion": "1.0.9",
+  "sourceType": "CRX",
+  "status": "success",
+  "duration": 4.364,
+  "files": [
+    {
+      "file": "js/background.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 51438,
+      "durationMs": 854.3893470000003
+    },
+    {
+      "file": "js/content-script.js",
+      "frame": "CS_1",
+      "frameTags": [
+        "CS_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "size": 13043,
+      "durationMs": 221.99069299999974
+    },
+    {
+      "file": "js/jquery.min.js",
+      "frame": "CS_1",
+      "frameTags": [
+        "CS_1",
+        "POPUP_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        },
+        {
+          "id": "POPUP_1",
+          "family": "EX"
+        }
+      ],
+      "size": 93637,
+      "durationMs": 1547.554658
+    },
+    {
+      "file": "js/popup.js",
+      "frame": "POPUP_1",
+      "frameTags": [
+        "POPUP_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "POPUP_1",
+          "family": "EX"
+        }
+      ],
+      "size": 0,
+      "durationMs": 3.226738999999725
+    }
+  ],
+  "totalFiles": 4,
+  "totalSize": 158118,
+  "cacheStats": {
+    "totalCalls": 0,
+    "hits": 0,
+    "misses": 0,
+    "evictions": 0,
+    "hitRate": 0,
+    "cacheSize": 0,
+    "maxEntries": 4096
+  },
+  "coverage": {
+    "totalNodes": 4317,
+    "coveredNodes": 663,
+    "nodeCoverage": 0.1535788742182071,
+    "totalScopes": 726,
+    "coveredScopes": 155,
+    "scopeCoverage": 0.21349862258953167,
+    "analyzedScripts": 3,
+    "scripts": [
+      {
+        "file": "js/jquery.min",
+        "frame": "CS_1",
+        "totalNodes": 3640,
+        "coveredNodes": 0,
+        "nodeCoverage": 0,
+        "totalScopes": 571,
+        "coveredScopes": 0,
+        "scopeCoverage": 0
+      },
+      {
+        "file": "js/content-script",
+        "frame": "CS_1",
+        "totalNodes": 163,
+        "coveredNodes": 150,
+        "nodeCoverage": 0.9202453987730062,
+        "totalScopes": 26,
+        "coveredScopes": 26,
+        "scopeCoverage": 1
+      },
+      {
+        "file": "js/background",
+        "frame": "BG_1",
+        "totalNodes": 514,
+        "coveredNodes": 513,
+        "nodeCoverage": 0.9980544747081712,
+        "totalScopes": 128,
+        "coveredScopes": 128,
+        "scopeCoverage": 1
+      },
+      {
+        "file": "js/popup",
+        "frame": "POPUP_1",
+        "totalNodes": 0,
+        "coveredNodes": 0,
+        "nodeCoverage": 1,
+        "totalScopes": 1,
+        "coveredScopes": 1,
+        "scopeCoverage": 1
+      }
+    ]
+  },
+  "hasFlows": true,
+  "flows": [
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "attacker-input-privileged-operation",
+      "ruleDescription": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "CHROME_COOKIES_REMOVE_OPTIONS",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L534:C16 -> L534:C79",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": "> {\n                >>>chrome.cookies.remove({url: actionData.url, name: cookie.name})<<<;\n            });\n  "
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "attacker-input-privileged-operation",
+      "ruleDescription": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L553:C8 -> L559:C10",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": "tabId = '';\n        >>>chrome.tabs.create({\n            url: url,\n            active: false,\n            pinned: true\n        }, function(tab) {\n            tabId = tab.id;\n        })<<<;\n        globalEven"
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "[Unknown URL]",
+      "sinkUrlTaintControl": "FULL",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L74:C35 -> L74:C75",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": "st response = await >>>fetch(this.videoUrl, { method: 'HEAD' })<<<;\n            if (!r"
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "attacker-input-storage-write",
+      "ruleDescription": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "unknown",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L598:C8 -> L609:C9",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": "y] = value;\n        >>>chrome.storage.local.set(\n            map,\n            function() {\n                chrome.tabs.sendMessage(sender.tab.id, { \n                    action: action, \n                    actionId: actionId, \n                    actionSource: 'backgroundCrossApi',\n                    actionData: ''\n                });\n                hasResponse = true;\n            }\n        )<<<;        \n    } else"
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "[Unknown URL]",
+      "sinkUrlTaintControl": "FULL",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L662:C12 -> L662:C52",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": "Text) {\n            >>>fetch(actionData.url, actionData.config)<<<.then(res => res.tex"
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "[Unknown URL]",
+      "sinkUrlTaintControl": "FULL",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L680:C12 -> L680:C52",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": " else {\n            >>>fetch(actionData.url, actionData.config)<<<.then(res => res.jso"
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "attacker-input-privileged-operation",
+      "ruleDescription": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L706:C8 -> L769:C10",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": ")\n        }\n        >>>chrome.tabs.create(Object.assign({\n            url,\n            active: false,\n            pinned: true\n        }, config.tabConfig || {}), function(tab) {\n            setTimeout(function() {\n                // chrome.tabs.sendMessage(tab.id, { \n                //     action: 'contentScriptExecuteScript',\n                //     actionId: actionId, \n                //     actionSource: 'contentScriptExecuteScript',\n                //     actionData: JSON.stringify(actionData)\n                // });\n                var senderTabId = sender.tab.id;\n                chrome.scripting.executeScript(Object.assign({\n                    target: { tabId: tab.id },\n                    func: function(script, _senderTabId) {\n                        eval(`\n                            var senderTabId = '${_senderTabId}';\n                            ${script}\n                        `);\n                    },\n                    world: config.scriptConfig?.world || \"MAIN\",\n                    injectImmediately: config.scriptConfig?.injectImmediately === false ? false : true,\n                    args: [actionData.script, senderTabId]\n                }, config.otherExecuteScriptConfig || {}));\n                globalEvent.on(data.action + data.actionId, function(responseActionData) {\n                    globalEvent.destory(data.action + data.actionId);\n                    chrome.tabs.sendMessage(senderTabId, { \n                        action: action, \n                        actionId: actionId, \n                        actionSource: 'backgroundCrossApi',\n                        actionData: JSON.stringify(responseActionData)\n                    });\n                    chrome.tabs.remove(tab.id);\n                    hasResponse = true;\n                });\n                if (config.closeByTargetUrl) {\n                    setTabIdTriggerCallback(tab.id, config.closeByTargetUrl, config.closeByTargetUrlExact, () => {\n                        setTimeout(function() {\n                            globalEvent.destory(data.action + data.actionId);\n                            chrome.tabs.sendMessage(senderTabId, { \n                                action: action, \n                                actionId: actionId, \n                                actionSource: 'backgroundCrossApi',\n                                actionData: JSON.stringify({})\n                            });\n                            chrome.tabs.remove(tab.id);\n                            hasResponse = true;\n                        }, config.closeByTargetUrlDelay || 0);\n                    });\n                }\n                if (config.triggerByManualClose) {\n                    setTabIdCloseTriggerCallback(tab.id, () => {\n                        globalEvent.destory(data.action + data.actionId);\n                        chrome.tabs.sendMessage(senderTabId, { \n                            action: action, \n                            actionId: actionId, \n                            actionSource: 'backgroundCrossApi',\n                            actionData: JSON.stringify({})\n                        });\n                    })\n                }\n            }, config.waitTime || 5000);\n        })<<<;\n    } else if (dat"
+    },
+    {
+      "flowType": "CODE_INJECTION",
+      "ruleId": "attacker-input-code-execution",
+      "ruleDescription": "Attacker-controlled data into eval / new Function / setTimeout(string) — code injection.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "EVAL",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L722:C24 -> L725:C26",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": "                    >>>eval(`\n                            var senderTabId = '${_senderTabId}';\n                            ${script}\n                        `)<<<;\n                  "
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "attacker-input-privileged-operation",
+      "ruleDescription": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "CHROME_WINDOWS_CREATE_OPTIONS",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L807:C12 -> L882:C14",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": "      }\n            >>>chrome.windows.create(Object.assign({\n                url,\n                type: 'popup',\n                width: config.width,\n                height: config.height,\n                top: config.top,\n                left: config.left,\n            }, config.otherWindowConfig || {}), function(newWindow) {\n                setTimeout(function() {\n                    if (!newWindow?.tabs[0]?.id) {\n                        return;\n                    }\n                    historyWindows.push(newWindow?.id);\n                    // chrome.tabs.sendMessage(newWindow?.tabs[0]?.id, { \n                    //     action: 'contentScriptExecuteScript',\n                    //     actionId: actionId, \n                    //     actionSource: 'contentScriptExecuteScript',\n                    //     actionData: JSON.stringify(actionData)\n                    // });\n                    chrome.scripting.executeScript(Object.assign({\n                        target: { tabId: newWindow?.tabs[0]?.id },\n                        func: function(script) {\n                            eval(script);\n                        },\n                        world: config.scriptConfig?.world || \"MAIN\",\n                        injectImmediately: config.scriptConfig?.injectImmediately === false ? false : true,\n                        args: [actionData.script]\n                    }, config.otherExecuteScriptConfig || {}));\n                    globalEvent.on(data.action + data.actionId, function(responseActionData) {\n                        globalEvent.destory(data.action + data.actionId);\n                        chrome.tabs.sendMessage(sender.tab.id, { \n                            action: action, \n                            actionId: actionId, \n                            actionSource: 'backgroundCrossApi',\n                            actionData: JSON.stringify(responseActionData)\n                        });\n                        try {\n                            chrome.windows.remove(newWindow.id);\n                        } catch (e) {\n                            // nothing\n                        }\n                        hasResponse = true;\n                    });\n                    if (config.closeByTargetUrl) {\n                        setTabIdTriggerCallback(newWindow?.tabs[0]?.id, config.closeByTargetUrl, config.closeByTargetUrlExact, () => {\n                            setTimeout(function() {\n                                globalEvent.destory(data.action + data.actionId);\n                                chrome.tabs.sendMessage(sender.tab.id, { \n                                    action: action, \n                                    actionId: actionId, \n                                    actionSource: 'backgroundCrossApi',\n                                    actionData: JSON.stringify({})\n                                });\n                                try {\n                                    chrome.tabs.remove(newWindow?.tabs[0]?.id);\n                                    chrome.windows.remove(newWindow.id);\n                                } catch (e) {\n                                    // nothing\n                                }\n                                hasResponse = true;\n                            }, config.closeByTargetUrlDelay || 0);\n                        });\n                    }\n                    if (config.triggerByManualClose) {\n                        setTabIdCloseTriggerCallback(newWindow?.tabs[0]?.id, () => {\n                            globalEvent.destory(data.action + data.actionId);\n                            chrome.tabs.sendMessage(sender.tab.id, { \n                                action: action, \n                                actionId: actionId, \n                                actionSource: 'backgroundCrossApi',\n                                actionData: JSON.stringify({})\n                            });\n                        })\n                    }\n                }, config.waitTime === undefined ? 3000 : config.waitTime);\n            })<<<;\n        })();\n    "
+    },
+    {
+      "flowType": "CODE_INJECTION",
+      "ruleId": "attacker-input-code-execution",
+      "ruleDescription": "Attacker-controlled data into eval / new Function / setTimeout(string) — code injection.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "EVAL",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L829:C28 -> L829:C40",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": "                    >>>eval(script)<<<;\n                  "
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "attacker-input-privileged-operation",
+      "ruleDescription": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L1041:C12 -> L1051:C13",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": "== 1) {\n            >>>chrome.tabs[actionData.funcName](\n                actionData.args[0],\n                function(res) {\n                    chrome.tabs.sendMessage(sender.tab.id, { \n                        action: action, \n                        actionId: actionId, \n                        actionSource: 'backgroundCrossApi',\n                        actionData: JSON.stringify(res)\n                    });\n                }\n            )<<<;\n        } else if "
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "attacker-input-privileged-operation",
+      "ruleDescription": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L1053:C12 -> L1064:C13",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": "== 2) {\n            >>>chrome.tabs[actionData.funcName](\n                actionData.args[0],\n                actionData.args[1],\n                function(res) {\n                    chrome.tabs.sendMessage(sender.tab.id, { \n                        action: action, \n                        actionId: actionId, \n                        actionSource: 'backgroundCrossApi',\n                        actionData: JSON.stringify(res)\n                    });\n                }\n            )<<<;\n        } else if "
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "attacker-input-privileged-operation",
+      "ruleDescription": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "CHROME_DECLARATIVENETREQUEST_RULES",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L899:C22 -> L931:C17",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": "              await >>>chrome.declarativeNetRequest.updateDynamicRules(\n                    {\n                        removeRuleIds: removeRuleIds,\n                        addRules: [{\n                            id: newRuleId,\n                            priority: 1,\n                            action: Object.assign({\n                                type: 'modifyHeaders'\n                            }, \n                            requestHeaders.length ? {\n                                requestHeaders: requestHeaders.map(function(header) {\n                                    return {\n                                        operation: header.operation || 'set', // 添加或修改头部信息, \"append\", \"set\", or \"remove\"\n                                        header: header.name, // 头部名称\n                                        value: header.value // 头部值\n                                    }\n                                })\n                            } : {}, \n                            responseHeaders.length ? {\n                                responseHeaders: responseHeaders.map(function(header) {\n                                    return {\n                                        operation: header.operation || 'set', // 添加或修改头部信息, \"append\", \"set\", or \"remove\"\n                                        header: header.name, // 头部名称\n                                        value: header.value // 头部值\n                                    }\n                                }),\n                            }: {}),\n                            condition: {\n                                urlFilter: '*' + prefix + '*'\n                            }\n                        }]\n                    },\n                )<<<;\n                co"
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "attacker-input-privileged-operation",
+      "ruleDescription": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L1066:C12 -> L1078:C13",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": "== 3) {\n            >>>chrome.tabs[actionData.funcName](\n                actionData.args[0],\n                actionData.args[1],\n                actionData.args[2],\n                function(res) {\n                    chrome.tabs.sendMessage(sender.tab.id, { \n                        action: action, \n                        actionId: actionId, \n                        actionSource: 'backgroundCrossApi',\n                        actionData: JSON.stringify(res)\n                    });\n                }\n            )<<<;\n        } else {\n "
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "attacker-input-privileged-operation",
+      "ruleDescription": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "CHROME_DECLARATIVENETREQUEST_RULES",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L956:C22 -> L969:C17",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": "              await >>>chrome.declarativeNetRequest.updateDynamicRules(\n                    {\n                        removeRuleIds: removeRuleIds,\n                        addRules: [{\n                            id: newRuleId,\n                            priority: 1,\n                            action: {\n                                type: \"redirect\",\n                                redirect: redirect\n                            },\n                            condition: condition\n                        }]\n                    }\n                )<<<;\n                se"
+    },
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "attacker-input-privileged-operation",
+      "ruleDescription": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentScriptExecuteScriptEndFromPage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "js/content-script",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "js/content-script",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "CHROME_DECLARATIVENETREQUEST_RULES",
+      "sinkFile": "js/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L1128:C14 -> L1133:C9",
+      "ctx": "js/background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[js/content-script->js/background]",
+      "messageSender": "js/content-script",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ize < 1024 * 1024 * >>>50) {\n     <<<               retur",
+      "sinkCode": ": [];\n        await >>>chrome.declarativeNetRequest.updateDynamicRules(\n            {\n                removeRuleIds: removeRuleIds,\n                addRules: addRules\n            }\n        )<<<;\n        chrome.tab"
+    }
+  ],
+  "privilegeSuppressedCount": 1,
+  "privilegeSuppressed": [
+    {
+      "flowType": "DOM_XSS",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceFile": "js/content-script",
+      "sourceLoc": "L253:C19 -> L253:C30",
+      "sinkType": "DOM_INNER_HTML",
+      "sinkFile": "js/content-script",
+      "sinkLoc": "L247:C59 -> L247:C68",
+      "reason": "page-controlled data reaches DOM_WRITE inside a content script; the page can perform this itself, so no authority is gained"
+    }
+  ]
+}

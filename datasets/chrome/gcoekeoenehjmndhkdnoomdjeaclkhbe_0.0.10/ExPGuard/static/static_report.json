@@ -1,0 +1,96 @@
+{
+  "extension_id": "gcoekeoenehjmndhkdnoomdjeaclkhbe",
+  "extension_version": "0.0.10",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.3,
+      "reasoning": "Structured extraction unavailable; preserved analyst notes: ## Verification reasoning\n\n**Decision ledger**\n\n(a) Who controls the source: a `window` message event in the content script (`scripts/classroom/content.js`). The listener is registered in `openNearpodModal()` and only checks attacker-supplied message fields:\n```js\nif (ev.data && ev.data.type === 'nearpodMessage' && ev.data.action_type === actionTypes.MY_LIBRARY_EXTENSION_LESSON_LAUNCHED_SUCCESS) {\n```\nThere is **no `ev.origin`/`ev.source` check**, and the gate values are constants an attacker can learn (`'nearpodMessage'`, `'MY_LIBRARY/EXTENSION_LESSON_LAUNCHED_SUCCESS'`). The harness confirms this is a PAGE_TO_CONTENT_SCRIPT bridge where message fields are not authentication. The page (`https://classroom.google.com/*`) can forge the message (XSS prerequisite; also the embedded `nearpod.com` iframe is another unauthenticated sender). Source is untrusted/attacker-controllable.\n\n(b) Source-to-sink path (from primary evidence + confirmed raw source):\n- `scripts/classroom/content.js` L31–38: forged `ev.data.payload.assignmentTitle` / `ev.data.payload.assignmentMaterial` are sent via `chrome.runtime.sendMessage({ type: messageTypes.CREATE_ASSIGNMENT, payload: {...} })`.\n- `scripts/servi",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "scripts/classroom/content",
+          "reportedLoc": "L31:C17 -> L31:C29",
+          "resolvedFile": "scripts/classroom/content.js",
+          "resolved": true,
+          "snippet": "L31 C17-29: \t\tif (ev.data && ev.data.type === 'nearpodMessage' && ev.data.action_type === actionTypes.MY_LIBRARY_EXTENSIO…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "scripts/service-worker",
+          "reportedLoc": "L91:C9 -> L91:C96",
+          "resolvedFile": "scripts/service-worker.js",
+          "resolved": true,
+          "snippet": "L91 C9-96: \t\t\tawait fetch(`${googleApiUrl}courses/${courseId}/courseWork?access_token=${oauthToken}`, init)"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://classroom.google.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "scripts/classroom/content.js"
+            ],
+            "runAt": "document_end",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "No structured verdict or explicit labelled transcript verdict was available.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 0 true-positive, 0 false-positive, 1 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

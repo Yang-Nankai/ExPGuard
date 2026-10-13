@@ -1,0 +1,118 @@
+{
+"update_url": "https://clients2.google.com/service/update2/crx",
+
+  "manifest_version": 3,
+  "name": "ggsel Ханти: 1080p на Twitch, игры дешевле и Steam в рублях",
+  "description": "Ханти находит низкую цену на игру и дает купить в один клик на Twitch и в Steam. Steam в рублях, 1080p на Twitch без ВПН.",
+  "version": "1.0.17.1",
+  "permissions": [
+    "storage",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
+    "cookies",
+    "alarms",
+    "notifications"
+  ],
+  "host_permissions": [
+    "*://*.twitch.tv/*",
+    "*://*.ttvnw.net/*",
+    "*://ggsel.net/*",
+    "*://*.ggsel.net/*",
+    "https://store.steampowered.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "icons": {
+    "16": "assets/icon16.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
+  "options_page": "options/options.html",
+  "content_scripts": [
+    {
+      "matches": ["*://*.twitch.tv/*"],
+      "js": ["content/twitch.integrity.main.js"],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    },
+    {
+      "matches": ["*://*.twitch.tv/*"],
+      "js": ["content/twitch.integrity.bridge.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": ["*://*.twitch.tv/*"],
+      "js": ["content/twitch.content.js"],
+      "css": ["content/ui.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://*.twitch.tv/*"],
+      "js": ["content/twitch.stats.content.js"],
+      "css": ["content/ui.stats.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://ggsel.net/*", "*://*.ggsel.net/*"],
+      "js": ["content/ggsel.content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://store.steampowered.com/*"],
+      "js": ["content/steam.content.js"],
+      "css": ["content/ui.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "common/storage.js",
+        "common/config.js",
+        "common/analytics.js",
+        "common/backgroundFetch.js",
+        "common/initContentScript.js",
+        "common/fetchGameData.js",
+        "common/ggselLink.js",
+        "common/openLink.js",
+        "common/steamGameData.js",
+        "common/twitchGameButton.js",
+        "common/stats/twitchGql.js",
+        "common/stats/heatmapRenderer.js",
+        "common/stats/gamesRenderer.js"
+      ],
+      "matches": ["https://*.twitch.tv/*"]
+    },
+    {
+      "resources": [
+        "common/storage.js",
+        "common/config.js",
+        "common/analytics.js",
+        "common/backgroundFetch.js",
+        "common/initContentScript.js",
+        "common/fetchGameData.js",
+        "common/ggselLink.js",
+        "common/openLink.js",
+        "common/steamGameData.js"
+      ],
+      "matches": ["https://store.steampowered.com/*"]
+    }
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "main_rules",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "action": {
+    "default_title": "GGSel — Twitch 1080p",
+    "default_popup": "options/options.html"
+  }
+}

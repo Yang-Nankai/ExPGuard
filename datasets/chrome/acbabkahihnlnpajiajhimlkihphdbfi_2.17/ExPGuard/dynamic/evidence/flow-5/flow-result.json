@@ -1,0 +1,147 @@
+{
+  "flow_index": 5,
+  "outcome": "CONFIRMED",
+  "final_verdict": "UNCERTAIN",
+  "confidence": 0.85,
+  "reproduced": true,
+  "trajectory": [
+    {
+      "action": "instrument_sink",
+      "detail": "background",
+      "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_e7a0ec2992a24c3e\", \"targetId\": \"17C9F4B15BAA7998387CE5C35073A334\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+    },
+    {
+      "action": "companion_payload_contract",
+      "detail": "bounded source-contract derivation",
+      "result": "{\"sourceCandidates\": [\"background\"], \"selectedSourcePath\": \"C:\\\\Users\\\\ph0jav7\\\\AppData\\\\Local\\\\Temp\\\\expagent-dynamic-dkzm60nn\\\\extension\\\\background.js\", \"sourceType\": \"CHROME_ONMESSAGEEXTERNAL_MESSAGE\", \"sinkRemark\": \"examId\", \"listenerToken\": \"onMessageExternal\", \"matchedRouteLiterals\": [\"key=candidateDetails\", \"name=AbortError\"], \"payloadKeys\": [\"_expagent_marker\", \"draft_id\", \"height\", \"key\", \"name\"], \"loginRouteDetected\": false}"
+    },
+    {
+      "action": "companion_send",
+      "detail": "companion(eeejfegkcegkghkmmbebhlfhdkmgonkm) -> target(aepkmplggklgeiecdkjfajlniahkifoe)",
+      "result": "{'ok': True, 'response': {'success': True}}"
+    },
+    {
+      "action": "observe",
+      "detail": "sink tap",
+      "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_e7a0ec2992a24c3e\", \"actualGeneration\": \"observer_e7a0"
+    },
+    {
+      "action": "external_fixture_result",
+      "detail": "storage.local.set",
+      "result": "exact sink observed"
+    }
+  ],
+  "planned_trajectory": {
+    "flow_index": 5,
+    "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+    "target_url": "http://localhost:8010/page",
+    "preconditions": [
+      "A page where the relevant content script/source frame runs.",
+      "Loaded extension must expose extension CDP targets.",
+      "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+    ],
+    "steps": [
+      {
+        "action": "list_cdp_targets",
+        "detail": "Confirm extension target/background/service-worker exists.",
+        "result": ""
+      },
+      {
+        "action": "get_extension_runtime_state",
+        "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+        "result": ""
+      },
+      {
+        "action": "new_page/navigate_page",
+        "detail": "Open approved source fixture only: http://localhost:8010/page",
+        "result": ""
+      },
+      {
+        "action": "list_scripts/search_in_sources",
+        "detail": "Confirm relevant content script/listener is injected.",
+        "result": ""
+      },
+      {
+        "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+        "detail": "Inject a JSON test marker through the matching local source surface.",
+        "result": ""
+      },
+      {
+        "action": "observe",
+        "detail": "Check beacon/network/console/runtime state/screenshot.",
+        "result": ""
+      },
+      {
+        "action": "ReAct-adjust",
+        "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+        "result": ""
+      }
+    ],
+    "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+    "expected_observation": "Instrument and observe CHROME_LOCAL_STORAGE; use a beacon when its security-relevant argument is a URL.",
+    "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+  },
+  "evidence": "companion send result: {'ok': True, 'response': {'success': True}}, mapped web send: None, sink tap: {\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_e7a0ec2992a24c3e\", \"actualGeneration\": \"observer_e7a0ec2992a24c3e\", \"previousTargetId\": \"17C9F4B15BAA7998387CE5C35073A334\", \"currentTargetId\": \"17C9F4B15BAA7998387CE5C35073A334\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"storage.local.set\\\",\\\"storage.onChanged\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__cookies_set__\\\":true,\\\"__tabs_create__\\\":true,\\\"__tabs_update__\\\":true,\\\"__tabs_remove__\\\":true,\\\"__tabs_sendMessage__\\\":true,\\\"__windows_create__\\\":true,\\\"__windows_update__\\\":true,\\\"__windows_remove__\\\":true,\\\"__action_se, harness patches: [{\"kind\": \"external-response-port-semantic-fixture\", \"semanticFixture\": true, \"positiveOnly\": true, \"port\": 8010, \"hosts\": [\"examroom.ai\", \"test.examroom.ai\", \"dev.examroom.ai\"], \"files\": [\"accessblocker.js\", \"background.js\", \"developer.js\"], \"replacements\": 6}, {\"kind\": \"externally_connectable-test-sender\", \"semanticFixture\": true, \"positiveOnly\": true, \"path\": \"manifest.json\", \"detail\": \"Added the controlled companion ID to the disposable manifest copy.\", \"companionId\": \"eeejfegkcegkghkmmbebhlfhdkmgonkm\"}]",
+  "reasoning": "A controlled companion extension reached the external-message listener and the exact privileged sink recorded the bounded test marker. If an ID allowlist existed, only the disposable manifest copy was patched and that semantic change is recorded.",
+  "evidence_stage": "MARKER_REACHED",
+  "blocked_reason": "",
+  "observer_status": {
+    "semanticFixture": true,
+    "positiveOnly": true,
+    "semanticFixtureKinds": [
+      "external-response-port-semantic-fixture",
+      "externally_connectable-test-sender"
+    ],
+    "environmentReady": true,
+    "listenerReady": true,
+    "sinkObserverReady": true,
+    "sourceContractReady": true,
+    "runtimeSourceContractProven": true,
+    "sourceReached": true,
+    "bridgeReached": true,
+    "sinkReached": true,
+    "markerReached": true,
+    "capabilityAssessment": {
+      "requiredContexts": [
+        "serviceWorker"
+      ],
+      "unsupportedContexts": [],
+      "limitations": [],
+      "deterministicReplaySupported": true,
+      "lineBreakpointSupported": true
+    }
+  },
+  "payload_used": "{'_expagent_marker': 'expa_c5e887b48367', 'key': 'candidateDetails', 'name': 'AbortError', 'height': 640, 'draft_id': 'expagent_draft'}",
+  "evidence_artifacts": [
+    {
+      "kind": "transcript",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\chrome\\acbabkahihnlnpajiajhimlkihphdbfi\\2.17\\dynamic-evidence\\flow-5\\trajectory.txt",
+      "description": "Bounded ReAct trajectory and tool evidence.",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\chrome\\acbabkahihnlnpajiajhimlkihphdbfi\\2.17\\dynamic-evidence\\flow-5\\step-final-state.png",
+      "description": "Step `final-state`: about:blank",
+      "stage": "final-state",
+      "captured_at": "2026-09-19T04:47:47.822592+00:00",
+      "target_url": "about:blank",
+      "sha256": "dbd1a27f5de7a1235fb2fb0f3b105004e687700f0301f794d8d53b3ceb0919a0"
+    },
+    {
+      "kind": "screenshot-manifest",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\chrome\\acbabkahihnlnpajiajhimlkihphdbfi\\2.17\\dynamic-evidence\\flow-5\\screenshot-evidence.json",
+      "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    }
+  ],
+  "human_handoff": null,
+  "debugger_summary": "",
+  "notes": "semanticFixture=true originalSenderIdentityNotClaimed=true semanticFixture=true originalSenderIdentityNotClaimed=true"
+}

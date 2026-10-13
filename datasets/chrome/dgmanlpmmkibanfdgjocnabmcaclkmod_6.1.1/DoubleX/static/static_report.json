@@ -1,0 +1,90 @@
+{
+  "extension_id": "dgmanlpmmkibanfdgjocnabmcaclkmod",
+  "extension_version": "6.1.1",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've verified the actual source. Here is my analysis.\n\n## Decision ledger\n\n**(a) Who controls the source?**\nThe reported source file `content_scripts.js` L10 does not exist as a message listener (that line is `let hasBeenAskedForReview10000 = false;`). The real source is the content script declared in the manifest: `messager.js` (matches `https://justread.link/*`), line 10:\n\n```js\nconst jrSecret = event.data.jrSecret;   // L10, exact span the report intended\n```\n\nThe value comes from a `window.addEventListener(\"message\", ...)` listener. A page on `https://justread.link/*` can forge `event.data.jrSecret` with arbitrary content; `event.origin` is attacker-satisfiable when the attacker can run JS on that origin.\n\n**(b) Exact source-to-sink path**\nUnbroken chain, confirmed in source:\n\n1. `messager.js:7-13` — window message listener; if `event.data.jrSecret` is truthy → `chrome.runtime.sendMessage({jrSecret})`.\n2. `background.js:197` — `chrome.runtime.onMessage.addListener` receives it.\n3. `background.js:219-220` — `else if (request.jrSecret) chrome.storage.sync.set({ jrSecret: request.jrSecret });`\n\n**(c) Which security-relevant argument is attacker-controlled?**\n`request.jrSecret` is ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": null,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "DoubleX matched external input to a sensitive API parameter.",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content_scripts.js",
+          "reportedLoc": "L10",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L243",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "Source report file could not be resolved in the unpacked CRX/XPI."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

@@ -1,0 +1,386 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "gpgbiinpmelaihndlegbgfkmnpofgfei",
+  "version": "3.7",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-73395913dd2df3fc",
+      "verification": "TP",
+      "source_family": "custom",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:gpgbiinpmelaihndlegbgfkmnpofgfei:3.7:b6fc04a0fc68aea4:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:gpgbiinpmelaihndlegbgfkmnpofgfei:3.7:b6fc04a0fc68aea4:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "b6fc04a0fc68aea448eceb31f83a85dfc72978a0ab59107e28a574967d8149e4",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "WINDOW_CUSTOM_EVENT",
+              "remark": "window.addEventListener(msfy-inner-message)",
+              "file": "js/content",
+              "loc": "L1:C626 -> L1:C634",
+              "frame": "CS_2",
+              "frames": [
+                {
+                  "id": "CS_2",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*"
+                    ],
+                    "excludeMatches": [
+                      "https://www.youtube.com/error?*",
+                      "https://www.youtube.com/howyoutubeworks/*",
+                      "https://www.youtube.com/intl/*",
+                      "https://www.youtube.com/kids/*",
+                      "https://www.youtube.com/live_chat?*",
+                      "https://www.youtube.com/pop-up-player/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/content",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "unknown",
+              "file": "js/content",
+              "loc": "L1:C777 -> L1:C805",
+              "frame": "CS_2",
+              "frames": [
+                {
+                  "id": "CS_2",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*"
+                    ],
+                    "excludeMatches": [
+                      "https://www.youtube.com/error?*",
+                      "https://www.youtube.com/howyoutubeworks/*",
+                      "https://www.youtube.com/intl/*",
+                      "https://www.youtube.com/kids/*",
+                      "https://www.youtube.com/live_chat?*",
+                      "https://www.youtube.com/pop-up-player/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "flow_index": 0,
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "User manually confirmed the YouTube page event reaches chrome.storage.local."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ### Four-part decision ledger **(a) Who controls the source?** The page on `https://www.youtube.com/*` controls it. In `js/content.js`, `l = \"msfy\" + \"-inner-message\"` and the content script registers: ```js e.addEventListener(l, r, true) ``` where `e` is `window`. A page can dispatch its own DOM `CustomEvent`: ```js window.dispatchEvent(new CustomEvent('msfy-inner-message', { detail: JSON.stringify({ type: 'menuWidth', value: 'evil' }) })) ``` There is no `isTrusted`, `event.source`, or…",
+              "path": "extensions/gpgbiinpmelaihndlegbgfkmnpofgfei_3.7/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "non_decisive",
+              "usable_for_label": false,
+              "evidence_stage": "BLOCKED",
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 25s budget and no deterministic terminal evidence was produced.",
+              "notes": "",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\gpgbiinpmelaihndlegbgfkmnpofgfei_3.7\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-22T15:03:58.686Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\gpgbiinpmelaihndlegbgfkmnpofgfei_3.7\\dynamic\\evidence\\flow-0",
+              "files": [
+                "flow-result.json"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 02178702581521859e4692ee8689b9dc112ef0a7e12032f6f9344', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/gpgbiinpmelaihndlegbgfkmnpofgfei_3.7/final/final_report.json",
+              "report_mtime": "2026-08-18T04:03:33.955Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-22T15:03:58.686Z",
+                "notes": "User manually confirmed the YouTube page event reaches chrome.storage.local.",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\gpgbiinpmelaihndlegbgfkmnpofgfei_3.7\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\gpgbiinpmelaihndlegbgfkmnpofgfei_3.7\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T15:03:58.686Z",
+                  "sha256": "c3aaa0e83de22563767ecdbe1444ec04d67b550e76cc8923ed58abad268896a1"
+                }
+              }
+            ],
+            "notes": [
+              "Latest manual attestation overrides the aggregate label while preserving the automated outcome for audit."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "3.7",
+        "latest_version": "3.7",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-9dd487955bddedda",
+      "verification": "TP",
+      "source_family": "custom",
+      "sink_family": "CHROME_TABS_CREATE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:gpgbiinpmelaihndlegbgfkmnpofgfei:3.7:9ba7cc871ab1593c:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:gpgbiinpmelaihndlegbgfkmnpofgfei:3.7:9ba7cc871ab1593c:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "9ba7cc871ab1593cdc6739c65a4291de19da5176a090c38e060a2e583087590e",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "WINDOW_CUSTOM_EVENT",
+              "remark": "window.addEventListener(msfy-inner-message)",
+              "file": "js/content",
+              "loc": "L1:C626 -> L1:C634",
+              "frame": "CS_2",
+              "frames": [
+                {
+                  "id": "CS_2",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*"
+                    ],
+                    "excludeMatches": [
+                      "https://www.youtube.com/error?*",
+                      "https://www.youtube.com/howyoutubeworks/*",
+                      "https://www.youtube.com/intl/*",
+                      "https://www.youtube.com/kids/*",
+                      "https://www.youtube.com/live_chat?*",
+                      "https://www.youtube.com/pop-up-player/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/content",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_TABS_CREATE_OPTIONS",
+              "remark": "",
+              "file": "background",
+              "loc": "L1:C408 -> L1:C440",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "js/content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "flow_index": 1,
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "User reported the second flow as Flow 2, but this extension has only Flow 0 and Flow 1; Flow 1 is the remaining tabs.create path."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": null,
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.6,
+              "reproduced": false,
+              "basis": "non_decisive",
+              "usable_for_label": false,
+              "evidence_stage": "ENVIRONMENT_READY",
+              "evidence_artifact_count": 3,
+              "reasoning": "The agent enumerated CDP targets and confirmed the service worker for the extension, but never read the handler source to learn the exact event/message contract and never injected any payload or dispatched the window custom event. The source search for 'msfy-inner-message' returned no matches, so the required field names were never determined. No beacon hits, network activity, or console signals indicating the chrome.tabs.create sink fired were observed. Since no payload was constructed with (or without) the correct fields and no trigger was attempted, the result is inconclusive rather than a valid SINK_NOT_FIRED rebuttal.",
+              "notes": "",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\gpgbiinpmelaihndlegbgfkmnpofgfei_3.7\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-22T15:03:58.686Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\gpgbiinpmelaihndlegbgfkmnpofgfei_3.7\\dynamic\\evidence\\flow-1",
+              "files": [
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "step-final-state-fixture.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787025815188e4d5e3acd6b6d5c09c835e2d36b9596ced3fb1', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/gpgbiinpmelaihndlegbgfkmnpofgfei_3.7/final/final_report.json",
+              "report_mtime": "2026-08-18T04:03:33.955Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-22T15:03:58.686Z",
+                "notes": "User reported the second flow as Flow 2, but this extension has only Flow 0 and Flow 1; Flow 1 is the remaining tabs.create path.",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\gpgbiinpmelaihndlegbgfkmnpofgfei_3.7\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\gpgbiinpmelaihndlegbgfkmnpofgfei_3.7\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T15:03:58.686Z",
+                  "sha256": "cbd1fe987b627382a57e5887da8b11b136d5fabe3ac21010f1c18ffd7a857123"
+                }
+              }
+            ],
+            "notes": [
+              "Flow is absent from dynamic_report.json: no ExPAgent dynamic record for this flow.",
+              "Latest manual attestation overrides the aggregate label while preserving the automated outcome for audit."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "3.7",
+        "latest_version": "3.7",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

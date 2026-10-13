@@ -1,0 +1,316 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "mdohdkncgoaamplcaokhmlppgafhlima",
+  "version": "1.1.25",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-114dfcad386601f1",
+      "verification": "TP",
+      "source_family": "storage",
+      "sink_family": "WINDOW_POSTMESSAGE",
+      "matched_tools": [
+        "CoCo",
+        "DoubleX"
+      ],
+      "match_region": "CoCo + DoubleX",
+      "match_basis": "explicit_reuse_and_normalized_signature",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:mdohdkncgoaamplcaokhmlppgafhlima:1.1.25:3886c0d3c93e3539:01",
+          "flow": {
+            "flow_id": "coco:chrome:mdohdkncgoaamplcaokhmlppgafhlima:1.1.25:3886c0d3c93e3539:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "3886c0d3c93e353998a19fcfaefb442ac304c4db825d1b33de737d5726d1038c",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "DATA_LEAK",
+            "rule_id": "coco-data_leak",
+            "severity": "HIGH",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "CoCo source evidence",
+              "file": "crx_headers/cs_header.js",
+              "loc": "L165:C1 -> L165:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "crx_headers/cs_header.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "CoCo sink evidence",
+              "file": "content.js",
+              "loc": "L1:C1 -> L1:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": true,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Reused/DoubleX"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_reused_doublex",
+                  "source": "Reused/DoubleX",
+                  "kind": "coco_reused_doublex",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "Reused DoubleX F001 (flow_index=0) via source_type_normalized_sink_type_exact/all_candidates_agree.",
+                  "reused_flow_id": "doublex:chrome:mdohdkncgoaamplcaokhmlppgafhlima:1.1.25:11e02d3ffbba2061:01",
+                  "package_sha256": "ea8eb968f1c3f1b2936aeb485dd9642fc96793701b14fb9b2bbb567a3e2f8e71"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "reused_confirmation_match",
+            "static": {
+              "verdict": "FALSE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 (DATA_LEAK)\n\n### 1. Source — who controls it / what is it?\nThe reported source anchor (`crx_headers/cs_header.js` L165 `'key': 'value'`) **does not exist in the unpacked extension**. `list_files()` shows no `crx_headers/` directory, and the harness confirms the source file could not be resolved. The real storage read that corresponds to this flow is in `content.js`:\n\n```js\nfunction n(){chrome.storage.local.get([\"msg\"],e=>{e&&e.msg&&postMessage({type:\"hidebmsg\",value:e.msg.toString()},\"*\")})}\n```\n\nThe `msg` key is written **only** by `popup.js` as a checkbox state:\n\n```js\nchrome.storage.local.set({ads:document.querySelector(\"#ads\").checked, msg:document.querySelector(\"#msg\").checked}, ...)\n```\n\n`popup.html` confirms `#msg` is the **\"Hide blocking Message\"** checkbox, and `background.js` uses the default `o={msg:!1,ads:!0}`. So `msg` is a **boolean extension option**, not cookies/history/credentials/tokens, and no web/external code controls it.\n\n### 2. Source-to-sink path\nThe real path is a local content-script read → `window.postMessage`:\n- `content.js` runs on `twitch.tv` (`*://*/*` matches, but guarded to twitch hosts).\n- If the `ads` option is enabled, ",
+              "path": "extensions/mdohdkncgoaamplcaokhmlppgafhlima_1.1.25/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/mdohdkncgoaamplcaokhmlppgafhlima_1.1.25/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T04:54:21.852443Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": {
+              "source_dataset": "DoubleX",
+              "extension_key": "mdohdkncgoaamplcaokhmlppgafhlima@1.1.25",
+              "flow_id": "doublex:chrome:mdohdkncgoaamplcaokhmlppgafhlima:1.1.25:11e02d3ffbba2061:01",
+              "flow_index": 0,
+              "flow_label": "F001",
+              "verification": "TP",
+              "verification_source": [
+                "Manual"
+              ],
+              "match_mode": "source_type_normalized_sink_type_exact",
+              "match_reason": "all_candidates_agree",
+              "source_type": "STORAGE_ALL_ITEMS",
+              "source_loc": "L51",
+              "source_file": "content_scripts.js",
+              "sink_type": "WINDOW_POSTMESSAGE",
+              "sink_loc": "L52",
+              "sink_file": "content_scripts.js",
+              "package_evidence": {
+                "same_package": true,
+                "same_crx": true,
+                "same_manifest": true,
+                "same_source_manifest": true,
+                "coco_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\mdohdkncgoaamplcaokhmlppgafhlima_1.1.25\\crx\\mdohdkncgoaamplcaokhmlppgafhlima.1.1.25.crx",
+                "external_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\mdohdkncgoaamplcaokhmlppgafhlima_1.1.25\\crx\\1.1.25\\mdohdkncgoaamplcaokhmlppgafhlima.1.1.25.crx",
+                "coco_package_sha256": "ea8eb968f1c3f1b2936aeb485dd9642fc96793701b14fb9b2bbb567a3e2f8e71",
+                "external_package_sha256": "ea8eb968f1c3f1b2936aeb485dd9642fc96793701b14fb9b2bbb567a3e2f8e71",
+                "coco_manifest_sha256": "2ce642ae3f2f0ce77c4cc5af5abedc29475af1d5e8717326ce00e31a1c556842",
+                "external_manifest_sha256": "2ce642ae3f2f0ce77c4cc5af5abedc29475af1d5e8717326ce00e31a1c556842",
+                "coco_source_manifest_sha256": "7a54bc16c32194c2dc47b7b3a88b5d0696dbd2b2d9f948c7b5875721ce1f87bf",
+                "external_source_manifest_sha256": "7a54bc16c32194c2dc47b7b3a88b5d0696dbd2b2d9f948c7b5875721ce1f87bf"
+              },
+              "supporting_matches": []
+            },
+            "notes": [
+              "CoCo static verdict snapshot: FALSE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        },
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:mdohdkncgoaamplcaokhmlppgafhlima:1.1.25:11e02d3ffbba2061:01",
+          "flow": {
+            "flow_id": "doublex:chrome:mdohdkncgoaamplcaokhmlppgafhlima:1.1.25:11e02d3ffbba2061:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "11e02d3ffbba2061318434d6cbdd5948691c8d6fbb0cf87e57528f180c0bccae",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "DATA_LEAK",
+            "rule_id": "doublex-sensitive-api-egress",
+            "severity": "HIGH",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "chrome.storage.local.get",
+              "file": "content_scripts.js",
+              "loc": "L51",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://*/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "{\n\t\t\t\ttype: \"hidebmsg\",\n\t\t\t\tvalue: e.msg.toString()\n\t\t\t}",
+              "file": "content_scripts.js",
+              "loc": "L52",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "Sensitive extension data is returned to a web-accessible channel."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_chrome_r4_user_manual",
+                  "source": "Manual",
+                  "kind": "doublex_chrome_r4_user_manual",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证为 TP：页面可读取 Twitch 扩展状态回传。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\mdohdkncgoaamplcaokhmlppgafhlima_1.1.25\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "report_sha256": "6da0982b078229a369913ab0a58d966a7047203f401e35e43656fcc40443bf9b"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "FALSE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've reconstructed the full content script and traced the data end-to-end. Here is my analysis.\n\n## Four-part decision ledger\n\n**(a) Who controls the source**\nThe reported source is `chrome.storage.local.get` in the content script (`content.js`, misnamed `content_scripts.js` in the report). The actual code reads only one key:\n\n```js\nchrome.storage.local.get([\"msg\"], e=>{ e && e.msg && postMessage({type:\"hidebmsg\",value:e.msg.toString()},\"*\") })\n```\n\nThe `msg` key is written **only by the extension popup** as a boolean checkbox:\n\n```js\nchrome.storage.local.set({ads: document.querySelector(\"#ads\").checked,\n                          msg: document.querySelector(\"#msg\").checked}, ...)\n```\n\nand defaults to `false` in `background.js` (`o={msg:!1,ads:!0}`). It is a user UI preference (\"hide broadcaster message\"), **not** attacker/web-controlled and not network-derived. The page cannot write this storage key (the content script has no storage-write/message bridge for it).\n\n**(b) Exact source-to-sink data path**\nThe path is real, not broken: `chrome.storage.local.get([\"msg\"])` → callback checks `e && e.msg` → `window.postMessage({type:\"hidebmsg\", value:e.msg.toString()}, \"*\")`. The helper `n",
+              "path": "extensions/mdohdkncgoaamplcaokhmlppgafhlima_1.1.25/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/mdohdkncgoaamplcaokhmlppgafhlima_1.1.25/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T17:20:08.469282Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "doublex_chrome_r4_user_manual",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-24T03:14:27.811401Z",
+                "notes": "人工验证为 TP：页面可读取 Twitch 扩展状态回传。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\mdohdkncgoaamplcaokhmlppgafhlima_1.1.25\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\mdohdkncgoaamplcaokhmlppgafhlima_1.1.25\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-24T03:14:27.811401Z",
+                  "sha256": "6da0982b078229a369913ab0a58d966a7047203f401e35e43656fcc40443bf9b"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: FALSE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "DoubleX Chrome r4 manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.1.25",
+        "latest_version": "1.1.25",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

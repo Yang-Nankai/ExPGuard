@@ -1,0 +1,100 @@
+{
+  "extension_id": "kikmpcjfahemhdgnlncobpamgoopocpm",
+  "extension_version": "2.0.0",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #2 (REQUEST_FORGERY)\n\n### 1. Who controls the source?\n**Page context on `https://www.tiktok.com/tiktokstudio/*`.** The content script (`content.js`, MV3 ISOLATED world) installs:\n\n```js\nwindow.addEventListener(\"message\", function(e) {\n  if (e.source === window && e.data) { ... }\n})\n```\n\n`e.source === window` is attacker-satisfiable — a script running in the page can post a `window.postMessage` to itself. No origin check, no sender.id, no cryptographic auth. Per the harness: message fields / same-window checks are not authentication. **Source is genuinely attacker-controlled.**\n\n### 2. Source-to-sink path\nConfirmed unbroken:\n\n1. `content.js` (L1 C1136+): if `e.data._tq_upload` and telemetry is not disabled, it forwards the *entire* page-controlled message:\n   ```js\n   _br.runtime.sendMessage({ type: \"upload\", payload: e.data })\n   ```\n2. Cross-boundary HOP `runtime.single.sender.message[content->background]` — confirmed by the propagation record.\n3. `background.js` (L1 C2600+):\n   ```js\n   if (\"upload\" === e.type && e.payload) sendUpload(e.payload);\n   ```\n4. `sendUpload(e)` (L1 C2048+) uses the attacker-supplied fields directly in the fetch body:\n   ```js\n  ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L1:C1136 -> L1:C1161",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": "L1 C1136-1161: …(){t(null)},s.readAsDataURL(e)}window.addEventListener(\"message\",function(e){if(e.source===window&&e.data){if(e.data._tq_cancel)return o=!0,s&&(s.abort(),s=null),void _br.runtime.sendMe…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C2048 -> L1:C2443",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C2048-2443: …urn;const r=await getInstallId(),o=t.tq_profile||{},n=navigator.userAgent;await fetch(TELEMETRY_URL,{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body:JSON.stringify({event:\"upload\",install_id:r,version:chrome.runtime.getManifest().version,unique_id:o.uniqueId||null,browser_region:o.browserRegion||null,server_region:o.serverRegion||null,browser:parseBrowser(n),os:parseOS(n),caption:e.caption||null,visibility:e.visibility??null,post_type:e.post_type??null})})}catch(e){}}function ensureAlarm(){chrome.alarms.get(\"tq_heartbeat\",e=>{e||chrom…"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://www.tiktok.com/tiktokstudio/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

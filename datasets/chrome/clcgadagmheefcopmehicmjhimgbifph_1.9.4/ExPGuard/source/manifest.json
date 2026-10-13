@@ -1,0 +1,60 @@
+{
+"update_url": "https://clients2.google.com/service/update2/crx",
+
+  "manifest_version": 3,
+  "name": "CS2 Case Opening Stats",
+  "version": "1.9.4",
+  "description": "The ultimate tool for tracking, analyzing and visualizing your Counterstrike inventory history.",
+  "icons": {
+    "16": "assets/icon16.png",
+    "48": "assets/icon48.png",
+    "64": "assets/icon64.png",
+    "128": "assets/icon128.png"
+  },
+  "permissions": ["storage", "unlimitedStorage"],
+  "optional_permissions": ["tabs"],
+  "optional_host_permissions": ["https://*.steamcommunity.com/*"],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://steamcommunity.com/id/*/inventoryhistory/*",
+        "https://steamcommunity.com/profiles/*/inventoryhistory/*"
+      ],
+      "js": [
+        "content/config.js",
+        "content/utils.js",
+        "content/domManipulation.js",
+        "content/dataProcessing.js",
+        "content/chunkManagement.js",
+        "content/caseScript.js",
+        "content/steamLoginCheck.js"
+      ],
+      "css": ["styles/caseAnalytics.css"]
+    },
+    {
+      "matches": ["*://*.lootspectrum.com/*"],
+      "js": ["content/chunkManagement.js", "content/syncData.js", "content/relay.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content/inject.js",
+        "html/casebox.html",
+        "html/finishedBox.html",
+        "styles/caseAnalytics.css",
+        "styles/finished.css",
+        "popup/popup.css",
+        "assets/*"
+      ],
+      "matches": ["https://steamcommunity.com/*"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "resources": ["popup/popup.css"]
+  }
+}

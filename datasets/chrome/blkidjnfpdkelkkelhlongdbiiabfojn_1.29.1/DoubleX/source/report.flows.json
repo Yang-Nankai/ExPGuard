@@ -1,0 +1,404 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L48",
+      "sourceCode": "req",
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.create",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L125",
+      "sinkCode": "chrome.tabs.create(<pdg_js.node.ValueExpr object at 0x7faa9a7f61f0>)",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": null,
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": true,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    },
+    {
+      "flowType": "DATA_LEAK",
+      "ruleId": "doublex-sensitive-api-egress",
+      "ruleDescription": "DoubleX detected permission-gated data sent to a web-accessible channel.",
+      "sourceType": "STORAGE_ALL_ITEMS",
+      "sourceRemark": "chrome.storage.local.get",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L113",
+      "sourceCode": "chrome.storage.local.get(<pdg_js.node.ValueExpr object at 0x7faa9a85c9d0>, <pdg_js.node.FunctionExpression object at 0x7faa9a85ca00>)",
+      "sinkType": "WINDOW_POSTMESSAGE",
+      "sinkRemark": "result",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L119",
+      "sinkCode": "result",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": "window.postMessage",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": true,
+      "privilegeReason": "Sensitive extension data is returned to a web-accessible channel.",
+      "doublexCategory": "exfiltration_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "cs:direct_dangers:danger1",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L68",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7faa9aa1bbe0>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\"neuromarket-auth-v3\": btoa(storageData)\n\t\t\t\t\t}",
+        "line": "68 - 70",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/content_scripts.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger2",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L85",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7faa9a9b8820>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\"neuromarket-token\": btoa(tokenData.token)\n\t\t\t\t\t}",
+        "line": "85 - 87",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/content_scripts.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger3",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L98",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7faa9a9d1070>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\"neuromarket-deviceid\": storageData\n\t\t\t\t\t}",
+        "line": "98 - 100",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/content_scripts.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger4",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L111",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7faa9a9d17c0>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\"neuromarket-captcha-token\": btoa(storageData)\n\t\t\t\t\t}",
+        "line": "111 - 113",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/content_scripts.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger5",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L124",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7faa9a9d1f70>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\"neuromarket-xpow-data\": btoa(storageData)\n\t\t\t\t\t}",
+        "line": "124 - 126",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/content_scripts.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L21",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7faa9a8752e0>)",
+        "sink-param1": "{\n\t\t\t\t[name]: cookies[0].value\n\t\t\t}",
+        "line": "21 - 23",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger2",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_COOKIES_REMOVE_OPTIONS",
+      "sinkRemark": "chrome.cookies.remove",
+      "sinkFile": "background.js",
+      "sinkLoc": "L29",
+      "legacy": {
+        "danger": "chrome.cookies.remove",
+        "value": "chrome.cookies.remove(<pdg_js.node.ValueExpr object at 0x7faa9a875c70>)",
+        "sink-param1": "{\n\t\t\t\tname,\n\t\t\t\turl\n\t\t\t}",
+        "line": "29 - 32",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger3",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.create",
+      "sinkFile": "background.js",
+      "sinkLoc": "L41",
+      "legacy": {
+        "danger": "chrome.tabs.create",
+        "value": "chrome.tabs.create(<pdg_js.node.ValueExpr object at 0x7faa9a88f430>)",
+        "sink-param1": "{\n\t\t\turl: chrome.runtime.getURL(\"onboarding.html\")\n\t\t}",
+        "line": "41 - 43",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger4",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.create",
+      "sinkFile": "background.js",
+      "sinkLoc": "L125",
+      "legacy": {
+        "danger": "chrome.tabs.create",
+        "value": "chrome.tabs.create(<pdg_js.node.ValueExpr object at 0x7faa9a7f61f0>)",
+        "sink-param1": "{\n\t\t\t\t\turl\n\t\t\t\t}",
+        "line": "125 - 127",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "req",
+            "line": "48 - 48",
+            "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+            "where": "req"
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger1",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": false,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkLoc": "L68",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(url, options)",
+        "sink-param1": "url",
+        "sink-param2": "options",
+        "line": "68 - 68",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+        "dataflow": false,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "req",
+            "line": "48 - 48",
+            "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+            "where": "req"
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger2",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": false,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkLoc": "L79",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(url, options)",
+        "sink-param1": "url",
+        "sink-param2": "options",
+        "line": "79 - 79",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+        "dataflow": false,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "req",
+            "line": "48 - 48",
+            "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+            "where": "req"
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger3",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": false,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkLoc": "L90",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(url, options)",
+        "sink-param1": "url",
+        "sink-param2": "options",
+        "line": "90 - 90",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+        "dataflow": false,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "req",
+            "line": "48 - 48",
+            "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+            "where": "req"
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger4",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": false,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkLoc": "L100",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(url, options)",
+        "sink-param1": "url",
+        "sink-param2": "options",
+        "line": "100 - 100",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+        "dataflow": false,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "req",
+            "line": "48 - 48",
+            "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+            "where": "req"
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.cookies.getAll",
+      "sinkFile": "background.js",
+      "sinkLoc": "L14",
+      "legacy": {
+        "danger": "chrome.cookies.getAll",
+        "value": "chrome.cookies.getAll(<pdg_js.node.ValueExpr object at 0x7faa9a933b20>)",
+        "sink-param1": "{\n\t\t\tname\n\t\t}",
+        "line": "14 - 16",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger2",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L19",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(neuromarket-xpow-data)",
+        "sink-param1": "neuromarket-xpow-data",
+        "line": "19 - 19",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger3",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": true,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L113",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(<pdg_js.node.ValueExpr object at 0x7faa9a85c9d0>, <pdg_js.node.FunctionExpression object at 0x7faa9a85ca00>)",
+        "sink-param1": "[\n\t\t\t\"neuromarket-auth-v3\",\n\t\t\t\"neuromarket-token\",\n\t\t\t\"neuromarket-deviceid\",\n\t\t\t\"neuromarket-captcha-token\",\n\t\t\t\"neuromarket-xpow-data\",\n\t\t]",
+        "sink-param2": "(result) => sendResponse(result)",
+        "line": "113 - 119",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+        "dataflow": true,
+        "sent_to_wa_1": {
+          "wa": "result",
+          "line": "119 - 119",
+          "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_zn5p477s/unpacked/blkidjnfpdkelkkelhlongdbiiabfojn.1.29.1/background.js",
+          "where": "result"
+        }
+      }
+    }
+  ]
+}

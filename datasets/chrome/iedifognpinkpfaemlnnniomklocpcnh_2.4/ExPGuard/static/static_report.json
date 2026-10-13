@@ -1,0 +1,99 @@
+{
+  "extension_id": "iedifognpinkpfaemlnnniomklocpcnh",
+  "extension_version": "2.4",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've verified the flow from the primary evidence and confirmed the key code regions in `js/background.js`.\n\n## Decision ledger\n\n**(a) Who controls the source?**\n`chrome.runtime.onMessageExternal.addListener` in the background service worker accepts messages from any origin allowed by `externally_connectable`. The manifest allows `https://*.app-sorteos.com/*` (wildcard subdomains). The handler immediately reads `t.payload` and `t.type` with **no `sender` check at all** (a `search_code` for `sender` returned NO MATCHES). So the message fields `type`, `payload.media_id`, and `payload.min_id` are fully attacker-controlled from an app-sorteos.com web surface (or XSS/subdomain takeover there). No fixed extension-ID allowlist exists.\n\n**(b) Exact source-to-sink path (confirmed):**\n- `onMessageExternal.addListener(async(t,e,n)=>{ ... r = t.payload ... })` (L1 C438)\n- Branch: `t && \"comments\" === t.type` \u2192 `t = r` (reassigns `t` to the attacker payload)\n- URL construction:\n  ```js\n  let e = \"https://www.instagram.com/api/v1/media/\" + t.media_id\n          + \"/comments/?can_support_threading=true&permalink_enabled=false\";\n  t.min_id && (e += \"&min_id=\" + encodeURIComponent(t.min_id));\n  fetch",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {
+        "sanitized": false,
+        "duplicatePaths": 1,
+        "rawSteps": 71,
+        "distinctLines": 1,
+        "crossContextHops": [],
+        "sinkUrlControl": [
+          "FULL"
+        ]
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/background",
+          "reportedLoc": "L1:C438 -> L1:C439",
+          "resolvedFile": "js/background.js",
+          "resolved": true,
+          "snippet": "L1 C438-439: \u2026pt:\"*/*\"}}chrome.runtime.onMessageExternal.addListener(async(t,e,n)=>{var i,o,r=t.payload;if(t&&\"status\"===t.type&&(i=await chrome.cookies.get({url:\"https://www.\u2026"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js/background",
+          "reportedLoc": "L1:C2175 -> L1:C2210",
+          "resolvedFile": "js/background.js",
+          "resolved": true,
+          "snippet": "L1 C2175-2210: \u2026permalink_enabled=false\";t.min_id&&(e+=\"&min_id=\"+encodeURIComponent(t.min_id));fetch(e,{method:\"GET\",headers:s()}).then(e=>e.json()).then(e=>{console.log(e),a&&a(e)}).catch(e=>{a({error:!0})})}}\u2026"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://*.app-sorteos.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

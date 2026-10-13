@@ -1,0 +1,409 @@
+{
+  "extension_id": "cpofhfeclnhnhodbcabgcihloffdpgpd",
+  "extension_version": "1.1.0",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 5,
+  "verified_count": 5,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification: background.js — external message → `chrome.storage.local.set`\n\n### Evidence notes\n- The normalized report cites `background.js` L1041 (source) and L1144 (sink), but the actual bundle is only 764 lines; no source-level propagation entry exists. I therefore verified against the raw bundle.\n- `background.js` has exactly one external/message listener: `chrome.runtime.onMessageExternal.addListener(function (request, sender, sendResponse) {...})` at **L496**. There is no `window.addEventListener('message')` in the service worker, so the reported `WINDOW_MESSAGE_EVENT`/DoubleX source corresponds to this externally-connectable message entry point (the `request` parameter is the tainted value).\n- The handler does **not** inspect `sender.id` or `sender.origin` at all. Dispatch is driven solely by the attacker-supplied `request.action`.\n\n### Four-part decision ledger\n\n**(a) Who controls the source?**\nUntrusted web content. `externally_connectable.matches` is `*://*.custom-cursor.com/*` and `*://custom-cursor.com/*`. Any page on `custom-cursor.com` or any subdomain can call `chrome.runtime.sendMessage(<extension-id>, payload)`. The origin restriction narrows the surface b",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": null,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "DoubleX matched external input to a sensitive API parameter.",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L1041",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L1144",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.custom-cursor.com/*",
+            "*://custom-cursor.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "DUPLICATE",
+      "confidence": 0.6,
+      "reasoning": "Semantically identical to flow #0. Inherited analysis: Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification: background.js — external message → `chrome.storage.local.set`\n\n### Evid...",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": 0,
+      "report_disposition": "SUMMARY",
+      "source_report_id": null,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "DoubleX matched external input to a sensitive API parameter.",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L1041",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L1144",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.custom-cursor.com/*",
+            "*://custom-cursor.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Inherited from representative flow #0. Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 2,
+      "verdict": "DUPLICATE",
+      "confidence": 0.6,
+      "reasoning": "Semantically identical to flow #0. Inherited analysis: Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification: background.js — external message → `chrome.storage.local.set`\n\n### Evid...",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": 0,
+      "report_disposition": "SUMMARY",
+      "source_report_id": null,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "DoubleX matched external input to a sensitive API parameter.",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L1041",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L1144",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.custom-cursor.com/*",
+            "*://custom-cursor.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Inherited from representative flow #0. Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 3,
+      "verdict": "DUPLICATE",
+      "confidence": 0.6,
+      "reasoning": "Semantically identical to flow #0. Inherited analysis: Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification: background.js — external message → `chrome.storage.local.set`\n\n### Evid...",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": 0,
+      "report_disposition": "SUMMARY",
+      "source_report_id": null,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "DoubleX matched external input to a sensitive API parameter.",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L1041",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L1144",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.custom-cursor.com/*",
+            "*://custom-cursor.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Inherited from representative flow #0. Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 4,
+      "verdict": "DUPLICATE",
+      "confidence": 0.6,
+      "reasoning": "Semantically identical to flow #0. Inherited analysis: Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification: background.js — external message → `chrome.storage.local.set`\n\n### Evid...",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": 0,
+      "report_disposition": "SUMMARY",
+      "source_report_id": null,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "DoubleX matched external input to a sensitive API parameter.",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L1041",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L1144",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.custom-cursor.com/*",
+            "*://custom-cursor.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Inherited from representative flow #0. Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 5 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 4 duplicate; 0 flagged triggerable for dynamic testing."
+}

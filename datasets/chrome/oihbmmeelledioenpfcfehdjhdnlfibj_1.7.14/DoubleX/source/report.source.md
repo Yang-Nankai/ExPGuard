@@ -1,0 +1,26 @@
+# DoubleX / ExPGuard aligned flow report
+
+- Extension: `oihbmmeelledioenpfcfehdjhdnlfibj.1.7.14`
+- Status: `success`
+- Duration: `808.014ms`
+- Flows: `5`
+
+## Flow 1 — PRIVILEGE_ESCALATION
+
+`WINDOW_MESSAGE_EVENT` (L12) → `CHROME_TABS_EXECUTE` (L146)
+
+## Flow 2 — STORAGE_POSOING
+
+`WINDOW_MESSAGE_EVENT` (L12) → `CHROME_LOCAL_STORAGE` (L184)
+
+## Flow 3 — REQUEST_FORGERY
+
+`WINDOW_MESSAGE_EVENT` (L12) → `FETCH_RESOURCE` (L168)
+
+## Flow 4 — REQUEST_FORGERY
+
+`WINDOW_MESSAGE_EVENT` (L12) → `FETCH_RESOURCE` (L236)
+
+## Flow 5 — REQUEST_FORGERY
+
+`WINDOW_MESSAGE_EVENT` (L12) → `FETCH_RESOURCE` (L252)

@@ -1,0 +1,163 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "edge",
+  "extension_id": "ackickikehkceifemplmnpbdkfndcfjl",
+  "version": "1.0.1",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-525f67da01753bcc",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_DECLARATIVENETREQUEST_RULES",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/edge/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:edge:ackickikehkceifemplmnpbdkfndcfjl:1.0.1:5600d184f5fd679a:01",
+          "flow": {
+            "flow_id": "expguard-opti:edge:ackickikehkceifemplmnpbdkfndcfjl:1.0.1:5600d184f5fd679a:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "5600d184f5fd679a2c14fbae137c38d5c3781450a3951b9ef3fb7047526cce63",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "scripts/chrome/service-worker",
+              "loc": "L87:C6 -> L87:C7",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "scripts/chrome/service-worker",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_DECLARATIVENETREQUEST_RULES",
+              "remark": "",
+              "file": "scripts/chrome/service-worker",
+              "loc": "L140:C4 -> L143:C6",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "flow_index": 0,
+                  "outcome": "CONFIRMED",
+                  "confidence": 0.85,
+                  "detail": "A controlled loopback web origin permitted by externally_connectable reached the onMessageExternal listener and the exact sink recorded the marker."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — CVPlayer `onMessageExternal` → `declarativeNetRequest.updateSessionRules` ### (a) Who controls the source? The source is the message object `e` received by `chrome.runtime.onMessageExternal.addListener(function (e, sender) { ... })` in `scripts/chrome/service-worker.js` (L86). - The manifest declares `externally_connectable.matches: [\"https://*.cvplayer.net/*\"]`, so any page loaded from any subdomain of `cvplayer.net` (with any path) may call `chrome.runtime.…",
+              "path": "extensions/ackickikehkceifemplmnpbdkfndcfjl_1.0.1/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.85,
+              "reproduced": true,
+              "basis": "runtime_reproduced",
+              "usable_for_label": true,
+              "evidence_stage": "MARKER_REACHED",
+              "evidence_artifact_count": 3,
+              "reasoning": "A controlled loopback web origin permitted by externally_connectable reached the onMessageExternal listener and the exact sink recorded the marker.",
+              "notes": "controlledWebSender=true semanticFixture=true originalSenderIdentityNotClaimed=true",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\ackickikehkceifemplmnpbdkfndcfjl_1.0.1\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-23T13:05:39.686Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\ackickikehkceifemplmnpbdkfndcfjl_1.0.1\\dynamic\\evidence\\flow-0",
+              "files": [
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "step-final-state.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787026083035640844006c495b97e3327b5d9afec856fc92cb', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/edge/extensions/ackickikehkceifemplmnpbdkfndcfjl_1.0.1/final/final_report.json",
+              "report_mtime": "2026-08-18T04:08:01.753Z"
+            },
+            "manual_verification": null,
+            "notes": [],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.0.1",
+        "latest_version": "1.0.1",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

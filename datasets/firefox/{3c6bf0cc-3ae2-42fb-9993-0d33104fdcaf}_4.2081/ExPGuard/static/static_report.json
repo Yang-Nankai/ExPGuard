@@ -1,0 +1,114 @@
+{
+  "extension_id": "{3c6bf0cc-3ae2-42fb-9993-0d33104fdcaf}",
+  "extension_version": "4.2081",
+  "browser": "firefox",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 4,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence from the primary report plus the raw source I inspected to render a verdict.\n\n## Decision ledger\n\n**(a) Who controls the source — page-attacker controllable.**\n`js&css/web-accessible/core.js:139-149` creates the bridge element in the **page DOM**:\n```js\nthis.element = document.createElement('div');\nthis.element.id = 'it-messages-from-youtube';\n...\ndocument.documentElement.appendChild(this.element);\n```\nThat element lives in the shared DOM. The content script (`js&css/extension/init.js:158-167`) reacts to a plain DOM `CustomEvent` and reads `provider.textContent` from that element:\n```js\ndocument.addEventListener('it-message-from-youtube', function () {\n  var provider = document.querySelector('#it-messages-from-youtube');\n  if (provider) {\n    var message = provider.textContent;\n    ...\n    message = JSON.parse(message);\n```\nThere is **no** `event.origin`, `event.source`, sender.id, or any other trust check. Any script running on the youtube.com page can set the element's `textContent` and dispatch `it-message-from-youtube`; the content script's isolated-world listener will see it (DOM events are shared across worlds). This matches the harness warning that the",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js&css/extension/init",
+          "reportedLoc": "L167:C24 -> L167:C31",
+          "resolvedFile": "js&css/extension/init.js",
+          "resolved": true,
+          "snippet": "L167 C24-31: \t\t\tmessage = JSON.parse(message);"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js&css/extension/init",
+          "reportedLoc": "L276:C4 -> L276:C62",
+          "resolvedFile": "js&css/extension/init.js",
+          "resolved": true,
+          "snippet": "L276 C4-62: \t\t\t\tchrome.storage.local.set({ [message.key]: message.value });"
+        },
+        "sourceExpectedMarkers": [
+          "document",
+          "window",
+          "value",
+          "textContent",
+          "innerHTML"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://www.youtube.com/*"
+            ],
+            "excludeMatches": [
+              "https://www.youtube.com/audiolibrary/*",
+              "https://www.youtube.com/tv*"
+            ],
+            "js": [
+              "js&css/extension/core.js",
+              "js&css/extension/functions.js",
+              "js&css/extension/www.youtube.com/night-mode/night-mode.js",
+              "js&css/extension/www.youtube.com/general/general.js",
+              "js&css/extension/www.youtube.com/appearance/sidebar/sidebar.js",
+              "js&css/extension/www.youtube.com/appearance/comments/comments.js",
+              "js&css/extension/init.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

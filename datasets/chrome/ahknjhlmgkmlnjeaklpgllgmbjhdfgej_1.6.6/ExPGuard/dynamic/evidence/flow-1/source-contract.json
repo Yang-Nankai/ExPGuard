@@ -1,0 +1,34 @@
+{
+  "surface": "CUSTOM_EVENT",
+  "sourcePath": "background.js",
+  "location": "L301",
+  "eventNames": [
+    "screenshot-selected",
+    "screenshot-cancelled"
+  ],
+  "eventTarget": "window",
+  "eventDetailKey": "detail",
+  "envelope": {},
+  "forwardField": "",
+  "requirements": {},
+  "selectors": [],
+  "mediaTags": [],
+  "snippet": "(()=>{const e=(e=\"\")=>/^(chrome|edge|brave|opera|about|devtools):\\/\\//.test(e)||e.startsWith(\"chrome-extension://\")||e.startsWith(\"view-source:\")||e.startsWith(\"file://\")||e.startsWith(\"https://chromewebstore.google.com\")||\"newtab\"===e,t=(e=\"UNSUPPORTED_PAGE\")=>chrome.runtime.sendMessage({action:\"screenshotError\",error:e}),r=async()=>{try{if(!chrome?.sidePanel)return void console.warn(\"Side panel API not available\");await chrome.sidePanel.setPanelBehavior({openPanelOnActionClick:!0}),console.log(\"Side panel behavior set successfully\")}catch(e){console.error(\"Failed to set side panel behavior:\",e)}};async function s(e,t){const r=new OffscreenCanvas(t.width*t.devicePixelRatio,t.height*t.devicePixelRatio),s=r.getContext(\"2d\"),o=await fetch(e),n=await o.blob(),a=await createImageBitmap(n);s.drawImage(a,t.x*t.devicePixelRatio,t.y*t.devicePixelRatio,t.width*t.devicePixelRatio,t.height*t.device",
+  "notes": [
+    "已从 sink 文件推导消息分发字段 `action` 及候选值。",
+    "已从 sink 调用推导 URL 承载字段 `url`。",
+    "已提取页面可达事件名。"
+  ],
+  "discriminatorField": "action",
+  "discriminatorValues": [
+    "screenshotError",
+    "screenshotCancelled",
+    "screenshotCaptured"
+  ],
+  "urlField": "url",
+  "sinkTapKey": "",
+  "messageAlias": "e",
+  "messageEventKey": "",
+  "jsonMessageField": "",
+  "sinkDataFields": []
+}

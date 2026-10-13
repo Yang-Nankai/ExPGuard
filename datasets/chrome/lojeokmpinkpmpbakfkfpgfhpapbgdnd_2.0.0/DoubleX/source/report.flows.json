@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "DATA_LEAK",
+      "ruleId": "doublex-sensitive-api-egress",
+      "ruleDescription": "DoubleX detected permission-gated data sent to a web-accessible channel.",
+      "sourceType": "CHROME_IDENTITY_PROFILE",
+      "sourceRemark": "chrome.identity.getProfileUserInfo",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L126",
+      "sourceCode": "chrome.identity.getProfileUserInfo(<pdg_js.node.FunctionExpression object at 0x7f92ccc222e0>)",
+      "sinkType": "WINDOW_POSTMESSAGE",
+      "sinkRemark": "se({\n\t\t\t\tmsg: userInfo.email\n\t",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L127",
+      "sinkCode": "se({\n\t\t\t\tmsg: userInfo.email\n\t",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": "window.postMessage",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": true,
+      "privilegeReason": "Sensitive extension data is returned to a web-accessible channel.",
+      "doublexCategory": "exfiltration_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "background.js",
+      "sinkLoc": "L182",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x7f92ccbdf970>, timeoutMs)",
+        "sink-param1": "ut(() => controller.abor",
+        "sink-param2": "timeoutMs",
+        "line": "182 - 182",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lojeokmpinkpmpbakfkfpgfhpapbgdnd_a21c074a8033/dx_1t7okx1r/unpacked/lojeokmpinkpmpbakfkfpgfhpapbgdnd.2.0.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger1",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": false,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkLoc": "L184",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(https://verifiedaccess.googleapis.com/v1/challenge?key=AIzaSyDCLsxSaEheQKr_kQrsT7Wv5iItUsV5o_c, <pdg_js.node.ValueExpr object at 0x7f92ccbdfc40>)",
+        "sink-param1": "https://verifiedaccess.googleapis.com/v1/challenge?key=AIzaSyDCLsxSaEheQKr_kQrsT7Wv5iItUsV5o_c",
+        "sink-param2": "g, {\n\t\t\t\t\t\t\tmethod: 'POST',\n\t\t\t\t\t\t\t// If you need headers or a body, specify them here\n\t\t\t\t\t\t\tsignal: controller.signal\n\t\t\t\t",
+        "line": "184 - 188",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lojeokmpinkpmpbakfkfpgfhpapbgdnd_a21c074a8033/dx_1t7okx1r/unpacked/lojeokmpinkpmpbakfkfpgfhpapbgdnd.2.0.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": true,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.identity.getProfileUserInfo",
+      "sinkFile": "background.js",
+      "sinkLoc": "L126",
+      "legacy": {
+        "danger": "chrome.identity.getProfileUserInfo",
+        "value": "chrome.identity.getProfileUserInfo(<pdg_js.node.FunctionExpression object at 0x7f92ccc222e0>)",
+        "sink-param1": "fo((userInfo) => {\n\t\t\tsendResponse({\n\t\t\t\tmsg: userInfo.email\n\t\t\t});\n",
+        "line": "126 - 130",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lojeokmpinkpmpbakfkfpgfhpapbgdnd_a21c074a8033/dx_1t7okx1r/unpacked/lojeokmpinkpmpbakfkfpgfhpapbgdnd.2.0.0/background.js",
+        "dataflow": true,
+        "sent_to_wa_1": {
+          "wa": "se({\n\t\t\t\tmsg: userInfo.email\n\t",
+          "line": "127 - 129",
+          "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lojeokmpinkpmpbakfkfpgfhpapbgdnd_a21c074a8033/dx_1t7okx1r/unpacked/lojeokmpinkpmpbakfkfpgfhpapbgdnd.2.0.0/background.js",
+          "where": "userInfo"
+        }
+      }
+    }
+  ]
+}

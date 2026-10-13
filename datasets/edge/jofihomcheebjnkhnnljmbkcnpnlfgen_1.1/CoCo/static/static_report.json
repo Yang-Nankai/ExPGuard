@@ -1,0 +1,98 @@
+{
+  "extension_id": "jofihomcheebjnkhnnljmbkcnpnlfgen",
+  "extension_version": "1.1",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Analysis\n\n### 1. Reported evidence is a mangled placeholder — not the real anchor\nThe normalized flow cites `crx_headers/expguard_compat_header.js` with `codeContext: \"document.title = 'title'\"` at `L41:C1` for **both** source and sink. That file does **not exist** in the unpacked extension (`list_files()` shows only `background.js`, `content.js`, `popup.*`, `manifest.json`, `icons/`). The deterministic harness confirms both anchors are unresolved (`\"resolved\": false`, warnings: source/sink file could not be resolved). The codeContext is a *constant assignment* to `document.title` — it is not a read of attacker data and not a `chrome.storage` write. As reported, that literal span is a dead placeholder, not a data flow.\n\nHowever, the *semantic* flow (DOCUMENT_TITLE → CHROME_LOCAL_STORAGE) genuinely exists in the real source, so I verified it against `content.js`.\n\n### 2. Decision ledger (real extension source)\n\n**(a) Who controls the source?** The web page itself. The content script is injected on `*://*/*` (manifest `contentScripts.matches`), so any page the user visits controls the DOM. In `content.js:9`:\n\n```js\nconst mediaName = playingElement.getAttribute('title'",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "CoCo reported cross-boundary flow; verify with source",
+      "report_evidence": {
+        "tool": "coco",
+        "sourceCapability": "WEB_CONTENT",
+        "sinkCapability": "STORAGE_WRITE",
+        "flowMeta": {
+          "totalSteps": 1,
+          "omitted": 0
+        },
+        "propagation": ""
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "crx_headers/expguard_compat_header.js",
+          "reportedLoc": "L41:C1 -> L41:C1",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "crx_headers/expguard_compat_header.js",
+          "reportedLoc": "L41:C1 -> L41:C1",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [
+          "document.title"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "Source report file could not be resolved in the unpacked CRX/XPI.",
+          "Sink report file could not be resolved in the unpacked CRX/XPI."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

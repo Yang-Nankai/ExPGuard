@@ -1,0 +1,213 @@
+{
+  "flow_index": 0,
+  "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+  "final_verdict": "UNCERTAIN",
+  "confidence": 0.4,
+  "reproduced": false,
+  "trajectory": [
+    {
+      "action": "instrument_sink",
+      "detail": "all",
+      "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_00775b33308247df\", \"targetId\": \"E2E7ED6930C4F529537576CC0D44EA2E\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+    },
+    {
+      "action": "new_page",
+      "detail": "https://feeder.co:60770/page",
+      "result": "{\"openedUrl\": \"https://feeder.co:60770/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:63948/devtools/"
+    },
+    {
+      "action": "contract_stimulus_batch",
+      "detail": "WINDOW_MESSAGE",
+      "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"postMessage\", \"event\": \"message\", \"eventTarget\": \"window\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 5, \"inputs\": [{\"bytes\": 2116, \"topLevelKeys\": [], \"testMarkers\": [\"EXPAGENT_TEST_expa_b905c8d739bd\\\",\"]}, {\"bytes\": 2111, \"topLevelKeys\": [], \"testMarkers\": [\"EXPAGENT_TEST_expa_b905c8d739bd\\\",\"]}, {\"bytes\": 2105, \"topLevelKeys\": [], \"testMarkers\": [\"EXPAG"
+    },
+    {
+      "action": "observe",
+      "detail": "sink tap + local beacon",
+      "result": "{\"sink_type\": \"fetch\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_00775b33308247df\", \"actualGeneration\": \"observer_00"
+    }
+  ],
+  "planned_trajectory": {
+    "flow_index": 0,
+    "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+    "target_url": "https://feeder.co:60770/page",
+    "preconditions": [
+      "A page where the relevant content script/source frame runs.",
+      "Loaded extension must expose extension CDP targets.",
+      "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+    ],
+    "steps": [
+      {
+        "action": "list_cdp_targets",
+        "detail": "Confirm extension target/background/service-worker exists.",
+        "result": ""
+      },
+      {
+        "action": "get_extension_runtime_state",
+        "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+        "result": ""
+      },
+      {
+        "action": "new_page/navigate_page",
+        "detail": "Open approved source target: https://feeder.co:60770/page",
+        "result": ""
+      },
+      {
+        "action": "list_scripts/search_in_sources",
+        "detail": "Confirm relevant content script/listener is injected.",
+        "result": ""
+      },
+      {
+        "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+        "detail": "Inject a JSON test marker through the matching local source surface.",
+        "result": ""
+      },
+      {
+        "action": "observe",
+        "detail": "Check beacon/network/console/runtime state/screenshot.",
+        "result": ""
+      },
+      {
+        "action": "ReAct-adjust",
+        "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+        "result": ""
+      }
+    ],
+    "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+    "expected_observation": "Instrument and observe FETCH_RESOURCE; use a beacon when its security-relevant argument is a URL.",
+    "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+  },
+  "evidence": "source-contract={\"surface\": \"WINDOW_MESSAGE\", \"sourcePath\": \"feeder_api.js\", \"location\": \"L1:C4036 -> L1:C4054\", \"eventNames\": [], \"eventTarget\": \"window\", \"eventDetailKey\": \"data\", \"envelope\": {\"message\": \"Extension context invalidated.\"}, \"forwardField\": \"\", \"scalarMessageValue\": \"\", \"requirements\": {\"from\": \"feeder.co\", \"sanityCheck\": \"feeder.co-version1\", \"payload.request.method\": \"GET\", \"payload.request.requestId\": \"__EXPAGENT_CONTROLLED_MARKER__\"}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"round\\\",e),!1}return!0}function m(){l||(l=setInterval((()=>{g()&&(clearInterval(l),l=null)}),1e3))}var y;y=()=>{c(\\\"[feeder] Extension context invalidated!\\\"),f=!0,m()},e.push(y),n(\\\"feeder:connect:response\\\",(e=>{e.errorMessage&&alert(e.errorMessage)})),r((()=>{const e=document.getElementById(\\\"feeder-connect-url\\\");if(e){n(\\\"sync:merge\\\",(function(e){document.getElementById(\\\"sync-status\\\").innerText=e.status}));const o=document.getElementById(\\\"do-merge\\\");t(\\\"feeder:connect\\\",{connectURL:e.value,doMerge:\\\"yes\\\"==(null==o?void 0:o.value)})}if(document.getElementById(\\\"feeder-feeds-json\\\")){const e=document.getElementById(\\\"feeder-feeds-json\\\");n(\\\"feeder:feedsFetched\\\",(function(t){e.value=t.feeds,e.setAttribute(\\\"data-loaded\\\",\\\"true\\\")})),t(\\\"feeder:fetchFeeds\\\",{})}})),n(\\\"dom:gotUserKey\\\",(function(e){a({type:\\\"gotUserKey\\\",userKey:e.userKey,email:e.email})})),document.documentElement.className+=\\\" feeder-api-enab\", \"notes\": [\"已从 source/sink 附近提取字面量分支。\", \"已从 sink 文件推导消息分发字段 `payload.action` 及候选值。\", \"已从 sink 调用推导 URL 承载字段 `payload.request.url`。\", \"已识别信封桥接（外层字段 + 转发字段）。\"], \"discriminatorField\": \"payload.action\", \"discriminatorValues\": [\"checkSubscriptionStatus\", \"preferencesChanged\", \"globalChange\", \"ping\", \"callApi\"], \"urlField\": \"payload.request.url\", \"sinkTapKey\": \"fetch\", \"messageAlias\": \"r\", \"messageEventKey\": \"__expagent_whole_data__:o\", \"jsonMessageField\": \"__expagent_whole_data__:o\", \"eventDetailIsJson\": false, \"sinkDataFields\": [], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"HIGH\", \"contractWarnings\": []}\npage-target={\"targetId\": \"D39A71082182A74BE8189E77308E9243\", \"url\": \"https://feeder.co:60770/page\"}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_00775b33308247df\", \"targetId\": \"E2E7ED6930C4F529537576CC0D44EA2E\", \"lifecycle\": {\"ok\": true, \"targetId\": \"E2E7ED6930C4F529537576CC0D44EA2E\", \"targetType\": \"service_worker\", \"targetUrl\": \"chrome-extension://aiaalkmopconcaojjkpgmcmmcendmjfn/mv3.js\", \"attachCount\": 1\nsource-bridge-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_f3e9cac5d5a24d86\", \"targetId\": \"D39A71082182A74BE8189E77308E9243\", \"pageUrl\": \"https://feeder.co:60770/page\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\",\\\"observerToken\\\":\\\"observer_f3e9cac5d5a24d86\\\"}\"}\nstimulus-batch={\"action\": \"dispatchStimulusBatch\", \"surface\": \"postMessage\", \"event\": \"message\", \"eventTarget\": \"window\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 5, \"inputs\": [{\"bytes\": 2116, \"topLevelKeys\": [], \"testMarkers\": [\"EXPAGENT_TEST_expa_b905c8d739bd\\\",\"]}, {\"bytes\": 2111, \"topLevelKeys\": [], \"testMarkers\": [\"EXPAGENT_TEST_expa_b905c8d739bd\\\",\"]}, {\"bytes\": 2105, \"topLevelKeys\": [], \"testMarkers\": [\"EXPAGENT_TEST_expa_b905c8d739bd\\\",\"]}, {\"bytes\": 2097, \"topLevelKeys\": [], \"testMarkers\": [\"EXPAGENT_TEST_expa_b905c8d739bd\\\",\"]}, {\"bytes\": 2100, \"topLevelKeys\": [], \"testMarkers\": [\"EXPAGENT_TEST_expa_b905c8d739bd\\\",\"]}], \"result\": {\"scheduled\": true, \"count\": 5, \"surface\": \"postMessage\", \"spacingMs\": 300}}\nsink-tap={\"sink_type\": \"fetch\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_00775b33308247df\", \"actualGeneration\": \"observer_00775b33308247df\", \"previousTargetId\": \"E2E7ED6930C4F529537576CC0D44EA2E\", \"currentTargetId\": \"E2E7ED6930C4F529537576CC0D44EA2E\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"fetch\\\",\\\"calls\\\":[{\\\"ts\\\":1790056077614,\\\"request\\\":{\\\"redacted\\\":true,\\\"length\\\":32},\\\"method\\\":\\\"GET\\\",\\\"body\\\":{\\\"redacted\\\":true,\\\"length\\\":0}}],\\\"observerToken\\\":\\\"observer_00775b33308247df\\\"}\"}\nbeacon={\"token\": \"expa_f93146aaae0f\", \"hit\": false, \"count\": 0}\nexternal-response-semantic-fixture=[{\"method\": \"GET\", \"path\": \"/api/feeder/status\", \"responseKind\": \"semantic-json\"}]\nsource-bridge-tap={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_f3e9cac5d5a24d86\", \"actualGeneration\": \"observer_f3e9cac5d5a24d86\", \"recoveryReason\": \"\", \"targetId\": \"D39A71082182A74BE8189E77308E9243\", \"pageUrl\": \"https://feeder.co:60770/page\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__dom_innerHTML__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__runtime_sendMessage__\\\":true},\\\"observerToken\\\":\\\"observer_f3e9cac5d5a24d86\\\"}\"}",
+  "reasoning": "The exact static sink recorded a call, but the controlled marker/beacon was not observed in its security-relevant argument. Semantic-fixture non-observation (PARTIAL) cannot rebut the original extension boundary.",
+  "evidence_stage": "LISTENER_READY",
+  "blocked_reason": "",
+  "observer_status": {
+    "semanticFixturesInstalled": true,
+    "semanticFixtureUsed": true,
+    "semanticFixtureKinds": [
+      "external-response-port-semantic-fixture"
+    ],
+    "semanticFixture": true,
+    "positiveOnly": true,
+    "environmentReady": true,
+    "listenerReady": true,
+    "sinkObserverReady": true,
+    "sourceContractConfidence": "HIGH",
+    "sourceContractReady": true,
+    "markerReached": false,
+    "capabilityAssessment": {
+      "requiredContexts": [
+        "serviceWorker",
+        "contentScriptIsolatedWorld"
+      ],
+      "unsupportedContexts": [],
+      "limitations": [],
+      "deterministicReplaySupported": true,
+      "lineBreakpointSupported": true
+    }
+  },
+  "payload_used": "[\"{\\\"marker\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"url\\\": \\\"http://127.0.0.1:60770/beacon/expa_f93146aaae0f\\\", \\\"data\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"value\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"message\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"title\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"text\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"number\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"listenerKey\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"pollingUrl\\\": \\\"http://127.0.0.1:60770/beacon/expa_f93146aaae0f\\\", \\\"pollingInterval\\\": 1000, \\\"pollingAuthorization\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"pollingContentType\\\": \\\"text/plain\\\", \\\"storageKey\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"name\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"id\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"key\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"type\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"action\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"cmd\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"Action\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"Message\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"fun\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"auth\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"phone\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"email\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"version\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"token\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"content\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"payload\\\": {\\\"request\\\": {\\\"method\\\": \\\"GET\\\", \\\"requestId\\\": \\\"EXPAGENT_TEST_expa_b905c8d739bd\\\", \\\"url\\\": \\\"http://127.0.0.1:60770/beacon/expa_f93146aaae0f\\\"}, \\\"action\\\":",
+  "evidence_artifacts": [
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\final-round20\\_runs\\chrome\\pnjaodmkngahhkoihejjehlcdlnohgmp\\8.0.28\\dynamic-evidence\\flow-0\\step-source-open.png",
+      "description": "Step `source-open`: https://feeder.co:60770/page",
+      "stage": "source-open",
+      "captured_at": "2026-09-22T05:47:58.872561+00:00",
+      "target_url": "https://feeder.co:60770/page",
+      "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\final-round20\\_runs\\chrome\\pnjaodmkngahhkoihejjehlcdlnohgmp\\8.0.28\\dynamic-evidence\\flow-0\\step-after-trigger.png",
+      "description": "Step `after-trigger`: https://feeder.co:60770/page",
+      "stage": "after-trigger",
+      "captured_at": "2026-09-22T05:47:58.974597+00:00",
+      "target_url": "https://feeder.co:60770/page",
+      "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+    },
+    {
+      "kind": "transcript",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\final-round20\\_runs\\chrome\\pnjaodmkngahhkoihejjehlcdlnohgmp\\8.0.28\\dynamic-evidence\\flow-0\\storage-after-trigger.json",
+      "description": "Storage state at `after-trigger` (markers shown, others redacted)",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\final-round20\\_runs\\chrome\\pnjaodmkngahhkoihejjehlcdlnohgmp\\8.0.28\\dynamic-evidence\\flow-0\\storage-after-trigger.png",
+      "description": "Storage panel (DevTools-style) at `after-trigger`",
+      "stage": "storage-after-trigger",
+      "captured_at": "2026-09-22T05:47:59.134975+00:00",
+      "target_url": "https://feeder.co:60770/page",
+      "sha256": "7866e027a46baa361e353582122b17653959215fd1049d169e4aa1ed84efdad4"
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\final-round20\\_runs\\chrome\\pnjaodmkngahhkoihejjehlcdlnohgmp\\8.0.28\\dynamic-evidence\\flow-0\\step-after-observation.png",
+      "description": "Step `after-observation`: https://feeder.co:60770/page",
+      "stage": "after-observation",
+      "captured_at": "2026-09-22T05:47:59.239504+00:00",
+      "target_url": "https://feeder.co:60770/page",
+      "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+    },
+    {
+      "kind": "transcript",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\final-round20\\_runs\\chrome\\pnjaodmkngahhkoihejjehlcdlnohgmp\\8.0.28\\dynamic-evidence\\flow-0\\storage-after-observation.json",
+      "description": "Storage state at `after-observation` (markers shown, others redacted)",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\final-round20\\_runs\\chrome\\pnjaodmkngahhkoihejjehlcdlnohgmp\\8.0.28\\dynamic-evidence\\flow-0\\storage-after-observation.png",
+      "description": "Storage panel (DevTools-style) at `after-observation`",
+      "stage": "storage-after-observation",
+      "captured_at": "2026-09-22T05:47:59.402613+00:00",
+      "target_url": "https://feeder.co:60770/page",
+      "sha256": "68898a2d5f457a6f5cbbdccf6309d307c3e3f3fd784c2472c43cda4bb435a6ae"
+    },
+    {
+      "kind": "transcript",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\final-round20\\_runs\\chrome\\pnjaodmkngahhkoihejjehlcdlnohgmp\\8.0.28\\dynamic-evidence\\flow-0\\trajectory.txt",
+      "description": "Bounded ReAct trajectory and tool evidence.",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    },
+    {
+      "kind": "source-contract",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\final-round20\\_runs\\chrome\\pnjaodmkngahhkoihejjehlcdlnohgmp\\8.0.28\\dynamic-evidence\\flow-0\\source-contract.json",
+      "description": "Source-adjacent literal guards and generated local-input contract.",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\final-round20\\_runs\\chrome\\pnjaodmkngahhkoihejjehlcdlnohgmp\\8.0.28\\dynamic-evidence\\flow-0\\step-final-state.png",
+      "description": "Step `final-state`: https://feeder.co:60770/page",
+      "stage": "final-state",
+      "captured_at": "2026-09-22T05:47:59.480811+00:00",
+      "target_url": "https://feeder.co:60770/page",
+      "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+    },
+    {
+      "kind": "screenshot-manifest",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\final-round20\\_runs\\chrome\\pnjaodmkngahhkoihejjehlcdlnohgmp\\8.0.28\\dynamic-evidence\\flow-0\\screenshot-evidence.json",
+      "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    }
+  ],
+  "human_handoff": null,
+  "debugger_summary": "",
+  "notes": "sinkTapKey=fetch sourceBridgeReached=false semanticFixture=true externalResponseSimulated=true originalExternalBoundaryNotClaimed=true"
+}

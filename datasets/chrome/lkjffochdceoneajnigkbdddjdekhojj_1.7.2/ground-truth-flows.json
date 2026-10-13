@@ -1,0 +1,375 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "lkjffochdceoneajnigkbdddjdekhojj",
+  "version": "1.7.2",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-cd6d9dc03083cbd3",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "FETCH_RESOURCE",
+      "matched_tools": [
+        "ExPGuard",
+        "DoubleX"
+      ],
+      "match_region": "ExPGuard + DoubleX",
+      "match_basis": "normalized_signature_one_to_one",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:lkjffochdceoneajnigkbdddjdekhojj:1.7.2:b6d9b5fa40075769:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:lkjffochdceoneajnigkbdddjdekhojj:1.7.2:b6d9b5fa40075769:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "b6d9b5fa40075769f51a47905ce440898949936584b8b691845173b2fa382faa",
+            "identity_occurrence": 1,
+            "source_report_id": 4,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+              "remark": "chrome.runtime.onConnectExternal.addListener[onMessage]",
+              "file": "js/background",
+              "loc": "L306:C12 -> L306:C15",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "js/background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "js/background",
+              "loc": "L22:C4 -> L22:C23",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "FULL"
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": "external_condition_required",
+                  "confidence": 0.9,
+                  "detail": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 4,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: The search confirms the `sender` parameter at L305 is unused in the external listener — no `sender.id`/`sender.origin` guard exists. The verdict stands. VERDICT: TRUE_POSITIVE",
+              "path": "extensions/lkjffochdceoneajnigkbdddjdekhojj_1.7.2/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.9,
+              "reproduced": false,
+              "basis": "external_condition_required",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 2,
+              "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+              "path": "extensions/lkjffochdceoneajnigkbdddjdekhojj_1.7.2/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T14:32:12.194Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787025936005efca7158d8a072a352f4e6ec3154e35a7ad90c', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "EXTERNAL_CONDITION_REQUIRED",
+              "tool_reports_consulted": [
+                "primary",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/lkjffochdceoneajnigkbdddjdekhojj_1.7.2/final/final_report.json",
+              "report_mtime": "2026-08-18T04:05:34.746Z"
+            },
+            "manual_verification": null,
+            "notes": [
+              "Label rests on a recorded ExPAgent verdict reached with an unmet external precondition (no runtime reproduction)."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        },
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:lkjffochdceoneajnigkbdddjdekhojj:1.7.2:2083b94631163fde:01",
+          "flow": {
+            "flow_id": "doublex:chrome:lkjffochdceoneajnigkbdddjdekhojj:1.7.2:2083b94631163fde:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "2083b94631163fdefc143edadc26a5638ba1b73e8d86b77502410329fc0afdf4",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "HIGH",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "background.js",
+              "loc": "L342",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "BACKGROUND",
+              "origin_context": "background.js",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "fetch",
+              "file": "background.js",
+              "loc": "L25",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": false,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "doublex_dynamic",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": "external_condition_required",
+                  "report_path": "extensions/lkjffochdceoneajnigkbdddjdekhojj_1.7.2/dynamic/dynamic_report.json"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow 0 — REQUEST_FORGERY\n\n### Decision ledger\n\n**(a) Who controls the source?**\nThe reported source (`WINDOW_MESSAGE_EVENT` at `js/background.js:342`) is misattributed. Line 342 is inside `outputDevicesToList()` building an HTML `<table>` of device names — it is not a message listener, and a Manifest V3 service worker has no `window`/`postMessage` surface at all. However, reading the real source reveals the actual web-accessible input the DoubleX rule was pointing at: `chrome.runtime.onConnectExternal` at `js/background.js:304`.\n\n`externally_connectable.matches: [\"*://*.mazii.net/*\"]` means any page whose origin is `https://*.mazii.net` can call `chrome.runtime.connect(extensionId)` and get a port. The listener has **no `sender.id` allowlist and no `sender.origin`/URL check** — it directly attaches `port.onMessage`. (It is also reachable by any other installed extension, since cross-extension connect is not restricted by `externally_connectable`.)\n\n**(b) Source-to-sink path**\n```\nexternal page on *.mazii.net\n  → chrome.runtime.connect(extId)                       // externally_connectable surface\n  → chrome.runtime.onConnectExternal          (bg L304)\n  → port.on",
+              "path": "extensions/lkjffochdceoneajnigkbdddjdekhojj_1.7.2/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.9,
+              "reproduced": false,
+              "basis": "external_condition_required",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 2,
+              "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+              "path": "extensions/lkjffochdceoneajnigkbdddjdekhojj_1.7.2/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T17:16:30.763440Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: EXTERNAL_CONDITION_REQUIRED; final_verdict=TRUE_POSITIVE."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "partial_tool_failure",
+        "dataset_version": "1.7.2",
+        "latest_version": "1.7.3",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\lkjffochdceoneajnigkbdddjdekhojj_1.7.3\\lkjffochdceoneajnigkbdddjdekhojj.1.7.3.crx",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:chrome:lkjffochdceoneajnigkbdddjdekhojj:1.7.2:b6d9b5fa40075769:01",
+            "original_source_type": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+            "original_sink_type": "FETCH_RESOURCE",
+            "revalidation_job_key": "chrome__lkjffochdceoneajnigkbdddjdekhojj__1.7.3__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\lkjffochdceoneajnigkbdddjdekhojj_1.7.3\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\lkjffochdceoneajnigkbdddjdekhojj_1.7.3\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 3.953,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 4,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+                "sink_type": "FETCH_RESOURCE",
+                "source": {
+                  "kind": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+                  "remark": "chrome.runtime.onConnectExternal.addListener[onMessage]",
+                  "file": "js/background",
+                  "loc": "L371:C12 -> L371:C15",
+                  "code": "if (»msg«.request == \"requestUrl\") {"
+                },
+                "sink": {
+                  "kind": "FETCH_RESOURCE",
+                  "remark": "[Unknown URL]",
+                  "file": "js/background",
+                  "loc": "L22:C4 -> L22:C23",
+                  "code": "»fetch(url, options)«"
+                },
+                "propagation_step_count": 5
+              }
+            ],
+            "tool_report_flow_count": 23,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          },
+          {
+            "tool": "DoubleX",
+            "original_source_flow_id": "doublex:chrome:lkjffochdceoneajnigkbdddjdekhojj:1.7.2:2083b94631163fde:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "FETCH_RESOURCE",
+            "revalidation_job_key": "chrome__lkjffochdceoneajnigkbdddjdekhojj__1.7.3__DoubleX",
+            "run_status": "failed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\lkjffochdceoneajnigkbdddjdekhojj_1.7.3\\revalidation\\DoubleX\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\lkjffochdceoneajnigkbdddjdekhojj_1.7.3\\revalidation\\DoubleX\\attempt-01\\report.flows.json",
+            "duration_seconds": 2.922,
+            "error": "Tool summary status was 'partial'; analysis did not fully succeed.",
+            "tool_summary_status": "partial",
+            "outcome": "tool_failure",
+            "reason": "The original tool did not complete successfully with a valid flow report."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "mixed_or_inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 4,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 1.0,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": false,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.9,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:chrome:lkjffochdceoneajnigkbdddjdekhojj:1.7.2:b6d9b5fa40075769:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          },
+          {
+            "status": "not_reviewable_tool_failure",
+            "basis": "The reporting tool did not produce a completed report that can identify the original Flow.",
+            "candidate_count": 1,
+            "tool": "DoubleX",
+            "original_flow_id": "doublex:chrome:lkjffochdceoneajnigkbdddjdekhojj:1.7.2:2083b94631163fde:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

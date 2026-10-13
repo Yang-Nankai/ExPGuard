@@ -1,0 +1,102 @@
+{
+  "extension_id": "hpgaehmokjbdfkbgkeifbfogjalkpfgb",
+  "extension_version": "9.62",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.3,
+      "reasoning": "Structured extraction unavailable; preserved analyst notes: ## Verification of Flow #1 — CHROME_TABS_CAPTURE_VISIBLE_TAB → CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE\n\n### 1. Primary evidence quality\n\nThe injected source report points both source and sink at `crx_headers/expguard_compat_header.js`, a synthetic ExPGuard/CoCo compat shim (`MarkSource(value, ...)`, `epgCallback(...)`, `EPGPromise`). The deterministic harness confirms both anchors are **unresolved** in the unpacked CRX (\"Source report file could not be resolved…\", \"Sink report file could not be resolved…\") and `propagation` is empty. So the primary report alone is insufficient/ambiguous, and I opened the real extension source.\n\n### 2. Real code confirms a concrete, unbroken path\n\n`background.js` is a single minified service-worker line. Its full contents (read via `read_minified_range`) contain:\n\n```js\nvar u = function(r,e,t,a){\n  n.t=\"unset\";\n  chrome.tabs.captureVisibleTab(r.tab.windowId,{format:\"png\",quality:100},function(r){\n    if(chrome.runtime.lastError||typeof r==\"undefined\"){n.t=\"error\";a({msg:n.t});return}\n    n.t=\"ok\";\n    n.fn=e+t+\"-time-\"+n.u()+\".png\";\n    a({msg:n.t,fn:n.fn,url:r})            // <-- sendResponse carries the screenshot data URL\n  })\n};\nchrome.run",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "CoCo reported cross-boundary flow; verify with source",
+      "report_evidence": {
+        "tool": "coco",
+        "sourceCapability": "SENSITIVE_DATA",
+        "sinkCapability": "MESSAGE_RESPONSE",
+        "flowMeta": {
+          "totalSteps": 1,
+          "omitted": 0
+        },
+        "propagation": ""
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "crx_headers/expguard_compat_header.js",
+          "reportedLoc": "L69:C1 -> L69:C1",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "crx_headers/expguard_compat_header.js",
+          "reportedLoc": "L69:C1 -> L69:C1",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://slither.io/*",
+            "*://slither.com/*",
+            "https://ntl-slither.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "NEEDS_SEMANTIC_CLASSIFICATION",
+          "rule": "Inspect the invoked API and the precise tainted argument before assigning a security label."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "Source report file could not be resolved in the unpacked CRX/XPI.",
+          "Sink report file could not be resolved in the unpacked CRX/XPI."
+        ]
+      },
+      "verdict_basis": "No structured verdict or explicit labelled transcript verdict was available.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 0 true-positive, 0 false-positive, 0 partial-available (PA), 1 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

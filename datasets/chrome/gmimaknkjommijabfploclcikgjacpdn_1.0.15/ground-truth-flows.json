@@ -1,0 +1,156 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "gmimaknkjommijabfploclcikgjacpdn",
+  "version": "1.0.15",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-e3e204864a4ebb0c",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_ACTION_BADGE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:gmimaknkjommijabfploclcikgjacpdn:1.0.15:5a4c2a5bddfc964a:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:gmimaknkjommijabfploclcikgjacpdn:1.0.15:5a4c2a5bddfc964a:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "5a4c2a5bddfc964aeff744834378a5efaca28bd8d23cfbd895d9c1afd841c669",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "sw.bundle",
+              "loc": "L3:C305 -> L3:C306",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "sw.bundle",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_ACTION_BADGE_OPTIONS",
+              "remark": "",
+              "file": "sw.bundle",
+              "loc": "L3:C323 -> L3:C465",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": "external_condition_required",
+                  "confidence": 0.9,
+                  "detail": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 2,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification analysis ### 1. Source: attacker-controllable? Yes. The raw minified source confirms: ```js chrome.runtime.onMessageExternal.addListener(function(_,w,f){ ... }) ``` `_` is the message object delivered via `chrome.runtime.onMessageExternal`. The manifest declares: ```json \"externally_connectable\": { \"matches\": [\"https://www.youtube.com/*\"] } ``` So a page running in the `https://www.youtube.com/*` origin can call `chrome.runtime.sendMessage(<extensionId>, {...})` and reach…",
+              "path": "extensions/gmimaknkjommijabfploclcikgjacpdn_1.0.15/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.9,
+              "reproduced": false,
+              "basis": "external_condition_required",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 2,
+              "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+              "path": "extensions/gmimaknkjommijabfploclcikgjacpdn_1.0.15/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T06:11:39.717Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 02178702581068696de9f55314d9c1d75ac853e3e9cad7efceb4f', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "EXTERNAL_CONDITION_REQUIRED",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/gmimaknkjommijabfploclcikgjacpdn_1.0.15/final/final_report.json",
+              "report_mtime": "2026-08-18T04:03:29.428Z"
+            },
+            "manual_verification": null,
+            "notes": [
+              "Label rests on a recorded ExPAgent verdict reached with an unmet external precondition (no runtime reproduction)."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.0.15",
+        "latest_version": "1.0.15",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

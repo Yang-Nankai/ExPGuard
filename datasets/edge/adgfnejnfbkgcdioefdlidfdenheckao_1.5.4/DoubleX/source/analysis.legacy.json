@@ -1,0 +1,178 @@
+{
+    "benchmarks": {
+        "crashes": [],
+        "cs: got AST": 0.18735511600971222,
+        "cs: AST": 0.05787254683673382,
+        "cs: CFG": 0.006535881198942661,
+        "cs: PDG": 0.130719730630517,
+        "bp: got AST": 0.2939975494518876,
+        "bp: AST": 0.09768486209213734,
+        "bp: CFG": 0.06912530213594437,
+        "bp: PDG": 0.277845305390656,
+        "collected messages": 0.03402772080153227,
+        "linked messages": 2.19228052534163,
+        "cs: dangers & from WA": 0.023160217329859734,
+        "bp: dangers & from WA": 0.06364275980740786,
+        "cs: got vulnerabilities": 0.0003302544355392456,
+        "bp: got vulnerabilities": 0.0007319403812289238,
+        "totalAnalysisSeconds": 3.4618675149977207
+    },
+    "extension": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4",
+    "cs": {
+        "direct_dangers": {
+            "danger1": {
+                "danger": "setTimeout",
+                "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x7feaa3df6700>, 1)",
+                "sink-param1": "() => {\n\t\t\t\t\tif (window === top) {\n\t\t\t\t\t\tconst delay = 2000;\n\t\t\t\t\t\t// this is needed to make sure we capture all resources\n\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\tgetResources();\n\t\t\t\t\t\t}, delay);\n\t\t\t\t\t}\n\t\t\t\t\tconst load = performance.timing.loadEventEnd - performance.timing.navigationStart;\n\t\t\t\t\tchrome.runtime.sendMessage({\n\t\t\t\t\t\tname: Constants_1.default.loadTimeMessage,\n\t\t\t\t\t\tdata: load,\n\t\t\t\t\t});\n\t\t\t\t\tmeasureResources();\n\t\t\t\t}",
+                "sink-param2": 1,
+                "line": "175 - 189",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/content_scripts.js",
+                "dataflow": false
+            },
+            "danger2": {
+                "danger": "setTimeout",
+                "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x7feaa3df6a30>, 2000)",
+                "sink-param1": "() => {\n\t\t\t\t\t\t\tgetResources();\n\t\t\t\t\t\t}",
+                "sink-param2": 2000,
+                "line": "179 - 181",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/content_scripts.js",
+                "dataflow": false
+            }
+        },
+        "indirect_dangers": {},
+        "exfiltration_dangers": {
+            "danger1": {
+                "danger": "chrome.storage.local.get",
+                "value": "chrome.storage.local.get(__webpack_require__(./src/helpers/Constants.ts).default.userDataKey, <pdg_js.node.FunctionExpression object at 0x7feaa3d92460>)",
+                "sink-param1": "__webpack_require__(./src/helpers/Constants.ts).default.userDataKey",
+                "sink-param2": "(data) => {\n\t\t\t\t\tconst url = window.location.hostname;\n\t\t\t\t\tconst userData = data[Constants_1.default.userDataKey];\n\t\t\t\t\t// we want to inject rum.js once per page, not in iframes\n\t\t\t\t\tconst isIframe = window.self !== window.top;\n\t\t\t\t\tif (!userData || !userData.Entities || isIframe) {\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\tconst entity = UserData_1.default.getEntity(userData, url);\n\t\t\t\t\tif (entity) {\n\t\t\t\t\t\tvar iframe = document.createElement(\"iframe\");\n\t\t\t\t\t\tiframe.src = \"about:blank\";\n\t\t\t\t\t\tiframe.setAttribute('data-source', Constants_1.default.catchpointUserExperience);\n\t\t\t\t\t\tiframe.setAttribute('id', 'cue-iframe');\n\t\t\t\t\t\tvar style = iframe.style;\n\t\t\t\t\t\tstyle.position = \"absolute\";\n\t\t\t\t\t\tstyle.top = \"-10000px\";\n\t\t\t\t\t\tstyle.left = \"-1000px\";\n\t\t\t\t\t\tiframe.addEventListener('load', function(event) {\n\t\t\t\t\t\t\tvar frame = event.currentTarget;\n\t\t\t\t\t\t\tvar iframeDocument = frame.contentDocument;\n\t\t\t\t\t\t\tif (iframeDocument) {\n\t\t\t\t\t\t\t\tvar rumScript = iframeDocument.createElement('script');\n\t\t\t\t\t\t\t\trumScript.type = 'text/javascript';\n\t\t\t\t\t\t\t\trumScript.src = chrome.runtime.getURL('rum.js');\n\t\t\t\t\t\t\t\trumScript.setAttribute('data-source', Constants_1.default.catchpointUserExperience);\n\t\t\t\t\t\t\t\trumScript.setAttribute('sonarUniqueId', userData.UniqueId.toString());\n\t\t\t\t\t\t\t\trumScript.setAttribute('rumUrl', userData.RumUrl.toString());\n\t\t\t\t\t\t\t\trumScript.setAttribute('sonarSiteId', entity.site_id.toString());\n\t\t\t\t\t\t\t\tiframeDocument.body.appendChild(rumScript);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t});\n\t\t\t\t\t\tif (document.body) {\n\t\t\t\t\t\t\tdocument.body.insertAdjacentElement('afterbegin', iframe);\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}",
+                "line": "190 - 226",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/content_scripts.js",
+                "dataflow": false
+            }
+        }
+    },
+    "bp": {
+        "direct_dangers": {
+            "danger1": {
+                "danger": "chrome.storage.local.set",
+                "value": "chrome.storage.local.set({'Constants_1': {'default': {'dataKey': {'formattedCache': {}, 'Constants_1': {'default': {'tabPrefix': {'tabId': \"formattedCache.Constants_1.default.tabPrefixNone['getCacheEntry(tabId).getFullData()', 'getCacheEntry(tabId).clear()']\"}}}}}}})",
+                "sink-param1": {
+                    "Constants_1": {
+                        "default": {
+                            "dataKey": {
+                                "formattedCache": {},
+                                "Constants_1": {
+                                    "default": {
+                                        "tabPrefix": {
+                                            "tabId": "formattedCache.Constants_1.default.tabPrefixNone['getCacheEntry(tabId).getFullData()', 'getCacheEntry(tabId).clear()']"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "line": "188 - 188",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/background.js",
+                "dataflow": false,
+                "param_id0": {}
+            },
+            "danger2": {
+                "danger": "chrome.storage.local.set",
+                "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7feaa3b82e80>)",
+                "sink-param1": "{\n\t\t\t\t\t\t\t[Constants_1.default.userDataKey]: userData,\n\t\t\t\t\t\t}",
+                "line": "156 - 158",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/background.js",
+                "dataflow": false,
+                "param_id0": {}
+            },
+            "danger3": {
+                "danger": "setInterval",
+                "value": "setInterval(getUserData, newRefreshFrequency)",
+                "sink-param1": "getUserData",
+                "sink-param2": "newRefreshFrequency",
+                "line": "163 - 163",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/background.js",
+                "dataflow": false
+            },
+            "danger4": {
+                "danger": "setInterval",
+                "value": "setInterval(getUserData, newRefreshFrequency)",
+                "sink-param1": "getUserData",
+                "sink-param2": "newRefreshFrequency",
+                "line": "143 - 143",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/background.js",
+                "dataflow": false
+            },
+            "danger5": {
+                "danger": "chrome.storage.local.set",
+                "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7feaa3aeea30>, <pdg_js.node.FunctionExpression object at 0x7feaa3aeea60>)",
+                "sink-param1": "{\n\t\t\t\t\t\t\t[key]: toSave\n\t\t\t\t\t\t}",
+                "sink-param2": "() => {\n\t\t\t\t\t\t\tchrome.runtime.sendMessage({\n\t\t\t\t\t\t\t\tname: 'webpage_error_request',\n\t\t\t\t\t\t\t\tid: key\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t}",
+                "line": "217 - 224",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/background.js",
+                "dataflow": false,
+                "param_id0": {},
+                "param_id1": {}
+            },
+            "danger6": {
+                "danger": "chrome.storage.local.set",
+                "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7feaa3aa8550>)",
+                "sink-param1": "{\n\t\t\t\t\tcurrentTab: activeInfo.tabId\n\t\t\t\t}",
+                "line": "248 - 250",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/background.js",
+                "dataflow": false,
+                "param_id0": {}
+            },
+            "danger7": {
+                "danger": "chrome.storage.local.set",
+                "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7feaa3ac5a60>)",
+                "sink-param1": "{\n\t\t\t\t\t[tabId]: ''\n\t\t\t\t}",
+                "line": "268 - 270",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/background.js",
+                "dataflow": false,
+                "param_id0": {}
+            },
+            "danger8": {
+                "danger": "chrome.storage.local.set",
+                "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7feaa3038640>, <pdg_js.node.FunctionExpression object at 0x7feaa3038670>)",
+                "sink-param1": "{\n\t\t\t\t\t\t\t[key]: message.data\n\t\t\t\t\t\t}",
+                "sink-param2": "() => {\n\t\t\t\t\t\t\tchrome.runtime.sendMessage({\n\t\t\t\t\t\t\t\tname: 'webpage_error',\n\t\t\t\t\t\t\t\tid: key\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t}",
+                "line": "332 - 339",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/background.js",
+                "dataflow": true,
+                "param_id0": {
+                    "received_from_wa_1": {
+                        "wa": "event",
+                        "line": "306 - 306",
+                        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/content_scripts.js",
+                        "where": "event"
+                    }
+                },
+                "param_id1": {}
+            },
+            "danger9": {
+                "danger": "chrome.storage.local.set",
+                "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7feaa3038f70>)",
+                "sink-param1": "{\n\t\t\t\t\t\t\t[keyErrosRequests]: []\n\t\t\t\t\t\t}",
+                "line": "344 - 346",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/background.js",
+                "dataflow": false,
+                "param_id0": {}
+            }
+        },
+        "indirect_dangers": {},
+        "exfiltration_dangers": {
+            "danger1": {
+                "danger": "chrome.storage.local.get",
+                "value": "chrome.storage.local.get(<pdg_js.node.ValueExpr object at 0x7feaa3aee250>, <pdg_js.node.FunctionExpression object at 0x7feaa3aee280>)",
+                "sink-param1": "[key]",
+                "sink-param2": "(data) => {\n\t\t\t\t\t\tlet toSave = [];\n\t\t\t\t\t\tif (typeof data[key] !== 'undefined') {\n\t\t\t\t\t\t\ttoSave = [...data[key]];\n\t\t\t\t\t\t}\n\t\t\t\t\t\ttoSave.push(entry);\n\t\t\t\t\t\tchrome.storage.local.set({\n\t\t\t\t\t\t\t[key]: toSave\n\t\t\t\t\t\t}, () => {\n\t\t\t\t\t\t\tchrome.runtime.sendMessage({\n\t\t\t\t\t\t\t\tname: 'webpage_error_request',\n\t\t\t\t\t\t\t\tid: key\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t});\n\t\t\t\t\t}",
+                "line": "211 - 225",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_adgfnejnfbkgcdioefdlidfdenheckao_a9a0085c5244/dx_o1inl54b/unpacked/adgfnejnfbkgcdioefdlidfdenheckao.1.5.4/background.js",
+                "dataflow": false
+            }
+        }
+    }
+}

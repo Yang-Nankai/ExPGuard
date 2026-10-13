@@ -1,0 +1,149 @@
+{
+  "extension_id": "khnbclggeggefodgimdekejhipkeobnc",
+  "extension_version": "5.0.10",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Analysis\n\n### (a) Who controls the source?\nThe source is the message payload `e` delivered to `chrome.runtime.onMessageExternal.addListener((e,t,n)=>{...})`. This listener is reachable only from `externally_connectable.matches`:\n- `https://*.lemlist.com/*`\n- `http://localhost:8000/*`\n- `http://dev.lemlist.com:8000/*`\n\nThat is a *web-origin* surface (not an extension-ID IPC surface). A web attacker who can execute script on any allowed origin can control `e.command` and `e.url`. The `sender.id` fixed-extension-ID trust boundary is **not** used.\n\n### (b) Exact source-to-sink path\nMinified code extracted from `assets/background-DncCHPoW.js`:\n\n```js\nst = e => {\n  if(!e) return !1;\n  try {\n    const {hostname:t, protocol:n} = new URL(e);\n    return n!==\"https:\"&&n!==\"http:\" ? !1\n      : t===\"app.lemlist.com\"\n      || t===\"staging.lemlist.com\"\n      || t.endsWith(\".lemlist.com\")\n      || t===\"localhost\"\n      || t===\"dev.lemlist.com\";\n  } catch { return !1; }\n};\n\nchrome.runtime.onMessageExternal.addListener((e,t,n)=>{\n  if(!st(t.origin??t.url)) return n({ok:!1,error:\"unauthorized origin\"}),!1;\n  if(e?.command===\"openTab\" && typeof e.url==\"string\"){\n    let r;\n    try { r ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "assets/background-DncCHPoW",
+          "reportedLoc": "L1:C14038 -> L1:C14039",
+          "resolvedFile": "assets/background-DncCHPoW.js",
+          "resolved": true,
+          "snippet": "L1 C14038-14039: …)=>{if(!st(t.origin??t.url))return n({ok:!1,error:\"unauthorized origin\"}),!1;if(e?.command===\"openTab\"&&typeof e.url==\"string\"){let r;try{r=new URL(e.url)}catch{…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "assets/background-DncCHPoW",
+          "reportedLoc": "L1:C14253 -> L1:C14301",
+          "resolvedFile": "assets/background-DncCHPoW.js",
+          "resolved": true,
+          "snippet": "L1 C14253-14301: …ocol!==\"https:\"&&r.protocol!==\"http:\"?(n({ok:!1,error:\"invalid protocol\"}),!1):(chrome.tabs.create({url:r.toString(),active:!0}).then(()=>n({ok:!0}),o=>{l.warn(\"[external] openTab failed\",{error:o instanceof …"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://*.linkedin.com/*",
+              "https://mail.google.com/*",
+              "https://*.force.com/*",
+              "https://*.lightning.force.com/*",
+              "https://*.my.salesforce.com/*",
+              "https://*.visual.force.com/*",
+              "https://*.hubspot.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          },
+          {
+            "matches": [
+              "https://*.linkedin.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          },
+          {
+            "matches": [
+              "https://mail.google.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          },
+          {
+            "matches": [
+              "https://*.hubspot.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          },
+          {
+            "matches": [
+              "https://*.force.com/*",
+              "https://*.lightning.force.com/*",
+              "https://*.my.salesforce.com/*",
+              "https://*.visual.force.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": {
+          "matches": [
+            "https://*.lemlist.com/*",
+            "http://localhost:8000/*",
+            "http://dev.lemlist.com:8000/*"
+          ]
+        },
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

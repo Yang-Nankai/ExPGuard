@@ -1,0 +1,96 @@
+{
+  "extension_id": "efgcpheifanopniaglaoeeecglncljkf",
+  "extension_version": "1.2.8",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification\n\n### (a) Who controls the source\n`document.title` is fully page-controlled. The content script runs at `document_start` on `<all_urls>` (`allFrames: true`, ISOLATED world), so any visited page can set `document.title` before/after the content script reads it.\n\n### (b) Source-to-sink path\nThe report’s source anchor points to `js/content.js:1213-1216`, which returns `document.title` in a `CMD_BtoCR_REQUEST_INFO` reply. The actual sink-consuming occurrence is a second `document.title` read in the same content script:\n\n- `js/content.js:2211`: `const filename = document.title + \".\" + suffix;`\n- `js/content.js:2212-2217`: `sendMessageToSW({ cmd: CMD_CtoB_DIRECT_DOWNLOAD, params: { url, filename } })`\n- `js/content.js:1081-1084`: `sendMessage` sets `msg.type = MESSAGE_TYPE_TO_SERVICEWORKER` and calls `runtime.sendMessage`\n- `bg.js:2067`: `runtime.onMessage` listener receives the message\n- `bg.js:2071`: checks `message.type === MESSAGE_TYPE_TO_SERVICEWORKER`\n- `bg.js:2303-2304`: `CMD_CtoB_DIRECT_DOWNLOAD` destructures `filename` from `params`\n- `bg.js:2306-2311`: derives `safeFileName` / `attachmentValue`\n- `bg.js:2312-2335`: passes `value: attachmentValue` into `decla",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/content",
+          "reportedLoc": "L1213:C12 -> L1216:C15",
+          "resolvedFile": "js/content.js",
+          "resolved": true,
+          "snippet": ">>  1213|             return sendResponse({\n>>  1214|                 url: location.href,\n>>  1215|                 title: document.title\n>>  1216|             });"
+        },
+        "sinkAnchor": {
+          "reportedFile": "bg",
+          "reportedLoc": "L2312:C22 -> L2335:C18",
+          "resolvedFile": "bg.js",
+          "resolved": true,
+          "snippet": ">>  2312|                 await WebExtensions.declarativeNetRequest.updateSessionRules({\n>>  2313|                     removeRuleIds: [ ruleId ],\n>>  2314|                     addRules: [ {\n>>  2315|                         action: {\n>>  2316|                             type: \"modifyHeaders\",\n>>  2317|                             responseHeaders: [ {\n>>  2318|                                 header: \"Content-Disposition\",\n>>  2319|                                 operation: \"set\",\n>>  2320|                                 value: attachmentValue\n>>  2321|                             }, {\n>>  2322|                                 header: \"Content-Type\",\n>>  2323|                                 operation: \"set\",\n>>  2324|                                 value: \"application/octet-stream\"\n>>  2325|                             } ]\n>>  2326|                         },\n>>  2327|                         condition: {\n>>  2328|                             tabIds: [ tabId ],\n>>  2329|                             urlFilter: HASH_STATIC_URL,\n>>  2330|                             resourceTypes: [ \"main_frame\", \"sub_frame\" ]\n>>  2331|                         },\n>>  2332|                         id: ruleId,\n>>  2333|                         priority: 1\n>>  2334|                     } ]\n>>  2335|                 }).catch(onEE(\"declarativeNetRequest.updateSessionRules\"));"
+        },
+        "sourceExpectedMarkers": [
+          "document.title"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "<all_urls>"
+            ],
+            "excludeMatches": [
+              "https://www.capturables.com/*process128.html*"
+            ],
+            "js": [
+              "js/content.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

@@ -1,0 +1,1250 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "firefox",
+  "extension_id": "youtube-volume-scroll@github.com",
+  "version": "3.4.1",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-12a4c800febf9f3b",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:65f92809b6aaaf27:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:65f92809b6aaaf27:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "semantic_sha256": "65f92809b6aaaf27885657f7c5e38aafa088af36db23b8f0bb68fe6908c44b47",
+            "semantic_key": {
+              "rule_id": "attacker-input-storage-write",
+              "flow_type": "STORAGE_POSOING",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_file": "index",
+              "source_loc": "80128023",
+              "source_frame": "CS_1",
+              "sink_type": "CHROME_LOCAL_STORAGE",
+              "sink_file": "popup/popup",
+              "sink_loc": "5885848",
+              "sink_frame": "OPTIONS_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://www.youtube.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "From storage.sync.set('config') in index",
+              "file": "index",
+              "loc": "L80:C12 -> L80:C23",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*",
+                      "https://music.youtube.com/*",
+                      "https://www.youtube-nocookie.com/embed/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "UNTRUSTED_STORAGE",
+              "origin_context": "index",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://www.youtube.com/*",
+                  "https://music.youtube.com/*",
+                  "https://www.youtube-nocookie.com/embed/*"
+                ]
+              },
+              "code_preview": "   if (granted) {\n  >>>           <<<           $('body')"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "config",
+              "file": "popup/popup",
+              "loc": "L58:C8 -> L58:C48",
+              "frame": "OPTIONS_1",
+              "frames": [
+                {
+                  "id": "POPUP_1",
+                  "family": "EX"
+                },
+                {
+                  "id": "OPTIONS_1",
+                  "family": "EX"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "out(() => {\n        >>>browserApi.storage.local.set({ config })<<<;\n        saveTimeou"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": true,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": "STORAGE_FLOW[area: sync, key: config, sender: index, receiver: popup/popup]"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual/Source Analysis",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 6,
+              "source_provenance": "UNTRUSTED_STORAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #6 (STORAGE_POSOING)\n\n### (a) Who controls the source\nThe effective source is the `message` listener in the content script `index.js` (`init()`):\n\n```js\nwindow.addEventListener('message', e => {\n    if (e.origin !== window.location.origin) return;\n    ...\n    } else if (\n        e.data.type === 'YoutubeVolumeScroll-config-save' &&\n        typeof e.data.config === 'object'\n    ) {\n        configFromPageAccess = e.data.config;\n        browserApi.storage.sync.set({ config: e.data.config });\n    }\n});\n```\n\n`e.data.config` is attacker/page-controlled. The only checks are:\n\n- `e.origin === window.location.origin` — this is not an authentication boundary for a page-to-content-script bridge. A script running in the YouTube page can trivially `window.postMessage(..., window.location.origin)`, satisfying the origin check.\n- `typeof e.data.config === 'object'` — an attacker can supply any object; no schema or allow-list validation occurs.\n\nSo the source is genuinely untrusted at runtime.\n\n### (b) Source-to-sink path\nThe path is real and unbroken:\n\n1. `index.js` L85–L89: page `message` event `e.data.config` is written directly to `browserApi.storage.sync` under key `con",
+              "dynamic_guidance": {
+                "triggerable": false,
+                "trigger_mechanism": "OTHER",
+                "injection_context": "",
+                "origin_requirement": "",
+                "trigger_surface": "",
+                "target_urls": [],
+                "payload_sketch": "",
+                "dom_forgery": "",
+                "beacon_pointable": false,
+                "beacon_param": "",
+                "observation": "",
+                "notes": ""
+              },
+              "path": "extensions/youtube-volume-scroll@github.com_3.4.1/static/static_report.json",
+              "report_mtime": "2026-08-14T16:13:47.989Z"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": null,
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "evidence": "deep-trace=source-contract={\"surface\": \"WINDOW_MESSAGE\", \"sourcePath\": \"index.js\", \"location\": \"L80:C12 -> L80:C23\", \"eventNames\": [], \"eventTarget\": \"window\", \"eventDetailKey\": \"data\", \"envelope\": {\"type\": \"YoutubeVolumeScroll-volume\", \"newVolume\": \"number\", \"config\": \"object\"}, \"forwardField\": \"\", \"requirements\": {\"type\": \"YoutubeVolumeScroll-volume\", \"newVolume\": \"number\", \"config\": \"object\"}, \"selectors\": [], \"mediaTags\": [], \"snippet\": \"const browserApi = globalThis.browser ?? globalThis.chrome ?? undefined;\\nif (!browserApi)\\n    throw new Error(\\n        'Youtube-Volume-Scroll could not find a browser api to use',\\n    );\\n\\nconst $ = document.querySelector.bind(document);\\nconst oneMonth = 2592e6;\\nconst isMusic = window.location.href.includes('music.youtube');\\n\\nlet configFromPageAccess;\\n\\nif (browserApi.extension.inIncognitoContext) {\\n    setupIncognito();\\n}\\n\\nwindow.addEventListener",
+              "path": "extensions/youtube-volume-scroll@github.com_3.4.1/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T10:16:04.003Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "evidence_summary": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "conflict_resolution": "Strict final decision table applied.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "static_supported",
+              "usable_for_label": true,
+              "path": "../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/firefox/extensions/youtube-volume-scroll@github.com_3.4.1/final-verified-v2/final_report.json",
+              "report_mtime": "2026-08-20T13:36:54.109Z"
+            },
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user/source-based manual validation",
+              "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user or derived from the supplied source and vulnerability reports when the user could not decide."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual/Source Analysis",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_and_source_analysis",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "3.4.1",
+        "latest_version": "3.4.2",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\youtube-volume-scroll@github.com_3.4.2\\youtube-volume-scroll@github.com.3.4.2.xpi",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:65f92809b6aaaf27:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "firefox__youtube-volume-scroll@github.com__3.4.2__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\youtube-volume-scroll@github.com_3.4.2\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\youtube-volume-scroll@github.com_3.4.2\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 1.718,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 6,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "From storage.sync.set('config') in index",
+                  "file": "popup/popup",
+                  "loc": "L92:C12 -> L92:C23",
+                  "code": "»    browser«Api.permissions.request(permissions, granted => {"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "config",
+                  "file": "popup/popup",
+                  "loc": "L58:C8 -> L58:C48",
+                  "code": "»browserApi.storage.local.set({ config })«;"
+                },
+                "propagation_step_count": 16
+              }
+            ],
+            "tool_report_flow_count": 7,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_ambiguous_candidates",
+            "basis": "Same API categories occur in multiple paths or source context similarity is insufficient for a unique identity decision.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 6,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 0.148,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 0.193,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.798,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:65f92809b6aaaf27:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-4912bd5be4fc7470",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_SYNC_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:f51d93e24443b1f7:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:f51d93e24443b1f7:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "f51d93e24443b1f73f5f30a7cbc2da9e7c383fd598cb028f1161c72bddc99ea5",
+            "semantic_key": {
+              "rule_id": "attacker-input-storage-write",
+              "flow_type": "STORAGE_POSOING",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_file": "index",
+              "source_loc": "80128023",
+              "source_frame": "CS_1",
+              "sink_type": "CHROME_SYNC_STORAGE",
+              "sink_file": "index",
+              "sink_loc": "89128966",
+              "sink_frame": "CS_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://www.youtube.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "index",
+              "loc": "L80:C12 -> L80:C23",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*",
+                      "https://music.youtube.com/*",
+                      "https://www.youtube-nocookie.com/embed/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "index",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://www.youtube.com/*",
+                  "https://music.youtube.com/*",
+                  "https://www.youtube-nocookie.com/embed/*"
+                ]
+              },
+              "code_preview": "   if (\n            >>>e.data.type<<< === 'YoutubeVolumeS"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "config",
+              "file": "index",
+              "loc": "L89:C12 -> L89:C66",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*",
+                      "https://music.youtube.com/*",
+                      "https://www.youtube-nocookie.com/embed/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "config;\n            >>>browserApi.storage.sync.set({ config: e.data.config })<<<;\n        }\n    });\n"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification": "TP",
+            "dynamic": false,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual/Source Analysis",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": null,
+            "dynamic_detail": null,
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user/source-based manual validation",
+              "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user or derived from the supplied source and vulnerability reports when the user could not decide."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual/Source Analysis",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_and_source_analysis",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "3.4.1",
+        "latest_version": "3.4.2",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\youtube-volume-scroll@github.com_3.4.2\\youtube-volume-scroll@github.com.3.4.2.xpi",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:f51d93e24443b1f7:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_SYNC_STORAGE",
+            "revalidation_job_key": "firefox__youtube-volume-scroll@github.com__3.4.2__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\youtube-volume-scroll@github.com_3.4.2\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\youtube-volume-scroll@github.com_3.4.2\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 1.718,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 3,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_SYNC_STORAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "index",
+                  "loc": "L92:C12 -> L92:C23",
+                  "code": "»e.data.type« === 'YoutubeVolumeScroll-volume' &&"
+                },
+                "sink": {
+                  "kind": "CHROME_SYNC_STORAGE",
+                  "remark": "savedVolume",
+                  "file": "index",
+                  "loc": "L182:C8 -> L182:C63",
+                  "code": "»browserApi.storage.sync.set({ savedVolume: newVolume })«;"
+                },
+                "propagation_step_count": 6
+              },
+              {
+                "tool_flow_index": 1,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_SYNC_STORAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "index",
+                  "loc": "L92:C12 -> L92:C23",
+                  "code": "»e.data.type« === 'YoutubeVolumeScroll-volume' &&"
+                },
+                "sink": {
+                  "kind": "CHROME_SYNC_STORAGE",
+                  "remark": "config",
+                  "file": "index",
+                  "loc": "L101:C12 -> L101:C66",
+                  "code": "»browserApi.storage.sync.set({ config: e.data.config })«;"
+                },
+                "propagation_step_count": 6
+              },
+              {
+                "tool_flow_index": 6,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_SYNC_STORAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "From storage.sync.set('config') in index",
+                  "file": "popup/popup",
+                  "loc": "L92:C12 -> L92:C23",
+                  "code": "»    browser«Api.permissions.request(permissions, granted => {"
+                },
+                "sink": {
+                  "kind": "CHROME_SYNC_STORAGE",
+                  "remark": "config",
+                  "file": "popup/popup",
+                  "loc": "L73:C8 -> L73:C47",
+                  "code": "»browserApi.storage.sync.set({ config })«;"
+                },
+                "propagation_step_count": 16
+              }
+            ],
+            "tool_report_flow_count": 7,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "likely_unchanged",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 3,
+            "top_candidate": {
+              "tool_flow_index": 1,
+              "sink_index": 2
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 0.962,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.99,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:f51d93e24443b1f7:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-604e22f4b464e14a",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_SYNC_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:9934acaabc302053:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:9934acaabc302053:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "9934acaabc30205328a5cdce6dccbfd141f690844e875f2a01c1c9a9263b01d0",
+            "semantic_key": {
+              "rule_id": "attacker-input-storage-write",
+              "flow_type": "STORAGE_POSOING",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_file": "index",
+              "source_loc": "80128023",
+              "source_frame": "CS_1",
+              "sink_type": "CHROME_SYNC_STORAGE",
+              "sink_file": "index",
+              "sink_loc": "170817063",
+              "sink_frame": "CS_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://www.youtube.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "index",
+              "loc": "L80:C12 -> L80:C23",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*",
+                      "https://music.youtube.com/*",
+                      "https://www.youtube-nocookie.com/embed/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "index",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://www.youtube.com/*",
+                  "https://music.youtube.com/*",
+                  "https://www.youtube-nocookie.com/embed/*"
+                ]
+              },
+              "code_preview": "   if (\n            >>>e.data.type<<< === 'YoutubeVolumeS"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "savedVolume",
+              "file": "index",
+              "loc": "L170:C8 -> L170:C63",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*",
+                      "https://music.youtube.com/*",
+                      "https://www.youtube-nocookie.com/embed/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "out(() => {\n        >>>browserApi.storage.sync.set({ savedVolume: newVolume })<<<;\n        saveTimeou"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification": "TP",
+            "dynamic": false,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual/Source Analysis",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": null,
+            "dynamic_detail": null,
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user/source-based manual validation",
+              "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user or derived from the supplied source and vulnerability reports when the user could not decide."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual/Source Analysis",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_and_source_analysis",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "3.4.1",
+        "latest_version": "3.4.2",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\youtube-volume-scroll@github.com_3.4.2\\youtube-volume-scroll@github.com.3.4.2.xpi",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:9934acaabc302053:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_SYNC_STORAGE",
+            "revalidation_job_key": "firefox__youtube-volume-scroll@github.com__3.4.2__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\youtube-volume-scroll@github.com_3.4.2\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\youtube-volume-scroll@github.com_3.4.2\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 1.718,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 3,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_SYNC_STORAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "index",
+                  "loc": "L92:C12 -> L92:C23",
+                  "code": "»e.data.type« === 'YoutubeVolumeScroll-volume' &&"
+                },
+                "sink": {
+                  "kind": "CHROME_SYNC_STORAGE",
+                  "remark": "savedVolume",
+                  "file": "index",
+                  "loc": "L182:C8 -> L182:C63",
+                  "code": "»browserApi.storage.sync.set({ savedVolume: newVolume })«;"
+                },
+                "propagation_step_count": 6
+              },
+              {
+                "tool_flow_index": 1,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_SYNC_STORAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "index",
+                  "loc": "L92:C12 -> L92:C23",
+                  "code": "»e.data.type« === 'YoutubeVolumeScroll-volume' &&"
+                },
+                "sink": {
+                  "kind": "CHROME_SYNC_STORAGE",
+                  "remark": "config",
+                  "file": "index",
+                  "loc": "L101:C12 -> L101:C66",
+                  "code": "»browserApi.storage.sync.set({ config: e.data.config })«;"
+                },
+                "propagation_step_count": 6
+              },
+              {
+                "tool_flow_index": 6,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_SYNC_STORAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "From storage.sync.set('config') in index",
+                  "file": "popup/popup",
+                  "loc": "L92:C12 -> L92:C23",
+                  "code": "»    browser«Api.permissions.request(permissions, granted => {"
+                },
+                "sink": {
+                  "kind": "CHROME_SYNC_STORAGE",
+                  "remark": "config",
+                  "file": "popup/popup",
+                  "loc": "L73:C8 -> L73:C47",
+                  "code": "»browserApi.storage.sync.set({ config })«;"
+                },
+                "propagation_step_count": 16
+              }
+            ],
+            "tool_report_flow_count": 7,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "likely_unchanged",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 3,
+            "top_candidate": {
+              "tool_flow_index": 1,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 0.962,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.99,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:9934acaabc302053:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-9998ace733a5f40a",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_SYNC_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:48192714b3e47e56:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:48192714b3e47e56:01",
+            "flow_index": 3,
+            "flow_order": 4,
+            "flow_label": "F004",
+            "semantic_sha256": "48192714b3e47e56dd92ec57ecafc38a6ec9b9d4288fb15cf402870605c9f254",
+            "semantic_key": {
+              "rule_id": "attacker-input-storage-write",
+              "flow_type": "STORAGE_POSOING",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_file": "index",
+              "source_loc": "80128023",
+              "source_frame": "CS_1",
+              "sink_type": "CHROME_SYNC_STORAGE",
+              "sink_file": "popup/popup",
+              "sink_loc": "7387347",
+              "sink_frame": "OPTIONS_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 4,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://www.youtube.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "From storage.sync.set('config') in index",
+              "file": "index",
+              "loc": "L80:C12 -> L80:C23",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*",
+                      "https://music.youtube.com/*",
+                      "https://www.youtube-nocookie.com/embed/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "UNTRUSTED_STORAGE",
+              "origin_context": "index",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://www.youtube.com/*",
+                  "https://music.youtube.com/*",
+                  "https://www.youtube-nocookie.com/embed/*"
+                ]
+              },
+              "code_preview": "   if (granted) {\n  >>>           <<<           $('body')"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "config",
+              "file": "popup/popup",
+              "loc": "L73:C8 -> L73:C47",
+              "frame": "OPTIONS_1",
+              "frames": [
+                {
+                  "id": "POPUP_1",
+                  "family": "EX"
+                },
+                {
+                  "id": "OPTIONS_1",
+                  "family": "EX"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "r = () => {\n        >>>browserApi.storage.sync.set({ config })<<<;\n    };\n\n    setupS"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": true,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": "STORAGE_FLOW[area: sync, key: config, sender: index, receiver: popup/popup]"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual/Source Analysis",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 6,
+              "source_provenance": "UNTRUSTED_STORAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #6 — STORAGE_POSOING\n\n### 1. Source control (attacker-controllable?)\n\n**Confirmed.** In `index.js` (content script, runs on `https://www.youtube.com/*`, `music.youtube.com/*`, `youtube-nocookie.com/embed/*`):\n\n```js\nwindow.addEventListener('message', e => {\n    if (e.origin !== window.location.origin) return;\n    if (e.data.type === 'YoutubeVolumeScroll-volume' && ...) {\n        saveVolume(e.data.newVolume);\n    } else if (\n        e.data.type === 'YoutubeVolumeScroll-config-save' &&\n        typeof e.data.config === 'object'\n    ) {\n        configFromPageAccess = e.data.config;\n        browserApi.storage.sync.set({ config: e.data.config });   // L89\n    }\n});\n```\n\nThe guards are exactly the bypassable class described in the harness:\n- `e.origin !== window.location.origin` is a same-page origin check; a page (or injected/XSS script) calling `window.postMessage(msg, window.location.origin)` trivially satisfies it.\n- `e.data.type === 'YoutubeVolumeScroll-config-save'` and `typeof e.data.config === 'object'` are checks on attacker-supplied message *fields*, not a trust anchor.\n- There is no `sender.id` allowlist (this is not extension messaging), no fixed-truste",
+              "dynamic_guidance": {
+                "triggerable": false,
+                "trigger_mechanism": "OTHER",
+                "injection_context": "",
+                "origin_requirement": "",
+                "trigger_surface": "",
+                "target_urls": [],
+                "payload_sketch": "",
+                "dom_forgery": "",
+                "beacon_pointable": false,
+                "beacon_param": "",
+                "observation": "",
+                "notes": ""
+              },
+              "path": "extensions/youtube-volume-scroll@github.com_3.4.1/static/static_report.json",
+              "report_mtime": "2026-08-14T16:13:47.989Z"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": null,
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "evidence": "deep-trace=source-contract={\"surface\": \"WINDOW_MESSAGE\", \"sourcePath\": \"index.js\", \"location\": \"L80:C12 -> L80:C23\", \"eventNames\": [], \"eventTarget\": \"window\", \"eventDetailKey\": \"data\", \"envelope\": {\"type\": \"YoutubeVolumeScroll-volume\", \"newVolume\": \"number\", \"config\": \"object\"}, \"forwardField\": \"\", \"requirements\": {\"type\": \"YoutubeVolumeScroll-volume\", \"newVolume\": \"number\", \"config\": \"object\"}, \"selectors\": [], \"mediaTags\": [], \"snippet\": \"const browserApi = globalThis.browser ?? globalThis.chrome ?? undefined;\\nif (!browserApi)\\n    throw new Error(\\n        'Youtube-Volume-Scroll could not find a browser api to use',\\n    );\\n\\nconst $ = document.querySelector.bind(document);\\nconst oneMonth = 2592e6;\\nconst isMusic = window.location.href.includes('music.youtube');\\n\\nlet configFromPageAccess;\\n\\nif (browserApi.extension.inIncognitoContext) {\\n    setupIncognito();\\n}\\n\\nwindow.addEventListener",
+              "path": "extensions/youtube-volume-scroll@github.com_3.4.1/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T10:16:04.003Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "evidence_summary": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "conflict_resolution": "Strict final decision table applied.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "static_supported",
+              "usable_for_label": true,
+              "path": "../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/firefox/extensions/youtube-volume-scroll@github.com_3.4.1/final-verified-v2/final_report.json",
+              "report_mtime": "2026-08-20T13:36:54.109Z"
+            },
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user/source-based manual validation",
+              "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user or derived from the supplied source and vulnerability reports when the user could not decide."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual/Source Analysis",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_and_source_analysis",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "3.4.1",
+        "latest_version": "3.4.2",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\youtube-volume-scroll@github.com_3.4.2\\youtube-volume-scroll@github.com.3.4.2.xpi",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:48192714b3e47e56:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_SYNC_STORAGE",
+            "revalidation_job_key": "firefox__youtube-volume-scroll@github.com__3.4.2__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\youtube-volume-scroll@github.com_3.4.2\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\youtube-volume-scroll@github.com_3.4.2\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 1.718,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 3,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_SYNC_STORAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "index",
+                  "loc": "L92:C12 -> L92:C23",
+                  "code": "»e.data.type« === 'YoutubeVolumeScroll-volume' &&"
+                },
+                "sink": {
+                  "kind": "CHROME_SYNC_STORAGE",
+                  "remark": "savedVolume",
+                  "file": "index",
+                  "loc": "L182:C8 -> L182:C63",
+                  "code": "»browserApi.storage.sync.set({ savedVolume: newVolume })«;"
+                },
+                "propagation_step_count": 6
+              },
+              {
+                "tool_flow_index": 1,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_SYNC_STORAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "index",
+                  "loc": "L92:C12 -> L92:C23",
+                  "code": "»e.data.type« === 'YoutubeVolumeScroll-volume' &&"
+                },
+                "sink": {
+                  "kind": "CHROME_SYNC_STORAGE",
+                  "remark": "config",
+                  "file": "index",
+                  "loc": "L101:C12 -> L101:C66",
+                  "code": "»browserApi.storage.sync.set({ config: e.data.config })«;"
+                },
+                "propagation_step_count": 6
+              },
+              {
+                "tool_flow_index": 6,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_SYNC_STORAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "From storage.sync.set('config') in index",
+                  "file": "popup/popup",
+                  "loc": "L92:C12 -> L92:C23",
+                  "code": "»    browser«Api.permissions.request(permissions, granted => {"
+                },
+                "sink": {
+                  "kind": "CHROME_SYNC_STORAGE",
+                  "remark": "config",
+                  "file": "popup/popup",
+                  "loc": "L73:C8 -> L73:C47",
+                  "code": "»browserApi.storage.sync.set({ config })«;"
+                },
+                "propagation_step_count": 16
+              }
+            ],
+            "tool_report_flow_count": 7,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_ambiguous_candidates",
+            "basis": "Same API categories occur in multiple paths or source context similarity is insufficient for a unique identity decision.",
+            "candidate_count": 3,
+            "top_candidate": {
+              "tool_flow_index": 6,
+              "sink_index": 2
+            },
+            "identity_evidence": {
+              "source_context_similarity": 0.148,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 0.193,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.798,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:firefox:youtube-volume-scroll@github.com:3.4.1:48192714b3e47e56:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

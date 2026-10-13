@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "content_scripts.js",
+      "sourceFrame": "CS_1",
+      "sourceLoc": "L2",
+      "sourceCode": "event",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L220",
+      "sinkCode": "chrome.storage.local.set({'OnboardUDID': 'forge.util.bytesToHex(bytes)'}, <pdg_js.node.FunctionExpression object at 0x7fec32045790>)",
+      "ctx": "background",
+      "messagePassing": true,
+      "channel": "doublex-edg",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L220",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set({'OnboardUDID': 'forge.util.bytesToHex(bytes)'}, <pdg_js.node.FunctionExpression object at 0x7fec32045790>)",
+        "sink-param1": {
+          "OnboardUDID": "forge.util.bytesToHex(bytes)"
+        },
+        "sink-param2": "function() {\n\t\t\t\t\t\tif (chrome.runtime.lastError) {\n\t\t\t\t\t\t\tclientEnrollment.redirect_error(1, 'Failed to generate device id');\n\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tcallback(item[deviceId]);\n\t\t\t\t\t}",
+        "line": "220 - 226",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_gdkddcndonbadjjminbeeokgcknciebo_5de77ba29a27/dx_xo8s5lfe/unpacked/gdkddcndonbadjjminbeeokgcknciebo.6.11.18.2503/background.js",
+        "dataflow": true,
+        "param_id0": {},
+        "param_id1": {
+          "received_from_wa_1": {
+            "wa": "event",
+            "line": "2 - 2",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_gdkddcndonbadjjminbeeokgcknciebo_5de77ba29a27/dx_xo8s5lfe/unpacked/gdkddcndonbadjjminbeeokgcknciebo.6.11.18.2503/content_scripts.js",
+            "where": "event"
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L210",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(OnboardUDID, <pdg_js.node.FunctionExpression object at 0x7fec32a2a0a0>)",
+        "sink-param1": "OnboardUDID",
+        "sink-param2": "function(item) {\n\t\t\tif (item[deviceId] === undefined) {\n\t\t\t\t// create new id\n\t\t\t\tforge.random.getBytes(16, function(err, bytes) {\n\t\t\t\t\tif (err) {\n\t\t\t\t\t\tclientEnrollment.redirect_error(1, 'Failed to generate device id');\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\titem = {}\n\t\t\t\t\titem[deviceId] = forge.util.bytesToHex(bytes);\n\t\t\t\t\tchrome.storage.local.set(item, function() {\n\t\t\t\t\t\tif (chrome.runtime.lastError) {\n\t\t\t\t\t\t\tclientEnrollment.redirect_error(1, 'Failed to generate device id');\n\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tcallback(item[deviceId]);\n\t\t\t\t\t});\n\t\t\t\t});\n\t\t\t} else {\n\t\t\t\tcallback(item[deviceId]);\n\t\t\t}\n\t\t}",
+        "line": "210 - 231",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_gdkddcndonbadjjminbeeokgcknciebo_5de77ba29a27/dx_xo8s5lfe/unpacked/gdkddcndonbadjjminbeeokgcknciebo.6.11.18.2503/background.js",
+        "dataflow": false
+      }
+    }
+  ]
+}

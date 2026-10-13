@@ -1,0 +1,27 @@
+# ExPAgent Dynamic Test — gdnpkbipbholkoaggmlblpbmgemddbgb v1.27.1
+
+- Browser: `chrome`  |  LLM: `deepseek` / `deepseek-v4-pro`
+- Runtime extension id: `hdhfpaofhlnfemdnekloeoipgmakbije`
+- Environment: `{'browserUrl': 'http://127.0.0.1:9222', 'runtimeExtensionId': 'hdhfpaofhlnfemdnekloeoipgmakbije', 'beaconBaseUrl': 'http://127.0.0.1:63257', 'headless': True, 'safety': {'mode': 'isolated-controlled-validation', 'allowedTestOrigins': ['http://127.0.0.1', 'http://[::1]', 'http://localhost'], 'network': 'loopback and explicitly configured controlled origins only', 'testInput': 'bounded JSON with harmless EXPAGENT_TEST_* markers', 'sensitiveData': 'credentials, cookies, tokens, and personal data are not read or collected'}, 'networkIsolation': True}`
+
+**Assessment:** Dynamically tested 1 flow(s): 0 CONFIRMED, 0 PARTIAL, 1 INCONCLUSIVE_AFTER_DEBUG.
+
+---
+
+## Flow #0 — INCONCLUSIVE AFTER DEBUG  (reproduced=False, confidence 0.00)
+
+**Reasoning:** ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.
+
+**Runtime evidence:** deep-trace=source-contract={"surface": "CUSTOM_EVENT", "sourcePath": "js/awebChromeHelper.min.js", "location": "L2:C662435 -> L2:C662446", "eventNames": ["scroll", "error", "timeout", "loadend", "loadedmetadata", "progress", "abort", "keyup"], "eventTarget": "document", "eventDetailKey": "detail", "envelope": {}, "forwardField": "", "requirements": {"type": "HIGHLIGHT_VIOLATION"}, "selectors": [], "mediaTags": [], "snippet": "web-inline-style\")}}))})),yr(this,\"_addTabTrail\",(()=>{let e=this._shadowBody.querySelector(\"#AWEB_Helper_Guideline_Container\")||null;e&&e.remove();const t=document.createElementNS(\"http://www.w3.org/2000/svg\",\"svg\"),r=document.createElementNS(\"http://www.w3.org/2000/svg\",\"line\"),n=document.createElementNS(\"http://www.w3.org/2000/svg\",\"line\");this._shadowBody.appendChild(t),t.appendChild(n),t.appendChild(r),t.setAttribute(\"id\",\"AWEB_Helper_Guideline_Contain
+
+**Planned trajectory:**
+1. `list_cdp_targets` Confirm extension target/background/service-worker exists.
+2. `get_extension_runtime_state` Snapshot pre-trigger badge/storage/runtime state.
+3. `new_page/navigate_page` Open approved source fixture only: http://127.0.0.1:63257/page
+4. `list_scripts/search_in_sources` Confirm relevant content script/listener is injected.
+5. `post_controlled_message/set_controlled_dom/dispatch_controlled_event` Inject a JSON test marker through the matching local source surface.
+6. `observe` Check beacon/network/console/runtime state/screenshot.
+7. `ReAct-adjust` If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.
+
+
+---

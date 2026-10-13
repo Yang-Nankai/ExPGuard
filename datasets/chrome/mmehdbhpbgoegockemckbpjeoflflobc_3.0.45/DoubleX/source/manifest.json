@@ -1,0 +1,65 @@
+{
+  "update_url": "https://clients2.google.com/service/update2/crx",
+  "manifest_version": 3,
+  "name": "Ad Library Cloud",
+  "description": "Save ads from Facebook Ad Library in one click, download ads from the Ad Library in HD quality.",
+  "version": "3.0.45",
+  "icons": {
+    "16": "icon-16.png",
+    "32": "icon-32.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  },
+  "background": {
+    "service_worker": "./static/js/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.facebook.com/ads/library*",
+        "https://web.facebook.com/ads/library*"
+      ],
+      "js": [
+        "./static/js/content.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
+    },
+    {
+      "world": "MAIN",
+      "js": [
+        "./static/js/inject.js"
+      ],
+      "matches": [
+        "https://www.facebook.com/*",
+        "https://web.facebook.com/*",
+        "https://www.facebook.com/ads/library*",
+        "https://web.facebook.com/ads/library*"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://www.facebook.com/*",
+        "https://web.facebook.com/*"
+      ],
+      "js": [
+        "./static/js/ads.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
+    }
+  ],
+  "action": {
+    "default_popup": "index.html"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.facebook.com/*",
+    "https://web.facebook.com/*"
+  ]
+}

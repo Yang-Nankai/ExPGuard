@@ -1,0 +1,155 @@
+{
+  "flow_index": 0,
+  "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+  "final_verdict": "UNCERTAIN",
+  "confidence": 0.4,
+  "reproduced": false,
+  "trajectory": [
+    {
+      "action": "dom_value_replay",
+      "detail": "ELEMENT_VALUE",
+      "result": "True"
+    },
+    {
+      "action": "observe",
+      "detail": "pinned background sink tap",
+      "result": "{\"content\": \"\", \"background\": \"{\\\"sink_type\\\": \\\"all\\\", \\\"target_hint\\\": \\\"background\\\", \\\"context\\\": \\\"extension-target\\\", \\\"observerReady\\\": true, \\\"observerLost\\\": false, \\\"observerRecovered\\\": false, \\\"expectedGeneration\\\": \\\"observer_6938654355a64eff\\\", \\\"actualGeneration\\\": \\\"observer_6938654355a64eff\\\", \\\"previousTargetId\\\": \\\"05B9738172FE246B9B224F606905CDA9\\\", \\\"currentTargetId\\\": \\\"05B9738172FE246B9B224F606905CDA9\\\", \\\"recoveryReason\\\": \\\"\\\", \\\"recoveryResult\\\": null, \\\"result\\\": \\\"{\\\\"
+    }
+  ],
+  "planned_trajectory": {
+    "flow_index": 0,
+    "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+    "target_url": "http://127.0.0.1:56097/page",
+    "preconditions": [
+      "A page where the relevant content script/source frame runs.",
+      "Loaded extension must expose extension CDP targets.",
+      "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+    ],
+    "steps": [
+      {
+        "action": "list_cdp_targets",
+        "detail": "Confirm extension target/background/service-worker exists.",
+        "result": ""
+      },
+      {
+        "action": "get_extension_runtime_state",
+        "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+        "result": ""
+      },
+      {
+        "action": "new_page/navigate_page",
+        "detail": "Open approved source target: http://127.0.0.1:56097/page",
+        "result": ""
+      },
+      {
+        "action": "list_scripts/search_in_sources",
+        "detail": "Confirm relevant content script/listener is injected.",
+        "result": ""
+      },
+      {
+        "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+        "detail": "Inject a JSON test marker through the matching local source surface.",
+        "result": ""
+      },
+      {
+        "action": "observe",
+        "detail": "Check beacon/network/console/runtime state/screenshot.",
+        "result": ""
+      },
+      {
+        "action": "ReAct-adjust",
+        "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+        "result": ""
+      }
+    ],
+    "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+    "expected_observation": "Instrument and observe CHROME_WINDOWS_CREATE_OPTIONS; use a beacon when its security-relevant argument is a URL.",
+    "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+  },
+  "evidence": "dom-target={\"targetId\": \"1F7477AC17868453E4E60DE4FB0D967C\", \"url\": \"http://127.0.0.1:56097/page\"}\ntriggered-events=[\"keyup\", \"click\"]\ncontent-retrigger={\"ok\": true, \"fields\": [\"palabra_para_bocadillo\", \"URL_para_bocadillo\", \"oculta_bocadillo\", \"me_oyes\", \"frameId_bocadillo_2022\", \"URLtraeHTML\", \"soy_pagina_o_extension\", \"palabra_a_buscar\"], \"result\": {\"sent\": true, \"tabId\": 828092109}}\ndom-source-continuation={\"invoked\": false, \"attempts\": []}\nisolated-event=null\ndom-handler=null\ndom-value-sink-tap={\"content\": \"\", \"background\": \"{\\\"sink_type\\\": \\\"all\\\", \\\"target_hint\\\": \\\"background\\\", \\\"context\\\": \\\"extension-target\\\", \\\"observerReady\\\": true, \\\"observerLost\\\": false, \\\"observerRecovered\\\": false, \\\"expectedGeneration\\\": \\\"observer_6938654355a64eff\\\", \\\"actualGeneration\\\": \\\"observer_6938654355a64eff\\\", \\\"previousTargetId\\\": \\\"05B9738172FE246B9B224F606905CDA9\\\", \\\"currentTargetId\\\": \\\"05B9738172FE246B9B224F606905CDA9\\\", \\\"recoveryReason\\\": \\\"\\\", \\\"recoveryResult\\\": null, \\\"result\\\": \\\"{\\\\\\\"keys\\\\\\\":[\\\\\\\"storage.local.set\\\\\\\",\\\\\\\"storage.onChanged\\\\\\\",\\\\\\\"tabs.sendMessage\\\\\\\",\\\\\\\"fetch\\\\\\\"],\\\\\\\"data\\\\\\\":{\\\\\\\"__fetch__\\\\\\\":true,\\\\\\\"__function__\\\\\\\":true,\\\\\\\"__eval__\\\\\\\":true,\\\\\\\"__storage_local_set__\\\\\\\":true,\\\\\\\"__storage_sync_set__\\\\\\\":true,\\\\\\\"__storage_session_set__\\\\\\\":true,\\\\\\\"__storage_onChanged__\\\\\\\":true,\\\\\\\"__tabs_create__\\\\\\\":true,\\\\\\\"__tabs_update__\\\\\\\":true,\\\\\\\"__tabs_remove__\\\\\\\":true,\\\\\\\"__tabs_sendMessage__\\\\\\\":true,\\\\\\\"__windows_create__\\\\\\\":true,\\\\\\\"__windows_update__\\\\\\\":true,\\\\\\\"__windows_remove__\\\\\\\":true,\\\\\\\"__action_setBadgeText__\\\\\\\":true,\\\\\\\"__action_setTitle__\\\\\\\":true,\\\\\\\"__action_setIcon__\\\\\\\":true,\\\\\\\"__runtime_sendMessage__\\\\\\\":true,\\\\\\\"storage.lo",
+  "reasoning": "DOM source replay and observer completed, but the exact sink did not record the controlled marker. This is a runtime non-reproduction after an actual attempt, not NOT_ATTEMPTED. Semantic-fixture non-observation (NOT_REPRODUCED) cannot rebut the original extension boundary.",
+  "evidence_stage": "ENVIRONMENT_READY",
+  "blocked_reason": "",
+  "observer_status": {
+    "semanticFixturesInstalled": true,
+    "semanticFixtureUsed": false,
+    "semanticFixtureKinds": [
+      "content-script-local-fallback-semantic-fixture"
+    ],
+    "semanticFixture": true,
+    "positiveOnly": true,
+    "environmentReady": true,
+    "sinkObserverReady": true,
+    "markerReached": false,
+    "capabilityAssessment": {
+      "requiredContexts": [
+        "serviceWorker",
+        "contentScriptIsolatedWorld"
+      ],
+      "unsupportedContexts": [],
+      "limitations": [],
+      "deterministicReplaySupported": true,
+      "lineBreakpointSupported": true
+    }
+  },
+  "payload_used": "",
+  "evidence_artifacts": [
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3-finalfocus\\_runs\\edge\\bhoebolnjfhalinoblhgekniajfiiaem\\2.4.0\\dynamic-evidence\\flow-0\\step-source-open.png",
+      "description": "Step `source-open`: http://127.0.0.1:56097/page",
+      "stage": "source-open",
+      "captured_at": "2026-09-23T10:46:45.531287+00:00",
+      "target_url": "http://127.0.0.1:56097/page",
+      "sha256": "bd244020f3dcfcd4c87e275bbbbf00d1b11b64f703bc65d31cddff91f5aa4c2c"
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3-finalfocus\\_runs\\edge\\bhoebolnjfhalinoblhgekniajfiiaem\\2.4.0\\dynamic-evidence\\flow-0\\step-after-trigger.png",
+      "description": "Step `after-trigger`: http://127.0.0.1:56097/page",
+      "stage": "after-trigger",
+      "captured_at": "2026-09-23T10:46:45.620917+00:00",
+      "target_url": "http://127.0.0.1:56097/page",
+      "sha256": "8807bbc7312bfd1f35c4d6abe99708788cffdc2ec1ec4e0dc1ba79366dc0f657"
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3-finalfocus\\_runs\\edge\\bhoebolnjfhalinoblhgekniajfiiaem\\2.4.0\\dynamic-evidence\\flow-0\\step-after-observation.png",
+      "description": "Step `after-observation`: http://127.0.0.1:56097/page",
+      "stage": "after-observation",
+      "captured_at": "2026-09-23T10:46:50.710955+00:00",
+      "target_url": "http://127.0.0.1:56097/page",
+      "sha256": "8807bbc7312bfd1f35c4d6abe99708788cffdc2ec1ec4e0dc1ba79366dc0f657"
+    },
+    {
+      "kind": "transcript",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3-finalfocus\\_runs\\edge\\bhoebolnjfhalinoblhgekniajfiiaem\\2.4.0\\dynamic-evidence\\flow-0\\trajectory.txt",
+      "description": "Bounded ReAct trajectory and tool evidence.",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3-finalfocus\\_runs\\edge\\bhoebolnjfhalinoblhgekniajfiiaem\\2.4.0\\dynamic-evidence\\flow-0\\step-final-state.png",
+      "description": "Step `final-state`: http://127.0.0.1:56097/page",
+      "stage": "final-state",
+      "captured_at": "2026-09-23T10:46:50.780733+00:00",
+      "target_url": "http://127.0.0.1:56097/page",
+      "sha256": "8807bbc7312bfd1f35c4d6abe99708788cffdc2ec1ec4e0dc1ba79366dc0f657"
+    },
+    {
+      "kind": "screenshot-manifest",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3-finalfocus\\_runs\\edge\\bhoebolnjfhalinoblhgekniajfiiaem\\2.4.0\\dynamic-evidence\\flow-0\\screenshot-evidence.json",
+      "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    }
+  ],
+  "human_handoff": null,
+  "debugger_summary": "",
+  "notes": ""
+}

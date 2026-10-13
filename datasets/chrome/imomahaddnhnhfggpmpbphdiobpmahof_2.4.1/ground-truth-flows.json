@@ -1,0 +1,880 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "imomahaddnhnhfggpmpbphdiobpmahof",
+  "version": "2.4.1",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-5e807f9b2f9f5a9a",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "FETCH_RESOURCE",
+      "matched_tools": [
+        "ExPGuard",
+        "CoCo"
+      ],
+      "match_region": "ExPGuard + CoCo",
+      "match_basis": "explicit_reuse_and_normalized_signature",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:711aeb10cd0bf53b:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:711aeb10cd0bf53b:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "711aeb10cd0bf53ba2b3aadd9073c06579b3b2e844076731b7e3a1b6c3849d40",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "resources/js/background",
+              "loc": "L26:C16 -> L26:C23",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "resources/js/background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "resources/js/background",
+              "loc": "L5:C18 -> L5:C49",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "FULL"
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": "external_condition_required",
+                  "confidence": 0.9,
+                  "detail": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Analysis ### (a) Who controls the source The source is `chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse){...})` at `background.js` L24–25. `request` is fully attacker-controlled by any page whose origin matches `externally_connectable.matches: [\"*://*.youtube-skins.com/*\"]`. There is **no `sender.id` check and no `sender.url`/`sender.origin` check** anywhere in the listener, so the only boundary is the manifest origin restriction — expl…",
+              "path": "extensions/imomahaddnhnhfggpmpbphdiobpmahof_2.4.1/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.9,
+              "reproduced": false,
+              "basis": "external_condition_required",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 2,
+              "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+              "path": "extensions/imomahaddnhnhfggpmpbphdiobpmahof_2.4.1/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T04:33:08.369Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/imomahaddnhnhfggpmpbphdiobpmahof/2.4.1/dynamic-evidence/flow-0",
+              "files": [
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountRateLimitExceeded', 'message': 'Requests are too frequent. Please reduce your request frequency, wait a short moment, and retry your request. Request id: 021787025860804b9f489096afc36acf45c00ec3935d23a617a2e', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "EXTERNAL_CONDITION_REQUIRED",
+              "tool_reports_consulted": [
+                "primary",
+                "coco"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/imomahaddnhnhfggpmpbphdiobpmahof_2.4.1/final/final_report.json",
+              "report_mtime": "2026-08-18T04:04:19.69Z"
+            },
+            "manual_verification": null,
+            "notes": [
+              "Label rests on a recorded ExPAgent verdict reached with an unmet external precondition (no runtime reproduction)."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        },
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:26db316e9cc65eb7:01",
+          "flow": {
+            "flow_id": "coco:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:26db316e9cc65eb7:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "26db316e9cc65eb7a732257507285f8e2a8c9af07f8738e58c48675f815e7837",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "coco-request_forgery",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "CoCo source evidence",
+              "file": "resources/js/background.js",
+              "loc": "L32:C1 -> L32:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN",
+                  "constraint": {
+                    "matches": [
+                      "*://*.youtube-skins.com/*",
+                      "http://127.0.0.1/*",
+                      "http://localhost/*",
+                      "https://127.0.0.1/*",
+                      "https://localhost/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "resources/js/background.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "CoCo sink evidence",
+              "file": "resources/js/background.js",
+              "loc": "L15:C1 -> L15:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "resources/js/background.js",
+              "message_sender_provenance": "UNKNOWN",
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Reused/ExPGuard-Opti"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "coco_dynamic",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": "external_condition_required",
+                  "report_path": "extensions/imomahaddnhnhfggpmpbphdiobpmahof_2.4.1/dynamic/dynamic_report.json"
+                },
+                {
+                  "tier": "coco_reused_expguard-opti",
+                  "source": "Reused/ExPGuard-Opti",
+                  "kind": "coco_reused_expguard-opti",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "Reused ExPGuard-Opti F001 (flow_index=0) via source_type_normalized_sink_type_exact/all_candidates_agree.",
+                  "reused_flow_id": "expguard-opti:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:711aeb10cd0bf53b:01",
+                  "package_sha256": "92f1c07493b159c208041779340616d05ff4db3ac96d76748e29fd3552e9ce7f"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_and_reused_match",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification ledger\n\n**(a) Who controls the source?**\n`chrome.runtime.onMessageExternal.addListener` at `background.js:24` receives messages from any page matching `externally_connectable.matches: [\"*://*.youtube-skins.com/*\"]`. The message field `request.files` is supplied entirely by that web page. There is **no `sender.id` allowlist** and no `sender.origin`/`sender.url` check — the only gate is `request.action == 'install'`, which is an attacker-satisfiable field check, not an authentication boundary. Per the harness rule, an `externally_connectable` origin restriction narrows scope but remains exploitable via XSS/compromise of that web origin. Source is genuinely web-controllable.\n\n**(b) Exact source→sink path**\n- `L24` `onMessageExternal` → `L26` `request.action == 'install'` → `L32` `preloadImgs(request.files)`\n- `L12` `imgs = JSON.parse(imgs)` (attacker JSON)\n- `L14` `imgs[key]` passed guard `imgs[key].indexOf('themes_pic_file') > 0` (trivially satisfiable by including the substring)\n- `L15` `img_files.push('https://youtube-skins.com' + imgs[key])` (attacker value appended into URL)\n- `L18-19` → `httpPreload(img_files.shift())` → `L5` `fetch(img_url, {method:'get'})`\n\nThe",
+              "path": "extensions/imomahaddnhnhfggpmpbphdiobpmahof_2.4.1/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.9,
+              "reproduced": false,
+              "basis": "external_condition_required",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 1,
+              "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+              "path": "extensions/imomahaddnhnhfggpmpbphdiobpmahof_2.4.1/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T04:53:05.938559Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": {
+              "source_dataset": "ExPGuard-Opti",
+              "extension_key": "imomahaddnhnhfggpmpbphdiobpmahof@2.4.1",
+              "flow_id": "expguard-opti:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:711aeb10cd0bf53b:01",
+              "flow_index": 0,
+              "flow_label": "F001",
+              "verification": "TP",
+              "verification_source": [
+                "ExPAgent"
+              ],
+              "match_mode": "source_type_normalized_sink_type_exact",
+              "match_reason": "all_candidates_agree",
+              "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "source_loc": "L26:C16 -> L26:C23",
+              "source_file": "resources/js/background",
+              "sink_type": "FETCH_RESOURCE",
+              "sink_loc": "L5:C18 -> L5:C49",
+              "sink_file": "resources/js/background",
+              "package_evidence": {
+                "same_package": true,
+                "same_crx": true,
+                "same_manifest": false,
+                "same_source_manifest": true,
+                "coco_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\imomahaddnhnhfggpmpbphdiobpmahof_2.4.1\\crx\\imomahaddnhnhfggpmpbphdiobpmahof.2.4.1.crx",
+                "external_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\imomahaddnhnhfggpmpbphdiobpmahof_2.4.1\\crx\\imomahaddnhnhfggpmpbphdiobpmahof.2.4.1.crx",
+                "coco_package_sha256": "92f1c07493b159c208041779340616d05ff4db3ac96d76748e29fd3552e9ce7f",
+                "external_package_sha256": "92f1c07493b159c208041779340616d05ff4db3ac96d76748e29fd3552e9ce7f",
+                "coco_manifest_sha256": "60abe989a61e7dbe682685a1583620d3132d99d7f181495e47b6eab6fc469dc4",
+                "external_manifest_sha256": "264d39d384932dbfb79c1cfe2b136af234abef0264a32dc6f0d190aa535c134b",
+                "coco_source_manifest_sha256": "2cecaa7e450afceafca39c5c648df2ae72fcce892371a982e4f21166b801548c",
+                "external_source_manifest_sha256": "2cecaa7e450afceafca39c5c648df2ae72fcce892371a982e4f21166b801548c"
+              },
+              "supporting_matches": []
+            },
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: EXTERNAL_CONDITION_REQUIRED; final_verdict=TRUE_POSITIVE."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "mixed_tool_outcome",
+        "dataset_version": "2.4.1",
+        "latest_version": "2.6.4",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\imomahaddnhnhfggpmpbphdiobpmahof_2.6.4\\imomahaddnhnhfggpmpbphdiobpmahof.2.6.4.crx",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:711aeb10cd0bf53b:01",
+            "original_source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+            "original_sink_type": "FETCH_RESOURCE",
+            "revalidation_job_key": "chrome__imomahaddnhnhfggpmpbphdiobpmahof__2.6.4__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\imomahaddnhnhfggpmpbphdiobpmahof_2.6.4\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\imomahaddnhnhfggpmpbphdiobpmahof_2.6.4\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 1.547,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "disappeared",
+            "comparison": "no_exact_source_and_sink_api_pair",
+            "candidate_match_count": 0,
+            "same_source_candidates": [
+              {
+                "tool_flow_index": 2,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+                  "file": "resources/js/background",
+                  "loc": "L77:C16 -> L77:C23",
+                  "code": "if (»request«.action == 'transcript_get') {"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "unknown",
+                  "file": "resources/js/background",
+                  "loc": "L120:C16 -> L130:C18",
+                  "code": "»chrome.storage.local.set(patch, function () {«"
+                },
+                "propagation_step_count": 17
+              }
+            ],
+            "same_sink_candidates": [],
+            "tool_report_flow_count": 2,
+            "source_review_required": true,
+            "interpretation": "The original source/sink pair was not reported in the successful rerun; this alone does not prove a security fix."
+          },
+          {
+            "tool": "CoCo",
+            "original_source_flow_id": "coco:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:26db316e9cc65eb7:01",
+            "original_source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+            "original_sink_type": "FETCH_RESOURCE",
+            "revalidation_job_key": "chrome__imomahaddnhnhfggpmpbphdiobpmahof__2.6.4__CoCo",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\imomahaddnhnhfggpmpbphdiobpmahof_2.6.4\\revalidation\\CoCo\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\imomahaddnhnhfggpmpbphdiobpmahof_2.6.4\\revalidation\\CoCo\\attempt-01\\report.flows.json",
+            "duration_seconds": 188.422,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 3,
+                "sink_index": 1,
+                "flow_type": "REQUEST_FORGERY",
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "FETCH_RESOURCE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE"
+                },
+                "sink": {
+                  "kind": "FETCH_RESOURCE"
+                },
+                "propagation_step_count": 0
+              }
+            ],
+            "tool_report_flow_count": 3,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_no_matching_candidate",
+            "basis": "No same-source/sink candidate was available in the successful new report; source absence is not proof of a fix.",
+            "candidate_count": 0,
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:711aeb10cd0bf53b:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          },
+          {
+            "status": "inconclusive_ambiguous_candidates",
+            "basis": "Same API categories occur in multiple paths or source context similarity is insufficient for a unique identity decision.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 3,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 0.0,
+              "sink_expression_similarity": 0.0,
+              "actual_source_context_similarity": 0.0,
+              "actual_sink_context_similarity": 0.0,
+              "source_remark_match": false,
+              "specific_sink_remark_match": false,
+              "sink_expression_same_after_short_identifier_normalization": false,
+              "ranking_score": 0.0,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "CoCo",
+            "original_flow_id": "coco:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:26db316e9cc65eb7:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-698eb914ab228881",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "CoCo"
+      ],
+      "match_region": "CoCo only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:01e4d30f5dd15e7a:01",
+          "flow": {
+            "flow_id": "coco:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:01e4d30f5dd15e7a:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "semantic_sha256": "01e4d30f5dd15e7a1ad813aa6652b5335a7124a61ce1e7c557f1977b1aa16f30",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "coco-storage_posoing",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "CoCo source evidence",
+              "file": "",
+              "loc": "",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN",
+                  "constraint": {
+                    "matches": [
+                      "*://*.youtube-skins.com/*",
+                      "http://127.0.0.1/*",
+                      "http://localhost/*",
+                      "https://127.0.0.1/*",
+                      "https://localhost/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "CoCo sink evidence",
+              "file": "",
+              "loc": "",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "",
+              "message_sender_provenance": "UNKNOWN",
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "coco_dynamic",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": "external_condition_required",
+                  "report_path": "extensions/imomahaddnhnhfggpmpbphdiobpmahof_2.4.1/dynamic/dynamic_report.json"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 3,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Analysis — Flow #3 (CHROME_ONMESSAGEEXTERNAL_MESSAGE → CHROME_LOCAL_STORAGE)\n\n### (a) Who controls the source?\nThe source is `chrome.runtime.onMessageExternal.addListener` in `resources/js/background.js` (line 24). The `request` argument is fully supplied by the external caller. Per the manifest, `externally_connectable.matches` is `[\"*://*.youtube-skins.com/*\"]`, so any page on `*.youtube-skins.com` (or a subdomain takeover/XSS on that domain) can send a crafted message. This is genuine attacker-influenced input — not extension-user input, not browser-derived data.\n\n### (b) Exact source-to-sink data path\n```\nchrome.runtime.onMessageExternal.addListener(function (request, sender, sendResponse) {\n    if (request.action == 'install') {              // attacker chooses 'install'\n        chrome.storage.local.get('skins').then(function (e) {\n            delete request.action;                   // removes only the 'action' key\n            skins = [];\n            if (e.skins !== undefined) skins = e.skins;\n            preloadImgs(request.files);\n            skins.unshift(request);                  // attacker object pushed into array\n            chrome.storage.local.set({ ",
+              "path": "extensions/imomahaddnhnhfggpmpbphdiobpmahof_2.4.1/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.9,
+              "reproduced": false,
+              "basis": "external_condition_required",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 2,
+              "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+              "path": "extensions/imomahaddnhnhfggpmpbphdiobpmahof_2.4.1/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T04:53:05.938559Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": null,
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: EXTERNAL_CONDITION_REQUIRED; final_verdict=TRUE_POSITIVE."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "2.4.1",
+        "latest_version": "2.6.4",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\imomahaddnhnhfggpmpbphdiobpmahof_2.6.4\\imomahaddnhnhfggpmpbphdiobpmahof.2.6.4.crx",
+        "tool_assessments": [
+          {
+            "tool": "CoCo",
+            "original_source_flow_id": "coco:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:01e4d30f5dd15e7a:01",
+            "original_source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "chrome__imomahaddnhnhfggpmpbphdiobpmahof__2.6.4__CoCo",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\imomahaddnhnhfggpmpbphdiobpmahof_2.6.4\\revalidation\\CoCo\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\imomahaddnhnhfggpmpbphdiobpmahof_2.6.4\\revalidation\\CoCo\\attempt-01\\report.flows.json",
+            "duration_seconds": 188.422,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 2,
+                "sink_index": 1,
+                "flow_type": "STORAGE_POSOING",
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE"
+                },
+                "propagation_step_count": 0
+              }
+            ],
+            "tool_report_flow_count": 3,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_ambiguous_candidates",
+            "basis": "Same API categories occur in multiple paths or source context similarity is insufficient for a unique identity decision.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 2,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 0.0,
+              "sink_expression_similarity": 0.0,
+              "actual_source_context_similarity": 0.0,
+              "actual_sink_context_similarity": 0.0,
+              "source_remark_match": false,
+              "specific_sink_remark_match": false,
+              "sink_expression_same_after_short_identifier_normalization": false,
+              "ranking_score": 0.0,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "CoCo",
+            "original_flow_id": "coco:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:01e4d30f5dd15e7a:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-ae7d079f3bb19afa",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "CoCo"
+      ],
+      "match_region": "CoCo only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:e591d8ae53cc22c5:01",
+          "flow": {
+            "flow_id": "coco:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:e591d8ae53cc22c5:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "e591d8ae53cc22c52086d5a342aa0678554f9d23320284fe1473583634078d97",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "coco-storage_posoing",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "CoCo source evidence",
+              "file": "resources/js/background.js",
+              "loc": "L32:C1 -> L32:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN",
+                  "constraint": {
+                    "matches": [
+                      "*://*.youtube-skins.com/*",
+                      "http://127.0.0.1/*",
+                      "http://localhost/*",
+                      "https://127.0.0.1/*",
+                      "https://localhost/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "resources/js/background.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "CoCo sink evidence",
+              "file": "resources/js/background.js",
+              "loc": "L32:C1 -> L32:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "resources/js/background.js",
+              "message_sender_provenance": "UNKNOWN",
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "coco_dynamic",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": "external_condition_required",
+                  "report_path": "extensions/imomahaddnhnhfggpmpbphdiobpmahof_2.4.1/dynamic/dynamic_report.json"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 2,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification: `CHROME_ONMESSAGEEXTERNAL_MESSAGE` → `CHROME_LOCAL_STORAGE`\n\n### (a) Who controls the source?\nThe source is `chrome.runtime.onMessageExternal.addListener` (background.js L24). The message is received from an external page. The manifest's `externally_connectable.matches` is `[\"*://*.youtube-skins.com/*\"]` — so the sender must be a page under `youtube-skins.com` (any subdomain). There is **no fixed `sender.id` extension allowlist** and **no sender.origin/url check** in the listener. The `request.action == 'install'` gate is an attacker-chosen message field, not a trust anchor.\n\nThe `request.files` field is fully attacker-controlled. Per the deterministic harness: an origin-match restriction narrows the attack surface but remains exploitable via XSS/subdomain compromise on `youtube-skins.com`; it is not an unforgeable boundary. So the source is genuinely attacker/untrusted-controllable (with an XSS prerequisite on the allowed domain).\n\n### (b) Exact source-to-sink data path\nThe report anchors both source and sink at L32 (`preloadImgs(request.files)`), which is a location approximation — the real sink is the `chrome.storage.local.set` a few lines below. Reading th",
+              "path": "extensions/imomahaddnhnhfggpmpbphdiobpmahof_2.4.1/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.9,
+              "reproduced": false,
+              "basis": "external_condition_required",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 2,
+              "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+              "path": "extensions/imomahaddnhnhfggpmpbphdiobpmahof_2.4.1/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T04:53:05.938559Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": null,
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: EXTERNAL_CONDITION_REQUIRED; final_verdict=TRUE_POSITIVE."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "2.4.1",
+        "latest_version": "2.6.4",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\imomahaddnhnhfggpmpbphdiobpmahof_2.6.4\\imomahaddnhnhfggpmpbphdiobpmahof.2.6.4.crx",
+        "tool_assessments": [
+          {
+            "tool": "CoCo",
+            "original_source_flow_id": "coco:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:e591d8ae53cc22c5:01",
+            "original_source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "chrome__imomahaddnhnhfggpmpbphdiobpmahof__2.6.4__CoCo",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\imomahaddnhnhfggpmpbphdiobpmahof_2.6.4\\revalidation\\CoCo\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\imomahaddnhnhfggpmpbphdiobpmahof_2.6.4\\revalidation\\CoCo\\attempt-01\\report.flows.json",
+            "duration_seconds": 188.422,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 2,
+                "sink_index": 1,
+                "flow_type": "STORAGE_POSOING",
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE"
+                },
+                "propagation_step_count": 0
+              }
+            ],
+            "tool_report_flow_count": 3,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_ambiguous_candidates",
+            "basis": "Same API categories occur in multiple paths or source context similarity is insufficient for a unique identity decision.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 2,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 0.0,
+              "sink_expression_similarity": 0.0,
+              "actual_source_context_similarity": 0.0,
+              "actual_sink_context_similarity": 0.0,
+              "source_remark_match": false,
+              "specific_sink_remark_match": false,
+              "sink_expression_same_after_short_identifier_normalization": false,
+              "ranking_score": 0.0,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "CoCo",
+            "original_flow_id": "coco:chrome:imomahaddnhnhfggpmpbphdiobpmahof:2.4.1:e591d8ae53cc22c5:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

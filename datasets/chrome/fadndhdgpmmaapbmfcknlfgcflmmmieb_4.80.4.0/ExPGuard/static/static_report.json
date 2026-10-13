@@ -1,0 +1,95 @@
+{
+  "extension_id": "fadndhdgpmmaapbmfcknlfgcflmmmieb",
+  "extension_version": "4.80.4.0",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Analysis\n\n**Reported flow:** `CHROME_ONCONNECTEXTERNAL_ONMESSAGE` (web/worker, `originFrameFamily: BG`) → `WINDOW_POSTMESSAGE` sink in the content script `web/script.min` (`CS_1`), labelled `PRIVILEGE_ESCALATION` with `privilegeReason: \"sink grants capability beyond the source origin\"`. Channel: `runtime.connect.sender.message[web/worker->web/script.min]`.\n\n### Four-part ledger\n\n**(a) Source control.** The worker does register `f.runtime.onConnectExternal.addListener(q)` (confirmed at worker.js: `f.runtime.onConnect.addListener(q),f.runtime.onConnectExternal.addListener(q)…`). `q` is the same `newPort` handler used for the internal `ffz-cs-bridge` port, and it accepts attacker-chosen `ffz_type`/`key`/`value` and broadcasts derived data (`z(...)` → `{ffz_type:\"change\", key, value}`) to **all** connected ports, including the CS bridge port. So the source is genuinely attacker-reachable (externally_connectable includes `*://*.twitch.tv/*` and `*://*.youtube.com/*` — wildcard subdomains, so an XSS on Twitch or any subdomain suffices).\n\n**(b) Path.** The reported path is real: external page → `onConnectExternal.onMessage` → `j()`/broadcast → CS `t.onMessage.addListener(n => …)` → sin",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "EXTERNAL_MESSAGE",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "web/script.min",
+          "reportedLoc": "L1:C657 -> L1:C755",
+          "resolvedFile": "web/script.min.js",
+          "resolved": true,
+          "snippet": "L1 C657-755: …njecting\"}),s){let t;const r=d(()=>{t=e.runtime.connect({name:\"ffz-cs-bridge\"}),t.onMessage.addListener(n=>{window.postMessage({ffz_from_worker:!0,...n},window.location.origin)}),t.onDisconnect.addListener(()=>{console.log(\"FFZ-CS-Bridge: Disconnected, attem…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "web/script.min",
+          "reportedLoc": "L1:C685 -> L1:C753",
+          "resolvedFile": "web/script.min.js",
+          "resolved": true,
+          "snippet": "L1 C685-753: …=d(()=>{t=e.runtime.connect({name:\"ffz-cs-bridge\"}),t.onMessage.addListener(n=>{window.postMessage({ffz_from_worker:!0,...n},window.location.origin)}),t.onDisconnect.addListener(()=>{console.log(\"FFZ-CS-Bridge: Disconnected, att…"
+        },
+        "sourceExpectedMarkers": [
+          "onConnectExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.twitch.tv/*",
+            "*://*.youtube.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "NEEDS_SEMANTIC_CLASSIFICATION",
+          "rule": "Inspect the invoked API and the precise tainted argument before assigning a security label."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 0 true-positive, 1 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

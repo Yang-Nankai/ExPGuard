@@ -1,0 +1,141 @@
+{
+  "extension_id": "yurui0216@gmail.com",
+  "extension_version": "1.3.0",
+  "browser": "firefox",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — REQUEST_FORGERY (attacker input → background fetch body)\n\n### (a) Who controls the source?\nThe resolved source anchor is `scripts/docxConverter.js:12`:\n\n```js\ndocument.addEventListener('deepshare:convertToDocx', async (event) => {\n    const message = event.detail?.messages || {};\n```\n\n`docxConverter.js` runs as an ISOLATED-world content script on `https://chat.deepseek.com/*`, `https://chatgpt.com/*`, and `https://gemini.google.com/*`. The listener is registered via `initDocxConverter()` at line 395. A page on any of those origins can dispatch the same DOM `CustomEvent` on `document` with an arbitrary `detail.messages` object — there is no `event.isTrusted`, `event.origin`, action allow-list, or sender check. So the source is genuinely web-content/attacker-controllable. The harness confirms this (`PAGE_TO_CONTENT_SCRIPT`, page can forge CustomEvent fields).\n\n### (b) Source-to-sink path\n1. `scripts/docxConverter.js:11-14` — page-forged `deepshare:convertToDocx` → `message = event.detail.messages`.\n2. `convertToDocx(message, sourceButton)` → `convertToDocxViaApi(message.content, settings.docxServerUrl)` (lines 85-88, when `docxMode !== 'local'`).\n3. `conv",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "scripts/docxConverter",
+          "reportedLoc": "L12:C24 -> L12:C36",
+          "resolvedFile": "scripts/docxConverter.js",
+          "resolved": true,
+          "snippet": "L12 C24-36:         const message = event.detail?.messages || {};"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L35:C31 -> L39:C10",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>    35|         const response = await fetch(request.url, {\n>>    36|             method: request.method,\n>>    37|             headers: request.headers,\n>>    38|             body: request.body\n>>    39|         });"
+        },
+        "sourceExpectedMarkers": [
+          "addEventListener",
+          "detail"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://chat.deepseek.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "lib/html2canvas.min.js",
+              "lib/dom-to-image.min.js",
+              "lib/katex.min.js",
+              "scripts/notifications.js",
+              "scripts/copyKatex.js",
+              "scripts/docxConverter.js",
+              "scripts/injectDocxButton.js",
+              "scripts/captureDeepSeek.js",
+              "scripts/saveDeepSeekAsDocx.js",
+              "scripts/injectDeepSeekButtons.js"
+            ],
+            "runAt": null,
+            "allFrames": false,
+            "world": "ISOLATED"
+          },
+          {
+            "matches": [
+              "https://chatgpt.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "lib/katex.min.js",
+              "scripts/notifications.js",
+              "scripts/copyKatex.js",
+              "scripts/docxConverter.js",
+              "scripts/injectGptButton.js"
+            ],
+            "runAt": null,
+            "allFrames": false,
+            "world": "ISOLATED"
+          },
+          {
+            "matches": [
+              "https://gemini.google.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "lib/katex.min.js",
+              "scripts/notifications.js",
+              "scripts/copyGeminiMath.js",
+              "scripts/docxConverter.js",
+              "scripts/injectGeminiButton.js",
+              "scripts/injectGeminiCanvasButton.js"
+            ],
+            "runAt": null,
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

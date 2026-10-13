@@ -1,0 +1,85 @@
+{
+  "extension_id": "debflmkfmkejgppfabgfcbemelmnpnho",
+  "extension_version": "2.0.16",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Decision Ledger\n\n| Question | Finding |\n|---|---|\n| (a) Who controls the source? | Any page/script executing on `https://www.viitor.info/*` can call `chrome.runtime.sendMessage(extensionId, payload)`. The `message` object `t` is fully attacker-controlled. |\n| (b) Source-to-sink path | `chrome.runtime.onMessageExternal.addListener((t,e,r)=>{...})` → branch `t?.type===o.loginSuccess && t.data` → `chrome.storage.local.set({[A.user]:t.data})`. No message/storage hop; it is a direct external-message → privileged-storage sink. |\n| (c) Security-relevant argument | The entire attacker-controlled `t.data` object is stored verbatim under `A.user` (`vf_user`). This is data flow into a privileged API argument, not merely a boolean gate. |\n| (d) Guard/trust boundary | The only gate is `t.type === o.loginSuccess && t.data`, where `t.type` and `t.data` are both attacker-chosen message fields. There is **no** `sender.id`, `sender.origin`, action allow-list, schema validation, or origin check. `externally_connectable` restricts the attack surface to `https://www.viitor.info/*` but does not eliminate the attacker (XSS/control on that origin suffices). |\n\n## Evidence\n\nThe `read_minified_range` ins",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "service-worker",
+          "reportedLoc": "L1:C18548 -> L1:C18549",
+          "resolvedFile": "service-worker.js",
+          "resolved": true,
+          "snippet": "L1 C18548-18549: …d&&ee(a,t)}return!0});chrome.runtime.onMessageExternal.addListener((t,e,r)=>{if(t?.type!==o.trackEvent&&_.then(()=>{let n=\"\";try{let i=t?{...t}:{};if(i.data&&typ…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "service-worker",
+          "reportedLoc": "L1:C19097 -> L1:C19140",
+          "resolvedFile": "service-worker.js",
+          "resolved": true,
+          "snippet": "L1 C19097-19140: …se?.status??-1,result:n})}),r({ok:!0}),!0}if(t?.type===o.loginSuccess&&t.data&&(chrome.storage.local.set({[A.user]:t.data}),O(t.data),_.then(()=>{E.event(\"anon_uid_bind\",\"login\",{anonUid:Y(),userId:Strin…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://www.viitor.info/*"
+          ]
+        },
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

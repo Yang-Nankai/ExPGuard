@@ -1,0 +1,421 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "firefox",
+  "extension_id": "claude-toolbox@lugia19.com",
+  "version": "2.8.5",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-1a012e0a4ddaaffc",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:claude-toolbox@lugia19.com:2.8.5:f49d705d088e8390:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:claude-toolbox@lugia19.com:2.8.5:f49d705d088e8390:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "f49d705d088e839004889aef73c114b6e424601989ff42416f3657cf7ec8ad3a",
+            "semantic_key": {
+              "rule_id": "attacker-input-storage-write",
+              "flow_type": "STORAGE_POSOING",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_file": "content/helpers/settings",
+              "source_loc": "2931129326",
+              "source_frame": "CS_1",
+              "sink_type": "CHROME_LOCAL_STORAGE",
+              "sink_file": "content/helpers/settings",
+              "sink_loc": "223922351",
+              "sink_frame": "CS_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://claude.ai/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content/helpers/settings",
+              "loc": "L293:C11 -> L293:C26",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://claude.ai/*"
+                    ]
+                  }
+                },
+                {
+                  "id": "CS_2",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://claude.ai/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content/helpers/settings",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://claude.ai/*"
+                ]
+              },
+              "code_preview": "\t\ttry {\r\n\t\t\tswitch (>>>event.data.type<<<) {\r\n\t\t\t\tcase 'SETTI"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "unknown",
+              "file": "content/helpers/settings",
+              "loc": "L223:C9 -> L223:C51",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://claude.ai/*"
+                    ]
+                  }
+                },
+                {
+                  "id": "CS_2",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://claude.ai/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "OrDef)) {\r\n\t\t\tawait >>>chrome.storage.local.set({ [key]: value })<<<;  // chrome.storage"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_final",
+                  "source": "ExPAgent",
+                  "kind": "final_report",
+                  "verdict": "TP",
+                  "confidence": 0.6,
+                  "detail": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+                  "trust": "static_supported"
+                },
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "PARTIAL",
+                  "basis": null,
+                  "confidence": 0.6,
+                  "detail": "The exact static sink recorded a call, but the controlled marker/beacon was not observed in its security-relevant argument."
+                }
+              ]
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — STORAGE_POSOING (attacker-input-storage-write)\n\n### 1. Source controllability\nThe source anchor `content/helpers/settings.js:293` is a real `window.addEventListener('message', ...)` handler (confirmed at L289). The handler runs in the **ISOLATED** content-script world (where `chrome.storage` is available) and is also duplicated in MAIN world. A page on `https://claude.ai/*` can call `window.postMessage(...)` to deliver arbitrary `event.data`; the only guard is:\n\n```js\nif (event.source !== window) return;\n```\n\nA same-page `window.postMessage` trivially satisfies this (the page is the source and equals `window`). It is not a sender/extension trust boundary. So `event.data.type`, `event.data.key`, and `event.data.value` are fully attacker-controlled.\n\n### 2. Source-to-sink path (confirmed in source)\n- L293 `switch (event.data.type)`\n- L303–304 `case 'SETTINGS_SET': await settingsRegistry.set(event.data.key, event.data.value);`\n- L219–223 `settingsRegistry.set`: `_resolveKey(keyOrDef)` → `_isLocalKey(keyOrDef)` → `await chrome.storage.local.set({ [key]: value })`\n\nThe `value` passed to `chrome.storage.local.set` is the unmodified `event.data.value`. The `ke",
+              "dynamic_guidance": {
+                "triggerable": false,
+                "trigger_mechanism": "OTHER",
+                "injection_context": "",
+                "origin_requirement": "",
+                "trigger_surface": "",
+                "target_urls": [],
+                "payload_sketch": "",
+                "dom_forgery": "",
+                "beacon_pointable": false,
+                "beacon_param": "",
+                "observation": "",
+                "notes": ""
+              },
+              "path": "extensions/claude-toolbox@lugia19.com_2.8.5/static/static_report.json",
+              "report_mtime": "2026-08-14T02:02:52.392Z"
+            },
+            "dynamic_detail": {
+              "outcome": "PARTIAL",
+              "final_verdict": "FALSE_POSITIVE",
+              "recorded_label": "FP",
+              "confidence": 0.6,
+              "reproduced": false,
+              "basis": null,
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 3,
+              "reasoning": "The exact static sink recorded a call, but the controlled marker/beacon was not observed in its security-relevant argument.",
+              "evidence": "source-contract={\"surface\": \"WINDOW_MESSAGE\", \"sourcePath\": \"content/isolated/tts.js\", \"location\": \"L293:C11 -> L293:C26\", \"eventNames\": [], \"eventTarget\": \"window\", \"eventDetailKey\": \"data\", \"envelope\": {\"type\": \"TTS_SYNTH_REQUEST\"}, \"forwardField\": \"\", \"requirements\": {}, \"selectors\": [], \"mediaTags\": [], \"snippet\": \" result[key];\\n\\t\\t} else {\\n\\t\\t\\tconst row = await _settingsDB.settings.get(key);\\n\\t\\t\\tif (row && row.value !== undefined) return row.value;\\n\\t\\t}\\n\\t\\treturn _resolveDefault(keyOrDef);\\n\\t};\\n\\n\\tsettingsRegistry.set = async function (keyOrDef, value) {\\n\\t\\tawait _ready;\\n\\t\\tconst key = _resolveKey(keyOrDef);\\n\\t\\tif (_isLocalKey(keyOrDef)) {\\n\\t\\t\\tawait chrome.storage.local.set({ [key]: value });  // chrome.storage.onChanged notifies\\n\\t\\t} else {\\n\\t\\t\\tawait _settingsDB.settings.put({ key, value });\\n\\t\\t\\t_notifyChange(key, value);\\n\\t\\t}\\n\\t};\\n\\n\\t// ======== Change listeners ========\\n\\t// Two backends, one listener map. chrome.storage.onChanged covers the local-flagged keys and\\n\\t// fires cross-tab for free; IndexedDB has no such event, so writes are announced manually.\\n\\tconst _changeListeners = {}; // key -> Set<callback>\\n\\n\\tfunction _fireListeners(key, newValue, oldValue) {\\n\\t\\tconst listeners = _changeListeners[key];\\n\\t\\tif (!li\", \"notes\": [\"已从 sink 调用推导 URL 承载字段 `url`。\", \"已识别信封桥接（外层字段 + 转发字段）。\"], \"discriminatorField\": \"\", \"discriminatorValues\": [], \"urlField\": \"url\", \"sinkTapKey\": \"storage.local.set\", \"messageAlias\": \"\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"sinkDataFields\": []}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\"}\"}\nstimulus={\"action\": \"postMessage\", \"targetUrl\": \"http://127.0.0.1:63097/page\", \"input\": {\"bytes\": 1155, \"topLevelKeys\": [\"Action\", \"Message\", \"action\", \"auth\", \"cmd\", \"content\", \"data\", \"email\", \"fun\", \"id\", \"key\", \"kind\", \"marker\", \"message\", \"name\", \"number\", \"payload\", \"phone\", \"requestId\", \"revision\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_df8cdf73e08d\"]}, \"result\": null}\nstimulus={\"action\": \"postMessage\", \"targetUrl\": \"http://127.0.0.1:63097/page\", \"input\": {\"bytes\": 1308, \"topLevelKeys\": [\"Action\", \"Message\", \"action\", \"auth\", \"cmd\", \"content\", \"data\", \"email\", \"fun\", \"id\", \"key\", \"kind\", \"marker\", \"message\", \"name\", \"number\", \"payload\", \"phone\", \"requestId\", \"revision\"], \"testMark",
+              "path": "extensions/claude-toolbox@lugia19.com_2.8.5/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T12:40:04.022Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "evidence_summary": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "conflict_resolution": "Strict final decision table applied.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "PARTIAL",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "static_supported",
+              "usable_for_label": true,
+              "path": "../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/firefox/extensions/claude-toolbox@lugia19.com_2.8.5/final-verified-v2/final_report.json",
+              "report_mtime": "2026-08-20T13:25:48.166Z"
+            },
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user-provided manual validation",
+              "validated_at_utc": "2026-09-22T15:32:00.942835Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user as a manual validation result. No screenshot or HAR bytes were supplied with this conversation."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_report",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-22T15:32:00.942835Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Final adjudication TP is not aligned with the selected FP label.",
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "disappeared",
+        "dataset_version": "2.8.5",
+        "latest_version": "3.1.2",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\claude-toolbox@lugia19.com_3.1.2\\claude-toolbox@lugia19.com.3.1.2.xpi",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:firefox:claude-toolbox@lugia19.com:2.8.5:f49d705d088e8390:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "firefox__claude-toolbox@lugia19.com__3.1.2__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\claude-toolbox@lugia19.com_3.1.2\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\claude-toolbox@lugia19.com_3.1.2\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 130.859,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "disappeared",
+            "comparison": "no_exact_source_and_sink_api_pair",
+            "candidate_match_count": 0,
+            "same_source_candidates": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "WINDOW_POSTMESSAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "common/ext/bridge-isolated",
+                  "loc": "L59:C6 -> L59:C10",
+                  "code": "if (»data«?.channel !== CHANNEL || data.app !== app || typeof data.type !== 'string' || 'reply' in data || 'error' in data) return;"
+                },
+                "sink": {
+                  "kind": "WINDOW_POSTMESSAGE",
+                  "remark": "location.origin",
+                  "file": "common/ext/bridge-isolated",
+                  "loc": "L60:C30 -> L60:C123",
+                  "code": "const respond = (result) => »window.postMessage({ channel: CHANNEL, app, id: data.id, ...result }, window.location.origin)«;"
+                },
+                "propagation_step_count": 7
+              },
+              {
+                "tool_flow_index": 4,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "WINDOW_POSTMESSAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "content/isolated/tts",
+                  "loc": "L150:C6 -> L150:C7",
+                  "code": "if (»d«?.type === 'TTS_SYNTH_REQUEST') {"
+                },
+                "sink": {
+                  "kind": "WINDOW_POSTMESSAGE",
+                  "remark": "location.origin",
+                  "file": "content/isolated/tts",
+                  "loc": "L51:C2 -> L51:C83",
+                  "code": "»window.postMessage({ type: 'TTS_SYNTH_DONE', requestId }, window.location.origin)«;"
+                },
+                "propagation_step_count": 33
+              },
+              {
+                "tool_flow_index": 4,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "WINDOW_POSTMESSAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "content/isolated/tts",
+                  "loc": "L150:C6 -> L150:C7",
+                  "code": "if (»d«?.type === 'TTS_SYNTH_REQUEST') {"
+                },
+                "sink": {
+                  "kind": "WINDOW_POSTMESSAGE",
+                  "remark": "location.origin",
+                  "file": "content/isolated/tts",
+                  "loc": "L90:C3 -> L90:C94",
+                  "code": "»window.postMessage({ type: 'TTS_SYNTH_PCM', requestId, chunk: ab }, window.location.origin)«;"
+                },
+                "propagation_step_count": 33
+              },
+              {
+                "tool_flow_index": 8,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "WINDOW_POSTMESSAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "content/main/tts-interceptor",
+                  "loc": "L39:C6 -> L39:C22",
+                  "code": "if (»event.data?.type« === 'tts-analyze-dialogue-request') {"
+                },
+                "sink": {
+                  "kind": "WINDOW_POSTMESSAGE",
+                  "remark": "location.origin",
+                  "file": "content/main/tts-interceptor",
+                  "loc": "L56:C4 -> L61:C30",
+                  "code": "»window.postMessage({«"
+                },
+                "propagation_step_count": 5
+              },
+              {
+                "tool_flow_index": 13,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "WASM_INSTANTIATE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "content/main/tts-ws-interceptor",
+                  "loc": "L43:C70 -> L43:C82",
+                  "code": "if (e.source !== window || e.origin !== window.location.origin || »e.data?.type« !== 'TTS_OPUS_WASM') return;"
+                },
+                "sink": {
+                  "kind": "WASM_INSTANTIATE",
+                  "remark": "WebAssembly.instantiate",
+                  "file": "content/main/tts-ws-interceptor",
+                  "loc": "L17:C29 -> L28:C4",
+                  "code": "// always produce 16kHz mono »s16le PCM), streams that back in the format the page asked for, then emits«"
+                },
+                "propagation_step_count": 9
+              }
+            ],
+            "same_sink_candidates": [],
+            "tool_report_flow_count": 13,
+            "source_review_required": true,
+            "interpretation": "The original source/sink pair was not reported in the successful rerun; this alone does not prove a security fix."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_no_matching_candidate",
+            "basis": "No same-source/sink candidate was available in the successful new report; source absence is not proof of a fix.",
+            "candidate_count": 0,
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:firefox:claude-toolbox@lugia19.com:2.8.5:f49d705d088e8390:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

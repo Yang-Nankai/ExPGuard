@@ -1,0 +1,303 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "firefox",
+  "extension_id": "{c98e042b-917d-4bdb-b125-dd3ace21ab71}",
+  "version": "4.0.1",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-8986a88f403e947b",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:{c98e042b-917d-4bdb-b125-dd3ace21ab71}:4.0.1:f8c001a1c923de20:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:{c98e042b-917d-4bdb-b125-dd3ace21ab71}:4.0.1:f8c001a1c923de20:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "f8c001a1c923de20383d97f0e33fb6f732156da9d15cd169752ffe4df9015098",
+            "semantic_key": {
+              "rule_id": "attacker-input-storage-write",
+              "flow_type": "STORAGE_POSOING",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_file": "content/hotmail_bridge",
+              "source_loc": "1671611",
+              "source_frame": "CS_4",
+              "sink_type": "CHROME_LOCAL_STORAGE",
+              "sink_file": "background",
+              "sink_loc": "69106939",
+              "sink_frame": "BG_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://outlook.live.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content/hotmail_bridge",
+              "loc": "L16:C7 -> L16:C11",
+              "frame": "CS_4",
+              "frames": [
+                {
+                  "id": "CS_4",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://outlook.live.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content/hotmail_bridge",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://outlook.live.com/*"
+                ]
+              },
+              "code_preview": " = [];\r\n\r\nlet soundD>>>ata;<<<\r\n\r\n// Hotmail (Outl"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "hotmailToken",
+              "file": "background",
+              "loc": "L69:C10 -> L69:C39",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "scripts) {\r\n      if>>> (scripts[id].config.cookies)<<< si[0][id] = scripts"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content/hotmail_bridge",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[content/hotmail_bridge->background]",
+              "storage_area": null
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": true,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "UNCERTAIN",
+              "confidence": 0.3,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; preserved analyst notes: I've traced the full chain in the real source. Here is my verification.\n\n## Decision ledger\n\n**(a) Who controls the source?**\n`content/hotmail_bridge.js` (ISOLATED world) listens for `window.addEventListener(\"message\")` on `https://outlook.live.com/*`. The guard is:\n\n```js\nif (event.source !== window || event.origin !== ORIGIN) return;\nconst data = event.data;\nif (!data || data.source !== SOURCE || data.type !== \"token\" || typeof data.token !== \"string\") return;\nextApi.runtime.sendMessage({ cmd: \"hotmailToken\", token: data.token });\n```\n\n`SOURCE` is a message *field* (`\"xnotifier-hotmail\"`), `type` is a message *field*, and `event.origin === \"https://outlook.live.com\"` is satisfiable by any script executing in the outlook.live.com page (the page's own `postMessage` sets `event.origin` to its own origin). These are attacker-satisfiable, not authentication. The `token` value is fully attacker-controlled.\n\n**(b) Source-to-sink path**\n`page postMessage → hotmail_bridge (CS) → runtime.sendMessage({cmd:\"hotmailToken\", token}) → background onMessage case \"hotmailToken\" → storeHotmailToken(req.token)`.\n\nThe background handler's checks are:\n```js\n!sender || sender.id !== extApi.runtime.id |",
+              "dynamic_guidance": {
+                "triggerable": false,
+                "trigger_mechanism": "OTHER",
+                "injection_context": "",
+                "origin_requirement": "",
+                "trigger_surface": "",
+                "target_urls": [],
+                "payload_sketch": "",
+                "dom_forgery": "",
+                "beacon_pointable": false,
+                "beacon_param": "",
+                "observation": "",
+                "notes": ""
+              },
+              "path": "extensions/{c98e042b-917d-4bdb-b125-dd3ace21ab71}_4.0.1/static/static_report.json",
+              "report_mtime": "2026-08-14T04:44:33.803Z"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": null,
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "evidence": "baseline=source-contract={\"surface\": \"WINDOW_MESSAGE\", \"sourcePath\": \"content/hotmail_bridge.js\", \"location\": \"L16:C7 -> L16:C11\", \"eventNames\": [], \"eventTarget\": \"window\", \"eventDetailKey\": \"data\", \"envelope\": {}, \"forwardField\": \"\", \"requirements\": {}, \"selectors\": [], \"mediaTags\": [], \"snippet\": \"\\\"use strict\\\";\\nconst extApi = globalThis.browser ?? globalThis.chrome;\\n/***********************************************************\\nHotmail token bridge (isolated world)\\nReceives the captured token from content/hotmail.js (MAIN world)\\nvia window.postMessage and relays it to the service worker.\\n***********************************************************/\\n(function () {\\n  const ORIGIN = \\\"https://outlook.live.com\\\";\\n  const SOURCE = \\\"xnotifier-hotmail\\\";\\n\\n  window.addEventListener(\\\"message\\\", function (event) {\\n    if (event.source !== window || event.origin !== ORIGIN) return;\\n    cons\ndeep-trace=source-contract={\"surface\": \"WINDOW_MESSAGE\", \"sourcePath\": \"content/hotmail_bridge.js\", \"location\": \"L16:C7 -> L16:C11\", \"eventNames\": [], \"eventTarget\": \"window\", \"eventDetailKey\": \"data\", \"envelope\": {}, \"forwardField\": \"\", \"requirements\": {}, \"selectors\": [], \"mediaTags\": [], \"snippet\": \"\\\"use strict\\\";\\nconst extApi = globalThis.browser ?? globalThis.chrome;\\n/***********************************************************\\nHotmail token bridge (isolated world)\\nReceives the captured token from content/hotmail.js (MAIN world)\\nvia window.postMessage and relays it to the service worker.\\n***********************************************************/\\n(function () {\\n  const ORIGIN = \\\"https://outlook.live.com\\\";\\n  const SOURCE = \\\"xnotifier-hotmail\\\";\\n\\n  window.addEventListener(\\\"message\\\", function (event) {\\n    if (event.source !== window || event.origin !== ORIGIN) return;\\n    cons",
+              "path": "extensions/{c98e042b-917d-4bdb-b125-dd3ace21ab71}_4.0.1/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T11:08:03.074Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.55,
+              "reasoning": "Final ReAct did not provide verifiable source-code evidence: Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-20 22:03:20 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 0217872332714773d3436761e68cde6bd2815b0b11060acfd1450', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Final ReAct did not provide verifiable source-code evidence: Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-20 22:03:20 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 0217872332714773d3436761e68cde6bd2815b0b11060acfd1450', 'param': '', 'type': 'TooManyRequests'}}",
+              "conflict_resolution": "Strict final decision table applied.",
+              "static_verdict_snapshot": "UNCERTAIN",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "fallback_insufficient_evidence",
+              "usable_for_label": true,
+              "path": "../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/firefox/extensions/{c98e042b-917d-4bdb-b125-dd3ace21ab71}_4.0.1/final-verified-v2/final_report.json",
+              "report_mtime": "2026-08-20T13:41:10.190Z"
+            },
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user-provided manual validation",
+              "validated_at_utc": "2026-09-22T15:32:00.942835Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user as a manual validation result. No screenshot or HAR bytes were supplied with this conversation."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_report",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-22T15:32:00.942835Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "4.0.1",
+        "latest_version": "4.0.2",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\_c98e042b-917d-4bdb-b125-dd3ace21ab71__4.0.2\\_c98e042b-917d-4bdb-b125-dd3ace21ab71_.4.0.2.xpi",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:firefox:{c98e042b-917d-4bdb-b125-dd3ace21ab71}:4.0.1:f8c001a1c923de20:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "firefox___c98e042b-917d-4bdb-b125-dd3ace21ab71___4.0.2__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\_c98e042b-917d-4bdb-b125-dd3ace21ab71__4.0.2\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\_c98e042b-917d-4bdb-b125-dd3ace21ab71__4.0.2\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 52.344,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "background",
+                  "loc": "L1112:C0 -> L1112:C47",
+                  "code": "»extApi.runtime.onMessage.addListener(onMessage)«;"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "hotmailToken",
+                  "file": "background",
+                  "loc": "L69:C10 -> L69:C39",
+                  "code": "await »exlib.savePrefsA(\"scriptInfo\"«, si);"
+                },
+                "propagation_step_count": 6
+              }
+            ],
+            "tool_report_flow_count": 1,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "likely_unchanged",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 1,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 1.0,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 1.0,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:firefox:{c98e042b-917d-4bdb-b125-dd3ace21ab71}:4.0.1:f8c001a1c923de20:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

@@ -1,0 +1,323 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "edge",
+  "extension_id": "iddkehdeljielbakinfojfgckaebpkna",
+  "version": "22.8.26.1400",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-879a2b26ea38c442",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_SYNC_STORAGE",
+      "matched_tools": [
+        "CoCo",
+        "DoubleX"
+      ],
+      "match_region": "CoCo + DoubleX",
+      "match_basis": "explicit_reuse_and_normalized_signature",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/edge/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:edge:iddkehdeljielbakinfojfgckaebpkna:22.8.26.1400:9c546a14bfa41172:01",
+          "flow": {
+            "flow_id": "coco:edge:iddkehdeljielbakinfojfgckaebpkna:22.8.26.1400:9c546a14bfa41172:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "9c546a14bfa41172b999dfcd202165bcdb73e090d81028cd707a9decd97b6a1b",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "coco-storage_posoing",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "CoCo source evidence",
+              "file": "content-script-webapp.js",
+              "loc": "L1:C1 -> L1:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "content-script-webapp.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "CoCo sink evidence",
+              "file": "background.js",
+              "loc": "L1:C1 -> L1:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content-script-webapp.js",
+              "message_sender_provenance": "UNKNOWN",
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Reused/DoubleX"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_reused_doublex",
+                  "source": "Reused/DoubleX",
+                  "kind": "coco_reused_doublex",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "Reused DoubleX F001 (flow_index=0) via source_type_normalized_sink_type_exact/all_candidates_agree.",
+                  "reused_flow_id": "doublex:edge:iddkehdeljielbakinfojfgckaebpkna:22.8.26.1400:6110d3f3eca3a5c1:01",
+                  "package_sha256": "73e32a150f33ed88a7880d1fdbe5b550dff0ef6fe0d53ac85b58d20a5324a93d"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "reused_confirmation_match",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — STORAGE_POSOING (WINDOW_MESSAGE_EVENT → CHROME_SYNC_STORAGE)\n\n### 1. Who controls the source\n\nThe source is a `window` message listener in `content-script-webapp.js`, which runs (per manifest) only on `*://web.organizeat.com/*`:\n\n```js\nwindow.addEventListener(\"message\", (function(e) {\n  e.source == window &&\n  e.data.type &&\n  e.data.type.startsWith(\"organizeat.\") &&\n  n(e.data)\n}), false);\n```\n\n`n(e)` does `chrome.runtime.sendMessage(e, ...)`. The page's own script can satisfy `e.source === window` by calling `window.postMessage(...)`, and the `startsWith(\"organizeat.\")` check is attacker-satisfiable (any `type` beginning with `organizeat.`). So any JavaScript executing on a `web.organizeat.com` page fully controls `e.data`, including `payload`.\n\n**Caveat on reachability:** the content script is scoped to the vendor's own origin `web.organizeat.com`, not `<all_urls>`. The practical trigger therefore requires code execution on that origin (XSS/compromised web app). That reduces the attack surface/severity but does not break the data path — consistent with the \"specific host is exploitable via XSS on that domain\" rule.\n\n### 2. Source-to-sink path\n\nThe br",
+              "path": "extensions/iddkehdeljielbakinfojfgckaebpkna_22.8.26.1400/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "TOOL_LIMITATION",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 1,
+              "reasoning": "The bounded dynamic trajectory did not produce a verdict within 60 seconds; recorded as a tooling limitation rather than treating the absence of an observation as a negative result.",
+              "path": "extensions/iddkehdeljielbakinfojfgckaebpkna_22.8.26.1400/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T15:48:37.492308Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": {
+              "source_dataset": "DoubleX",
+              "extension_key": "iddkehdeljielbakinfojfgckaebpkna@22.8.26.1400",
+              "flow_id": "doublex:edge:iddkehdeljielbakinfojfgckaebpkna:22.8.26.1400:6110d3f3eca3a5c1:01",
+              "flow_index": 0,
+              "flow_label": "F001",
+              "verification": "TP",
+              "verification_source": [
+                "Manual"
+              ],
+              "match_mode": "source_type_normalized_sink_type_exact",
+              "match_reason": "all_candidates_agree",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_loc": "L16",
+              "source_file": "content_scripts.js",
+              "sink_type": "CHROME_SYNC_STORAGE",
+              "sink_loc": "L51",
+              "sink_file": "background.js",
+              "package_evidence": {
+                "same_package": true,
+                "same_crx": true,
+                "same_manifest": true,
+                "same_source_manifest": true,
+                "coco_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\edge\\extensions\\iddkehdeljielbakinfojfgckaebpkna_22.8.26.1400\\crx\\iddkehdeljielbakinfojfgckaebpkna.22.8.26.1400.crx",
+                "external_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\edge\\extensions\\iddkehdeljielbakinfojfgckaebpkna_22.8.26.1400\\crx\\22.8.26.1400\\iddkehdeljielbakinfojfgckaebpkna.22.8.26.1400.crx",
+                "coco_package_sha256": "73e32a150f33ed88a7880d1fdbe5b550dff0ef6fe0d53ac85b58d20a5324a93d",
+                "external_package_sha256": "73e32a150f33ed88a7880d1fdbe5b550dff0ef6fe0d53ac85b58d20a5324a93d",
+                "coco_manifest_sha256": "82e630de647bbe838ecd697567d7b83405c62ce5848b66e1599759c5f2518169",
+                "external_manifest_sha256": "82e630de647bbe838ecd697567d7b83405c62ce5848b66e1599759c5f2518169",
+                "coco_source_manifest_sha256": "ea97ff101248bdd5d3c6fef4fb7cc0a9f3b26309780b3795f267a9ffab8e0067",
+                "external_source_manifest_sha256": "ea97ff101248bdd5d3c6fef4fb7cc0a9f3b26309780b3795f267a9ffab8e0067"
+              },
+              "supporting_matches": []
+            },
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: TOOL_LIMITATION; final_verdict=UNCERTAIN."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        },
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/edge/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:edge:iddkehdeljielbakinfojfgckaebpkna:22.8.26.1400:6110d3f3eca3a5c1:01",
+          "flow": {
+            "flow_id": "doublex:edge:iddkehdeljielbakinfojfgckaebpkna:22.8.26.1400:6110d3f3eca3a5c1:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "6110d3f3eca3a5c10451d17b68ca777227b399ebacdc0cdd000fa08af14b213b",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L16",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://web.organizeat.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "chrome.storage.sync.set",
+              "file": "background.js",
+              "loc": "L51",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": false,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content_scripts.js",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_edge_r2_user_manual",
+                  "source": "Manual",
+                  "kind": "doublex_edge_r2_user_manual",
+                  "flow_index": 0,
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证该扩展为 TP。",
+                  "confirmed_at": "2026-09-24T06:35:50.615800Z",
+                  "run_id": "round-doublex-edge-unconfirmed-21-r2"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow 0 — `STORAGE_POSOING` (WINDOW_MESSAGE_EVENT → `chrome.storage.sync.set`)\n\n### Evidence reconciliation\n\nThe report names `content_scripts.js`, which does not exist in the unpacked extension. The actual content script is `content-script-webapp.js` (per `manifest.json`). I therefore corroborated from raw source; the reported sink file `background.js` resolves and the minified single line contains the described listener chain.\n\n### (a) Who controls the source?\n\nThe page. `content-script-webapp.js` contains:\n\n```js\nwindow.addEventListener(\"message\",(function(e){\n  e.source==window && e.data.type && e.data.type.startsWith(\"organizeat.\") && n(e.data)\n}),!1)\n```\n\nwhere `n(e)` is `chrome.runtime.sendMessage(e, …)`. The content script runs on `*://web.organizeat.com/*`. The `e.source==window` check and the `type.startsWith(\"organizeat.\")` check are both attacker-satisfiable by the page's own `window.postMessage` (same-window `event.source` is `window`). So the page fully controls `e.data`, including `type` and `payload`.\n\n### (b) Exact source-to-sink data path\n\n1. **Source**: page `window.postMessage({type, payload}, \"*\")` on `https://web.organizeat.com/`.\n2. **Bridge",
+              "path": "extensions/iddkehdeljielbakinfojfgckaebpkna_22.8.26.1400/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.45,
+              "reproduced": false,
+              "usable_for_label": false,
+              "evidence_stage": "LISTENER_READY",
+              "reasoning": "sink 断点已就绪且候选输入已重放，但 sink 断点/ tap 均未命中；source 可能未到达后台，或需要额外的页面前置条件。",
+              "notes": "deepTraceCode=SINK_NOT_REACHED_AFTER_BREAKPOINT react=skippedDeterministicResolved",
+              "run_id": "doublex-edge-r1",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\round-doublex-edge-unconfirmed-21-r2\\dynamic\\doublex-edge-r2\\summary.json"
+            },
+            "dynamic_run_evidence": {
+              "run_id": "doublex-edge-r1",
+              "summary_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\round-doublex-edge-unconfirmed-21-r2\\dynamic\\doublex-edge-r2\\summary.json",
+              "out_dir": null,
+              "log_path": null,
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "confidence": 0.45,
+              "reproduced": false,
+              "evidence_stage": "LISTENER_READY",
+              "notes": "deepTraceCode=SINK_NOT_REACHED_AFTER_BREAKPOINT react=skippedDeterministicResolved",
+              "reasoning": "sink 断点已就绪且候选输入已重放，但 sink 断点/ tap 均未命中；source 可能未到达后台，或需要额外的页面前置条件。"
+            },
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "doublex_edge_r2_user_manual",
+                "verification_origin": "user_manual_round_r1",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-24T06:35:50.615800Z",
+                "notes": "用户人工验证该扩展为 TP。",
+                "run_id": "round-doublex-edge-unconfirmed-21-r2"
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "DoubleX Edge r1 ExPAgent dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "DoubleX Edge r1 user manual verdict: TP. 用户人工验证该扩展为 TP。"
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "22.8.26.1400",
+        "latest_version": "22.8.26.1400",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

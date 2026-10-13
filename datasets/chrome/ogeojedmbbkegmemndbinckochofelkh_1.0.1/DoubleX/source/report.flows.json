@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L7",
+      "sourceCode": "request",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L9",
+      "sinkCode": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7febf1eb3130>, <pdg_js.node.FunctionExpression object at 0x7febf1eb3ca0>)",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": null,
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L9",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7febf1eb3130>, <pdg_js.node.FunctionExpression object at 0x7febf1eb3ca0>)",
+        "sink-param1": "{\n\t\t\t'id': request.id\n\t\t}",
+        "sink-param2": "function() {\n\t\t\tupdateRules(request.id);\n\t\t}",
+        "line": "9 - 13",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_ogeojedmbbkegmemndbinckochofelkh_b93149c32795/dx_odto68q3/unpacked/ogeojedmbbkegmemndbinckochofelkh.1.0.1/background.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "request",
+            "line": "7 - 7",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_ogeojedmbbkegmemndbinckochofelkh_b93149c32795/dx_odto68q3/unpacked/ogeojedmbbkegmemndbinckochofelkh.1.0.1/background.js",
+            "where": "request"
+          }
+        },
+        "param_id1": {
+          "received_from_wa_1": {
+            "wa": "request",
+            "line": "7 - 7",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_ogeojedmbbkegmemndbinckochofelkh_b93149c32795/dx_odto68q3/unpacked/ogeojedmbbkegmemndbinckochofelkh.1.0.1/background.js",
+            "where": "request"
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger2",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_SYNC_STORAGE",
+      "sinkRemark": "chrome.storage.sync.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L33",
+      "legacy": {
+        "danger": "chrome.storage.sync.set",
+        "value": "chrome.storage.sync.set(<pdg_js.node.ValueExpr object at 0x7febf1d30670>, <pdg_js.node.FunctionExpression object at 0x7febf1d306a0>)",
+        "sink-param1": "{\n\t\t\t'installed_at': now\n\t\t}",
+        "sink-param2": "function() {}",
+        "line": "33 - 35",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_ogeojedmbbkegmemndbinckochofelkh_b93149c32795/dx_odto68q3/unpacked/ogeojedmbbkegmemndbinckochofelkh.1.0.1/background.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger3",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.create",
+      "sinkFile": "background.js",
+      "sinkLoc": "L40",
+      "legacy": {
+        "danger": "chrome.tabs.create",
+        "value": "chrome.tabs.create(<pdg_js.node.ValueExpr object at 0x7febf1d30e20>)",
+        "sink-param1": "{\n\t\t\turl: url\n\t\t}",
+        "line": "40 - 42",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_ogeojedmbbkegmemndbinckochofelkh_b93149c32795/dx_odto68q3/unpacked/ogeojedmbbkegmemndbinckochofelkh.1.0.1/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger1",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": false,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkLoc": "L18",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(chrome.runtime.getURL(rules.json))",
+        "sink-param1": "chrome.runtime.getURL(rules.json)",
+        "line": "18 - 18",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_ogeojedmbbkegmemndbinckochofelkh_b93149c32795/dx_odto68q3/unpacked/ogeojedmbbkegmemndbinckochofelkh.1.0.1/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    }
+  ]
+}

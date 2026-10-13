@@ -1,0 +1,303 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "lfidjngibpklhhijphdmbmedchiiolgk",
+  "version": "8.18.0",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-979692f1a9eb991b",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:lfidjngibpklhhijphdmbmedchiiolgk:8.18.0:32b44d60de784c68:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:lfidjngibpklhhijphdmbmedchiiolgk:8.18.0:32b44d60de784c68:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "32b44d60de784c685b1c5b2224394512bf307d3a470e1551a59c8033c54ccae7",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "From storage.local.set('data') in filterUrl",
+              "file": "filterUrl",
+              "loc": "L1:C9715 -> L1:C9716",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "UNTRUSTED_STORAGE",
+              "origin_context": "filterUrl",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "data",
+              "file": "filterUrl",
+              "loc": "L1:C6212 -> L1:C6246",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": true,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic_round_r3",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "CONFIRMED",
+                  "basis": "runtime_reproduced",
+                  "confidence": 0.85,
+                  "detail": "A controlled companion extension reached the external-message listener and the exact privileged sink recorded the bounded test marker. If an ID allowlist existed, only the disposable manifest copy was patched and that semantic change is recorded."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": {
+              "verdict": "PARTIAL",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 2,
+              "source_provenance": "UNTRUSTED_STORAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #2 (CHROME_ONMESSAGEEXTERNAL_MESSAGE → CHROME_LOCAL_STORAGE) ### 1. Who controls the source? The source is `t`, the message payload of: ```js chrome.runtime.onMessageExternal.addListener(function(t,e){ e.id!==CHROME_CLIENT_APP_ID && e.origin!==IWA_CLIENT_ORIGIN_ID || !t || \"updateRule\"!==t.type || ... ``` `t` (and specifically `t.content`) is attacker-controlled **by whatever sender is allowed to reach this listener**. Reachability is restricted by both the in-cod…",
+              "path": "extensions/lfidjngibpklhhijphdmbmedchiiolgk_8.18.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.85,
+              "reproduced": true,
+              "basis": "runtime_reproduced",
+              "usable_for_label": true,
+              "evidence_stage": "MARKER_REACHED",
+              "evidence_artifact_count": 3,
+              "reasoning": "A controlled companion extension reached the external-message listener and the exact privileged sink recorded the bounded test marker. If an ID allowlist existed, only the disposable manifest copy was patched and that semantic change is recorded.",
+              "notes": "semanticFixture=true originalSenderIdentityNotClaimed=true semanticFixture=true originalSenderIdentityNotClaimed=true",
+              "round": "r3",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\lfidjngibpklhhijphdmbmedchiiolgk_8.18.0\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-22T11:33:13.349Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\lfidjngibpklhhijphdmbmedchiiolgk_8.18.0\\dynamic\\evidence\\flow-1",
+              "files": []
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 0217870259248058878e6c95084a12b4d57c4d96cb06f1dd90d2a', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "PARTIAL",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/lfidjngibpklhhijphdmbmedchiiolgk_8.18.0/final/final_report.json",
+              "report_mtime": "2026-08-18T04:05:23.583Z"
+            },
+            "manual_verification": null,
+            "notes": [
+              "Flow is absent from dynamic_report.json: no ExPAgent dynamic record for this flow."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "8.18.0",
+        "latest_version": "8.18.0",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-ac0110a89fbfbeff",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:lfidjngibpklhhijphdmbmedchiiolgk:8.18.0:5cda627b92d4807d:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:lfidjngibpklhhijphdmbmedchiiolgk:8.18.0:5cda627b92d4807d:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "5cda627b92d4807d2aa56be9d6fcf8943b71baf0f7f449797a923cb43086b793",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "filterUrl",
+              "loc": "L1:C9715 -> L1:C9716",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "filterUrl",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "data",
+              "file": "filterUrl",
+              "loc": "L1:C9994 -> L1:C10052",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "CONFIRMED",
+                  "basis": "runtime_sink_evidence",
+                  "confidence": 0.85,
+                  "detail": "Controlled companion type=updateRule passed the fixed-sender fixture and wrote the marker-bearing data object to storage.local.set.",
+                  "path": "extensions/lfidjngibpklhhijphdmbmedchiiolgk_8.18.0/dynamic/dynamic_report.json"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": null,
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.85,
+              "reproduced": true,
+              "basis": "runtime_sink_evidence",
+              "usable_for_label": true,
+              "evidence_stage": "SINK_REACHED",
+              "evidence_artifact_count": 0,
+              "reasoning": "Controlled companion type=updateRule passed the fixed-sender fixture and wrote the marker-bearing data object to storage.local.set.",
+              "path": "extensions/lfidjngibpklhhijphdmbmedchiiolgk_8.18.0/dynamic/dynamic_report.json",
+              "report_mtime": "2026-09-21T13:53:33.6908939Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 0217870259248730e23c04e8b740c94d8512f0597aa5fa6b80564', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/lfidjngibpklhhijphdmbmedchiiolgk_8.18.0/final/final_report.json",
+              "report_mtime": "2026-08-18T04:05:23.583Z"
+            },
+            "manual_verification": null,
+            "notes": [
+              "Flow is absent from dynamic_report.json: no ExPAgent dynamic record for this flow."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "8.18.0",
+        "latest_version": "8.18.0",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "surface": "WINDOW_MESSAGE",
+  "sourcePath": "extension-content.js",
+  "location": "L1:C202 -> L1:C213",
+  "eventNames": [],
+  "eventTarget": "window",
+  "eventDetailKey": "data",
+  "envelope": {},
+  "forwardField": "",
+  "scalarMessageValue": "EXTENSION_REQUEST_TOKENS",
+  "requirements": {},
+  "preconditionActions": [],
+  "selectors": [],
+  "mediaTags": [],
+  "snippet": "!function(){\"use strict\";window.addEventListener(\"message\",function(e){if(\"https://youtubetotranscript.com:58453\"===e.origin||e.origin.startsWith(\"http://localhost:\")){if(e.data&&\"EXTENSION_REQUEST_TOKENS\"===e.data.type)try{chrome.storage.local.get([\"token\",\"refreshToken\",\"isLoggedIn\",\"expiresAt\"],function(t){chrome.runtime.lastError||window.postMessage({type:\"EXTENSION_TOKENS\",token:t.token||null,refresh_token:t.refreshToken||null,isLoggedIn:!!t.isLoggedIn,expiresAt:t.expiresAt||null},e.origin)})}catch(e){}if(e.data&&\"EXTENSION_AUTH_SUCCESS\"===e.data.type){var t=e.data,o=t.token,n=t.refresh_token;if(!o||!n)return;try{chrome.storage.local.set({token:o,refreshToken:n,isLoggedIn:!0,expiresAt:Date.now()+31536e6},function(){chrome.runtime.lastError||chrome.runtime.sendMessage({action:\"AUTH_COMPLETE\",token:o,refresh_token:n,source:\"email\"},function(e){chrome.runtime.lastError})})}catch(e){}}}",
+  "notes": [
+    "已从 sink 文件推导消息分发字段 `data` 及候选值。",
+    "已从 sink 调用推导 URL 承载字段 `url`。",
+    "已识别 window.message 的标量数据契约。"
+  ],
+  "discriminatorField": "data",
+  "discriminatorValues": [
+    "EXTENSION_REQUEST_TOKENS",
+    "EXTENSION_AUTH_SUCCESS"
+  ],
+  "urlField": "url",
+  "sinkTapKey": "storage.local.set",
+  "messageAlias": "",
+  "messageEventKey": "",
+  "jsonMessageField": "",
+  "eventDetailIsJson": false,
+  "sinkDataFields": [
+    "type"
+  ],
+  "runtimeMessageKeyPrefix": "",
+  "contractConfidence": "HIGH",
+  "contractWarnings": []
+}

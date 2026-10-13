@@ -1,0 +1,797 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L758",
+      "sourceCode": "message",
+      "sinkType": "CHROME_SYNC_STORAGE",
+      "sinkRemark": "chrome.storage.sync.set",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L809",
+      "sinkCode": "chrome.storage.sync.set(<pdg_js.node.ValueExpr object at 0x7f393bd951c0>, <pdg_js.node.FunctionExpression object at 0x7f393bd951f0>)",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": null,
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    },
+    {
+      "flowType": "DATA_LEAK",
+      "ruleId": "doublex-sensitive-api-egress",
+      "ruleDescription": "DoubleX detected permission-gated data sent to a web-accessible channel.",
+      "sourceType": "STORAGE_ALL_ITEMS",
+      "sourceRemark": "chrome.storage.sync.get",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L778",
+      "sourceCode": "chrome.storage.sync.get(message, <pdg_js.node.FunctionExpression object at 0x7f393bde0e20>)",
+      "sinkType": "WINDOW_POSTMESSAGE",
+      "sinkRemark": "{\n\t\t\t\t\t\t\t\t\tstatus: 'success',\n\t\t\t\t\t\t\t\t\tvalue: result[key] || null\n\t\t\t\t\t\t\t\t}",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L787",
+      "sinkCode": "{\n\t\t\t\t\t\t\t\t\tstatus: 'success',\n\t\t\t\t\t\t\t\t\tvalue: result[key] || null\n\t\t\t\t\t\t\t\t}",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": "window.postMessage",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": true,
+      "privilegeReason": "Sensitive extension data is returned to a web-accessible channel.",
+      "doublexCategory": "exfiltration_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_SYNC_STORAGE",
+      "sinkRemark": "chrome.storage.sync.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L748",
+      "legacy": {
+        "danger": "chrome.storage.sync.set",
+        "value": "chrome.storage.sync.set(<pdg_js.node.ValueExpr object at 0x7f393bdc4a90>, <pdg_js.node.FunctionExpression object at 0x7f393bdc4ac0>)",
+        "sink-param1": "{\n\t\t\t\tuser_id: userId,\n\t\t\t\t[`pw-93-visitor-id`]: userId\n\t\t\t}",
+        "sink-param2": "() => {\n\t\t\t\tcallback(userId);\n\t\t\t}",
+        "line": "748 - 753",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger2",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L12",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393ca914f0>)",
+        "sink-param1": "{\n\t\t\ttarget: {\n\t\t\t\ttabId: tab.id\n\t\t\t},\n\t\t\tfiles: ['js/capture.js']\n\t\t}",
+        "line": "12 - 17",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger3",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L47",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393ca57a90>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\t\ttarget: {\n\t\t\t\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\tfiles: ['js/capture.js']\n\t\t\t\t\t\t\t}",
+        "line": "47 - 52",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger4",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L66",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393c0343d0>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\t\ttarget: {\n\t\t\t\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\tfiles: ['js/history-app.js']\n\t\t\t\t\t\t\t}",
+        "line": "66 - 71",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger5",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L85",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393c034eb0>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\t\ttarget: {\n\t\t\t\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\tfiles: ['js/langs-app.js']\n\t\t\t\t\t\t\t}",
+        "line": "85 - 90",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger6",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L103",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393c04d9d0>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\t\ttarget: {\n\t\t\t\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\tfiles: ['js/uploader-app.js']\n\t\t\t\t\t\t\t}",
+        "line": "103 - 108",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger7",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L143",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393c0051f0>)",
+        "sink-param1": "{\n\t\t\t\t\ttarget: {\n\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t},\n\t\t\t\t\tfiles: ['js/capture.js']\n\t\t\t\t}",
+        "line": "143 - 148",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger8",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L173",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393c021100>)",
+        "sink-param1": "{\n\t\t\t\t\ttarget: {\n\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t},\n\t\t\t\t\t// find container by id and remove it - this will close the content app\n\t\t\t\t\tfunction: (appContainerId) => {\n\t\t\t\t\t\tconst container = document.getElementById(appContainerId);\n\t\t\t\t\t\tif (container) {\n\t\t\t\t\t\t\tcontainer.remove();\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\targs: [\n\t\t\t\t\t\tappContainerId\n\t\t\t\t\t]\n\t\t\t\t}",
+        "line": "173 - 187",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger9",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L201",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393c021f70>)",
+        "sink-param1": "{\n\t\t\t\t\ttarget: {\n\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t},\n\t\t\t\t\tfiles: ['js/uploader-app.js']\n\t\t\t\t}",
+        "line": "201 - 206",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger10",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.create",
+      "sinkFile": "background.js",
+      "sinkLoc": "L222",
+      "legacy": {
+        "danger": "chrome.tabs.create",
+        "value": "chrome.tabs.create(<pdg_js.node.ValueExpr object at 0x7f393bfbb790>, <pdg_js.node.FunctionExpression object at 0x7f393bfbb7c0>)",
+        "sink-param1": "{\n\t\t\tactive: true,\n\t\t\turl: 'https://google.com',\n\t\t}",
+        "sink-param2": "async tab => {\n\t\t\tchrome.tabs.onUpdated.addListener(function listener(tabId, info) {\n\t\t\t\tif (info.status === 'complete' && tabId === tab.id) {\n\t\t\t\t\tchrome.tabs.onUpdated.removeListener(listener);\n\n\t\t\t\t\ttry {\n\t\t\t\t\t\tconst tabId = tab.id;\n\t\t\t\t\t\tchrome.scripting.executeScript({\n\t\t\t\t\t\t\ttarget: {\n\t\t\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tfiles: ['js/uploader-app.js']\n\t\t\t\t\t\t}).then(() => {\n\t\t\t\t\t\t\t// need to send any response, otherwise the callback\n\t\t\t\t\t\t\t// in the popup will not work\n\t\t\t\t\t\t\tsendResponse({});\n\t\t\t\t\t\t});\n\t\t\t\t\t} catch (e) {\n\t\t\t\t\t\tsendResponse({\n\t\t\t\t\t\t\terror: 'Unable to launch the uploader on this page.'\n\t\t\t\t\t\t});\n\t\t\t\t\t\tconsole.error(e);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\t\t}",
+        "line": "222 - 250",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger11",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L232",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393bfd54f0>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\ttarget: {\n\t\t\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tfiles: ['js/uploader-app.js']\n\t\t\t\t\t\t}",
+        "line": "232 - 237",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger12",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L261",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393bf722e0>)",
+        "sink-param1": "{\n\t\t\t\t\ttarget: {\n\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t},\n\t\t\t\t\tfunc: () => {\n\t\t\t\t\t\tconst container = document.querySelector('.etfi-uploader-container');\n\t\t\t\t\t\tconst shadow = container.shadowRoot;\n\t\t\t\t\t\tconst frame = shadow.querySelector('iframe');\n\t\t\t\t\t\t// It will be something like \"chrome-extension://<extension-id>/\"\n\t\t\t\t\t\tconst origin = chrome.runtime.getURL('/');\n\t\t\t\t\t\t// it was not working without setTimeout\n\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\t\t// focus on the iframe content to allow clipboard access\n\t\t\t\t\t\t\t\tframe.contentWindow.focus();\n\t\t\t\t\t\t\t\tframe.contentWindow.postMessage({\n\t\t\t\t\t\t\t\t\tcommand: 'paste_image_from_clipboard'\n\t\t\t\t\t\t\t\t}, origin);\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t// delay is needed to allow the focus to work - I guess, the extension popup\n\t\t\t\t\t\t\t// keeps the focus until it's closed\n\t\t\t\t\t\t\t300\n\t\t\t\t\t\t);\n\t\t\t\t\t},\n\t\t\t\t\targs: []\n\t\t\t\t}",
+        "line": "261 - 285",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger13",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "background.js",
+      "sinkLoc": "L272",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x7f393bf72c10>, 300)",
+        "sink-param1": "() => {\n\t\t\t\t\t\t\t\t// focus on the iframe content to allow clipboard access\n\t\t\t\t\t\t\t\tframe.contentWindow.focus();\n\t\t\t\t\t\t\t\tframe.contentWindow.postMessage({\n\t\t\t\t\t\t\t\t\tcommand: 'paste_image_from_clipboard'\n\t\t\t\t\t\t\t\t}, origin);\n\t\t\t\t\t\t\t}",
+        "sink-param2": 300,
+        "line": "272 - 282",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger14",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L300",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393bf8ba30>)",
+        "sink-param1": "{\n\t\t\t\t\ttarget: {\n\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t},\n\t\t\t\t\t// find container by id and remove it - this will close the content app\n\t\t\t\t\tfunction: () => {\n\t\t\t\t\t\tconst container = document.getElementsByClassName('etfi-uploader-container')[0];\n\t\t\t\t\t\tif (container) {\n\t\t\t\t\t\t\tcontainer.remove();\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\targs: []\n\t\t\t\t}",
+        "line": "300 - 312",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger15",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L326",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393bfa8910>)",
+        "sink-param1": "{\n\t\t\t\t\ttarget: {\n\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t},\n\t\t\t\t\tfiles: ['js/history-app.js']\n\t\t\t\t}",
+        "line": "326 - 331",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger16",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L345",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393bf443d0>)",
+        "sink-param1": "{\n\t\t\t\t\ttarget: {\n\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t},\n\t\t\t\t\t// find container by id and remove it - this will close the content app\n\t\t\t\t\tfunction: () => {\n\t\t\t\t\t\tconst container = document.getElementsByClassName('etfi-history-container')[0];\n\t\t\t\t\t\tif (container) {\n\t\t\t\t\t\t\tcontainer.remove();\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\targs: []\n\t\t\t\t}",
+        "line": "345 - 357",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger17",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L371",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393bf5c280>)",
+        "sink-param1": "{\n\t\t\t\t\ttarget: {\n\t\t\t\t\t\ttabId: tabId\n\t\t\t\t\t},\n\t\t\t\t\t// find container by id and remove it - this will close the content app\n\t\t\t\t\tfunction: () => {\n\t\t\t\t\t\tconst container = document.getElementsByClassName('etfi-langs-container')[0];\n\t\t\t\t\t\tif (container) {\n\t\t\t\t\t\t\tcontainer.remove();\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\targs: []\n\t\t\t\t}",
+        "line": "371 - 383",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger18",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L396",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393bf5cc70>)",
+        "sink-param1": "{\n\t\t\t\ttarget: {\n\t\t\t\t\ttabId: sender.tab.id\n\t\t\t\t},\n\t\t\t\tfiles: ['js/langs-app.js']\n\t\t\t}",
+        "line": "396 - 401",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger19",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L413",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393bef94c0>)",
+        "sink-param1": "{\n\t\t\ttarget: {\n\t\t\t\ttabId: sender.tab.id\n\t\t\t},\n\t\t\tfunc: (sourceImageData, cropBox) => {\n\t\t\t\tconst container = document.querySelector('.etfi-langs-container');\n\t\t\t\tconst shadow = container.shadowRoot;\n\t\t\t\tconst frame = shadow.querySelector('iframe');\n\t\t\t\t// It will be something like \"chrome-extension://<extension-id>/\"\n\t\t\t\tconst origin = chrome.runtime.getURL('/');\n\t\t\t\t// it was not working without setTimeout\n\t\t\t\tsetTimeout(() => {\n\t\t\t\t\tframe.contentWindow.postMessage({\n\t\t\t\t\t\tcommand: 'set_source_image_data',\n\t\t\t\t\t\tdata: {\n\t\t\t\t\t\t\tsourceImageData: sourceImageData,\n\t\t\t\t\t\t\tcropBox: cropBox\n\t\t\t\t\t\t}\n\t\t\t\t\t}, origin);\n\t\t\t\t}, 100);\n\t\t\t},\n\t\t\targs: [sourceImageData, cropBox]\n\t\t}",
+        "line": "413 - 435",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger20",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "background.js",
+      "sinkLoc": "L424",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x7f393bef9f10>, 100)",
+        "sink-param1": "() => {\n\t\t\t\t\tframe.contentWindow.postMessage({\n\t\t\t\t\t\tcommand: 'set_source_image_data',\n\t\t\t\t\t\tdata: {\n\t\t\t\t\t\t\tsourceImageData: sourceImageData,\n\t\t\t\t\t\t\tcropBox: cropBox\n\t\t\t\t\t\t}\n\t\t\t\t\t}, origin);\n\t\t\t\t}",
+        "sink-param2": 100,
+        "line": "424 - 432",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger21",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L452",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393beae160>)",
+        "sink-param1": "{\n\t\t\t\t\ttarget,\n\t\t\t\t\tfiles: ['js/helpers.js']\n\t\t\t\t}",
+        "line": "452 - 455",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger22",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L457",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393beae430>)",
+        "sink-param1": "{\n\t\t\t\t\ttarget,\n\t\t\t\t\tfunc: (lang, href, box, targetApp) => {\n\t\t\t\t\t\tetfiExtractText(null, 'normal', lang, href, box, targetApp);\n\t\t\t\t\t},\n\t\t\t\t\targs: [lang, sourceImageData, cropBox, targetApp]\n\t\t\t\t}",
+        "line": "457 - 463",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger23",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L480",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393beca310>)",
+        "sink-param1": "{\n\t\t\t\t\t\ttarget: {\n\t\t\t\t\t\t\ttabId: tab.id\n\t\t\t\t\t\t},\n\t\t\t\t\t\tfunc: (tabId) => {\n\t\t\t\t\t\t\tconst container = document.querySelector('.etfi-app-container');\n\t\t\t\t\t\t\tif (container) {\n\t\t\t\t\t\t\t\tconst shadow = container.shadowRoot;\n\t\t\t\t\t\t\t\tconst frame = shadow.querySelector('.etfi-app-content-iframe');\n\t\t\t\t\t\t\t\t// It will be something like \"chrome-extension://<extension-id>/\"\n\t\t\t\t\t\t\t\tconst origin = chrome.runtime.getURL('/');\n\t\t\t\t\t\t\t\t// it was not working without setTimeout\n\t\t\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\t\t\tframe.contentWindow.postMessage({\n\t\t\t\t\t\t\t\t\t\tcommand: 'history_updated'\n\t\t\t\t\t\t\t\t\t}, origin);\n\t\t\t\t\t\t\t\t}, 50);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t},\n\t\t\t\t\t\targs: [tab.id]\n\t\t\t\t\t}",
+        "line": "480 - 500",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger24",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "background.js",
+      "sinkLoc": "L492",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x7f393becad90>, 50)",
+        "sink-param1": "() => {\n\t\t\t\t\t\t\t\t\tframe.contentWindow.postMessage({\n\t\t\t\t\t\t\t\t\t\tcommand: 'history_updated'\n\t\t\t\t\t\t\t\t\t}, origin);\n\t\t\t\t\t\t\t\t}",
+        "sink-param2": 50,
+        "line": "492 - 496",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger25",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L514",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393bee6910>)",
+        "sink-param1": "{\n\t\t\t\t\t\ttarget: {\n\t\t\t\t\t\t\ttabId: tab.id\n\t\t\t\t\t\t},\n\t\t\t\t\t\tfunc: (langId) => {\n\t\t\t\t\t\t\tconst container = document.querySelector('.etfi-app-container');\n\t\t\t\t\t\t\tif (container) {\n\t\t\t\t\t\t\t\tconst shadow = container.shadowRoot;\n\t\t\t\t\t\t\t\tconst frame = shadow.querySelector('iframe');\n\t\t\t\t\t\t\t\t// It will be something like \"chrome-extension://<extension-id>/\"\n\t\t\t\t\t\t\t\tconst origin = chrome.runtime.getURL('/');\n\t\t\t\t\t\t\t\t// it was not working without setTimeout\n\t\t\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\t\t\tframe.contentWindow.postMessage({\n\t\t\t\t\t\t\t\t\t\tcommand: 'language_selected',\n\t\t\t\t\t\t\t\t\t\tdata: {\n\t\t\t\t\t\t\t\t\t\t\tlangId: langId\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t}, origin);\n\t\t\t\t\t\t\t\t}, 50);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t},\n\t\t\t\t\t\targs: [langId]\n\t\t\t\t\t}",
+        "line": "514 - 537",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger26",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "background.js",
+      "sinkLoc": "L526",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x7f393be803d0>, 50)",
+        "sink-param1": "() => {\n\t\t\t\t\t\t\t\t\tframe.contentWindow.postMessage({\n\t\t\t\t\t\t\t\t\t\tcommand: 'language_selected',\n\t\t\t\t\t\t\t\t\t\tdata: {\n\t\t\t\t\t\t\t\t\t\t\tlangId: langId\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t}, origin);\n\t\t\t\t\t\t\t\t}",
+        "sink-param2": 50,
+        "line": "526 - 533",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger27",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L564",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393be9e130>)",
+        "sink-param1": "{\n\t\t\t\ttarget,\n\t\t\t\tfiles: ['js/content-app.js']\n\t\t\t}",
+        "line": "564 - 567",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger28",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L569",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393be9e400>)",
+        "sink-param1": "{\n\t\t\t\ttarget,\n\t\t\t\tfiles: ['js/helpers.js']\n\t\t\t}",
+        "line": "569 - 572",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger29",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L603",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393be3a700>)",
+        "sink-param1": "{\n\t\t\t\t\t// console.log('worker prefs', prefs);\n\t\t\t\t\t// const container = document.querySelector('.etfi-app-container:last-of-type');\n\t\t\t\t\t// const shadow = container.shadowRoot;\n\t\t\t\t\t// const frame = shadow.querySelector('.etfi-app-content-iframe');\n\t\t\t\t\t// // It will be something like \"chrome-extension://<extension-id>/\"\n\t\t\t\t\t// const origin = chrome.runtime.getURL('/');\n\t\t\t\t\t// // it was not working without setTimeout\n\t\t\t\t\t// setTimeout(() => {\n\t\t\t\t\t// frame.contentWindow.postMessage({\n\t\t\t\t\t// command: 'data_to_ocr',\n\t\t\t\t\t// prefs,\n\t\t\t\t\t// href,\n\t\t\t\t\t// box\n\t\t\t\t\t// }, origin);\n\t\t\t\t\t// }, 50);\n\n\t\t\t\t\ttarget: {\n\t\t\t\t\t\ttabId: sender.tab.id\n\t\t\t\t\t},\n\t\t\t\t\tfunc: (prefs, href, box) => {\n\t\t\t\t\t\tetfiExtractText(null, 'normal', prefs.ocrLanguageId, href, box);\n\t\t\t\t\t},\n\t\t\t\t\targs: [prefs, href, {\n\t\t\t\t\t\twidth: width * devicePixelRatio,\n\t\t\t\t\t\theight: height * devicePixelRatio,\n\t\t\t\t\t\tleft: left * devicePixelRatio,\n\t\t\t\t\t\ttop: top * devicePixelRatio\n\t\t\t\t\t}]\n\t\t\t\t}",
+        "line": "603 - 632",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger30",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L643",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7f393be554c0>)",
+        "sink-param1": "{\n\t\t\ttarget: {\n\t\t\t\ttabId: sender.tab.id\n\t\t\t},\n\t\t\tfunc: (langs) => {\n\t\t\t\twindow.etfiLangs = langs;\n\t\t\t},\n\t\t\targs: [langs]\n\t\t}",
+        "line": "643 - 651",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger31",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.create",
+      "sinkFile": "background.js",
+      "sinkLoc": "L666",
+      "legacy": {
+        "danger": "chrome.tabs.create",
+        "value": "chrome.tabs.create(<pdg_js.node.ValueExpr object at 0x7f393bdf3040>)",
+        "sink-param1": "{\n\t\t\turl: \"/welcome.html\",\n\t\t}",
+        "line": "666 - 668",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger32",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_SYNC_STORAGE",
+      "sinkRemark": "chrome.storage.sync.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L673",
+      "legacy": {
+        "danger": "chrome.storage.sync.set",
+        "value": "chrome.storage.sync.set(<pdg_js.node.ValueExpr object at 0x7f393bdf34f0>)",
+        "sink-param1": "{\n\t\t\tinstallDate\n\t\t}",
+        "line": "673 - 675",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger33",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_SYNC_STORAGE",
+      "sinkRemark": "chrome.storage.sync.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L809",
+      "legacy": {
+        "danger": "chrome.storage.sync.set",
+        "value": "chrome.storage.sync.set(<pdg_js.node.ValueExpr object at 0x7f393bd951c0>, <pdg_js.node.FunctionExpression object at 0x7f393bd951f0>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\t[key]: value\n\t\t\t\t\t\t}",
+        "sink-param2": "() => {\n\t\t\t\t\t\t\tif (chrome.runtime.lastError) {\n\t\t\t\t\t\t\t\tconst errorMessage = chrome.runtime.lastError.message;\n\t\t\t\t\t\t\t\tconsole.error('Storage error:', errorMessage);\n\t\t\t\t\t\t\t\tsendResponse({\n\t\t\t\t\t\t\t\t\tstatus: 'error',\n\t\t\t\t\t\t\t\t\tmessage: errorMessage\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\tsendResponse({\n\t\t\t\t\t\t\t\t\tstatus: 'success'\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\tnotifyConnectedClients({\n\t\t\t\t\t\t\t\t\ttype: 'storage_update',\n\t\t\t\t\t\t\t\t\taction: 'set',\n\t\t\t\t\t\t\t\t\tkey,\n\t\t\t\t\t\t\t\t\tvalue,\n\t\t\t\t\t\t\t\t\ttimestamp: Date.now(),\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}",
+        "line": "809 - 831",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": true,
+        "param_id0": {},
+        "param_id1": {
+          "received_from_wa_1": {
+            "wa": "message",
+            "line": "758 - 758",
+            "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+            "where": "message"
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger1",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": false,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkLoc": "L714",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(https://onlineapp.pro/api/track-event, <pdg_js.node.ValueExpr object at 0x7f393be293d0>)",
+        "sink-param1": "https://onlineapp.pro/api/track-event",
+        "sink-param2": "{\n\t\t\tmethod: 'POST',\n\t\t\theaders: {\n\t\t\t\t'Content-Type': 'application/json'\n\t\t\t},\n\t\t\tbody: JSON.stringify({\n\t\t\t\tevent: eventName,\n\t\t\t\t// this will be replaced during build\n\t\t\t\twallId: parseInt('93'),\n\t\t\t\textensionId: chrome.runtime.id,\n\t\t\t\tuserId: userId,\n\t\t\t\t...additionalData,\n\t\t\t}),\n\t\t}",
+        "line": "714 - 727",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L743",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(<pdg_js.node.ValueExpr object at 0x7f393bdc43d0>, <pdg_js.node.FunctionExpression object at 0x7f393bdc4400>)",
+        "sink-param1": "['user_id']",
+        "sink-param2": "result => {\n\t\tif (result.user_id) {\n\t\t\tcallback(result.user_id);\n\t\t} else {\n\t\t\tconst userId = crypto.randomUUID();\n\t\t\tchrome.storage.sync.set({\n\t\t\t\tuser_id: userId,\n\t\t\t\t[`pw-93-visitor-id`]: userId\n\t\t\t}, () => {\n\t\t\t\tcallback(userId);\n\t\t\t});\n\t\t}\n\t}",
+        "line": "743 - 755",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger2",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L31",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(<pdg_js.node.ValueExpr object at 0x7f393ca7ed00>)",
+        "sink-param1": "{\n\t\tuseHotKeys: false,\n\t\tetfi: false\n\t}",
+        "line": "31 - 31",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger3",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L602",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(<pdg_js.node.ValueExpr object at 0x7f393be9ef40>)",
+        "sink-param1": "{\n\t\t\t\tocrLanguageId: 'eng',\n\t\t\t\tocrAccuracy: '4.0.0',\n\t\t\t\tocrFrequentLanguages: ['eng', 'fra', 'deu', 'rus', 'ara']\n\t\t\t}",
+        "line": "602 - 602",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger4",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": true,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L778",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(message, <pdg_js.node.FunctionExpression object at 0x7f393bde0e20>)",
+        "sink-param1": "message",
+        "sink-param2": "result => {\n\t\t\t\t\t\t\tif (chrome.runtime.lastError) {\n\t\t\t\t\t\t\t\tconst errorMessage = chrome.runtime.lastError.message;\n\t\t\t\t\t\t\t\tconsole.error('Storage error:', errorMessage);\n\t\t\t\t\t\t\t\tsendResponse({\n\t\t\t\t\t\t\t\t\tstatus: 'error',\n\t\t\t\t\t\t\t\t\tmessage: errorMessage\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\tsendResponse({\n\t\t\t\t\t\t\t\t\tstatus: 'success',\n\t\t\t\t\t\t\t\t\tvalue: result[key] || null\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}",
+        "line": "778 - 792",
+        "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+        "dataflow": true,
+        "sent_to_wa_1": {
+          "wa": "{\n\t\t\t\t\t\t\t\t\tstatus: 'success',\n\t\t\t\t\t\t\t\t\tvalue: result[key] || null\n\t\t\t\t\t\t\t\t}",
+          "line": "787 - 790",
+          "filename": "/tmp/dx__hwjpaxo/unpacked/adkbpbalabenjlfngiefoifoebjpbjjl.2.3.0/background.js",
+          "where": "result"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,441 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "ifompgilpgnbnopfpfdjcmmpgkgckabi",
+  "version": "2.1.1",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-bbc5a24126e79426",
+      "verification": "TP",
+      "source_family": "storage",
+      "sink_family": "response",
+      "matched_tools": [
+        "ExPGuard",
+        "DoubleX"
+      ],
+      "match_region": "ExPGuard + DoubleX",
+      "match_basis": "normalized_signature_one_to_one",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:ifompgilpgnbnopfpfdjcmmpgkgckabi:2.1.1:d92263e9ba7e71ac:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:ifompgilpgnbnopfpfdjcmmpgkgckabi:2.1.1:d92263e9ba7e71ac:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "d92263e9ba7e71aca55df60334ded2617cbe815c2117d9fab46de4d76df50cdc",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "DATA_LEAK",
+            "rule_id": "storage-data-message-egress",
+            "rule_description": "Data read from chrome.storage being exfiltrated through a message channel.",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "storage.dynamic.items[sync]",
+              "file": "background",
+              "loc": "L1:C3807 -> L1:C3811",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTENSION",
+              "origin_context": "background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[sendResponse]",
+              "file": "background",
+              "loc": "L1:C3781 -> L1:C3819",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "Manual replay on https://appbox.space/: getItem returned the unique storage marker, confirming onMessageExternal storage disclosure. TP."
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "Manual replay on https://appbox.space/: getItem returned the unique storage marker, confirming onMessageExternal storage disclosure. TP."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": null,
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.6,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": "LISTENER_READY",
+              "evidence_artifact_count": 3,
+              "reasoning": "The transcript shows only environment reconnaissance and sink instrumentation (instrument_sink returned observerReady=true for the background service worker, sink tap self.__expagentSinks initialized with empty keys). No attacker-controlled message was ever delivered to the external onMessageExternal handler: there is no post_controlled_message, dispatch_controlled_event, or any payload construction/injection step. Consequently there are no observed signals of the flow — no beacon hits, no network activity, no console output, and no sink tap entries. Because the triggering payload was never constructed or sent (and thus the exact field names the handler reads from message/sender were never exercised or validated), SINK_NOT_FIRED cannot be used as a rebuttal; the dynamic test is simply incomplete. Verdict is inconclusive.",
+              "notes": "",
+              "round": "ifompgilpgnbnopfpfdjcmmpgkgckabi_2.1.1",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\ifompgilpgnbnopfpfdjcmmpgkgckabi_2.1.1\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-26T04:00:04.386Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\ifompgilpgnbnopfpfdjcmmpgkgckabi_2.1.1\\dynamic\\evidence\\flow-1",
+              "files": []
+            },
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-26T16:06:57+08:00",
+                "observation": "Manual replay on https://appbox.space/: getItem returned the unique storage marker, confirming onMessageExternal storage disclosure. TP.",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/ifompgilpgnbnopfpfdjcmmpgkgckabi_2.1.1/dynamic/evidence/flow-1/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-26T08:06:57.364Z",
+                "notes": "Manual replay on https://appbox.space/: getItem returned the unique storage marker, confirming onMessageExternal storage disclosure. TP.",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\ifompgilpgnbnopfpfdjcmmpgkgckabi_2.1.1\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\ifompgilpgnbnopfpfdjcmmpgkgckabi_2.1.1\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-26T08:06:57.364Z",
+                  "sha256": "53b00ae2aee6a5c45e70cf0d6b537112998ce504c04151524a3edba99f57b742"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "Restricted DATA_LEAK rerun; source/sink allowlist matched.",
+              "Manual verdict applied from operator attestation."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+rerun-summary"
+          }
+        },
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:ifompgilpgnbnopfpfdjcmmpgkgckabi:2.1.1:48026ed1b774f3b7:01",
+          "flow": {
+            "flow_id": "doublex:chrome:ifompgilpgnbnopfpfdjcmmpgkgckabi:2.1.1:48026ed1b774f3b7:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "48026ed1b774f3b7302ba79565f6a0b3c10fb04d71d424bf9049c5fcd11f0d03",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "DATA_LEAK",
+            "rule_id": "doublex-sensitive-api-egress",
+            "severity": "HIGH",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "chrome.storage.sync.get",
+              "file": "background.js",
+              "loc": "L163",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "BACKGROUND",
+              "origin_context": "background.js",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "{\n\t\t\t\t\t\t\t\t\t\tstatus: \"success\",\n\t\t\t\t\t\t\t\t\t\tvalue: e[t] || null\n\t\t\t\t\t\t\t\t\t}",
+              "file": "background.js",
+              "loc": "L170",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "Sensitive extension data is returned to a web-accessible channel."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "doublex_dynamic",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": "external_condition_required",
+                  "report_path": "extensions/ifompgilpgnbnopfpfdjcmmpgkgckabi_2.1.1/dynamic/dynamic_report.json"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification: `chrome.storage.sync` read returned to an external web page\n\n### 1. What the code actually does\n\nThe minified `background.js` contains an `onMessageExternal` handler. The relevant excerpt (single bundled line, but matching the reported `L163`/`L170` original-source anchors):\n\n```js\nchrome.runtime.onMessageExternal.addListener(((e,o,s)=>{\n  if(o.url && o.url.includes(\"appbox.space\"))\n    if(\"supabase-auth-adapter\"===e.source) switch(e.action){\n      ...\n      case \"getItem\":\n        try {\n          const { key: t } = e.data;\n          return chrome.storage.sync.get(t, (e=>{\n            if (chrome.runtime.lastError) { ... }\n            else s({ status: \"success\", value: e[t] || null })\n          })), true\n        }\n        ...\n```\n\nSo:\n\n- **Source (L163):** `chrome.storage.sync.get(t, ...)` — reads a key from extension sync storage.\n- **Sink (L170):** `s({status:\"success\", value: e[t] || null})` — `s` is the `sendResponse` callback for `chrome.runtime.onMessageExternal`. ExPGuard labels it `WINDOW_POSTMESSAGE`, but semantically it is an external-message response returning the stored value to the caller's web page.\n\n### 2. Four-part ledger\n\n**(a) Who controls the",
+              "path": "extensions/ifompgilpgnbnopfpfdjcmmpgkgckabi_2.1.1/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.9,
+              "reproduced": false,
+              "basis": "external_condition_required",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 2,
+              "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+              "path": "extensions/ifompgilpgnbnopfpfdjcmmpgkgckabi_2.1.1/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T16:56:19.828378Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: EXTERNAL_CONDITION_REQUIRED; final_verdict=TRUE_POSITIVE."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "extension_delisted",
+        "dataset_version": "2.1.1",
+        "latest_version": null,
+        "reason": "Chrome Web Store has no public details for this ID",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-c18f5262d54bda02",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_SYNC_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:ifompgilpgnbnopfpfdjcmmpgkgckabi:2.1.1:a8ed8734a0fc456f:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:ifompgilpgnbnopfpfdjcmmpgkgckabi:2.1.1:a8ed8734a0fc456f:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "a8ed8734a0fc456fbb226aa50e055d602a5128e735fc97b3705d722913eb3f45",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L1:C3506 -> L1:C3507",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "unknown",
+              "file": "background",
+              "loc": "L1:C3979 -> L1:C4255",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": "external_condition_required",
+                  "confidence": 0.9,
+                  "detail": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — STORAGE_POSOING (attacker-input → chrome.storage.sync.set) ### Four-part decision ledger **(a) Who controls the source?** The source is `chrome.runtime.onMessageExternal.addListener` in the MV3 background service worker (`background.js`). The manifest restricts `externally_connectable.matches` to `https://appbox.space/*`, so the message sender must be a page on that origin. This is not an unforgeable trust boundary — a page on `appbox.space` is exactly the we…",
+              "path": "extensions/ifompgilpgnbnopfpfdjcmmpgkgckabi_2.1.1/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.9,
+              "reproduced": false,
+              "basis": "external_condition_required",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 2,
+              "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+              "path": "extensions/ifompgilpgnbnopfpfdjcmmpgkgckabi_2.1.1/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T06:27:08.233Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 0217870258470973f04613060c95c0e1cb70b4f628471a9330087', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "EXTERNAL_CONDITION_REQUIRED",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/ifompgilpgnbnopfpfdjcmmpgkgckabi_2.1.1/final/final_report.json",
+              "report_mtime": "2026-08-18T04:04:05.844Z"
+            },
+            "manual_verification": null,
+            "notes": [
+              "Label rests on a recorded ExPAgent verdict reached with an unmet external precondition (no runtime reproduction)."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "extension_delisted",
+        "dataset_version": "2.1.1",
+        "latest_version": null,
+        "reason": "Chrome Web Store has no public details for this ID",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

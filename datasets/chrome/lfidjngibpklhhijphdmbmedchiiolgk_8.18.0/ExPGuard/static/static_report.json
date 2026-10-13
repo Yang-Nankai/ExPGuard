@@ -1,0 +1,115 @@
+{
+  "extension_id": "lfidjngibpklhhijphdmbmedchiiolgk",
+  "extension_version": "8.18.0",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 2,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 1,
+      "verdict": "PARTIAL",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #2 (CHROME_ONMESSAGEEXTERNAL_MESSAGE → CHROME_LOCAL_STORAGE)\n\n### 1. Who controls the source?\nThe source is `t`, the message payload of:\n\n```js\nchrome.runtime.onMessageExternal.addListener(function(t,e){\n  e.id!==CHROME_CLIENT_APP_ID && e.origin!==IWA_CLIENT_ORIGIN_ID || !t || \"updateRule\"!==t.type || ...\n```\n\n`t` (and specifically `t.content`) is attacker-controlled **by whatever sender is allowed to reach this listener**. Reachability is restricted by both the in-code guard and the manifest `externally_connectable`:\n\n- `ids: [\"ppkfnjlimknmjoaemnpidmdlfchhehel\"]` — fixed, browser-authenticated extension ID.\n- `matches: [\"isolated-app://ckg65ilaae42o6wd3uj4xfwznhba7pz2p6kojga5c27hkwq5f66qaaic/*\"]` — isolated web app origin (also browser-authenticated, tied to a signed web bundle).\n\nThe guard logic `e.id !== CHROME_CLIENT_APP_ID && e.origin !== IWA_CLIENT_ORIGIN_ID || ...` rejects only when **both** the sender ID and origin are wrong. So the handler accepts either the fixed companion extension ID **or** the fixed isolated-app origin. An ordinary webpage cannot satisfy `externally_connectable`, so this is a trusted-peer-only boundary, not an open web attack su",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised).",
+      "pa_category": "PA_PARTIAL_TRUSTED_IPC",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "AUTHENTICATED_EXTENSION_IPC",
+          "browserFacts": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised)."
+        },
+        "sourceAnchor": {
+          "reportedFile": "filterUrl",
+          "reportedLoc": "L1:C9715 -> L1:C9716",
+          "resolvedFile": "filterUrl.js",
+          "resolved": true,
+          "snippet": "L1 C9715-9716: …er(function(t,e){e.id!==CHROME_CLIENT_APP_ID&&e.origin!==IWA_CLIENT_ORIGIN_ID||!t||\"updateRule\"!==t.type||(t.content?[\"enabled\",\"origin\",\"host\",\"protocols\"].redu…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "filterUrl",
+          "reportedLoc": "L1:C6212 -> L1:C6246",
+          "resolvedFile": "filterUrl.js",
+          "resolved": true,
+          "snippet": "L1 C6212-6246: …al.get(\"data\",e=>{if(e&&e.data)try{var o=JSON.parse(e.data),t=JSON.stringify(o);chrome.storage.local.set({data:t}),console.log(\"Successfully read data from storage.\")}catch(e){console.error(\"Inv…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "ids": [
+            "ppkfnjlimknmjoaemnpidmdlfchhehel"
+          ],
+          "matches": [
+            "isolated-app://ckg65ilaae42o6wd3uj4xfwznhba7pz2p6kojga5c27hkwq5f66qaaic/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": {
+          "class": "PA_PARTIAL_TRUSTED_IPC",
+          "reason": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised).",
+          "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+          "boundaryType": "FIXED_SENDER_ID_ALLOWLIST",
+          "codeEvidence": [
+            {
+              "file": "filterUrl.js",
+              "fixedExtensionIds": [
+                "ppkfnjlimknmjoaemnpidmdlfchhehel"
+              ],
+              "senderIdCheck": false,
+              "allowlistCue": true,
+              "fixedRecipient": false
+            }
+          ],
+          "manifestExtensionIds": [
+            "ppkfnjlimknmjoaemnpidmdlfchhehel"
+          ],
+          "manifestIdsOnly": false
+        },
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "PA_PARTIAL_TRUSTED_IPC: fixed browser-authenticated extension-ID allowlist keeps the path out of the ordinary webpage threat model, but the trusted companion extension can still reach the privileged operation. Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "PA_PARTIAL_TRUSTED_IPC: do not attempt as an ordinary webpage; requires the browser-authenticated companion extension."
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 0 true-positive, 0 false-positive, 1 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

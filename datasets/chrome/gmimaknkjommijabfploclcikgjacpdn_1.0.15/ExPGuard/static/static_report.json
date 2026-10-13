@@ -1,0 +1,91 @@
+{
+  "extension_id": "gmimaknkjommijabfploclcikgjacpdn",
+  "extension_version": "1.0.15",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification analysis\n\n### 1. Source: attacker-controllable?\n\nYes. The raw minified source confirms:\n\n```js\nchrome.runtime.onMessageExternal.addListener(function(_,w,f){ ... })\n```\n\n`_` is the message object delivered via `chrome.runtime.onMessageExternal`. The manifest declares:\n\n```json\n\"externally_connectable\": { \"matches\": [\"https://www.youtube.com/*\"] }\n```\n\nSo a page running in the `https://www.youtube.com/*` origin can call `chrome.runtime.sendMessage(<extensionId>, {...})` and reach this listener. There is **no** `sender.id` / `sender.origin` / `sender.url` check — the listener signature is `(_,w,f)` and `w` (sender) is never used. The source field `_.badge` is therefore attacker-controlled from the YouTube origin (exploitable via XSS on YouTube, or by any script executing in that origin).\n\n### 2. Source-to-sink path\n\nThe listener body (comma-operator sequence in the `if` condition) executes the badge branch **unconditionally on message type**:\n\n```js\n_?.hasOwnProperty(\"badge\") && (\n  h = { text: _.badge },\n  h?.text && chrome.action.setBadgeText(\n    (b => ([\"On\",\"Off\"].includes(b.text) && chrome.action.setBadgeBackgroundColor({...}), b))(h)\n  ).then()\n)\n```\n\n- `h = { t",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "sw.bundle",
+          "reportedLoc": "L3:C305 -> L3:C306",
+          "resolvedFile": "sw.bundle.js",
+          "resolved": true,
+          "snippet": "L3 C305-306: …_id:K.CONTENT_TURN_ON,type:Y.ACTION},z())),_?.hasOwnProperty(\"badge\")&&(h={text:_.badge},h?.text&&chrome.action.setBadgeText((b=>([\"On\",\"Off\"].includes(b.text)&&…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "sw.bundle",
+          "reportedLoc": "L3:C323 -> L3:C465",
+          "resolvedFile": "sw.bundle.js",
+          "resolved": true,
+          "snippet": "L3 C323-465: …_ON,type:Y.ACTION},z())),_?.hasOwnProperty(\"badge\")&&(h={text:_.badge},h?.text&&chrome.action.setBadgeText((b=>([\"On\",\"Off\"].includes(b.text)&&chrome.action.setBadgeBackgroundColor({color:[0,0,0,+(b.text!==\"On\")]}),b))(h)).then()),_?.hasOwnProperty(\"title\")&&(E=_.title),(_?.hasOwnProperty(\"options\")||…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://www.youtube.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "PRIVILEGED_EXTENSION_UI_CONTROL",
+          "rule": "Treat attacker-controlled badge/title/icon/notification content or state as a privilege escalation: it controls browser/extension UI outside the page principal. Still prove the untrusted value reaches the actual API argument; a literal, browser-derived value, or disconnected action branch is not a flow."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

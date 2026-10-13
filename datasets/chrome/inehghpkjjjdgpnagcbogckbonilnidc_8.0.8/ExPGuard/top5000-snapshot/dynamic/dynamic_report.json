@@ -1,0 +1,442 @@
+{
+  "extension_id": "inehghpkjjjdgpnagcbogckbonilnidc",
+  "extension_version": "8.0.8",
+  "browser": "chrome",
+  "runtime_browser": "chrome",
+  "runtime_extension_id": "inehghpkjjjdgpnagcbogckbonilnidc",
+  "provider": "deepseek",
+  "model": "deepseek-v4.1-flash",
+  "tested_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "outcome": "CONFIRMED",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.85,
+      "reproduced": true,
+      "trajectory": [
+        {
+          "action": "instrument_sink",
+          "detail": "background",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_9876c689647f4abc\", \"targetId\": \"C249A493679F673C157E263A203E61A6\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+        },
+        {
+          "action": "companion_payload_contract",
+          "detail": "bounded source-contract derivation",
+          "result": "{\"sourceCandidates\": [\"background\"], \"selectedSourcePath\": \"C:\\\\Users\\\\ph0jav7\\\\AppData\\\\Local\\\\Temp\\\\expagent-dynamic-x475hy1h\\\\extension\\\\background.js\", \"sourceType\": \"CHROME_ONMESSAGEEXTERNAL_MESSAGE\", \"sinkRemark\": \"dgServiceHost\", \"listenerToken\": \"onMessageExternal\", \"matchedRouteLiterals\": [\"message=SET_SERVICE_HOST\", \"message=SET_ACCESS_TOKEN\"], \"routeScore\": null, \"routeCandidates\": 0, \"payloadKeys\": [\"data\", \"draft_id\", \"height\", \"type\"], \"loginRouteDetected\": false}"
+        },
+        {
+          "action": "companion_send",
+          "detail": "companion(eeejfegkcegkghkmmbebhlfhdkmgonkm) -> target(inehghpkjjjdgpnagcbogckbonilnidc)",
+          "result": "{'ok': True, 'response': True, 'sequenced': True}"
+        },
+        {
+          "action": "observe",
+          "detail": "sink tap",
+          "result": "{\"sink_type\": \"storage.sync.set\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"\", \"actualGeneration\": \"observer_9876c689647f4abc"
+        },
+        {
+          "action": "external_fixture_result",
+          "detail": "storage.sync.set",
+          "result": "exact sink observed"
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 0,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:56942/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source fixture only: http://127.0.0.1:56942/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_SYNC_STORAGE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "companion send result: {'ok': True, 'response': True, 'sequenced': True}, mapped web send: None, sink tap: {\"sink_type\": \"storage.sync.set\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"\", \"actualGeneration\": \"observer_9876c689647f4abc\", \"previousTargetId\": \"\", \"currentTargetId\": \"C249A493679F673C157E263A203E61A6\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"storage.sync.set\\\",\\\"calls\\\":[{\\\"ts\\\":1790004268067,\\\"arg\\\":{\\\"dgServiceHost\\\":{\\\"testMarker\\\":\\\"expa_3fa09b2c6378\\\"},\\\"__expagentTestMarker\\\":\\\"expa_3fa09b2c6378\\\"}},{\\\"ts\\\":1790004268294,\\\"arg\\\":{\\\"degreed_bearer_access\\\":{\\\"testMarker\\\":\\\"expa_3fa09b2c6378\\\"},\\\"__expagentTestMarker\\\":\\\"expa_3fa09b2c6378\\\"}}],\\\"observerToken\\\":\\\"observer_9876c689647f4abc\\\"}\"}, harness patches: [{\"kind\": \"externally_connectable-test-sender\", \"semanticFixture\": true, \"positiveOnly\": true, \"path\": \"manifest.json\", \"detail\": \"Added the controlled companion ID to the disposable manifest copy.\", \"companionId\": \"eeejfegkcegkghkmmbebhlfhdkmgonkm\"}]",
+      "reasoning": "A controlled companion extension reached the external-message listener and the exact privileged sink recorded the bounded test marker. If an ID allowlist existed, only the disposable manifest copy was patched and that semantic change is recorded.",
+      "evidence_stage": "MARKER_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": true,
+        "semanticFixtureKinds": [
+          "externally_connectable-test-sender"
+        ],
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractReady": true,
+        "runtimeSourceContractProven": true,
+        "sourceReached": true,
+        "bridgeReached": true,
+        "sinkReached": true,
+        "markerReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "{'__expagentMessages': [{'message': {'message': 'SET_SERVICE_HOST'}, 'value': 'http://127.0.0.1:56942/beacon/expa_3fa09b2c6378?expagent=1'}, {'message': {'message': 'SET_ACCESS_TOKEN'}, 'token': 'expa_3fa09b2c6378'}], 'type': 'message', 'data': 'http://127.0.0.1:56942/beacon/expa_3fa09b2c6378', 'height': 640, 'draft_id': 'expagent_draft'}",
+      "evidence_artifacts": [
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\chrome\\inehghpkjjjdgpnagcbogckbonilnidc\\8.0.8\\dynamic-evidence\\flow-0\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\chrome\\inehghpkjjjdgpnagcbogckbonilnidc\\8.0.8\\dynamic-evidence\\flow-0\\step-final-state-fixture.png",
+          "description": "Post-run controlled fixture state (reopened because the service-worker flow left no screenshot-capable page target); sink evidence remains in the trace.",
+          "stage": "final-state-fixture",
+          "captured_at": "2026-09-21T15:24:39.116180+00:00",
+          "target_url": "http://127.0.0.1:56942/page",
+          "sha256": "1561f7a7514e175951aa0550e86f7c9490422709d8af2fbe3929d9643a24a347"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\chrome\\inehghpkjjjdgpnagcbogckbonilnidc\\8.0.8\\dynamic-evidence\\flow-0\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": "semanticFixture=true originalSenderIdentityNotClaimed=true semanticFixture=true originalSenderIdentityNotClaimed=true"
+    },
+    {
+      "flow_index": 1,
+      "outcome": "CONFIRMED",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.85,
+      "reproduced": true,
+      "trajectory": [
+        {
+          "action": "instrument_sink",
+          "detail": "background",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_d90f15addffc45fb\", \"targetId\": \"BAF72F6E69366E87E95C4248944B14A8\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+        },
+        {
+          "action": "companion_payload_contract",
+          "detail": "bounded source-contract derivation",
+          "result": "{\"sourceCandidates\": [\"background\"], \"selectedSourcePath\": \"C:\\\\Users\\\\ph0jav7\\\\AppData\\\\Local\\\\Temp\\\\expagent-dynamic-mt39e7kz\\\\extension\\\\background.js\", \"sourceType\": \"CHROME_ONMESSAGEEXTERNAL_MESSAGE\", \"sinkRemark\": \"degreed_bearer_access\", \"listenerToken\": \"onMessageExternal\", \"matchedRouteLiterals\": [\"message=SET_SERVICE_HOST\", \"message=SET_ACCESS_TOKEN\"], \"routeScore\": null, \"routeCandidates\": 0, \"payloadKeys\": [\"data\", \"draft_id\", \"height\", \"type\"], \"loginRouteDetected\": false}"
+        },
+        {
+          "action": "companion_send",
+          "detail": "companion(eeejfegkcegkghkmmbebhlfhdkmgonkm) -> target(inehghpkjjjdgpnagcbogckbonilnidc)",
+          "result": "{'ok': True, 'response': True, 'sequenced': True}"
+        },
+        {
+          "action": "observe",
+          "detail": "sink tap",
+          "result": "{\"sink_type\": \"storage.sync.set\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_d90f15addffc45fb\", \"actualGeneration\": \""
+        },
+        {
+          "action": "external_fixture_result",
+          "detail": "storage.sync.set",
+          "result": "exact sink observed"
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 1,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:63184/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: http://127.0.0.1:63184/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_SYNC_STORAGE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "companion send result: {'ok': True, 'response': True, 'sequenced': True}, mapped web send: None, sink tap: {\"sink_type\": \"storage.sync.set\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_d90f15addffc45fb\", \"actualGeneration\": \"observer_d90f15addffc45fb\", \"previousTargetId\": \"BAF72F6E69366E87E95C4248944B14A8\", \"currentTargetId\": \"BAF72F6E69366E87E95C4248944B14A8\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"storage.sync.set\\\",\\\"calls\\\":[{\\\"ts\\\":1790045289902,\\\"arg\\\":{\\\"dgServiceHost\\\":{\\\"testMarker\\\":\\\"expa_6e35db4ffee1\\\"},\\\"__expagentTestMarker\\\":\\\"expa_6e35db4ffee1\\\"}},{\\\"ts\\\":1790045290117,\\\"arg\\\":{\\\"degreed_bearer_access\\\":{\\\"testMarker\\\":\\\"expa_6e35db4ffee1\\\"},\\\"__expagentTestMarker\\\":\\\"expa_6e35db4ffee1\\\"}}],\\\"observerToken\\\":\\\"observer_d90f15addffc45fb\\\"}\"}, storage change tap: {\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_d90f15addffc45fb\", \"actualGeneration\": \"observer_d90f15addffc45fb\", \"previousTargetId\": \"BAF72F6E69366E87E95C4248944B14A8\", \"currentTargetId\": \"BAF72F6E69366E87E95C4248944B14A8\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"action.setIcon\\\",\\\"fetch\\\",\\\"tabs.sendMessage\\\",\\\"storage.sync.set\\\",\\\"storage.onChanged\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__tabs_create__\\\":true,\\\"__tabs_update__\\\":true,\\\"__tabs_remove__\\\":true,\\\"__tabs_sendMessage__\\\":true,\\\"__windows_create__\\\":true,\\\"__windows_update__\\\":true,\\\"__windows_remove__\\\":true,\\\"__action_setBadgeText__\\\":true,\\\"__action_setTitle__\\\":true,\\\"__action_setIcon__\\\":true,\\\"__runtime_sendMessage__\\\":true,\\\"action.setIcon\\\":[{\\\"ts\\\":1790045278775,\\\"arg\\\":{\\\"path\\\":{\\\"redacted\\\":true,\\\"length\\\":18}}},{\\\"ts\\\":1790045278864,\\\"arg\\\":{\\\"path\\\":{\\\"redacted\\\":true,\\\"length\\\":, storage probe: {}, harness patches: [{\"kind\": \"externally_connectable-test-sender\", \"semanticFixture\": true, \"positiveOnly\": true, \"path\": \"manifest.json\", \"detail\": \"Added the controlled companion ID to the disposable manifest copy.\", \"companionId\": \"eeejfegkcegkghkmmbebhlfhdkmgonkm\"}]",
+      "reasoning": "A controlled companion extension reached the external-message listener and the exact privileged sink recorded the bounded test marker. If an ID allowlist existed, only the disposable manifest copy was patched and that semantic change is recorded.",
+      "evidence_stage": "MARKER_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": true,
+        "semanticFixtureKinds": [
+          "externally_connectable-test-sender"
+        ],
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractReady": true,
+        "runtimeSourceContractProven": true,
+        "sourceReached": true,
+        "bridgeReached": true,
+        "sinkReached": true,
+        "markerReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "{'__expagentMessages': [{'message': {'message': 'SET_SERVICE_HOST'}, 'value': 'http://127.0.0.1:63184/beacon/expa_6e35db4ffee1?expagent=1'}, {'message': {'message': 'SET_ACCESS_TOKEN'}, 'token': 'expa_6e35db4ffee1'}], 'type': 'message', 'data': 'http://127.0.0.1:63184/beacon/expa_6e35db4ffee1', 'height': 640, 'draft_id': 'expagent_draft'}",
+      "evidence_artifacts": [
+        {
+          "kind": "transcript",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\inehghpkjjjdgpnagcbogckbonilnidc\\8.0.8\\dynamic-evidence\\flow-1\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\inehghpkjjjdgpnagcbogckbonilnidc\\8.0.8\\dynamic-evidence\\flow-1\\step-final-state-fixture.png",
+          "description": "Post-run controlled fixture state (reopened because the service-worker flow left no screenshot-capable page target); sink evidence remains in the trace.",
+          "stage": "final-state-fixture",
+          "captured_at": "2026-09-22T02:48:21.041378+00:00",
+          "target_url": "http://127.0.0.1:63184/page",
+          "sha256": "53d3e008e9474d85c0eb3e173ef62acfb39496aa90a820e3b676f3b2bac9e098"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "runs\\round-unconfirmed-10-next\\final-verified\\_runs\\chrome\\inehghpkjjjdgpnagcbogckbonilnidc\\8.0.8\\dynamic-evidence\\flow-1\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": "semanticFixture=true originalSenderIdentityNotClaimed=true semanticFixture=true originalSenderIdentityNotClaimed=true"
+    }
+  ],
+  "checkpoint_signature": "f2fae50ef23a599a2f8324c8bed9610cfa21ee77e0b96483af57cefbe0f4e0a1",
+  "checkpoint_inputs": {
+    "protocolVersion": 142,
+    "capabilityMatrixVersion": 3,
+    "extension": {
+      "kind": "archive",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\inehghpkjjjdgpnagcbogckbonilnidc_8.0.8\\crx\\inehghpkjjjdgpnagcbogckbonilnidc.8.0.8.crx",
+      "sha256": "9ffcd8ec02e65dfcd0d68d566327858136f6f2673c8c749c0a99603019200bff"
+    },
+    "staticReportSha256": "a7355249465adf91d20eb729bd3c918a599a0796fcf82db8614b3f385c6b1e7f",
+    "browserBuild": {
+      "path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "size": 4510872,
+      "mtimeNs": 1789445935781456000
+    },
+    "runtime": {
+      "targetBrowser": "chrome",
+      "runtimeBrowser": "chrome",
+      "headless": true,
+      "networkIsolation": true,
+      "controlledOrigins": [],
+      "deterministicOnly": true,
+      "maxFlows": 1,
+      "flowTimeoutSeconds": 180,
+      "reactTimeoutSeconds": 90,
+      "provider": "deepseek",
+      "model": "deepseek-v4.1-flash"
+    }
+  },
+  "environment": {
+    "browserUrl": "http://127.0.0.1:58673",
+    "runtimeExtensionId": "inehghpkjjjdgpnagcbogckbonilnidc",
+    "targetBrowser": "chrome",
+    "runtimeBrowser": "chrome",
+    "compatibilityRuntime": false,
+    "beaconBaseUrl": "http://127.0.0.1:56942",
+    "headless": true,
+    "safety": {
+      "mode": "isolated-controlled-validation",
+      "allowedTestOrigins": [
+        "http://127.0.0.1",
+        "http://[::1]",
+        "http://localhost",
+        "https://expagent.degreed.app:56942",
+        "https://expagent.degreed.com:56942"
+      ],
+      "network": "loopback and explicitly configured controlled origins only",
+      "testInput": "bounded JSON with harmless EXPAGENT_TEST_* markers",
+      "sensitiveData": "credentials, cookies, tokens, and personal data are not read or collected"
+    },
+    "networkIsolation": true,
+    "harnessPatches": [
+      {
+        "kind": "externally_connectable-test-sender",
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "path": "manifest.json",
+        "detail": "Added the controlled companion ID to the disposable manifest copy.",
+        "companionId": "eeejfegkcegkghkmmbebhlfhdkmgonkm"
+      }
+    ],
+    "capabilityMatrix": {
+      "version": 3,
+      "browser": "chrome",
+      "manifestVersion": 3,
+      "runtimeProduct": "Chrome/153.0.8010.48",
+      "runtimeCompatibility": {
+        "available": true,
+        "observer": "manifest/browser runtime",
+        "reason": ""
+      },
+      "contexts": {
+        "pageMainWorld": {
+          "available": true,
+          "observer": "CDP/RDP page evaluation",
+          "reason": ""
+        },
+        "contentScriptIsolatedWorld": {
+          "available": true,
+          "observer": "extension content-script bridge",
+          "reason": ""
+        },
+        "backgroundPage": {
+          "available": false,
+          "observer": "extension background target",
+          "reason": "The manifest has no persistent background page/scripts."
+        },
+        "serviceWorker": {
+          "available": true,
+          "observer": "Chromium service-worker wake + persistent CDP attachment",
+          "reason": ""
+        },
+        "iframe": {
+          "available": false,
+          "observer": "frameId-scoped main/isolated execution contexts",
+          "reason": "No all_frames content-script declaration was found; frame injection must be proven at runtime."
+        },
+        "webWorker": {
+          "available": false,
+          "observer": "worker target",
+          "reason": "Dedicated/shared worker target discovery and replay are not implemented."
+        },
+        "companionExtension": {
+          "available": true,
+          "observer": "bundled controlled companion extension",
+          "reason": ""
+        }
+      },
+      "observers": {
+        "sinkInstrumentation": {
+          "available": true,
+          "observer": "runtime sink tap with observer-generation validation",
+          "reason": ""
+        },
+        "beacon": {
+          "available": true,
+          "observer": "loopback HTTP(S) beacon",
+          "reason": ""
+        },
+        "lineBreakpoint": {
+          "available": true,
+          "observer": "CDP Debugger.setBreakpointByUrl",
+          "reason": ""
+        },
+        "mcpPageTools": {
+          "available": true,
+          "observer": "js-reverse-mcp",
+          "reason": ""
+        }
+      }
+    }
+  },
+  "summary": "Dynamically tested 1 flow(s): 1 CONFIRMED, 0 PARTIAL.",
+  "skipped_reason": ""
+}

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "expagent-coco-adapter/v1",
+  "extensionId": "bcmoplgjpddohaelhnnodojbamdobbhc",
+  "extensionVersion": "1.1.0",
+  "sourceType": "DIR",
+  "browser": "chrome",
+  "status": "failed",
+  "files": [
+    {
+      "file": "crx_headers/cs_header.js",
+      "size": null,
+      "durationMs": null
+    },
+    {
+      "file": "extension-content.js",
+      "size": 1045,
+      "durationMs": null
+    }
+  ],
+  "hasFlows": true,
+  "flows": [
+    {
+      "flowType": "DATA_LEAK",
+      "ruleId": "coco-data_leak",
+      "ruleDescription": "CoCo flow converted to ExPAgent-compatible evidence",
+      "severity": "UNKNOWN",
+      "severityReason": "CoCo report does not provide ExPGuard severity",
+      "severityEvidence": [],
+      "sourceType": "STORAGE_ALL_ITEMS",
+      "sourceRemark": "CoCo source evidence",
+      "sourceFile": "crx_headers/cs_header.js",
+      "sourceFrame": "UNKNOWN",
+      "sourceLoc": "L165:C1 -> L165:C1",
+      "sourceFrameConstraint": null,
+      "sourceCode": "'key': 'value'",
+      "sinkType": "WINDOW_POSTMESSAGE",
+      "sinkRemark": "CoCo sink evidence",
+      "sinkFile": "extension-content.js",
+      "sinkFrame": "UNKNOWN",
+      "sinkLoc": "L1:C1 -> L1:C1",
+      "sinkCode": "!function(){\"use strict\";window.addEventListener(\"message\",function(e){if(\"https://youtubetotranscript.com\"===e.origin||e.origin.startsWith(\"http://localhost:\")){if(e.data&&\"EXTENSION_REQUEST_TOKENS\"===e.data.type)try{chrome.storage.local.get([\"token\",\"refreshToken\",\"isLoggedIn\",\"expiresAt\"],function(t){chrome.runtime.lastError||window.postMessage({type:\"EXTENSION_TOKENS\",token:t.token||null,refresh_token:t.refreshToken||null,isLoggedIn:!!t.isLoggedIn,expiresAt:t.expiresAt||null},e.origin)})}catch(e){}if(e.data&&\"EXTENSION_AUTH_SUCCESS\"===e.data.type){var t=e.data,o=t.token,n=t.refresh_token;if(!o||!n)return;try{chrome.storage.local.set({token:o,refreshToken:n,isLoggedIn:!0,expiresAt:Date.now()+31536e6},function(){chrome.runtime.lastError||chrome.runtime.sendMessage({action:\"AUTH_COMPLETE\",token:o,refresh_token:n,source:\"email\"},function(e){chrome.runtime.lastError})})}catch(e){}}}}),window.__sendTokensToExtension=function(e,t){window.postMessage({type:\"EXTENSION_AUTH_SUCCESS\",token:e,refresh_token:t},window.location.origin)}}();",
+      "messagePassing": false,
+      "channel": null,
+      "storagePassing": true,
+      "area": null,
+      "constraintKind": "UNKNOWN",
+      "privilegeCrossing": true,
+      "privilegeReason": "CoCo reported cross-boundary flow; verify with source",
+      "reportDisposition": "SUMMARY",
+      "sourceReportId": 1,
+      "reportEvidence": {
+        "tool": "coco",
+        "sourceCapability": "SENSITIVE_DATA",
+        "sinkCapability": "MESSAGE_RESPONSE",
+        "flowMeta": {
+          "totalSteps": 3,
+          "omitted": 0
+        },
+        "propagation": "t.isLoggedIn"
+      }
+    }
+  ],
+  "coverage": {
+    "timedOut": false,
+    "durationSeconds": null,
+    "statementCoveragePercent": null,
+    "coverageMetric": "CoCo covered application statements / total application statements"
+  },
+  "adapter": "CoCo nested source/sink fields normalized for ExPAgent"
+}

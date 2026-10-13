@@ -1,0 +1,157 @@
+{
+  "extensionId": "blkboeaihdlecgdjjgkcabbacndbjibc",
+  "extensionVersion": "4.4.27",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 7,
+    "totalFiles": 15,
+    "distinctFlows": 2,
+    "rawIssueEntries": 2,
+    "sinklessSourcesSkipped": 10
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "scripts/shell",
+      "frame": "CS_1",
+      "constraint": {
+        "matches": [
+          "https://www.dropbox.com/*"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "scripts/shell",
+        "loc": "L1:C1130 -> L1:C1144",
+        "line": 1,
+        "col": [
+          1130,
+          1144
+        ],
+        "spansTo": null,
+        "code": "…ForCommands:function(n){if(n.origin===dsCommon.docusignDomainOrigin&&\"object\"==typeof n.data&&\"command\"in n.data)switch(»n.data.command«){case\"shell - open url in chrome\":dsShell.openUrlInChrome(dsCommon.docusignDomain+n.data.url);break;case\"shell - open e…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_ACTION_BADGE_OPTIONS",
+          "remark": null,
+          "file": "scripts/common",
+          "loc": "L1:C3823 -> L1:C3859",
+          "line": 1,
+          "col": [
+            3823,
+            3859
+          ],
+          "spansTo": null,
+          "code": "…),e.data(\"hidden\")?e.hide():e.show()},setBadgeText:function(e){chrome.action.setBadgeBackgroundColor({color:\"#e04f55\"}),»chrome.action.setBadgeText({text:e})«},createContextMenuEntries:function(e,t){var n=chrome.contextMenus.create({title:chrome.i18n.getMessage(\"chromeMenuSign\"…",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "https://www.dropbox.com/*"
+            ]
+          }
+        },
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "scripts/common",
+          "loc": "L1:C5694 -> L1:C5702",
+          "line": 1,
+          "col": [
+            5694,
+            5702
+          ],
+          "spansTo": null,
+          "code": "…in e.data&&\"common - show in-flow rating prompt\"===e.data.command&&n(e.data.source,!0)},!1)},downloadFile:function(e,t){»fetch(e)«.then(function(e){return e.blob()}).then(function(e){var n=new FileReader;n.onloadend=function(){var e=btoa(n.result);t(…",
+          "urlControl": "FULL",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "https://www.dropbox.com/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 36,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "scripts/common",
+            "line": 1,
+            "ops": [
+              "ELEMENT:member-element",
+              "ASSIGN:binary-right",
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "MESSAGE"
+            ],
+            "code": "…o&&$(\".b-modal\").cli»ck()})):0===n?fetch(dsCommon.docusignDomain+\"/chromeext/inflow-rating-counter\",{method:\"POST\",headers:{\"Content-Type\":\"a …⟨tainted span: 4862 chars⟩… ta&&\"common - show in-flow rating prompt\"===e.data.command&&n(e.data.source,!0)},!1)},downloadFile:function(e,t){fetch(e«).then(function(e){r…",
+            "crossContextHop": "runtime.single.response.message[scripts/background->scripts/shell]"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "scripts/background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "scripts/background",
+        "loc": "L1:C1754 -> L1:C2827",
+        "line": 1,
+        "col": [
+          1754,
+          2827
+        ],
+        "spansTo": null,
+        "code": "…romeext/uninstall\"),»chrome.runtime.onMessage.addListener(function(t,e,o){if(\"object\"==typeof t&&\"command\"in t)switch(t.command){case\"social  …⟨tainted span: 1073 chars⟩… },o(e)}).catch(function(e){o({command:\"landing - retrieve file from given url - error\",html:e.responseText})})})}),!0}})«,chrome.runtime.onCo…"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_BODY",
+          "remark": "[Unknown URL]",
+          "file": "scripts/background",
+          "loc": "L1:C2247 -> L1:C2401",
+          "line": 1,
+          "col": [
+            2247,
+            2401
+          ],
+          "spansTo": null,
+          "code": "…docusignDomain+\"/csrf-token\").then(function(e){return e.json()}).then(function(e){return e.csrfToken}).then(function(e){»fetch(dsCommon.docusignDomain+\"/chromeext/attachment\",{method:\"POST\",headers:{\"Content-Type\":\"application/json\",\"x-csrf-token\":e},body:JSON.stringify(n)})«.then(function(e){return e.text()}).then(function(e){e=\"log out user\"===e?{command:\"landing - retrieve file from given u…",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 17,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "scripts/background",
+            "line": 1,
+            "ops": [
+              "MESSAGE",
+              "ELEMENT:member-element",
+              "ELEMENT:object.setProperty",
+              "RETURN:json.stringify",
+              "ASSIGN:conditional-alternate"
+            ],
+            "code": "…romeext/uninstall\"),»chrome.runtime.onMessage.addListener(function(t,e,o){if(\"object\"==typeof t&&\"command\"in t)switch(t.command){case\"social  …⟨tainted span: 1073 chars⟩… },o(e)}).catch(function(e){o({command:\"landing - retrieve file from given url - error\",html:e.responseText})})})}),!0}})«,chrome.runtime.onCo…",
+            "crossContextHop": "runtime.single.sender.message[scripts/shell->scripts/background]"
+          }
+        ]
+      }
+    }
+  ]
+}

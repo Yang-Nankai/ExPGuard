@@ -1,0 +1,299 @@
+{
+  "extension_id": "iojojcfflmfcejodomoafimdiianbgfe",
+  "extension_version": "7.3.25",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 7,
+  "verified_count": 3,
+  "verdicts": [
+    {
+      "flow_index": 3,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence to decide. Key findings from the source:\n\n**1. The sender guard is NOT a companion-extension allowlist.**\n`ceID` is defined at the top of `lbg.js` as `chrome.runtime.id` — the extension's **own** ID:\n\n```\nvar user,winProcF,jsFN=\"lbg.js\",ceID=chrome.runtime.id,...\n```\n\nThe guard in the listener is:\n\n```js\nif(r.id && r.id != ceID) throw ... \"Attempted invalid onMessageExternal access\"\n```\n\nThis only rejects messages from *other extensions*. A web page sender has no `sender.id`, so `r.id` is falsy and the guard does not fire. There is no `sender.origin`/`sender.url` check anywhere (`search_code` for `r.origin|r.url|sender.*` returned no matches). The harness's `PA_PARTIAL_TRUSTED_IPC` / `FIXED_SENDER_ID_ALLOWLIST` classification is therefore **unsound** — the only real boundary is the browser-enforced `externally_connectable` match list (`*://leadleaper.com/*`, `*://aws.leadleaper.net/*`).\n\n**2. The message object `n` genuinely reaches the privileged sink as `s.url`.**\nThe listener signature is `function(n,r,a)`, and the `reqPerm` branch calls:\n\n```js\npopInWin(\"request.reqPerm.result\", n, a, e)   // and analogous granted/NOT.granted/catch branches\n```\n\n`popInWin",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "AUTHENTICATED_EXTENSION_IPC",
+          "browserFacts": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised)."
+        },
+        "sourceAnchor": {
+          "reportedFile": "lbg",
+          "reportedLoc": "L16:C97501 -> L16:C97502",
+          "resolvedFile": "lbg.js",
+          "resolved": true,
+          "snippet": "L16 C97501-97502: ….id!=ceID)throw e=!0,new Error(\"Attempted invalid onMessageExternal access\");if(n.reqPerm)try{chrome.permissions.contains({permissions:[\"system.display\"]},e=>{e?…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "lbg",
+          "reportedLoc": "L16:C62007 -> L16:C62376",
+          "resolvedFile": "lbg.js",
+          "resolved": true,
+          "snippet": "L16 C62007-62376: …emove(h,function(e){chrome.runtime.lastError})}catch(e){}}setTimeout(function(){chrome.windows.create({url:s.url,type:\"popup\",state:\"normal\",focused:!0,width:350,height:e,top:r,left:c},function(e){var r=e.id,e=e.tabs[0].id;bckGrnd.aiObj&&s.aiProcF||(bckGrnd.aiObj={winID:r,tabID:e,cID:s.cID,snF:!!s.snF,url:s.url,pu:s.pu,puLnk:s.puLnk,urn:s.urn,snLnk:s.snLnk,IncID:s.IncID,IncKey:s.IncKey},chrome.storage.local.set({bckGrnd:bckGrnd},function(){}))})},l)}}else{try{r&&r({sF:!1,er:\"!request || !request.url\"})}catch(e){}onError(\"po…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://leadleaper.com/*",
+            "*://aws.leadleaper.net/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": {
+          "class": "PA_PARTIAL_TRUSTED_IPC",
+          "reason": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised).",
+          "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+          "boundaryType": "FIXED_SENDER_ID_ALLOWLIST",
+          "codeEvidence": [
+            {
+              "file": "lbg.js",
+              "fixedExtensionIds": [
+                "iojojcfflmfcejodomoafimdiianbgfe"
+              ],
+              "senderIdCheck": true,
+              "allowlistCue": true,
+              "fixedRecipient": false
+            }
+          ],
+          "manifestExtensionIds": [],
+          "manifestIdsOnly": false
+        },
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 2,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Analysis\n\n### (a) Who controls the source?\nThe source is the first argument `n` of `chrome.runtime.onMessageExternal.addListener(function(n,r,a){...})`. It is the full message object sent by an external sender.\n\nCritically, I inspected the actual guard at the listener head:\n\n```js\nceID = chrome.runtime.id\n...\nif (r.id && r.id != ceID) throw new Error(\"Attempted invalid onMessageExternal access\");\nif (n.reqPerm) ...\n```\n\nThe deterministic harness labeled this a `FIXED_SENDER_ID_ALLOWLIST` of a trusted peer extension. That is **incorrect**. `ceID` is `chrome.runtime.id` — the *extension's own* ID, not a trusted peer's ID. The guard therefore:\n\n- rejects any *other extension* sender (`r.id` present but != self),\n- **allows web-page senders**, because for a page sending via `externally_connectable`, `MessageSender.id` is `undefined`, so `r.id && ...` is falsy and the `throw` is skipped.\n\nThere is no `sender.url`/`sender.origin` check. The only effective boundary is the manifest `externally_connectable.matches` (`*://leadleaper.com/*`, `*://aws.leadleaper.net/*`), so a page on those origins (e.g., via XSS or site control) is the attacker surface.\n\n### (b) Source-to-sink ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "AUTHENTICATED_EXTENSION_IPC",
+          "browserFacts": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised)."
+        },
+        "sourceAnchor": {
+          "reportedFile": "lbg",
+          "reportedLoc": "L16:C97501 -> L16:C97502",
+          "resolvedFile": "lbg.js",
+          "resolved": true,
+          "snippet": "L16 C97501-97502: ….id!=ceID)throw e=!0,new Error(\"Attempted invalid onMessageExternal access\");if(n.reqPerm)try{chrome.permissions.contains({permissions:[\"system.display\"]},e=>{e?…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "lbg",
+          "reportedLoc": "L16:C61688 -> L16:C61744",
+          "resolvedFile": "lbg.js",
+          "resolved": true,
+          "snippet": "L16 C61688-61744: …eStr,likeCom:s.likeCom,cID:s.cID,snF:!!s.snF,url:s.url,urn:s.urn,snLnk:s.snLnk},chrome.storage.local.set({bckGrnd:bckGrnd},function(){})})},l)}else{l=0;if(bckGrnd.aiObj&&bckGrnd.aiObj.winID){l=400;var h=bckGrnd.aiObj…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://leadleaper.com/*",
+            "*://aws.leadleaper.net/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": {
+          "class": "PA_PARTIAL_TRUSTED_IPC",
+          "reason": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised).",
+          "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+          "boundaryType": "FIXED_SENDER_ID_ALLOWLIST",
+          "codeEvidence": [
+            {
+              "file": "lbg.js",
+              "fixedExtensionIds": [
+                "iojojcfflmfcejodomoafimdiianbgfe"
+              ],
+              "senderIdCheck": true,
+              "allowlistCue": true,
+              "fixedRecipient": false
+            }
+          ],
+          "manifestExtensionIds": [],
+          "manifestIdsOnly": false
+        },
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification analysis\n\n**Who controls the source?**  \nThe source is the message object `n` delivered to `chrome.runtime.onMessageExternal.addListener(function(n,r,a){...})` in the MV3 service worker `lbg.js`. The manifest sets:\n\n```json\n\"externallyConnectable\": {\n  \"matches\": [\n    \"*://leadleaper.com/*\",\n    \"*://aws.leadleaper.net/*\"\n  ]\n}\n```\n\nSo a page running on those origins can call `chrome.runtime.sendMessage(extensionId, payload)`. This is web-origin-controlled input, though the attack surface is limited to those two hosts (exploitable via XSS/compromise on either host, per ExPGuard’s model).\n\n**Is the guard a real trust boundary?**  \nThe listener guard is:\n\n```js\nif(r.id && r.id != ceID) throw ...\n```\n\n`ceID` is initialized to `chrome.runtime.id`. This check only rejects messages where `sender.id` is present and differs from the extension’s own ID. A web page sender has **no `sender.id`**, so `r.id` is undefined and the condition is false — the message is accepted. Therefore this is **not** a browser-authenticated fixed-extension-ID allowlist boundary against web pages. The harness labels this `PA_PARTIAL_TRUSTED_IPC`, but the actual code does not enforce that for the ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "AUTHENTICATED_EXTENSION_IPC",
+          "browserFacts": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised)."
+        },
+        "sourceAnchor": {
+          "reportedFile": "lbg",
+          "reportedLoc": "L16:C97501 -> L16:C97502",
+          "resolvedFile": "lbg.js",
+          "resolved": true,
+          "snippet": "L16 C97501-97502: ….id!=ceID)throw e=!0,new Error(\"Attempted invalid onMessageExternal access\");if(n.reqPerm)try{chrome.permissions.contains({permissions:[\"system.display\"]},e=>{e?…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "lbg",
+          "reportedLoc": "L16:C29815 -> L16:C30107",
+          "resolvedFile": "lbg.js",
+          "resolved": true,
+          "snippet": "L16 C29815-30107: …imeOutFn.catch\",e.message)}}function clsExt(e){}function login(e,r){try{c=e,s=r,fetch(gURLs+\"AJAX_Login\",{method:\"POST\",headers:{Accept:\"application/json\",\"Content-Type\":\"application/x-www-form-urlencoded\"},body:getEncodedData({mv3F:!0,gbF:!0,affCode:c.affCode||0,gauthF:c.gauthF||!1,msauthF:c.msauthF||!1,nalF:c.nalF||!1,splF:c.splF||!1,uID:c.uID,eID:ceID,gVer:extVer})}).then(e=>{if(!e.ok)throw new Error(\"!resp.ok --\\x3e resp.statusText= \"+e.statusT…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://leadleaper.com/*",
+            "*://aws.leadleaper.net/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": {
+          "class": "PA_PARTIAL_TRUSTED_IPC",
+          "reason": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised).",
+          "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+          "boundaryType": "FIXED_SENDER_ID_ALLOWLIST",
+          "codeEvidence": [
+            {
+              "file": "lbg.js",
+              "fixedExtensionIds": [
+                "iojojcfflmfcejodomoafimdiianbgfe"
+              ],
+              "senderIdCheck": true,
+              "allowlistCue": true,
+              "fixedRecipient": false
+            }
+          ],
+          "manifestExtensionIds": [],
+          "manifestIdsOnly": false
+        },
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 3 flow(s): 3 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

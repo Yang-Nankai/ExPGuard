@@ -1,0 +1,183 @@
+{
+  "extension_id": "inehghpkjjjdgpnagcbogckbonilnidc",
+  "extension_version": "8.0.8",
+  "browser": "chrome",
+  "runtime_extension_id": "inehghpkjjjdgpnagcbogckbonilnidc",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "tested_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "outcome": "EXTERNAL_CONDITION_REQUIRED",
+      "final_verdict": "FALSE_POSITIVE",
+      "confidence": 0.9,
+      "reproduced": false,
+      "trajectory": [],
+      "planned_trajectory": {
+        "flow_index": 0,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:52236/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source fixture only: http://127.0.0.1:52236/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_SYNC_STORAGE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "",
+      "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+      "payload_used": "",
+      "evidence_artifacts": [
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\Temp\\dynamic_workspace\\runs\\chrome\\inehghpkjjjdgpnagcbogckbonilnidc\\8.0.8\\dynamic-evidence\\flow-0\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence."
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\Temp\\dynamic_workspace\\runs\\chrome\\inehghpkjjjdgpnagcbogckbonilnidc\\8.0.8\\dynamic-evidence\\flow-0\\key-state.png",
+          "description": "Key browser state after replay: about:blank"
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": ""
+    },
+    {
+      "flow_index": 2,
+      "outcome": "NOT_ATTEMPTED",
+      "final_verdict": "UNCERTAIN",
+      "confidence": 0.0,
+      "reproduced": false,
+      "trajectory": [],
+      "planned_trajectory": {
+        "flow_index": 2,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:62174/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source fixture only: http://127.0.0.1:62174/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe WINDOW_POSTMESSAGE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "",
+      "reasoning": "No deterministic replay was possible for this flow.",
+      "payload_used": "",
+      "evidence_artifacts": [
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\chrome\\inehghpkjjjdgpnagcbogckbonilnidc\\8.0.8\\dynamic-evidence\\flow-2\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence."
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\ExPAgent\\runs\\chrome\\inehghpkjjjdgpnagcbogckbonilnidc\\8.0.8\\dynamic-evidence\\flow-2\\key-state.png",
+          "description": "Key browser state after replay: about:blank"
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": ""
+    }
+  ],
+  "environment": {
+    "browserUrl": "http://127.0.0.1:9222",
+    "runtimeExtensionId": "inehghpkjjjdgpnagcbogckbonilnidc",
+    "beaconBaseUrl": "http://127.0.0.1:52236",
+    "headless": true,
+    "safety": {
+      "mode": "isolated-controlled-validation",
+      "allowedTestOrigins": [
+        "http://127.0.0.1",
+        "http://[::1]",
+        "http://localhost"
+      ],
+      "network": "loopback and explicitly configured controlled origins only",
+      "testInput": "bounded JSON with harmless EXPAGENT_TEST_* markers",
+      "sensitiveData": "credentials, cookies, tokens, and personal data are not read or collected"
+    },
+    "networkIsolation": true
+  },
+  "summary": "Dynamically tested 2 flow(s): 0 CONFIRMED, 0 PARTIAL.",
+  "skipped_reason": ""
+}

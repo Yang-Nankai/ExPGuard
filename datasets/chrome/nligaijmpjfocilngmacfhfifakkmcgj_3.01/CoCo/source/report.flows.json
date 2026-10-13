@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "expagent-coco-adapter/v1",
+  "flows": [
+    {
+      "id": 1,
+      "source": {
+        "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "file": "background.js",
+        "loc": "L24:C1 -> L24:C1",
+        "code": "request[\"arg\"]"
+      },
+      "sinks": [
+        {
+          "kind": "XML_HTTP_REQUEST_OPEN",
+          "file": "background.js",
+          "loc": "L106:C1 -> L106:C1",
+          "code": "reqObj.url"
+        }
+      ],
+      "sanitized": false,
+      "propagation": {
+        "rawSteps": 0,
+        "distinctLines": 0,
+        "steps": []
+      }
+    },
+    {
+      "id": 2,
+      "source": {
+        "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "file": "background.js",
+        "loc": "L24:C1 -> L24:C1",
+        "code": "request[\"arg\"]"
+      },
+      "sinks": [
+        {
+          "kind": "XML_HTTP_REQUEST_SEND",
+          "file": "background.js",
+          "loc": "L130:C1 -> L130:C1",
+          "code": "reqObj.data"
+        }
+      ],
+      "sanitized": false,
+      "propagation": {
+        "rawSteps": 0,
+        "distinctLines": 0,
+        "steps": []
+      }
+    },
+    {
+      "id": 3,
+      "source": {
+        "kind": "XML_HTTP_RESPONSE",
+        "file": "crx_headers/bg_header.js",
+        "loc": "L79:C1 -> L79:C1",
+        "code": "XMLHttpRequest.prototype.responseText = 'sensitive_responseText'"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+          "file": "background.js",
+          "loc": "L122:C1 -> L122:C1",
+          "code": "JSON.parse(httpReq.responseText)"
+        }
+      ],
+      "sanitized": false,
+      "propagation": {
+        "rawSteps": 0,
+        "distinctLines": 0,
+        "steps": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,267 @@
+{
+  "extension_id": "pagahecnnmjjlpoakhagcpnalaodfbkk",
+  "extension_version": "24.2.4",
+  "browser": "chrome",
+  "runtime_extension_id": "bgfglopaokojodnabkilgpdcdlpindoi",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "tested_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.4,
+      "reproduced": false,
+      "trajectory": [
+        {
+          "action": "instrument_sink",
+          "detail": "all",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_20aed60bc7a04dff\", \"targetId\": \"886802D82BB8D9E6A6810BDF48520D2D\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+        },
+        {
+          "action": "new_page",
+          "detail": "https://expagent.slack.com:55269/page",
+          "result": "{\"openedUrl\": \"https://expagent.slack.com:55269/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:62212/"
+        },
+        {
+          "action": "contract_stimulus_batch",
+          "detail": "WINDOW_MESSAGE",
+          "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"postMessage\", \"event\": \"message\", \"eventTarget\": \"window\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 8, \"inputs\": [{\"bytes\": 1630, \"topLevelKeys\": [\"Action\", \"Message\", \"action\", \"auth\", \"cmd\", \"content\", \"data\", \"email\", \"fileInspectionData\", \"fun\", \"guid\", \"id\", \"initiatingPage\", \"key\", \"kind\", \"listenerKey\", \"marker\", \"message\", \"name\", \"number\"], \"tes"
+        },
+        {
+          "action": "observe",
+          "detail": "sink tap + local beacon",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_20aed60bc7a04dff\", \"actualGeneration\": \"observer_20ae"
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 0,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "https://expagent.slack.com:55269/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: https://expagent.slack.com:55269/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_SYNC_STORAGE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"WINDOW_MESSAGE\", \"sourcePath\": \"src/content-script.js\", \"location\": \"L402:C61 -> L402:C70\", \"eventNames\": [], \"eventTarget\": \"window\", \"eventDetailKey\": \"data\", \"envelope\": {}, \"forwardField\": \"\", \"scalarMessageValue\": \"\", \"requirements\": {\"type\": \"send-link\", \"name\": \"activateChatwork\"}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"remove_listener, create_modal,\\n            toggle_modal, close_modal, $sa_overlay, $sa_selector, $sa_content_wrap;\\n\\n        on_complete = function(data) {\\n            if (service === 'gmail' && composeView && data) {\\n                const attachment = create_attachment_tag_ele(data);\\n                if (attachment) {\\n                    composeView.insertHTMLIntoBodyAtCursor(document.createElement('br'));\\n                    composeView.insertHTMLIntoBodyAtCursor(document.createElement('br'));\\n                    composeView.insertHTMLIntoBodyAtCursor(attachment);\\n                    composeView.insertHTMLIntoBodyAtCursor(document.createElement('br'));    \\n                }\\n            } else if (service === 'editable' && data && right_click_ele) {\\n                const input_id = right_click_ele.element;\\n\\n                if (right_click_ele.insert_type === 'value') {\\n                   \", \"notes\": [\"已从 source/sink 附近提取字面量分支。\", \"已从 sink 文件推导消息分发字段 `type` 及候选值。\", \"已从 sink 调用推导 URL 承载字段 `url`。\"], \"discriminatorField\": \"type\", \"discriminatorValues\": [\"send-link\", \"close-extension\", \"update-setting\", \"load_embedded_webapp\"], \"urlField\": \"url\", \"sinkTapKey\": \"storage.sync.set\", \"messageAlias\": \"msg\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"HIGH\", \"contractWarnings\": []}\npage-target={\"targetId\": \"D5C5A9348B3D885832A86CDC2649C873\", \"url\": \"https://expagent.slack.com:55269/page\"}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_20aed60bc7a04dff\", \"targetId\": \"886802D82BB8D9E6A6810BDF48520D2D\", \"lifecycle\": {\"ok\": true, \"targetId\": \"886802D82BB8D9E6A6810BDF48520D2D\", \"targetType\": \"service_worker\", \"targetUrl\": \"chrome-extension://ecolkkdkcmlfpbphnkdohffcljfplldi/src/service_worker.js\", \"\nsource-bridge-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_6e5b0d21aee14570\", \"targetId\": \"D5C5A9348B3D885832A86CDC2649C873\", \"pageUrl\": \"https://expagent.slack.com:55269/page\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\",\\\"observerToken\\\":\\\"observer_6e5b0d21aee14570\\\"}\"}\nstimulus-batch={\"action\": \"dispatchStimulusBatch\", \"surface\": \"postMessage\", \"event\": \"message\", \"eventTarget\": \"window\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 8, \"inputs\": [{\"bytes\": 1630, \"topLevelKeys\": [\"Action\", \"Message\", \"action\", \"auth\", \"cmd\", \"content\", \"data\", \"email\", \"fileInspectionData\", \"fun\", \"guid\", \"id\", \"initiatingPage\", \"key\", \"kind\", \"listenerKey\", \"marker\", \"message\", \"name\", \"number\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_822ce00fa00e\"]}, {\"bytes\": 1636, \"topLevelKeys\": [\"Action\", \"Message\", \"action\", \"auth\", \"cmd\", \"content\", \"data\", \"email\", \"fileInspectionData\", \"fun\", \"guid\", \"id\", \"initiatingPage\", \"key\", \"kind\", \"listenerKey\", \"marker\", \"message\", \"name\", \"number\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_822ce00fa00e\"]}, {\"bytes\": 1635, \"topLevelKeys\": [\"Action\", \"Message\", \"action\", \"auth\", \"cmd\", \"content\", \"data\", \"email\", \"fileInspectionData\", \"fun\", \"gui\nsink-tap={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_20aed60bc7a04dff\", \"actualGeneration\": \"observer_20aed60bc7a04dff\", \"previousTargetId\": \"886802D82BB8D9E6A6810BDF48520D2D\", \"currentTargetId\": \"886802D82BB8D9E6A6810BDF48520D2D\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"storage.local.set\\\",\\\"storage.onChanged\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__tabs_create__\\\":true,\\\"__tabs_update__\\\":true,\\\"__tabs_remove__\\\":true,\\\"__tabs_sendMessage__\\\":true,\\\"__windows_create__\\\":true,\\\"__windows_update__\\\":true,\\\"__windows_remove__\\\":true,\\\"__action_setBadgeText__\\\":true,\\\"__a\nbeacon={\"token\": \"expa_c79d8fa193cd\", \"hit\": false, \"count\": 0}\nsource-bridge-tap={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_6e5b0d21aee14570\", \"actualGeneration\": \"observer_6e5b0d21aee14570\", \"recoveryReason\": \"\", \"targetId\": \"D5C5A9348B3D885832A86CDC2649C873\", \"pageUrl\": \"https://expagent.slack.com:55269/page\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__dom_innerHTML__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__runtime_sendMessage__\\\":true},\\\"observerToken\\\":\\\"observer_6e5b0d21aee14570\\\"}\"}",
+      "reasoning": "The exact static sink recorded a call, but the controlled marker/beacon was not observed in its security-relevant argument. Semantic-fixture non-observation (PARTIAL) cannot rebut the original extension boundary.",
+      "evidence_stage": "LISTENER_READY",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": false,
+        "semanticFixtureKinds": [
+          "content-script-local-fallback-semantic-fixture",
+          "external-response-port-semantic-fixture",
+          "message-listener-hook-semantic-fixture"
+        ],
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "HIGH",
+        "sourceContractReady": true,
+        "markerReached": false,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[{\"marker\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"url\": \"http://127.0.0.1:55269/beacon/expa_c79d8fa193cd\", \"data\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"value\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"message\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"title\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"text\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"number\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"listenerKey\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"pollingUrl\": \"http://127.0.0.1:55269/beacon/expa_c79d8fa193cd\", \"pollingInterval\": 1000, \"pollingAuthorization\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"pollingContentType\": \"text/plain\", \"storageKey\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"name\": \"activateChatwork\", \"id\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"key\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"type\": \"send-link\", \"action\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"cmd\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"Action\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"Message\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"fun\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"auth\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"phone\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"email\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"version\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"token\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"content\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"payload\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"kind\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"requestId\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"revision\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"guid\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"initiatingPage\": \"EXPAGENT_TEST_expa_822ce00fa00e\", \"referringPage\": \"EXPAGENT_TEST_expa_822ce00fa0",
+      "evidence_artifacts": [
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\pagahecnnmjjlpoakhagcpnalaodfbkk\\24.2.4\\dynamic-evidence\\flow-0\\step-source-open.png",
+          "description": "Step `source-open`: https://expagent.slack.com:55269/page",
+          "stage": "source-open",
+          "captured_at": "2026-09-22T16:41:15.580516+00:00",
+          "target_url": "https://expagent.slack.com:55269/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\pagahecnnmjjlpoakhagcpnalaodfbkk\\24.2.4\\dynamic-evidence\\flow-0\\step-after-trigger.png",
+          "description": "Step `after-trigger`: https://expagent.slack.com:55269/page",
+          "stage": "after-trigger",
+          "captured_at": "2026-09-22T16:41:15.664815+00:00",
+          "target_url": "https://expagent.slack.com:55269/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\pagahecnnmjjlpoakhagcpnalaodfbkk\\24.2.4\\dynamic-evidence\\flow-0\\storage-after-trigger.json",
+          "description": "Storage state at `after-trigger` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\pagahecnnmjjlpoakhagcpnalaodfbkk\\24.2.4\\dynamic-evidence\\flow-0\\storage-after-trigger.png",
+          "description": "Storage panel (DevTools-style) at `after-trigger`",
+          "stage": "storage-after-trigger",
+          "captured_at": "2026-09-22T16:41:15.803273+00:00",
+          "target_url": "https://expagent.slack.com:55269/page",
+          "sha256": "8aa490024d68589eb6721b68d360678fbe20d874cae25b2e2a1cf7ed48a61928"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\pagahecnnmjjlpoakhagcpnalaodfbkk\\24.2.4\\dynamic-evidence\\flow-0\\step-after-observation.png",
+          "description": "Step `after-observation`: https://expagent.slack.com:55269/page",
+          "stage": "after-observation",
+          "captured_at": "2026-09-22T16:41:30.039497+00:00",
+          "target_url": "https://expagent.slack.com:55269/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\pagahecnnmjjlpoakhagcpnalaodfbkk\\24.2.4\\dynamic-evidence\\flow-0\\storage-after-observation.json",
+          "description": "Storage state at `after-observation` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\pagahecnnmjjlpoakhagcpnalaodfbkk\\24.2.4\\dynamic-evidence\\flow-0\\storage-after-observation.png",
+          "description": "Storage panel (DevTools-style) at `after-observation`",
+          "stage": "storage-after-observation",
+          "captured_at": "2026-09-22T16:41:30.159306+00:00",
+          "target_url": "https://expagent.slack.com:55269/page",
+          "sha256": "a4025c30ec138f947a2dbe2eefe769146d80c6258933d67ee4a1ffc98ac60b92"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\pagahecnnmjjlpoakhagcpnalaodfbkk\\24.2.4\\dynamic-evidence\\flow-0\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\pagahecnnmjjlpoakhagcpnalaodfbkk\\24.2.4\\dynamic-evidence\\flow-0\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\pagahecnnmjjlpoakhagcpnalaodfbkk\\24.2.4\\dynamic-evidence\\flow-0\\step-final-state.png",
+          "description": "Step `final-state`: https://expagent.slack.com:55269/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-22T16:41:30.254368+00:00",
+          "target_url": "https://expagent.slack.com:55269/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\pagahecnnmjjlpoakhagcpnalaodfbkk\\24.2.4\\dynamic-evidence\\flow-0\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "manual-attestation",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\pagahecnnmjjlpoakhagcpnalaodfbkk_24.2.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+          "description": "User manually confirmed the frame message updates chrome.storage.sync options.",
+          "stage": "manual-confirmation",
+          "captured_at": "2026-09-23T02:49:05.902Z",
+          "target_url": "",
+          "sha256": "dae4a7cfd2e36e32a972bbbbe15d57b3dbe83ca100b3731ce581fa4676357495"
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": "sinkTapKey=storage.sync.set sourceBridgeReached=false manualValidation=true; automatedOutcomePreserved=INCONCLUSIVE_AFTER_DEBUG",
+      "manual_validation": {
+        "extension_id": "pagahecnnmjjlpoakhagcpnalaodfbkk",
+        "extension_version": "24.2.4",
+        "flow_index": 0,
+        "verdict": "TP",
+        "observation": "User manually confirmed the frame message updates chrome.storage.sync options.",
+        "operator": "user-provided manual validation",
+        "validated_at": "2026-09-23T02:49:05.902Z",
+        "evidence_type": "operator_attestation",
+        "attestation_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\pagahecnnmjjlpoakhagcpnalaodfbkk_24.2.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+        "attestation_sha256": "dae4a7cfd2e36e32a972bbbbe15d57b3dbe83ca100b3731ce581fa4676357495"
+      }
+    }
+  ],
+  "environment": {
+    "browserUrl": "http://127.0.0.1:52449",
+    "runtimeExtensionId": "bgfglopaokojodnabkilgpdcdlpindoi",
+    "beaconBaseUrl": "http://127.0.0.1:52448",
+    "headless": true,
+    "safety": {
+      "mode": "isolated-controlled-validation",
+      "allowedTestOrigins": [
+        "http://127.0.0.1",
+        "http://[::1]",
+        "http://localhost"
+      ],
+      "network": "loopback and explicitly configured controlled origins only",
+      "testInput": "bounded JSON with harmless EXPAGENT_TEST_* markers",
+      "sensitiveData": "credentials, cookies, tokens, and personal data are not read or collected"
+    },
+    "networkIsolation": true
+  },
+  "summary": "Round-20 r4 merged 1 dynamic/manual flow verdict(s).",
+  "skipped_reason": ""
+}

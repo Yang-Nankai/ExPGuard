@@ -1,0 +1,419 @@
+{
+  "extension_id": "jneiicfablflajihcdbimhhlkopenido",
+  "extension_version": "3.1.8",
+  "browser": "edge",
+  "runtime_extension_id": "ldcohgcjcapkjfmhgkfdppnaohgjdnnj",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "tested_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "outcome": "PARTIAL",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reproduced": false,
+      "trajectory": [
+        {
+          "action": "instrument_sink",
+          "detail": "all",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_56de9f1321064206\", \"targetId\": \"3CA95A3036FC8E629C6A0659E89443B3\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+        },
+        {
+          "action": "new_page",
+          "detail": "https://expagent.share-a-cart.com:60953/page",
+          "result": "{\"openedUrl\": \"https://expagent.share-a-cart.com:60953/us\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:5"
+        },
+        {
+          "action": "contract_stimulus_batch",
+          "detail": "WINDOW_MESSAGE",
+          "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"postMessage\", \"event\": \"message\", \"eventTarget\": \"window\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 1, \"inputs\": [{\"bytes\": 18, \"topLevelKeys\": [], \"testMarkers\": []}], \"result\": {\"scheduled\": true, \"count\": 1, \"surface\": \"postMessage\", \"spacingMs\": 300}}"
+        },
+        {
+          "action": "observe",
+          "detail": "sink tap + local beacon",
+          "result": "{\"sink_type\": \"fetch\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_56de9f1321064206\", \"actualGeneration\": \"observer_56"
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 0,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "https://expagent.share-a-cart.com:60953/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: https://expagent.share-a-cart.com:60953/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe FETCH_RESOURCE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"WINDOW_MESSAGE\", \"sourcePath\": \"js/sac.js\", \"location\": \"L1:C526 -> L1:C551\", \"eventNames\": [], \"eventTarget\": \"window\", \"eventDetailKey\": \"data\", \"envelope\": {}, \"forwardField\": \"\", \"scalarMessageValue\": \"from-page-script\", \"requirements\": {\"direction\": \"from-page-script\"}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"const getSACFlavor=()=>{const{name:e}=chrome.runtime.getManifest();return e.endsWith(\\\"Amazon\\\")?\\\"amazon\\\":e.endsWith(\\\"Walmart\\\")?\\\"walmart\\\":e.endsWith(\\\"AliExpress\\\")?\\\"aliexpress\\\":e.endsWith(\\\"Instacart\\\")?\\\"instacart\\\":\\\"sac\\\"},getSACVersion=()=>{const{version:e}=chrome.runtime.getManifest();return e},SAC_VERSION=getSACVersion(),SAC_FLAVOR=getSACFlavor();window.addEventListener(\\\"load\\\",()=>{const{pathname:e}=document.location;let t=\\\"\\\";try{t=chrome.runtime.id?chrome.runtime.id:\\\"\\\"}catch(e){}if(window.addEventListener(\\\"message\\\",e=>{if(e.source===window&&e.data&&\\\"from-page-script\\\"===e.data.direction){const{action:s}=e.data.message;if(\\\"load-cart-from-site\\\"===s){const{vendor:t,cartId:s,cartItems:r,sourceParam:o}=e.data.message;(t===SAC_FLAVOR||\\\"everything\\\"===t&&\\\"sac\\\"===SAC_FLAVOR)&&chrome.runtime.sendMessage({action:\\\"receive-cart\\\",id:s,cartItems:r,sourceParam:o})}else\\\"import-start-from-sac-plus-web\\\"===s?c\", \"notes\": [\"已从 source/sink 附近提取字面量分支。\", \"已从 sink 文件推导消息分发字段 `action` 及候选值。\", \"已从 sink 调用推导 URL 承载字段 `url`。\", \"已识别 window.message 的标量数据契约。\"], \"discriminatorField\": \"action\", \"discriminatorValues\": [\"sac-receive-step\"], \"urlField\": \"url\", \"sinkTapKey\": \"fetch\", \"messageAlias\": \"n\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [\"direction\", \"message\"], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"HIGH\", \"contractWarnings\": []}\npage-target={\"targetId\": \"B49853D1593BABD0E38275B053D90A81\", \"url\": \"https://expagent.share-a-cart.com:60953/us\"}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_56de9f1321064206\", \"targetId\": \"3CA95A3036FC8E629C6A0659E89443B3\", \"lifecycle\": {\"ok\": true, \"targetId\": \"3CA95A3036FC8E629C6A0659E89443B3\", \"targetType\": \"service_worker\", \"targetUrl\": \"chrome-extension://onofajjjhaodogdmjgohdfkgcfjdgpna/js/background.js\", \"attac\nsource-bridge-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_c3516ce48c824f90\", \"targetId\": \"B49853D1593BABD0E38275B053D90A81\", \"pageUrl\": \"https://expagent.share-a-cart.com:60953/us\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\",\\\"observerToken\\\":\\\"observer_c3516ce48c824f90\\\"}\"}\nstimulus-batch={\"action\": \"dispatchStimulusBatch\", \"surface\": \"postMessage\", \"event\": \"message\", \"eventTarget\": \"window\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 1, \"inputs\": [{\"bytes\": 18, \"topLevelKeys\": [], \"testMarkers\": []}], \"result\": {\"scheduled\": true, \"count\": 1, \"surface\": \"postMessage\", \"spacingMs\": 300}}\nsink-tap={\"sink_type\": \"fetch\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_56de9f1321064206\", \"actualGeneration\": \"observer_56de9f1321064206\", \"previousTargetId\": \"3CA95A3036FC8E629C6A0659E89443B3\", \"currentTargetId\": \"3CA95A3036FC8E629C6A0659E89443B3\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"fetch\\\",\\\"calls\\\":[{\\\"ts\\\":1790147567273,\\\"request\\\":{\\\"redacted\\\":true,\\\"length\\\":26},\\\"method\\\":\\\"GET\\\",\\\"body\\\":{\\\"redacted\\\":true,\\\"length\\\":0}},{\\\"ts\\\":1790147568514,\\\"request\\\":{\\\"redacted\\\":true,\\\"length\\\":26},\\\"method\\\":\\\"GET\\\",\\\"body\\\":{\\\"redacted\\\":true,\\\"length\\\":0}}],\\\"observerToken\\\":\\\"observer_56de9f1321064206\\\"}\"}\nbeacon={\"token\": \"expa_b2d716ff5fb2\", \"hit\": false, \"count\": 0}\nsource-bridge-tap={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_c3516ce48c824f90\", \"actualGeneration\": \"observer_c3516ce48c824f90\", \"recoveryReason\": \"\", \"targetId\": \"B49853D1593BABD0E38275B053D90A81\", \"pageUrl\": \"https://expagent.share-a-cart.com:60953/us\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__dom_innerHTML__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__runtime_sendMessage__\\\":true},\\\"observerToken\\\":\\\"observer_c3516ce48c824f90\\\"}\"}",
+      "reasoning": "The exact static sink recorded a call, but the controlled marker/beacon was not observed in its security-relevant argument.",
+      "evidence_stage": "SINK_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "HIGH",
+        "sourceContractReady": true,
+        "sinkReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[\"from-page-script\"]",
+      "evidence_artifacts": [
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-0\\step-source-open.png",
+          "description": "Step `source-open`: about:blank",
+          "stage": "source-open",
+          "captured_at": "2026-09-23T07:12:52.582456+00:00",
+          "target_url": "about:blank",
+          "sha256": "70e8fb1afe7526921ab87c2bcd0894d80bc2d406347ca86a95792c5cc6124f19"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-0\\storage-after-trigger.json",
+          "description": "Storage state at `after-trigger` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-0\\storage-after-trigger.png",
+          "description": "Storage panel (DevTools-style) at `after-trigger`",
+          "stage": "storage-after-trigger",
+          "captured_at": "2026-09-23T07:13:02.743566+00:00",
+          "target_url": "about:blank",
+          "sha256": "70e8fb1afe7526921ab87c2bcd0894d80bc2d406347ca86a95792c5cc6124f19"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-0\\storage-after-observation.json",
+          "description": "Storage state at `after-observation` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-0\\storage-after-observation.png",
+          "description": "Storage panel (DevTools-style) at `after-observation`",
+          "stage": "storage-after-observation",
+          "captured_at": "2026-09-23T07:13:12.907326+00:00",
+          "target_url": "about:blank",
+          "sha256": "70e8fb1afe7526921ab87c2bcd0894d80bc2d406347ca86a95792c5cc6124f19"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-0\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-0\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-0\\step-final-state.png",
+          "description": "Step `final-state`: about:blank",
+          "stage": "final-state",
+          "captured_at": "2026-09-23T07:13:14.946157+00:00",
+          "target_url": "about:blank",
+          "sha256": "70e8fb1afe7526921ab87c2bcd0894d80bc2d406347ca86a95792c5cc6124f19"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-0\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "manual-attestation",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\jneiicfablflajihcdbimhhlkopenido_3.1.8\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+          "description": "User manually confirmed the Share-A-Cart page message path.",
+          "stage": "manual-confirmation",
+          "captured_at": "2026-09-23T09:43:33.688Z",
+          "target_url": "",
+          "sha256": "df8eca2debbdf23ed260216e20e79f64bd680bc838d809d2acdc9a3b98aa66cf"
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": "sinkTapKey=fetch sourceBridgeReached=false manualValidation=true; automatedOutcomePreserved=PARTIAL",
+      "manual_validation": {
+        "extension_id": "jneiicfablflajihcdbimhhlkopenido",
+        "extension_version": "3.1.8",
+        "flow_index": 0,
+        "verdict": "TP",
+        "observation": "User manually confirmed the Share-A-Cart page message path.",
+        "operator": "user-provided manual validation",
+        "validated_at": "2026-09-23T09:43:33.688Z",
+        "evidence_type": "operator_attestation",
+        "attestation_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\jneiicfablflajihcdbimhhlkopenido_3.1.8\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+        "attestation_sha256": "df8eca2debbdf23ed260216e20e79f64bd680bc838d809d2acdc9a3b98aa66cf"
+      }
+    },
+    {
+      "flow_index": 1,
+      "outcome": "PARTIAL",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.78,
+      "reproduced": false,
+      "trajectory": [
+        {
+          "action": "new_page",
+          "detail": "https://expagent.share-a-cart.com:60953/page",
+          "result": "{\"openedUrl\": \"https://expagent.share-a-cart.com:60953/us\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:5"
+        },
+        {
+          "action": "set_source_breakpoint",
+          "detail": "js/sac L1:C526 -> L1:C551",
+          "result": "{\"ok\": true, \"sourceFile\": \"js/sac.js\", \"url\": \"chrome-extension://onofajjjhaodogdmjgohdfkgcfjdgpna/js/sac.js\", \"line\": 1, \"column\": 526, \"targetHint\": \"content\", \"breakpointId\": \"br:1:0:526:chrome-extension://onofajjjhaodogdmjgohdfkgcfjdgpna/js/sac.js\", \"resolved\": true, \"locations\": [{\"scriptId\": \"3\", \"lineNumber\": 0, \"columnNumber\": 528}], \"targetType\": \"page\", \"targetUrl\": \"https://expagent.share-a-cart.com:60953"
+        },
+        {
+          "action": "source_contract_stimulus_batch",
+          "detail": "WINDOW_MESSAGE",
+          "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"postMessage\", \"event\": \"message\", \"eventTarget\": \"window\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 1, \"inputs\": [{\"bytes\": 18, \"topLevelKeys\": [], \"testMarkers\": []}], \"result\": {\"scheduled\": true, \"count\": 1, \"surface\": \"postMessage\", \"spacingMs\": 300}}"
+        },
+        {
+          "action": "set_sink_breakpoint",
+          "detail": "js/background L2:C1407500 -> L2:C1407566",
+          "result": "{\"ok\": true, \"sourceFile\": \"js/background.js\", \"url\": \"chrome-extension://onofajjjhaodogdmjgohdfkgcfjdgpna/js/background.js\", \"line\": 2, \"column\": 1407500, \"targetHint\": \"background\", \"breakpointId\": \"1:1:1407500:chrome-extension://onofajjjhaodogdmjgohdfkgcfjdgpna/js/background.js\", \"resolved\": true, \"locations\": [{\"scriptId\": \"3\", \"lineNumber\": 1, \"columnNumber\": 1407512}], \"targetType\": \"service_worker\", \"targetUrl"
+        },
+        {
+          "action": "sink_contract_stimulus_batch",
+          "detail": "WINDOW_MESSAGE",
+          "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"postMessage\", \"event\": \"message\", \"eventTarget\": \"window\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 1, \"inputs\": [{\"bytes\": 18, \"topLevelKeys\": [], \"testMarkers\": []}], \"result\": {\"scheduled\": true, \"count\": 1, \"surface\": \"postMessage\", \"spacingMs\": 300}}"
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 1,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "https://expagent.share-a-cart.com:60953/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: https://expagent.share-a-cart.com:60953/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_TABS_CREATE_OPTIONS; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"WINDOW_MESSAGE\", \"sourcePath\": \"js/sac.js\", \"location\": \"L1:C526 -> L1:C551\", \"eventNames\": [], \"eventTarget\": \"window\", \"eventDetailKey\": \"data\", \"envelope\": {}, \"forwardField\": \"\", \"scalarMessageValue\": \"from-page-script\", \"requirements\": {\"direction\": \"from-page-script\"}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"const getSACFlavor=()=>{const{name:e}=chrome.runtime.getManifest();return e.endsWith(\\\"Amazon\\\")?\\\"amazon\\\":e.endsWith(\\\"Walmart\\\")?\\\"walmart\\\":e.endsWith(\\\"AliExpress\\\")?\\\"aliexpress\\\":e.endsWith(\\\"Instacart\\\")?\\\"instacart\\\":\\\"sac\\\"},getSACVersion=()=>{const{version:e}=chrome.runtime.getManifest();return e},SAC_VERSION=getSACVersion(),SAC_FLAVOR=getSACFlavor();window.addEventListener(\\\"load\\\",()=>{const{pathname:e}=document.location;let t=\\\"\\\";try{t=chrome.runtime.id?chrome.runtime.id:\\\"\\\"}catch(e){}if(window.addEventListener(\\\"message\\\",e=>{if(e.source===window&&e.data&&\\\"from-page-script\\\"===e.data.direction){const{action:s}=e.data.message;if(\\\"load-cart-from-site\\\"===s){const{vendor:t,cartId:s,cartItems:r,sourceParam:o}=e.data.message;(t===SAC_FLAVOR||\\\"everything\\\"===t&&\\\"sac\\\"===SAC_FLAVOR)&&chrome.runtime.sendMessage({action:\\\"receive-cart\\\",id:s,cartItems:r,sourceParam:o})}else\\\"import-start-from-sac-plus-web\\\"===s?c\", \"notes\": [\"已从 source/sink 附近提取字面量分支。\", \"已从 sink 文件推导消息分发字段 `action` 及候选值。\", \"已从 sink 调用推导 URL 承载字段 `data.url`。\", \"已识别 window.message 的标量数据契约。\"], \"discriminatorField\": \"action\", \"discriminatorValues\": [\"sac-receive-step\"], \"urlField\": \"data.url\", \"sinkTapKey\": \"tabs.create\", \"messageAlias\": \"n\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [\"direction\", \"message\"], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"HIGH\", \"contractWarnings\": []}\nisolated-context={\"origin\": \"https://expagent.share-a-cart.com:60953\", \"dsShell\": \"undefined\", \"dsCommon\": \"undefined\", \"jquery\": \"undefined\", \"shellFrame\": false}\nsource-breakpoint=armed\nsource-pause={\"paused\": true, \"reason\": \"other\", \"target\": {\"type\": \"page\", \"url\": \"https://expagent.share-a-cart.com:60953/us\"}, \"frames\": [{\"function\": \"<anonymous>\", \"scriptId\": \"3\", \"line\": 1, \"column\": 528, \"url\": \"\"}]}\nsink-breakpoint=armed\nsink-pause={\"paused\": false, \"reason\": \"\", \"target\": {\"type\": \"service_worker\", \"url\": \"chrome-extension://onofajjjhaodogdmjgohdfkgcfjdgpna/js/background.js\"}, \"frames\": []}\ndeep-observe-window={\"elapsedSeconds\": 8.313, \"pollAttempts\": 17, \"firstObservedSeconds\": null, \"sinkObserved\": false, \"beaconObserved\": false, \"observerRecoveredDuringWindow\": false}\nsink-tap={\"sink_type\": \"tabs.create\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_160893b7c87e49ba\", \"actualGeneration\": \"observer_160893b7c87e49ba\", \"previousTargetId\": \"3CA95A3036FC8E629C6A0659E89443B3\", \"currentTargetId\": \"3CA95A3036FC8E629C6A0659E89443B3\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"tabs.create\\\",\\\"calls\\\":[],\\\"observerToken\\\":\\\"observer_160893b7c87e49ba\\\"}\"}\nbeacon={\"token\": \"expa_62ef1dd665d9\", \"hit\": false, \"count\": 0, \"hits\": []}",
+      "reasoning": "The exact content-script source breakpoint fired for the controlled page event, but the privileged sink did not. The remaining failure is isolated to message routing or a background-side payload precondition.",
+      "evidence_stage": "SINK_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "environmentReady": true,
+        "listenerReady": true,
+        "sourceReached": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "HIGH",
+        "sourceContractReady": true,
+        "sinkReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[\"from-page-script\"]",
+      "evidence_artifacts": [
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-1\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-1\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "debug",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-1\\extension-debug.json",
+          "description": "Persistent CDP extension debugger breakpoint/pause state.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-1\\step-final-state-fixture.png",
+          "description": "Post-run controlled fixture state (reopened because the service-worker flow left no screenshot-capable page target); sink evidence remains in the trace.",
+          "stage": "final-state-fixture",
+          "captured_at": "2026-09-23T07:14:31.022732+00:00",
+          "target_url": "https://expagent.share-a-cart.com:60953/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r2\\_runs\\edge\\jneiicfablflajihcdbimhhlkopenido\\3.1.8\\dynamic-evidence\\flow-1\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "manual-attestation",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\jneiicfablflajihcdbimhhlkopenido_3.1.8\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+          "description": "User manually confirmed the Share-A-Cart page message path.",
+          "stage": "manual-confirmation",
+          "captured_at": "2026-09-23T09:43:33.688Z",
+          "target_url": "",
+          "sha256": "cb80a808ec40a4614371fe6099cf32f2ff54721d902a84786ea6a04eb135b96f"
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "Extension debugger recorded 2 breakpoint(s); see artifact for line-level state.",
+      "notes": "sourceBreakpointHits=1 sinkBreakpointHits=0 react=skippedDeterministicResolved manualValidation=true; automatedOutcomePreserved=PARTIAL",
+      "manual_validation": {
+        "extension_id": "jneiicfablflajihcdbimhhlkopenido",
+        "extension_version": "3.1.8",
+        "flow_index": 1,
+        "verdict": "TP",
+        "observation": "User manually confirmed the Share-A-Cart page message path.",
+        "operator": "user-provided manual validation",
+        "validated_at": "2026-09-23T09:43:33.688Z",
+        "evidence_type": "operator_attestation",
+        "attestation_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\jneiicfablflajihcdbimhhlkopenido_3.1.8\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+        "attestation_sha256": "cb80a808ec40a4614371fe6099cf32f2ff54721d902a84786ea6a04eb135b96f"
+      }
+    }
+  ],
+  "environment": {
+    "browserUrl": "http://127.0.0.1:9222",
+    "runtimeExtensionId": "ldcohgcjcapkjfmhgkfdppnaohgjdnnj",
+    "beaconBaseUrl": "http://127.0.0.1:60640",
+    "headless": true,
+    "safety": {
+      "mode": "isolated-controlled-validation",
+      "allowedTestOrigins": [
+        "http://127.0.0.1",
+        "http://[::1]",
+        "http://localhost"
+      ],
+      "network": "loopback and explicitly configured controlled origins only",
+      "testInput": "bounded JSON with harmless EXPAGENT_TEST_* markers",
+      "sensitiveData": "credentials, cookies, tokens, and personal data are not read or collected"
+    },
+    "networkIsolation": true
+  },
+  "summary": "Round-20 r4 merged 2 dynamic/manual flow verdict(s).",
+  "skipped_reason": ""
+}

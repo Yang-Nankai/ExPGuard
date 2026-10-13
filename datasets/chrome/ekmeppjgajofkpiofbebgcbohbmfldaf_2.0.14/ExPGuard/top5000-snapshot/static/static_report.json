@@ -1,0 +1,100 @@
+{
+  "extension_id": "ekmeppjgajofkpiofbebgcbohbmfldaf",
+  "extension_version": "2.0.14",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 2,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 1,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Ledger\n\n**(a) Who controls the source?**\nThe source is `TARGET_CUSTOM_EVENT` in `injected.js` at line 766: `var req = e.detail;` inside `handleC(e)`. The listener is registered as:\n\n```js\ncomm.sid = 'OM' + 'C';               // \"OMC\"\ndocument.addEventListener(comm.sid, comm['handle' + srcId].bind(comm), false);\n// -> document.addEventListener('OMC', handleC, false)\n```\n\n`handleC` is invoked on a plain DOM `CustomEvent('OMC')` whose `detail` is set by the dispatching page. The manifest runs this content script at `document_start` on `<all_urls>` in an ISOLATED world, but DOM events are shared across the page/isolated-world boundary, so **any webpage can dispatch `new CustomEvent('OMC', {detail: ...})` on `document` and fully control `e.detail`**. There is no secret token, event-source check, or signature on the event. ✅ Attacker-controlled.\n\n**(b) Exact source-to-sink path**\n1. `injected.js:765-804` — `handleC(e)` reads `req = e.detail`, then `var func = maps[req.cmd]; if (func) func(req.data);`.\n2. `injected.js:777-779` — for `req.cmd === 'OpenTab'`, it calls `sendMessage({cmd:'OpenTab', data: data})`.\n3. `injected.js:10-12` — `sendMessage` performs `chrome.runtime.",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "injected",
+          "reportedLoc": "L766:C12 -> L766:C20",
+          "resolvedFile": "injected.js",
+          "resolved": true,
+          "snippet": "L766 C12-20:   var req = e.detail;"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C68748 -> L1:C68795",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C68748-68795: …}),e)}))),function(e,t){return ye.apply(this,arguments)}),OpenTab:function(e,t){chrome.tabs.create({url:e.url,active:e.active})},CheckIfUserScriptsAvailable:(ge=o(c().mark((function e(){return c().wrap((func…"
+        },
+        "sourceExpectedMarkers": [
+          "addEventListener",
+          "detail"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "<all_urls>"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "injected.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

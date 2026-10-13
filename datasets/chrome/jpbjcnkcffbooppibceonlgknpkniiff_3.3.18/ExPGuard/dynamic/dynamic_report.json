@@ -1,0 +1,129 @@
+{
+  "extension_id": "jpbjcnkcffbooppibceonlgknpkniiff",
+  "extension_version": "3.3.18",
+  "browser": "chrome",
+  "runtime_extension_id": "bklakkdojdppkjnejpcekmgoifcamfkd",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "tested_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 1,
+      "outcome": "PRECONDITION_UNMET",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.7,
+      "reproduced": false,
+      "trajectory": [],
+      "planned_trajectory": {
+        "flow_index": 1,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "http://127.0.0.1:62887/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source fixture only: http://127.0.0.1:62887/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_SESSION_STORAGE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "",
+      "reasoning": "源是 DOCUMENT_URL（页面自身 URL），sink 在扩展 popup/UI 内；触发需要 popup 处于打开状态并读取当前标签 URL，当前确定性重放不覆盖该 UI 前置条件。",
+      "payload_used": "",
+      "evidence_artifacts": [
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\Temp\\dynamic_workspace\\runs\\chrome\\jpbjcnkcffbooppibceonlgknpkniiff\\3.3.18\\dynamic-evidence\\flow-1\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence."
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Ablation\\Temp\\dynamic_workspace\\runs\\chrome\\jpbjcnkcffbooppibceonlgknpkniiff\\3.3.18\\dynamic-evidence\\flow-1\\key-state.png",
+          "description": "Key browser state after replay: http://127.0.0.1:62887/page?expagent=EXPAGENT_TEST_expa_9406b37e9c23"
+        },
+        {
+          "kind": "manual-attestation",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\jpbjcnkcffbooppibceonlgknpkniiff_3.3.18\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+          "description": "人工复测确认页面 document.URL marker 被媒体状态对象采集并写入 chrome.storage.session。",
+          "stage": "manual-confirmation",
+          "captured_at": "2026-09-21T16:15:06.547346Z",
+          "target_url": "",
+          "sha256": "4e538e633df655bca633c40409702ca21c576bf27ad6bd9d30e4bef27ee58d93"
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": "manualValidation=true; automatedOutcomePreserved=PRECONDITION_UNMET",
+      "manual_validation": {
+        "extension_id": "jpbjcnkcffbooppibceonlgknpkniiff",
+        "extension_version": "3.3.18",
+        "flow_index": 1,
+        "source_type": "DOCUMENT_URL",
+        "sink_type": "CHROME_SESSION_STORAGE",
+        "observation": "人工复测确认页面 document.URL marker 被媒体状态对象采集并写入 chrome.storage.session。",
+        "verdict": "TP",
+        "operator": "user-provided manual validation",
+        "validated_at": "2026-09-21T16:15:06.547346Z",
+        "evidence_type": "operator_attestation",
+        "attestation_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\jpbjcnkcffbooppibceonlgknpkniiff_3.3.18\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json"
+      }
+    }
+  ],
+  "environment": {
+    "browserUrl": "http://127.0.0.1:9222",
+    "runtimeExtensionId": "bklakkdojdppkjnejpcekmgoifcamfkd",
+    "beaconBaseUrl": "http://127.0.0.1:62887",
+    "headless": true,
+    "safety": {
+      "mode": "isolated-controlled-validation",
+      "allowedTestOrigins": [
+        "http://127.0.0.1",
+        "http://[::1]",
+        "http://localhost"
+      ],
+      "network": "loopback and explicitly configured controlled origins only",
+      "testInput": "bounded JSON with harmless EXPAGENT_TEST_* markers",
+      "sensitiveData": "credentials, cookies, tokens, and personal data are not read or collected"
+    },
+    "networkIsolation": true
+  },
+  "summary": "Dynamically tested 1 flow(s): 0 CONFIRMED, 0 PARTIAL, 1 PRECONDITION_UNMET.",
+  "skipped_reason": ""
+}

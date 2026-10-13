@@ -1,0 +1,233 @@
+{
+  "extensionId": "ljnadbaeifgbakekpdcecdiefpbooihh",
+  "extensionVersion": "5.8",
+  "sourceType": "CRX",
+  "status": "success",
+  "duration": 0.276,
+  "files": [
+    {
+      "file": "background.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 4445,
+      "durationMs": 124.85275999999999
+    }
+  ],
+  "totalFiles": 1,
+  "totalSize": 4445,
+  "cacheStats": {
+    "totalCalls": 0,
+    "hits": 0,
+    "misses": 0,
+    "evictions": 0,
+    "hitRate": 0,
+    "cacheSize": 0,
+    "maxEntries": 4096
+  },
+  "coverage": {
+    "totalNodes": 55,
+    "coveredNodes": 55,
+    "nodeCoverage": 1,
+    "totalScopes": 11,
+    "coveredScopes": 11,
+    "scopeCoverage": 1,
+    "analyzedScripts": 1,
+    "scripts": [
+      {
+        "file": "background",
+        "frame": "BG_1",
+        "totalNodes": 55,
+        "coveredNodes": 55,
+        "nodeCoverage": 1,
+        "totalScopes": 11,
+        "coveredScopes": 11,
+        "scopeCoverage": 1
+      }
+    ]
+  },
+  "hasFlows": true,
+  "flows": [
+    {
+      "flowType": "PRIVILEGE_ESCALATION",
+      "ruleId": "attacker-input-privileged-operation",
+      "ruleDescription": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "chrome.runtime.onMessageExternal.addListener[message]",
+      "sourceProvenance": "EXTERNAL_MESSAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L152:C15 -> L152:C22",
+      "sinkType": "CHROME_DOWNLOADS_OPTIONS",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L24:C32 -> L24:C85",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "HIGH",
+      "severityReason": "Wildcard subdomain matching is allowed.",
+      "severityEvidence": [
+        "https://*.octagst.com/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "e) {\n  processAsync(>>>request<<<, sendResponse)\n  re",
+      "sinkCode": " Promise(resolve => >>>chrome.downloads.download({ url, filename }, resolve)<<<)\n}\n\nfunction comple"
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "chrome.runtime.onMessageExternal.addListener[message]",
+      "sourceProvenance": "EXTERNAL_MESSAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L152:C15 -> L152:C22",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "[Unknown URL]",
+      "sinkUrlTaintControl": "FULL",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L63:C34 -> L69:C8",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "HIGH",
+      "severityReason": "Wildcard subdomain matching is allowed.",
+      "severityEvidence": [
+        "https://*.octagst.com/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "e) {\n  processAsync(>>>request<<<, sendResponse)\n  re",
+      "sinkCode": "tchResponse = await >>>fetch(request.url, {\n        method: request.method,\n        credentials: 'include',\n        redirect: 'follow',\n        headers,\n        body: request.body,\n      })<<<\n\n      //GSTN redir"
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "chrome.runtime.onMessageExternal.addListener[message]",
+      "sourceProvenance": "EXTERNAL_MESSAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L152:C15 -> L152:C22",
+      "sinkType": "FETCH_HEADERS",
+      "sinkRemark": "[Unknown URL]",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L63:C34 -> L69:C8",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "HIGH",
+      "severityReason": "Wildcard subdomain matching is allowed.",
+      "severityEvidence": [
+        "https://*.octagst.com/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "e) {\n  processAsync(>>>request<<<, sendResponse)\n  re",
+      "sinkCode": "tchResponse = await >>>fetch(request.url, {\n        method: request.method,\n        credentials: 'include',\n        redirect: 'follow',\n        headers,\n        body: request.body,\n      })<<<\n\n      //GSTN redir"
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "chrome.runtime.onMessageExternal.addListener[message]",
+      "sourceProvenance": "EXTERNAL_MESSAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L152:C15 -> L152:C22",
+      "sinkType": "FETCH_BODY",
+      "sinkRemark": "[Unknown URL]",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L63:C34 -> L69:C8",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "HIGH",
+      "severityReason": "Wildcard subdomain matching is allowed.",
+      "severityEvidence": [
+        "https://*.octagst.com/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "e) {\n  processAsync(>>>request<<<, sendResponse)\n  re",
+      "sinkCode": "tchResponse = await >>>fetch(request.url, {\n        method: request.method,\n        credentials: 'include',\n        redirect: 'follow',\n        headers,\n        body: request.body,\n      })<<<\n\n      //GSTN redir"
+    }
+  ],
+  "privilegeSuppressedCount": 0,
+  "privilegeSuppressed": []
+}

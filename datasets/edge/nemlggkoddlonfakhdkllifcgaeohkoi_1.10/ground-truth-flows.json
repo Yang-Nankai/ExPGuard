@@ -1,0 +1,180 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "edge",
+  "extension_id": "nemlggkoddlonfakhdkllifcgaeohkoi",
+  "version": "1.10",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-4092e9ecca83918d",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "FETCH_RESOURCE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/edge/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:edge:nemlggkoddlonfakhdkllifcgaeohkoi:1.10:80299eabc5aaeaf4:01",
+          "flow": {
+            "flow_id": "expguard-opti:edge:nemlggkoddlonfakhdkllifcgaeohkoi:1.10:80299eabc5aaeaf4:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "80299eabc5aaeaf4d01c7d457188250b9dff37e7185b68d9eb3785b9966d3248",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "service_worker",
+              "loc": "L127:C12 -> L127:C19",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "service_worker",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "service_worker",
+              "loc": "L29:C11 -> L32:C6",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "PARTIAL"
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "flow_index": 0,
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "User manually confirmed TP; only a subset of URL forms is affected."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification: REQUEST_FORGERY — external message → `fetch` I read the injected propagation report and then confirmed the actual source in `service_worker.js`. The chain is real and unbroken. ### (a) Who controls the source The source is `chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => …)` at L125-140. The entire `message` object (`type`, `url`, `folder`) is supplied by whatever external party can reach the listener. The manifest has `externally_connecta…",
+              "path": "extensions/nemlggkoddlonfakhdkllifcgaeohkoi_1.10/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.4,
+              "reproduced": false,
+              "basis": "non_decisive",
+              "usable_for_label": false,
+              "evidence_stage": "LISTENER_READY",
+              "evidence_artifact_count": 3,
+              "reasoning": "Companion extension sent message but no beacon hit and no sink tap activity.",
+              "notes": "",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\nemlggkoddlonfakhdkllifcgaeohkoi_1.10\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-23T09:43:33.688Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\nemlggkoddlonfakhdkllifcgaeohkoi_1.10\\dynamic\\evidence\\flow-0",
+              "files": []
+            },
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 0217870262661440b63b37cbca791937f2f41fb0469576dd51923', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary",
+                "coco"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/edge/extensions/nemlggkoddlonfakhdkllifcgaeohkoi_1.10/final/final_report.json",
+              "report_mtime": "2026-08-18T04:11:04.910Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-23T09:43:33.688Z",
+                "notes": "User manually confirmed TP; only a subset of URL forms is affected.",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\nemlggkoddlonfakhdkllifcgaeohkoi_1.10\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\nemlggkoddlonfakhdkllifcgaeohkoi_1.10\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-23T09:43:33.688Z",
+                  "sha256": "154d68011389a49d420b2a85edb6fcafbccd71d8f92eca175d3c4d282d20c1aa"
+                }
+              }
+            ],
+            "notes": [
+              "Latest manual attestation overrides the aggregate label while preserving the automated outcome for audit."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "extension_delisted",
+        "dataset_version": "1.10",
+        "latest_version": null,
+        "reason": "Edge Add-ons returned HTTP 404",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

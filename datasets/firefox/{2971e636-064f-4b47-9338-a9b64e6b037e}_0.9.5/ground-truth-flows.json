@@ -1,0 +1,250 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "firefox",
+  "extension_id": "{2971e636-064f-4b47-9338-a9b64e6b037e}",
+  "version": "0.9.5",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-a3c68cd97971c3c9",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_SYNC_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:{2971e636-064f-4b47-9338-a9b64e6b037e}:0.9.5:1a178f9d99ed68d6:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:{2971e636-064f-4b47-9338-a9b64e6b037e}:0.9.5:1a178f9d99ed68d6:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "1a178f9d99ed68d61c7d25dbcff353054ca9e3a69334f491485a5d688de4d1c7",
+            "semantic_key": {
+              "rule_id": "attacker-input-storage-write",
+              "flow_type": "STORAGE_POSOING",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_file": "content",
+              "source_loc": "20382056",
+              "source_frame": "CS_1",
+              "sink_type": "CHROME_SYNC_STORAGE",
+              "sink_file": "content",
+              "sink_loc": "26102639",
+              "sink_frame": "CS_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "CRITICAL",
+            "severity_reason": "Wildcard host `*` allows coverage of arbitrary domains.",
+            "severity_evidence": [
+              "http://*/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content",
+              "loc": "L20:C38 -> L20:C56",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "http://*/*",
+                      "https://*/*",
+                      "file:///*"
+                    ],
+                    "excludeMatches": [
+                      "https://hangouts.google.com/*",
+                      "https://meet.google.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "http://*/*",
+                  "https://*/*",
+                  "file:///*"
+                ],
+                "excludeMatches": [
+                  "https://hangouts.google.com/*",
+                  "https://meet.google.com/*"
+                ]
+              },
+              "code_preview": "urce !== window || !>>>event.data?.source<<<?.startsWith(\"vsc-\")"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "storage.fuzzy.settings",
+              "file": "content",
+              "loc": "L26:C10 -> L26:C39",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "http://*/*",
+                      "https://*/*",
+                      "file:///*"
+                    ],
+                    "excludeMatches": [
+                      "https://hangouts.google.com/*",
+                      "https://meet.google.com/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "pdate\") {\n          >>>chrome.storage.sync.set(data)<<<;\n        } else if "
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: The code confirms the reported flow end-to-end. Here is my four-part decision ledger.\n\n**(a) Who controls the source?**\nA webpage. The content script runs in the ISOLATED world on `http://*/*`, `https://*/*`, and `file:///*` (all frames). It registers `window.addEventListener(\"message\", ...)`, and any page can call `window.postMessage(...)` to itself. The entire `event.data` object — including `source`, `action`, and `data` — is attacker-chosen. `event.source === window` is trivially satisfied by the page's own `postMessage`.\n\n**(b) Exact source-to-sink path**\nL19 `addEventListener(\"message\")` → L20 guard (`event.source === window` and `event.data?.source?.startsWith(\"vsc-\")`, both attacker-satisfiable) → L23 `const { source, action, data } = event.data` → L24 `source === \"vsc-page\"` (attacker field) → L25 `action === \"storage-update\"` (attacker field) → L26 `chrome.storage.sync.set(data)`. The propagation trace matches the real code exactly.\n\n**(c) Which security-relevant argument is attacker-controlled?**\nThe whole `data` value passed to `chrome.storage.sync.set(data)`. It is not a literal, not browser-derived, and not sanitized or schema-validated — the attacker supplies arbitra",
+              "dynamic_guidance": {
+                "triggerable": false,
+                "trigger_mechanism": "OTHER",
+                "injection_context": "",
+                "origin_requirement": "",
+                "trigger_surface": "",
+                "target_urls": [],
+                "payload_sketch": "",
+                "dom_forgery": "",
+                "beacon_pointable": false,
+                "beacon_param": "",
+                "observation": "",
+                "notes": ""
+              },
+              "path": "extensions/{2971e636-064f-4b47-9338-a9b64e6b037e}_0.9.5/static/static_report.json",
+              "report_mtime": "2026-08-14T03:44:09.661Z"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": null,
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "evidence": "deep-trace=source-contract={\"surface\": \"WINDOW_MESSAGE\", \"sourcePath\": \"content.js\", \"location\": \"L20:C38 -> L20:C56\", \"eventNames\": [], \"eventTarget\": \"window\", \"eventDetailKey\": \"data\", \"envelope\": {}, \"forwardField\": \"\", \"requirements\": {}, \"selectors\": [], \"mediaTags\": [], \"snippet\": \"(() => {\\n  // src/content/injection-bridge.js\\n  async function injectScript(scriptPath) {\\n    return new Promise((resolve, reject) => {\\n      const script = document.createElement(\\\"script\\\");\\n      script.src = chrome.runtime.getURL(scriptPath);\\n      script.onload = () => {\\n        script.remove();\\n        resolve();\\n      };\\n      script.onerror = () => {\\n        script.remove();\\n        reject(new Error(`Failed to load script: ${scriptPath}`));\\n      };\\n      (document.head || document.documentElement).appendChild(script);\\n    });\\n  }\\n  function setupMessageBridge() {\\n    window.addEventListe",
+              "path": "extensions/{2971e636-064f-4b47-9338-a9b64e6b037e}_0.9.5/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T10:25:31.274Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "evidence_summary": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "conflict_resolution": "Strict final decision table applied.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "static_supported",
+              "usable_for_label": true,
+              "path": "../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/firefox/extensions/{2971e636-064f-4b47-9338-a9b64e6b037e}_0.9.5/final-verified-v2/final_report.json",
+              "report_mtime": "2026-08-20T13:37:39.376Z"
+            },
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user-provided manual validation",
+              "validated_at_utc": "2026-09-22T15:32:00.942835Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user as a manual validation result. No screenshot or HAR bytes were supplied with this conversation."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_report",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-22T15:32:00.942835Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "0.9.5",
+        "latest_version": "0.9.5",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

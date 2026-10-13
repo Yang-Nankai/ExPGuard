@@ -1,0 +1,169 @@
+{
+  "extension_id": "cdcepkaoihgaaiidecpfkgpkigbibcee",
+  "extension_version": "1.1.28",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 2,
+  "verified_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Analysis\n\n### (a) Who controls the source?\nThe tainted span is `$(\"#languages\").val()` — the value of a `<select>` element on the extension's **options page** (`options.html`). The element is populated with a fixed, hardcoded list of `<option>` values (e.g. `af`, `sq`, …). This value is chosen by the **extension user** via the options UI, not by web content.\n\nThe report's frame label (`BG_1`, file `data/bg`) is a misattribution: the actual code lives in `data/libs/core.js:1` (`class Translation{ ... save(){ chrome.storage.local.set({tl:$(\"#languages\").val(), vm:$(\"#view-mode\").val()}) ... }`), and it is instantiated/called from `data/options.js` in response to the options page's `change` event:\n\n```js\ndocument.querySelector(\"#languages\").addEventListener(\"change\", function(){ this.translate.save() }.bind(this))\ndocument.querySelector(\"#view-mode\").addEventListener(\"change\", function(){ this.translate.save() }.bind(this))\n```\n\n`data/options.js` has no `onMessage`/`postMessage`/`connect` listener, no content-script bridge, and `externally_connectable` is absent (not externally connectable). There is no cross-boundary transport (`messagePassing: false`, `storagePassing",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "UNKNOWN",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "data/bg",
+          "reportedLoc": "L1:C570 -> L1:C647",
+          "resolvedFile": "data/bg.js",
+          "resolved": true,
+          "snippet": "L1 C570-647: …(\"x\"==e?t:3&t|8).toString(16)}))}}class t{constructor(){this.Utils=new e}save(){chrome.storage.local.set({tl:$(\"#languages\").val(),vm:$(\"#view-mode\").val()}),$(\"#notification\").attr(\"class\",\"notification is-warning\"),$(\"#message\").html(c…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "data/bg",
+          "reportedLoc": "L1:C570 -> L1:C647",
+          "resolvedFile": "data/bg.js",
+          "resolved": true,
+          "snippet": "L1 C570-647: …(\"x\"==e?t:3&t|8).toString(16)}))}}class t{constructor(){this.Utils=new e}save(){chrome.storage.local.set({tl:$(\"#languages\").val(),vm:$(\"#view-mode\").val()}),$(\"#notification\").attr(\"class\",\"notification is-warning\"),$(\"#message\").html(c…"
+        },
+        "sourceExpectedMarkers": [
+          "document",
+          "window",
+          "value",
+          "textContent",
+          "innerHTML"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "DUPLICATE",
+      "confidence": 0.6,
+      "reasoning": "Semantically identical to flow #0. Inherited analysis: Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Analysis\n\n### (a) Who controls the source?\nThe tainted span is `$(\"#languages...",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": 0,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "UNKNOWN",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "data/bg",
+          "reportedLoc": "L1:C570 -> L1:C647",
+          "resolvedFile": "data/bg.js",
+          "resolved": true,
+          "snippet": "L1 C570-647: …(\"x\"==e?t:3&t|8).toString(16)}))}}class t{constructor(){this.Utils=new e}save(){chrome.storage.local.set({tl:$(\"#languages\").val(),vm:$(\"#view-mode\").val()}),$(\"#notification\").attr(\"class\",\"notification is-warning\"),$(\"#message\").html(c…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "data/bg",
+          "reportedLoc": "L1:C570 -> L1:C647",
+          "resolvedFile": "data/bg.js",
+          "resolved": true,
+          "snippet": "L1 C570-647: …(\"x\"==e?t:3&t|8).toString(16)}))}}class t{constructor(){this.Utils=new e}save(){chrome.storage.local.set({tl:$(\"#languages\").val(),vm:$(\"#view-mode\").val()}),$(\"#notification\").attr(\"class\",\"notification is-warning\"),$(\"#message\").html(c…"
+        },
+        "sourceExpectedMarkers": [
+          "document",
+          "window",
+          "value",
+          "textContent",
+          "innerHTML"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Inherited from representative flow #0. Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 2 flow(s): 0 true-positive, 1 false-positive, 0 partial-available (PA), 0 uncertain, 1 duplicate; 0 flagged triggerable for dynamic testing."
+}

@@ -1,0 +1,362 @@
+{
+  "extension_id": "okkffdhbfplmbjblhgapnchjinanmnij",
+  "extension_version": "1.4.1",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 8,
+  "verified_count": 4,
+  "verdicts": [
+    {
+      "flow_index": 2,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Summary\n\n**Flow under verification:** `WINDOW_MESSAGE_EVENT` (page → content script) → `chrome.runtime.onMessage` (background) → `chrome.windows.update(t.winId, t.data)`.\n\n### (a) Who controls the source — confirmed attacker-controlled\n\n`content/ct.js` (document_start, all frames, `<all_urls>`) registers the page-message relay:\n\n```js\nconst t = \"recorder-screenshot-v3\";\nwindow.addEventListener(\"message\", e => {\n  let a = e.data;\n  a.p == t && \"tobg\" == a.cmd && chrome.runtime.sendMessage(a.data, t => {\n    a.cb && window.postMessage({cmd:\"ctcb\", cb:a.cb, data:t});\n  });\n});\n```\n\n- There is **no `event.source === window` check and no origin check** — a page's own `window.postMessage` trivially reaches the listener.\n- The `p`/`cmd` gates are attacker-supplied message *fields* (`a.p`, `a.cmd`), not an authentication boundary. The \"secret\" `recorder-screenshot-v3` is also directly leaked to the page via the injected `<script data-pname=\"recorder-screenshot-v3\" src=\".../content/sm.js\">` element (`a.dataset.pname = t`).\n- `chrome.runtime.sendMessage(a.data, ...)` forwards the **entire page-controlled object** `a.data` to the background service worker.\n\n### (b) Exact sourc",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content/content",
+          "reportedLoc": "L1:C107989 -> L1:C110208",
+          "resolvedFile": "content/content.js",
+          "resolved": true,
+          "snippet": "L1 C107989-110208: …){var n=s(I,F,\"area\");chrome.runtime.sendMessage({type:e,data:n,model:t})}),50)}chrome.runtime.onMessage.addListener((function(e,t,n){\"area_copy\"===e.type&&function(e,t){var n=e.getContext(\"2d\");switch(t.type){case\"all\":return function(e,t,n){return new Promise((function(r,o){e.height=n.pageHeight*devicePixelRatio,e.width=n.pageWidth*devicePixelRatio,e.style=\"height:\".concat(n.pageHeight,\"px; width:\").concat(n.pageWidth,\"px;\"),n.screen.forEach((function(o,i){!function(e,t){var n=new Image;n.onload=function(){e.drawImage(n,0,t.data.top*devicePixelRatio,n.width,n.height)},n.src=t.base64}(t,o),i>=n.screen.length-1&&r({height:e.height,width:e.width})}))}))}(e,n,t);case\"visible\":case\"upload\":return function(e,t,n){return new Promise((function(r,o){var i=new Image;i.onload=function(){e.height=i.height,e.width=i.width,e.style=\"height:\".concat(i.height/devicePixelRatio,\"px; width:\").concat(i.width/devicePixelRatio,\"px;\"),t.drawImage(i,0,0,i.width,i.height),r({height:e.height,width:e.width})},i.src=n.screen[0].base64}))}(e,n,t);case\"area\":return function(e,t,n){return new Promise((function(r,o){e.height=n.pageHeight*devicePixelRatio,e.width=n.pageWidth*devicePixelRatio,e.style=\"height:\".concat(n.pageHeight,\"px; width:\").concat(n.pageWidth,\"px;\"),n.screen.forEach((function(n,o){var i=new Image;i.onload=function(){t.drawImage(i,n.data.offsetLeft*devicePixelRatio,n.data.offsetTop*devicePixelRatio,n.data.width*devicePixelRatio,n.data.height*devicePixelRatio,0,n.data.top*devicePixelRatio,n.data.width*devicePixelRatio,n.data.height*devicePixelRatio),r({height:e.height,width:e.width})},i.src=n.base64}))}))}(e,n,t)}}(d[0],e.data).then((function(e){d[0].toBlob(function(){var e,t=(e=P().mark((function e(t){var n;return P().wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return n=[new ClipboardItem((r={},o=t.type,i=t,(o=l(o))in r?Object.defineProperty(r,o,{value:i,enumerable:!0,configurable:!0,writable:!0}):r[o]=i,r))],e.next=3,navigator.clipboard.write(n).then((function(){}),(function(){}));case 3:case\"end\":return e.stop()}var r,o,i}),e)})),function(){var t=this,n=arguments;return new Promise((function(r,o){var i=e.apply(t,n);function a(e){f(i,r,o,a,s,\"next\",e)}function s(e){f(i,r,o,a,s,\"throw\",e)}a(void 0)}))});return function(e){return t.apply(this,arguments)}}())}))})),O(document).on(\"keydown\",(function(e){27!==e.keyCode&&\"Escape\"!==e.key||G()}));…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background/background",
+          "reportedLoc": "L1:C3370 -> L1:C3407",
+          "resolvedFile": "background/background.js",
+          "resolved": true,
+          "snippet": "L1 C3370-3407: ….create(t.data,(e=>{i=e.tabs[0].id,c({winId:e.id,htab:i})}))})):\"update\"==t.fun?chrome.windows.update(t.winId,t.data):\"remove\"==t.fun&&chrome.windows.remove(t.winId);break;case\"tab\":if(\"create\"==t.…"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "<all_urls>"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content/content.js"
+            ],
+            "runAt": "document_end",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "NEEDS_SEMANTIC_CLASSIFICATION",
+          "rule": "Inspect the invoked API and the precise tainted argument before assigning a security label."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 3,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #3 (WINDOW_MESSAGE_EVENT → `chrome.declarativeNetRequest.updateDynamicRules`)\n\n### 1. Who controls the source — ATTACKER-CONTROLLED (real bridge, with a source-file misattribution)\nI located the actual page→extension bridge in `content/ct.js` (not `content/content.js` as the normalized flow claims):\n\n```js\nwindow.addEventListener(\"message\",(e=>{\n  let a=e.data;\n  a.p==t && \"tobg\"==a.cmd && chrome.runtime.sendMessage(a.data,(t=>{\n    a.cb && window.postMessage({cmd:\"ctcb\",cb:a.cb,data:t})\n  }))\n}));\n```\n\nwhere `t = \"recorder-screenshot-v3\"` (a public constant). A page can trivially satisfy the `p`/`cmd` field checks because they are attacker-supplied message fields, not browser-authenticated identity. So the page controls `a.data` that is forwarded to the background.\n\nThe normalized flow’s `source.file = content/content` and the harness’s `content/content.js` anchor are misattributed: `content/content.js` contains no `window.addEventListener(\"message\")`; the real page bridge is in `content/ct.js` (the `document_start`/`all_frames` content script). The cross-boundary channel correctly names `content/ct → background`.\n\n### 2. Data path — unbroken in code\n`page ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content/content",
+          "reportedLoc": "L1:C107989 -> L1:C110208",
+          "resolvedFile": "content/content.js",
+          "resolved": true,
+          "snippet": "L1 C107989-110208: …){var n=s(I,F,\"area\");chrome.runtime.sendMessage({type:e,data:n,model:t})}),50)}chrome.runtime.onMessage.addListener((function(e,t,n){\"area_copy\"===e.type&&function(e,t){var n=e.getContext(\"2d\");switch(t.type){case\"all\":return function(e,t,n){return new Promise((function(r,o){e.height=n.pageHeight*devicePixelRatio,e.width=n.pageWidth*devicePixelRatio,e.style=\"height:\".concat(n.pageHeight,\"px; width:\").concat(n.pageWidth,\"px;\"),n.screen.forEach((function(o,i){!function(e,t){var n=new Image;n.onload=function(){e.drawImage(n,0,t.data.top*devicePixelRatio,n.width,n.height)},n.src=t.base64}(t,o),i>=n.screen.length-1&&r({height:e.height,width:e.width})}))}))}(e,n,t);case\"visible\":case\"upload\":return function(e,t,n){return new Promise((function(r,o){var i=new Image;i.onload=function(){e.height=i.height,e.width=i.width,e.style=\"height:\".concat(i.height/devicePixelRatio,\"px; width:\").concat(i.width/devicePixelRatio,\"px;\"),t.drawImage(i,0,0,i.width,i.height),r({height:e.height,width:e.width})},i.src=n.screen[0].base64}))}(e,n,t);case\"area\":return function(e,t,n){return new Promise((function(r,o){e.height=n.pageHeight*devicePixelRatio,e.width=n.pageWidth*devicePixelRatio,e.style=\"height:\".concat(n.pageHeight,\"px; width:\").concat(n.pageWidth,\"px;\"),n.screen.forEach((function(n,o){var i=new Image;i.onload=function(){t.drawImage(i,n.data.offsetLeft*devicePixelRatio,n.data.offsetTop*devicePixelRatio,n.data.width*devicePixelRatio,n.data.height*devicePixelRatio,0,n.data.top*devicePixelRatio,n.data.width*devicePixelRatio,n.data.height*devicePixelRatio),r({height:e.height,width:e.width})},i.src=n.base64}))}))}(e,n,t)}}(d[0],e.data).then((function(e){d[0].toBlob(function(){var e,t=(e=P().mark((function e(t){var n;return P().wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return n=[new ClipboardItem((r={},o=t.type,i=t,(o=l(o))in r?Object.defineProperty(r,o,{value:i,enumerable:!0,configurable:!0,writable:!0}):r[o]=i,r))],e.next=3,navigator.clipboard.write(n).then((function(){}),(function(){}));case 3:case\"end\":return e.stop()}var r,o,i}),e)})),function(){var t=this,n=arguments;return new Promise((function(r,o){var i=e.apply(t,n);function a(e){f(i,r,o,a,s,\"next\",e)}function s(e){f(i,r,o,a,s,\"throw\",e)}a(void 0)}))});return function(e){return t.apply(this,arguments)}}())}))})),O(document).on(\"keydown\",(function(e){27!==e.keyCode&&\"Escape\"!==e.key||G()}));…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background/background",
+          "reportedLoc": "L1:C3696 -> L1:C3751",
+          "resolvedFile": "background/background.js",
+          "resolved": true,
+          "snippet": "L1 C3696-3751: …te(t.tabId,t.data):\"remove\"==t.fun&&chrome.tabs.remove(t.tabId);break;case\"udr\":chrome.declarativeNetRequest.updateDynamicRules(t.data);break;case\"usr\":chrome.declarativeNetRequest.updateSessionRules(t.data)}return!…"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "<all_urls>"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content/content.js"
+            ],
+            "runAt": "document_end",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 5,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #5 (WINDOW_MESSAGE_EVENT → chrome.tabs.create)\n\n### 1. Source control (who controls the data)\n\nThe normalized flow labels the source as `WINDOW_MESSAGE_EVENT` in a content script. The propagation HOP identifies the real sender as `content/ct` (`runtime.single.sender.message[content/ct->background/background]`).\n\nI extracted the actual listener in `content/ct.js`:\n\n```js\ndocument.addEventListener(\"DOMContentLoaded\",(()=>{\n  const t=\"recorder-screenshot-v3\";\n  window.addEventListener(\"message\",(e=>{\n    let a=e.data;\n    a.p==t && \"tobg\"==a.cmd && chrome.runtime.sendMessage(a.data,(t=>{...}))\n  }));\n  ...\n}));\n```\n\n- The listener is registered in a content script that the manifest injects into **every frame** with `matches: [\"<all_urls>\"]`, `allFrames: true`, at `document_start`.\n- The page fully controls `e.data`. The only gates are `a.p == \"recorder-screenshot-v3\"` and `a.cmd == \"tobg\"`. Both are attacker-chosen fields (`p` is a static, discoverable protocol tag embedded in the content script and in the injected page script `content/sm.js`; `cmd` is attacker-supplied). There is **no** `event.origin` check and no `source` check.\n- Whatever the page puts in `a",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content/content",
+          "reportedLoc": "L1:C107989 -> L1:C110208",
+          "resolvedFile": "content/content.js",
+          "resolved": true,
+          "snippet": "L1 C107989-110208: …){var n=s(I,F,\"area\");chrome.runtime.sendMessage({type:e,data:n,model:t})}),50)}chrome.runtime.onMessage.addListener((function(e,t,n){\"area_copy\"===e.type&&function(e,t){var n=e.getContext(\"2d\");switch(t.type){case\"all\":return function(e,t,n){return new Promise((function(r,o){e.height=n.pageHeight*devicePixelRatio,e.width=n.pageWidth*devicePixelRatio,e.style=\"height:\".concat(n.pageHeight,\"px; width:\").concat(n.pageWidth,\"px;\"),n.screen.forEach((function(o,i){!function(e,t){var n=new Image;n.onload=function(){e.drawImage(n,0,t.data.top*devicePixelRatio,n.width,n.height)},n.src=t.base64}(t,o),i>=n.screen.length-1&&r({height:e.height,width:e.width})}))}))}(e,n,t);case\"visible\":case\"upload\":return function(e,t,n){return new Promise((function(r,o){var i=new Image;i.onload=function(){e.height=i.height,e.width=i.width,e.style=\"height:\".concat(i.height/devicePixelRatio,\"px; width:\").concat(i.width/devicePixelRatio,\"px;\"),t.drawImage(i,0,0,i.width,i.height),r({height:e.height,width:e.width})},i.src=n.screen[0].base64}))}(e,n,t);case\"area\":return function(e,t,n){return new Promise((function(r,o){e.height=n.pageHeight*devicePixelRatio,e.width=n.pageWidth*devicePixelRatio,e.style=\"height:\".concat(n.pageHeight,\"px; width:\").concat(n.pageWidth,\"px;\"),n.screen.forEach((function(n,o){var i=new Image;i.onload=function(){t.drawImage(i,n.data.offsetLeft*devicePixelRatio,n.data.offsetTop*devicePixelRatio,n.data.width*devicePixelRatio,n.data.height*devicePixelRatio,0,n.data.top*devicePixelRatio,n.data.width*devicePixelRatio,n.data.height*devicePixelRatio),r({height:e.height,width:e.width})},i.src=n.base64}))}))}(e,n,t)}}(d[0],e.data).then((function(e){d[0].toBlob(function(){var e,t=(e=P().mark((function e(t){var n;return P().wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return n=[new ClipboardItem((r={},o=t.type,i=t,(o=l(o))in r?Object.defineProperty(r,o,{value:i,enumerable:!0,configurable:!0,writable:!0}):r[o]=i,r))],e.next=3,navigator.clipboard.write(n).then((function(){}),(function(){}));case 3:case\"end\":return e.stop()}var r,o,i}),e)})),function(){var t=this,n=arguments;return new Promise((function(r,o){var i=e.apply(t,n);function a(e){f(i,r,o,a,s,\"next\",e)}function s(e){f(i,r,o,a,s,\"throw\",e)}a(void 0)}))});return function(e){return t.apply(this,arguments)}}())}))})),O(document).on(\"keydown\",(function(e){27!==e.keyCode&&\"Escape\"!==e.key||G()}));…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background/background",
+          "reportedLoc": "L1:C3543 -> L1:C3579",
+          "resolvedFile": "background/background.js",
+          "resolved": true,
+          "snippet": "L1 C3543-3579: …ase\"tab\":if(\"create\"==t.fun){var u={...t.data};u.index||(u.index=r.tab.index+1),chrome.tabs.create(u,(e=>{c(e.id)}))}else\"update\"==t.fun?chrome.tabs.update(t.tabId,t.data):\"remove\"==t.fun&&chrome.…"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "<all_urls>"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content/content.js"
+            ],
+            "runAt": "document_end",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 6,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #6 — `WINDOW_MESSAGE_EVENT → chrome.downloads.download`\n\n### (a) Who controls the source?\nA webpage controls it. The actual page→extension bridge is in **`content/ct.js`** (the content script that runs at `document_start`, `all_frames: true`, on `<all_urls>`). It installs:\n\n```js\nwindow.addEventListener(\"message\", (e => {\n  let a = e.data;\n  a.p == t && \"tobg\" == a.cmd && chrome.runtime.sendMessage(a.data, ...)\n}));\n```\n\nwhere `t = \"recorder-screenshot-v3\"`. The guard is only `a.p == \"recorder-screenshot-v3\" && a.cmd == \"tobg\"`. Both are fixed strings the attacker can learn (the token is exposed through the page-world `sm.js` injection and the public CRX), and there is **no `e.origin`, `e.source`, or `sender.id` check**. Any page on `<all_urls>` can forge this message and forward an arbitrary `data` object to the background.\n\n*(Note: the normalized record labels the source file `content/content`, but the cross-boundary channel correctly identifies `content/ct`, and raw inspection of `ct.js` shows the real `window.addEventListener(\"message\")` bridge.)*\n\n### (b) Source-to-sink data path\n1. Page: `window.postMessage({p:\"recorder-screenshot-v3\", cmd:\"tobg\", data",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content/content",
+          "reportedLoc": "L1:C107989 -> L1:C110208",
+          "resolvedFile": "content/content.js",
+          "resolved": true,
+          "snippet": "L1 C107989-110208: …){var n=s(I,F,\"area\");chrome.runtime.sendMessage({type:e,data:n,model:t})}),50)}chrome.runtime.onMessage.addListener((function(e,t,n){\"area_copy\"===e.type&&function(e,t){var n=e.getContext(\"2d\");switch(t.type){case\"all\":return function(e,t,n){return new Promise((function(r,o){e.height=n.pageHeight*devicePixelRatio,e.width=n.pageWidth*devicePixelRatio,e.style=\"height:\".concat(n.pageHeight,\"px; width:\").concat(n.pageWidth,\"px;\"),n.screen.forEach((function(o,i){!function(e,t){var n=new Image;n.onload=function(){e.drawImage(n,0,t.data.top*devicePixelRatio,n.width,n.height)},n.src=t.base64}(t,o),i>=n.screen.length-1&&r({height:e.height,width:e.width})}))}))}(e,n,t);case\"visible\":case\"upload\":return function(e,t,n){return new Promise((function(r,o){var i=new Image;i.onload=function(){e.height=i.height,e.width=i.width,e.style=\"height:\".concat(i.height/devicePixelRatio,\"px; width:\").concat(i.width/devicePixelRatio,\"px;\"),t.drawImage(i,0,0,i.width,i.height),r({height:e.height,width:e.width})},i.src=n.screen[0].base64}))}(e,n,t);case\"area\":return function(e,t,n){return new Promise((function(r,o){e.height=n.pageHeight*devicePixelRatio,e.width=n.pageWidth*devicePixelRatio,e.style=\"height:\".concat(n.pageHeight,\"px; width:\").concat(n.pageWidth,\"px;\"),n.screen.forEach((function(n,o){var i=new Image;i.onload=function(){t.drawImage(i,n.data.offsetLeft*devicePixelRatio,n.data.offsetTop*devicePixelRatio,n.data.width*devicePixelRatio,n.data.height*devicePixelRatio,0,n.data.top*devicePixelRatio,n.data.width*devicePixelRatio,n.data.height*devicePixelRatio),r({height:e.height,width:e.width})},i.src=n.base64}))}))}(e,n,t)}}(d[0],e.data).then((function(e){d[0].toBlob(function(){var e,t=(e=P().mark((function e(t){var n;return P().wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return n=[new ClipboardItem((r={},o=t.type,i=t,(o=l(o))in r?Object.defineProperty(r,o,{value:i,enumerable:!0,configurable:!0,writable:!0}):r[o]=i,r))],e.next=3,navigator.clipboard.write(n).then((function(){}),(function(){}));case 3:case\"end\":return e.stop()}var r,o,i}),e)})),function(){var t=this,n=arguments;return new Promise((function(r,o){var i=e.apply(t,n);function a(e){f(i,r,o,a,s,\"next\",e)}function s(e){f(i,r,o,a,s,\"throw\",e)}a(void 0)}))});return function(e){return t.apply(this,arguments)}}())}))})),O(document).on(\"keydown\",(function(e){27!==e.keyCode&&\"Escape\"!==e.key||G()}));…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background/background",
+          "reportedLoc": "L3:C34682 -> L3:C34773",
+          "resolvedFile": "background/background.js",
+          "resolved": true,
+          "snippet": "L3 C34682-34773: …rome.tabs.sendMessage(r.tab.id,{type:\"area_copy\",data:p[h]})}))}function k(e,t){chrome.downloads.download({url:e,filename:\"Video Screen\".concat(Date.now(),\".\").concat(t)})}function O(e){y=e,\"cancel\"===e||\"stop\"===e?(\"cancel\"===e&&(S=0,chrome.runtime.s…"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "<all_urls>"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content/content.js"
+            ],
+            "runAt": "document_end",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 4 flow(s): 3 true-positive, 1 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

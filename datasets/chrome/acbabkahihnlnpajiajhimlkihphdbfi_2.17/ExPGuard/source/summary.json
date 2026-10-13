@@ -1,0 +1,844 @@
+{
+  "extensionId": "acbabkahihnlnpajiajhimlkihphdbfi",
+  "extensionVersion": "2.17",
+  "sourceType": "CRX",
+  "status": "success",
+  "duration": 2.763,
+  "files": [
+    {
+      "file": "DS_stor.js",
+      "frame": "UNKNOWN",
+      "frameTags": [
+        "UNKNOWN"
+      ],
+      "frameDetails": [
+        {
+          "id": "UNKNOWN",
+          "family": "UNKNOWN"
+        }
+      ],
+      "size": 0,
+      "durationMs": 0
+    },
+    {
+      "file": "accessblocker.js",
+      "frame": "UNKNOWN",
+      "frameTags": [
+        "UNKNOWN"
+      ],
+      "frameDetails": [
+        {
+          "id": "UNKNOWN",
+          "family": "UNKNOWN"
+        }
+      ],
+      "size": 0,
+      "durationMs": 0
+    },
+    {
+      "file": "background.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 0,
+      "durationMs": 1536.7715010000002
+    },
+    {
+      "file": "content.js",
+      "frame": "CS_1",
+      "frameTags": [
+        "CS_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ]
+          }
+        }
+      ],
+      "size": 0,
+      "durationMs": 492.12968999999975
+    },
+    {
+      "file": "developer.js",
+      "frame": "DEVTOOLS_1",
+      "frameTags": [
+        "DEVTOOLS_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "DEVTOOLS_1",
+          "family": "DT"
+        }
+      ],
+      "size": 0,
+      "durationMs": 3.5122550000000956
+    }
+  ],
+  "totalFiles": 5,
+  "totalSize": 0,
+  "cacheStats": {
+    "totalCalls": 0,
+    "hits": 0,
+    "misses": 0,
+    "evictions": 0,
+    "hitRate": 0,
+    "cacheSize": 0,
+    "maxEntries": 4096
+  },
+  "coverage": {
+    "totalNodes": 583,
+    "coveredNodes": 575,
+    "nodeCoverage": 0.9862778730703259,
+    "totalScopes": 83,
+    "coveredScopes": 83,
+    "scopeCoverage": 1,
+    "analyzedScripts": 3,
+    "scripts": [
+      {
+        "file": "background",
+        "frame": "BG_1",
+        "totalNodes": 381,
+        "coveredNodes": 373,
+        "nodeCoverage": 0.979002624671916,
+        "totalScopes": 58,
+        "coveredScopes": 58,
+        "scopeCoverage": 1
+      },
+      {
+        "file": "content",
+        "frame": "CS_1",
+        "totalNodes": 199,
+        "coveredNodes": 199,
+        "nodeCoverage": 1,
+        "totalScopes": 24,
+        "coveredScopes": 24,
+        "scopeCoverage": 1
+      },
+      {
+        "file": "developer",
+        "frame": "DEVTOOLS_1",
+        "totalNodes": 3,
+        "coveredNodes": 3,
+        "nodeCoverage": 1,
+        "totalScopes": 1,
+        "coveredScopes": 1,
+        "scopeCoverage": 1
+      }
+    ]
+  },
+  "hasFlows": true,
+  "flows": [
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "attacker-input-storage-write",
+      "ruleDescription": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "From storage.local.set('myPassword') in background",
+      "sourceProvenance": "UNTRUSTED_STORAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "content",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "http://*/*",
+          "https://*/*"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L31:C0 -> L62:C2",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "myKey",
+      "sinkFile": "content",
+      "sinkFrame": "CS_1",
+      "sinkFrameConstraint": {
+        "matches": [
+          "http://*/*",
+          "https://*/*"
+        ]
+      },
+      "sinkFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ]
+          }
+        }
+      ],
+      "sinkLoc": "L33:C2 -> L33:C46",
+      "ctx": "content",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[background->content]",
+      "messageSender": "background",
+      "messageSenderFrameFamily": "BG",
+      "messageSenderProvenance": "UNTRUSTED_STORAGE",
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": " receivng the msgs\r\n>>>chrome.runtime.onMessage.addListener(function (message, sender, reply) {\r\n  console.log(\"start\", message);\r\n  chrome.storage.local.set({ myKey: message });\r\n  storeMsg = message\r\n  if (message.data == 'start') {\r\n    readApijson = message.readData\r\n    allowedUrlsList = message.allowedUrl\r\n    Clientid = message.clientID\r\n    startkeyblocker();\r\n    blockRightAndSelection();\r\n    ClearLocalkeys();\r\n    isAllowed = true;\r\n    // return sendResponse(message);    \r\n    // return true;\r\n  } else if (message.data == \"stop\") {\r\n    isAllowed = false;\r\n    chrome.storage.local.clear();\r\n  } else if (message.data == 'refresh') {\r\n    document.querySelector('body').style.opacity = '1';\r\n  } else if (message.data == \"passwaord\") {\r\n    myData = message;\r\n  }\r\n  if (message.data === \"analysis background\") {\r\n    let obj = parse();\r\n    sendResponse(obj);\r\n    return true;\r\n  }\r\n  if(message.key === \"set-alert-extensions\"){\r\n    return message.data \r\n }\r\n  // return true;\r\n})<<<\r\n\r\n\r\nconst blockCon",
+      "sinkCode": "tart\", message);\r\n  >>>chrome.storage.local.set({ myKey: message })<<<;\r\n  storeMsg = mess"
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "attacker-input-storage-write",
+      "ruleDescription": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "chrome.runtime.onMessageExternal.addListener[message]",
+      "sourceProvenance": "EXTERNAL_MESSAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L293:C38 -> L293:C45",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "Sendmsgcontentscript",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L292:C18 -> L296:C14",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ndmsgcontentscript: >>>request<<<?.key || null,\r\n    ",
+      "sinkCode": "\r\n            await >>>chrome.storage.local.set({\r\n                Sendmsgcontentscript: request?.key || null,\r\n                ClearBlockingkey: request || null,\r\n                examTabId: examTabId || null\r\n            })<<<;\r\n\r\n            /* "
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "attacker-input-storage-write",
+      "ruleDescription": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "chrome.runtime.onMessageExternal.addListener[message]",
+      "sourceProvenance": "EXTERNAL_MESSAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L293:C38 -> L293:C45",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "ClearBlockingkey",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L292:C18 -> L296:C14",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ndmsgcontentscript: >>>request<<<?.key || null,\r\n    ",
+      "sinkCode": "\r\n            await >>>chrome.storage.local.set({\r\n                Sendmsgcontentscript: request?.key || null,\r\n                ClearBlockingkey: request || null,\r\n                examTabId: examTabId || null\r\n            })<<<;\r\n\r\n            /* "
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "attacker-input-storage-write",
+      "ruleDescription": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "chrome.runtime.onMessageExternal.addListener[message]",
+      "sourceProvenance": "EXTERNAL_MESSAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L293:C38 -> L293:C45",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "candidateData",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L451:C26 -> L454:C22",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ndmsgcontentscript: >>>request<<<?.key || null,\r\n    ",
+      "sinkCode": "              await >>>chrome.storage.local.set({\r\n                        candidateData: request.value,\r\n                        isRunningExam: true\r\n                    })<<<;\r\n\r\n               "
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "attacker-input-storage-write",
+      "ruleDescription": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "chrome.runtime.onMessageExternal.addListener[message]",
+      "sourceProvenance": "EXTERNAL_MESSAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L293:C38 -> L293:C45",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "clientId",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L462:C26 -> L465:C22",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ndmsgcontentscript: >>>request<<<?.key || null,\r\n    ",
+      "sinkCode": "              await >>>chrome.storage.local.set({\r\n                        clientId: request.clientId || null,\r\n                        examId: request.examIdToUnblock || null\r\n                    })<<<;\r\n                 "
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "attacker-input-storage-write",
+      "ruleDescription": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "chrome.runtime.onMessageExternal.addListener[message]",
+      "sourceProvenance": "EXTERNAL_MESSAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L293:C38 -> L293:C45",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "examId",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L462:C26 -> L465:C22",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ndmsgcontentscript: >>>request<<<?.key || null,\r\n    ",
+      "sinkCode": "              await >>>chrome.storage.local.set({\r\n                        clientId: request.clientId || null,\r\n                        examId: request.examIdToUnblock || null\r\n                    })<<<;\r\n                 "
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "attacker-input-storage-write",
+      "ruleDescription": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "chrome.runtime.onMessageExternal.addListener[message]",
+      "sourceProvenance": "EXTERNAL_MESSAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L293:C38 -> L293:C45",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "clientId",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L481:C26 -> L484:C22",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ndmsgcontentscript: >>>request<<<?.key || null,\r\n    ",
+      "sinkCode": "              await >>>chrome.storage.local.set({\r\n                        clientId: request.clientId || null,\r\n                        examId: request.examIdToUnblock || null\r\n                    })<<<;\r\n\r\n               "
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "attacker-input-storage-write",
+      "ruleDescription": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "chrome.runtime.onMessageExternal.addListener[message]",
+      "sourceProvenance": "EXTERNAL_MESSAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L293:C38 -> L293:C45",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "examId",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L481:C26 -> L484:C22",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ndmsgcontentscript: >>>request<<<?.key || null,\r\n    ",
+      "sinkCode": "              await >>>chrome.storage.local.set({\r\n                        clientId: request.clientId || null,\r\n                        examId: request.examIdToUnblock || null\r\n                    })<<<;\r\n\r\n               "
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "attacker-input-storage-write",
+      "ruleDescription": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "chrome.runtime.onMessageExternal.addListener[message]",
+      "sourceProvenance": "EXTERNAL_MESSAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L293:C38 -> L293:C45",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "myPassword",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L499:C26 -> L501:C22",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ndmsgcontentscript: >>>request<<<?.key || null,\r\n    ",
+      "sinkCode": "              await >>>chrome.storage.local.set({\r\n                        myPassword: request.value\r\n                    })<<<;\r\n\r\n               "
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "From storage.local.set('candidateData') in background",
+      "sourceProvenance": "UNTRUSTED_STORAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "content",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "http://*/*",
+          "https://*/*"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L293:C38 -> L293:C45",
+      "sinkType": "FETCH_BODY",
+      "sinkRemark": "https://3l7giimka4.execute-api.us-east-1.amazonaws.com/Prod/gesturelog",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L570:C31 -> L577:C10",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": true,
+      "area": "STORAGE_FLOW[area: local, key: candidateData, sender: background, receiver: background]",
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ndmsgcontentscript: >>>request<<<?.key || null,\r\n    ",
+      "sinkCode": "st response = await >>>fetch(url, {\r\n            method: \"POST\",\r\n            headers: {\r\n                \"Content-Type\": \"application/json\"\r\n            },\r\n            body: JSON.stringify(data),\r\n            signal: controller.signal\r\n        })<<<;\r\n\r\n        clearTi"
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "From storage.local.set('clientId') in background",
+      "sourceProvenance": "UNTRUSTED_STORAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "content",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "http://*/*",
+          "https://*/*"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L293:C38 -> L293:C45",
+      "sinkType": "FETCH_BODY",
+      "sinkRemark": "https://examroomapi.com/api/Allowedextensions/Extension",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L1164:C31 -> L1173:C10",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": true,
+      "area": "STORAGE_FLOW[area: local, key: clientId, sender: background, receiver: background]",
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ndmsgcontentscript: >>>request<<<?.key || null,\r\n    ",
+      "sinkCode": "st response = await >>>fetch('https://examroomapi.com/api/Allowedextensions/Extension', {\r\n            method: 'POST',\r\n            headers: {\r\n                'Content-Type': 'application/json'\r\n            },\r\n            body: JSON.stringify({\r\n                clientId: clientId || \"\",\r\n                examId: examId || \"\"\r\n            })\r\n        })<<<;\r\n        \r\n       "
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "From storage.local.set('clientId') in background",
+      "sourceProvenance": "UNTRUSTED_STORAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "content",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "http://*/*",
+          "https://*/*"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L293:C38 -> L293:C45",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "[Unknown URL]",
+      "sinkUrlTaintControl": "PARTIAL",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L75:C31 -> L77:C9",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": true,
+      "area": "STORAGE_FLOW[area: local, key: clientId, sender: background, receiver: background]",
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "ndmsgcontentscript: >>>request<<<?.key || null,\r\n    ",
+      "sinkCode": "st response = await >>>fetch(\r\n            `https://examroomapi.com/api/Extension/GetData?clientId=${clientId}`\r\n        )<<<;\r\n\r\n        const d"
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "From storage.local.set('clientId') in background",
+      "sourceProvenance": "UNTRUSTED_STORAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "content",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "http://*/*",
+          "https://*/*"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L31:C0 -> L62:C2",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "[Unknown URL]",
+      "sinkUrlTaintControl": "PARTIAL",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L831:C39 -> L833:C17",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": true,
+      "area": "STORAGE_FLOW[area: local, key: clientId, sender: background, receiver: background]",
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "pigetData();\r\n      >>>      return;\r\n        }\r\n        console.log(\"GetDataFromJSON\");\r\n        const allowedUrlsList = data.key || [\"examroom.ai\", \"chrome://\", \"edge://\"];\r\n        const passwordAllow = data.passallow || [];\r\n        const cookiesList = data.clearcookie || [];\r\n        console.log(\"allowedUrlsList\", allowedUrlsList);\r\n        const { clientId } = await chrome.storage.local.get(\"clientId\");\r\n\r\n        const clientIdlist = allowedUrlsList.map(val => val.clientId);\r\n        console.log(\"clientIdlist\", clientIdlist);\r\n        const clientPasswaordAllow =\r\n            passwordAllow.find(ele => ele.clientId == clientId) || null;\r\n\r\n        let domainListForCookies =\r\n            cookiesList.find(ele => ele.clientId == clientId)?.urls || [];\r\n\r\n        await chrome.storage.local.set({\r\n            allowedUrlsList,\r\n            passwordAllow,\r\n            cookiesList,\r\n            clientIdlist,\r\n            clientPasswaordAllow,\r\n            domainListForCookies\r\n        });<<<\r\n        const { op",
+      "sinkCode": "st response = await >>>fetch(\r\n                    `https://examroomapi.com/api/Extension/GetData?clientId=${clientId}`\r\n                )<<<;\r\n\r\n               "
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "attacker-input-storage-write",
+      "ruleDescription": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+      "sourceRemark": "From storage.local.set('clientId') in background",
+      "sourceProvenance": "UNTRUSTED_STORAGE",
+      "sourceOriginContext": "background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "content",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "http://*/*",
+          "https://*/*"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L31:C0 -> L62:C2",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "allowedUrlsList",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L864:C18 -> L871:C14",
+      "ctx": "background",
+      "messagePassing": false,
+      "storagePassing": true,
+      "area": "STORAGE_FLOW[area: local, key: clientId, sender: background, receiver: background]",
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://examroom.ai/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "pigetData();\r\n      >>>      return;\r\n        }\r\n        console.log(\"GetDataFromJSON\");\r\n        const allowedUrlsList = data.key || [\"examroom.ai\", \"chrome://\", \"edge://\"];\r\n        const passwordAllow = data.passallow || [];\r\n        const cookiesList = data.clearcookie || [];\r\n        console.log(\"allowedUrlsList\", allowedUrlsList);\r\n        const { clientId } = await chrome.storage.local.get(\"clientId\");\r\n\r\n        const clientIdlist = allowedUrlsList.map(val => val.clientId);\r\n        console.log(\"clientIdlist\", clientIdlist);\r\n        const clientPasswaordAllow =\r\n            passwordAllow.find(ele => ele.clientId == clientId) || null;\r\n\r\n        let domainListForCookies =\r\n            cookiesList.find(ele => ele.clientId == clientId)?.urls || [];\r\n\r\n        await chrome.storage.local.set({\r\n            allowedUrlsList,\r\n            passwordAllow,\r\n            cookiesList,\r\n            clientIdlist,\r\n            clientPasswaordAllow,\r\n            domainListForCookies\r\n        });<<<\r\n        const { op",
+      "sinkCode": "\r\n            await >>>chrome.storage.local.set({\r\n                allowedUrlsList,\r\n                clientIdlist,\r\n                passwordAllow,\r\n                clientPasswaordAllow,\r\n                cookiesList,\r\n                domainListForCookies\r\n            })<<<;\r\n\r\n            /* "
+    }
+  ],
+  "privilegeSuppressedCount": 0,
+  "privilegeSuppressed": []
+}

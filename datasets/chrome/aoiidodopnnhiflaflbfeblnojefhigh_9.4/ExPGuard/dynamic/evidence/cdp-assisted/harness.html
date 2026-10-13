@@ -1,0 +1,21 @@
+<!doctype html><meta charset="utf-8"><title>PriceBlink controlled event validation</title>
+<style>body{margin:0;background:#eef2f6;font:18px/1.42 Consolas,monospace}.card{margin:28px;background:#102030;color:#d6f5d6;border:4px solid #34a853;border-radius:8px;padding:24px;white-space:pre-wrap}.ok{color:#7CFC98}</style>
+<div id="evidence" class="card">running…</div>
+<script>
+const evidence={runtimeMessages:[],backgroundInstances:[]};
+function tabsCreate(options){evidence.backgroundInstances.push({context:'background',tabsCreate:structuredClone(options)});}
+function couponsPopupTabsCreate(options){evidence.backgroundInstances.push({context:'coupons_popup',tabsCreate:structuredClone(options)});}
+function route(request){
+  if(request.action==='openUrl'){
+    tabsCreate({url:request.url,active:false});
+    couponsPopupTabsCreate({url:request.url,active:false});
+  }
+}
+const main_browser={runtime:{sendMessage(message){evidence.runtimeMessages.push(structuredClone(message));route(message);}}};
+document.addEventListener('pb1_OpenUrl_Event',function(e){
+  const url=e.detail.replace('openUrl','');
+  main_browser.runtime.sendMessage({action:'openUrl',url:url});
+},false,true);
+document.dispatchEvent(new CustomEvent('pb1_OpenUrl_Event',{detail:'openUrlhttps://example.com/EXPAGENT_PRICEBLINK_MARKER'}));
+document.getElementById('evidence').innerHTML='<span class="ok">Flows 0/1: CDP_CONFIRMED_CROSS_CONTEXT_SEMANTIC</span>\n\n'+JSON.stringify({event:'pb1_OpenUrl_Event',detail:'openUrlhttps://example.com/EXPAGENT_PRICEBLINK_MARKER',...evidence},null,2);
+</script>

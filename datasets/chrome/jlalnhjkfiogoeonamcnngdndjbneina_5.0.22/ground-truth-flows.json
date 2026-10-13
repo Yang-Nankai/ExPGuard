@@ -1,0 +1,411 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "jlalnhjkfiogoeonamcnngdndjbneina",
+  "version": "5.0.22",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-7459c746ddac57ba",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:jlalnhjkfiogoeonamcnngdndjbneina:5.0.22:2092d11f154fd6df:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:jlalnhjkfiogoeonamcnngdndjbneina:5.0.22:2092d11f154fd6df:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "2092d11f154fd6df70edf55fdf1f8b479bfa323ff233aac4303f7492f73d0ed2",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "From storage.local.set('teamAccessToken') in scripts/background",
+              "file": "scripts/background",
+              "loc": "L1:C59071 -> L1:C59072",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "UNTRUSTED_STORAGE",
+              "origin_context": "scripts/background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "unknown",
+              "file": "scripts/chatgptContent",
+              "loc": "L1:C286807 -> L1:C286840",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://chatgpt.com/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": true,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "flow_index": 0,
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "User manually confirmed the allowed-origin TEAM_SESSION message writes team credentials into chrome.storage.local."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": null,
+            "dynamic_detail": {
+              "outcome": "PARTIAL",
+              "final_verdict": "FALSE_POSITIVE",
+              "recorded_label": null,
+              "confidence": 0.72,
+              "reproduced": false,
+              "basis": "non_decisive",
+              "usable_for_label": false,
+              "evidence_stage": "SINK_REACHED",
+              "evidence_artifact_count": 3,
+              "reasoning": "The controlled companion reached the external listener and received its response, proving the fixed-ID IPC route is reachable only after the recorded disposable allowlist fixture. The response did not carry the bounded marker in the security-relevant sink argument, so this remains a partial trusted-IPC result rather than CONFIRMED.",
+              "notes": "semanticFixture=true originalSenderIdentityNotClaimed=true trustedCompanionRouteReached=true markerAbsentAtSink=true",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\jlalnhjkfiogoeonamcnngdndjbneina_5.0.22\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-22T16:37:59.090Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\jlalnhjkfiogoeonamcnngdndjbneina_5.0.22\\dynamic\\evidence\\flow-0",
+              "files": [
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "step-final-state-fixture.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 02178702588480140d92d5266a85c14e28416df297f1b20148459', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/jlalnhjkfiogoeonamcnngdndjbneina_5.0.22/final/final_report.json",
+              "report_mtime": "2026-08-18T04:04:43.694Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-22T16:37:59.090Z",
+                "notes": "User manually confirmed the allowed-origin TEAM_SESSION message writes team credentials into chrome.storage.local.",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\jlalnhjkfiogoeonamcnngdndjbneina_5.0.22\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\jlalnhjkfiogoeonamcnngdndjbneina_5.0.22\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T16:37:59.090Z",
+                  "sha256": "7e331290312f77c0af0c7f4dd76056722c2f7551279a0c82132a028bdf7bd628"
+                }
+              }
+            ],
+            "notes": [
+              "Flow is absent from dynamic_report.json: no ExPAgent dynamic record for this flow.",
+              "Latest manual attestation overrides the aggregate label while preserving the automated outcome for audit."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "5.0.22",
+        "latest_version": "5.0.52",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\jlalnhjkfiogoeonamcnngdndjbneina_5.0.52\\jlalnhjkfiogoeonamcnngdndjbneina.5.0.52.crx",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:chrome:jlalnhjkfiogoeonamcnngdndjbneina:5.0.22:2092d11f154fd6df:01",
+            "original_source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "chrome__jlalnhjkfiogoeonamcnngdndjbneina__5.0.52__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\jlalnhjkfiogoeonamcnngdndjbneina_5.0.52\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\jlalnhjkfiogoeonamcnngdndjbneina_5.0.52\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 256.953,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 8,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 5,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "From storage.local.set('teamAccessToken') in scripts/background",
+                  "file": "scripts/chatgptContent",
+                  "loc": "L1:C72386 -> L1:C72387",
+                  "code": "…0.2852L5.28989 10ZM5.84138 8.66982L6.7206 9.14625C6.93146 8.75712 6.86145 8.27567 6.54849 7.96272L5.84138 8.66982ZM4.928»9«4 7.75738L4.22183 8.46449H4.22183L4.92894 7.75738ZM4.92894 6.34317L5.63605 7.05027H5.63605L4.92894 6.34317ZM6.34315 4.92…"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "unknown",
+                  "file": "scripts/chatgptContent",
+                  "loc": "L1:C882284 -> L1:C882317",
+                  "code": "…tion b(){const t=await m();return(await chrome.storage.local.get(t))[t]||[]}async function y(t){const e=await m();await »chrome.storage.local.set({[e]:t})«}async function v(){if(await h())try{const t=await(0,s.KL)(!0);if(t){const t=await(0,s.t2)(),e=[];for(const n of t){cons…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 5,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "From storage.local.set('teamAccessToken') in scripts/background",
+                  "file": "scripts/chatgptContent",
+                  "loc": "L1:C72386 -> L1:C72387",
+                  "code": "…0.2852L5.28989 10ZM5.84138 8.66982L6.7206 9.14625C6.93146 8.75712 6.86145 8.27567 6.54849 7.96272L5.84138 8.66982ZM4.928»9«4 7.75738L4.22183 8.46449H4.22183L4.92894 7.75738ZM4.92894 6.34317L5.63605 7.05027H5.63605L4.92894 6.34317ZM6.34315 4.92…"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "unknown",
+                  "file": "scripts/chatgptContent",
+                  "loc": "L1:C1463516 -> L1:C1463543",
+                  "code": "…Date.now(),data:a},[i.SM]:t};for(const t of n)t in s?l[t]=s[t]:t===i.Gn?l[t]=[]:t===i.WU?l[t]={}:l[t]=null;return await »chrome.storage.local.set(l)«,await chrome.storage.local.remove(r),\"switched\"}catch{return\"failed\"}})}},9453(t,e,n){\"use strict\";function i(t){return…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 5,
+                "sink_index": 3,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "From storage.local.set('teamAccessToken') in scripts/background",
+                  "file": "scripts/chatgptContent",
+                  "loc": "L1:C72386 -> L1:C72387",
+                  "code": "…0.2852L5.28989 10ZM5.84138 8.66982L6.7206 9.14625C6.93146 8.75712 6.86145 8.27567 6.54849 7.96272L5.84138 8.66982ZM4.928»9«4 7.75738L4.22183 8.46449H4.22183L4.92894 7.75738ZM4.92894 6.34317L5.63605 7.05027H5.63605L4.92894 6.34317ZM6.34315 4.92…"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "unknown",
+                  "file": "scripts/chatgptContent",
+                  "loc": "L1:C1580445 -> L1:C1580504",
+                  "code": "…nc function h(t,e){if(e.length)try{const n=f(t),i=await chrome.storage.local.get(n),a=Array.isArray(i[n])?i[n]:[];await »chrome.storage.local.set({[n]:a.filter(t=>!e.includes(t))})«}catch{}}function m(t){try{chrome.storage.onChanged.addListener((e,n)=>{if(\"local\"===n)try{o in e&&t(\"prompts\"),s in e&&…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 6,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "From storage.local.set('teamRefreshToken') in scripts/background",
+                  "file": "scripts/chatgptContent",
+                  "loc": "L1:C72386 -> L1:C72387",
+                  "code": "…0.2852L5.28989 10ZM5.84138 8.66982L6.7206 9.14625C6.93146 8.75712 6.86145 8.27567 6.54849 7.96272L5.84138 8.66982ZM4.928»9«4 7.75738L4.22183 8.46449H4.22183L4.92894 7.75738ZM4.92894 6.34317L5.63605 7.05027H5.63605L4.92894 6.34317ZM6.34315 4.92…"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "unknown",
+                  "file": "scripts/chatgptContent",
+                  "loc": "L1:C882284 -> L1:C882317",
+                  "code": "…tion b(){const t=await m();return(await chrome.storage.local.get(t))[t]||[]}async function y(t){const e=await m();await »chrome.storage.local.set({[e]:t})«}async function v(){if(await h())try{const t=await(0,s.KL)(!0);if(t){const t=await(0,s.t2)(),e=[];for(const n of t){cons…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 6,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "From storage.local.set('teamRefreshToken') in scripts/background",
+                  "file": "scripts/chatgptContent",
+                  "loc": "L1:C72386 -> L1:C72387",
+                  "code": "…0.2852L5.28989 10ZM5.84138 8.66982L6.7206 9.14625C6.93146 8.75712 6.86145 8.27567 6.54849 7.96272L5.84138 8.66982ZM4.928»9«4 7.75738L4.22183 8.46449H4.22183L4.92894 7.75738ZM4.92894 6.34317L5.63605 7.05027H5.63605L4.92894 6.34317ZM6.34315 4.92…"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "unknown",
+                  "file": "scripts/chatgptContent",
+                  "loc": "L1:C1463516 -> L1:C1463543",
+                  "code": "…Date.now(),data:a},[i.SM]:t};for(const t of n)t in s?l[t]=s[t]:t===i.Gn?l[t]=[]:t===i.WU?l[t]={}:l[t]=null;return await »chrome.storage.local.set(l)«,await chrome.storage.local.remove(r),\"switched\"}catch{return\"failed\"}})}},9453(t,e,n){\"use strict\";function i(t){return…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 6,
+                "sink_index": 3,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "From storage.local.set('teamRefreshToken') in scripts/background",
+                  "file": "scripts/chatgptContent",
+                  "loc": "L1:C72386 -> L1:C72387",
+                  "code": "…0.2852L5.28989 10ZM5.84138 8.66982L6.7206 9.14625C6.93146 8.75712 6.86145 8.27567 6.54849 7.96272L5.84138 8.66982ZM4.928»9«4 7.75738L4.22183 8.46449H4.22183L4.92894 7.75738ZM4.92894 6.34317L5.63605 7.05027H5.63605L4.92894 6.34317ZM6.34315 4.92…"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "unknown",
+                  "file": "scripts/chatgptContent",
+                  "loc": "L1:C1580445 -> L1:C1580504",
+                  "code": "…nc function h(t,e){if(e.length)try{const n=f(t),i=await chrome.storage.local.get(n),a=Array.isArray(i[n])?i[n]:[];await »chrome.storage.local.set({[n]:a.filter(t=>!e.includes(t))})«}catch{}}function m(t){try{chrome.storage.onChanged.addListener((e,n)=>{if(\"local\"===n)try{o in e&&t(\"prompts\"),s in e&&…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 8,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+                  "file": "scripts/background",
+                  "loc": "L1:C72386 -> L1:C72387",
+                  "code": "….origin&&Xn.has(e.origin)?\"TEAM_SESSION\"===t?.type&&\"string\"==typeof t.accessToken&&\"string\"==typeof t.refreshToken?(Ce(»t«.accessToken,t.refreshToken).then(()=>n({ok:!0})).catch(()=>n({ok:!1})),!0):\"TEAM_SIGNOUT\"===t?.type?(async function(){a…"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "teamAccessToken",
+                  "file": "scripts/background",
+                  "loc": "L1:C41659 -> L1:C41708",
+                  "code": "…trim().toLowerCase():null,ye=\"teamAccessToken\",we=\"teamRefreshToken\",Re=\"teamMemberMarker\";async function Ce(t,e){await »chrome.storage.local.set({[ye]:t,[we]:e,[Re]:!0})«}function Ie(t,e=120){if(!t)return!1;try{const n=t.split(\".\")[1];if(!n)return!1;const r=n.replace(/-/g,\"+\").replace(/_/g…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 8,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+                  "file": "scripts/background",
+                  "loc": "L1:C72386 -> L1:C72387",
+                  "code": "….origin&&Xn.has(e.origin)?\"TEAM_SESSION\"===t?.type&&\"string\"==typeof t.accessToken&&\"string\"==typeof t.refreshToken?(Ce(»t«.accessToken,t.refreshToken).then(()=>n({ok:!0})).catch(()=>n({ok:!1})),!0):\"TEAM_SIGNOUT\"===t?.type?(async function(){a…"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "teamRefreshToken",
+                  "file": "scripts/background",
+                  "loc": "L1:C41659 -> L1:C41708",
+                  "code": "…trim().toLowerCase():null,ye=\"teamAccessToken\",we=\"teamRefreshToken\",Re=\"teamMemberMarker\";async function Ce(t,e){await »chrome.storage.local.set({[ye]:t,[we]:e,[Re]:!0})«}function Ie(t,e=120){if(!t)return!1;try{const n=t.split(\".\")[1];if(!n)return!1;const r=n.replace(/-/g,\"+\").replace(/_/g…"
+                },
+                "propagation_step_count": 1
+              }
+            ],
+            "tool_report_flow_count": 10,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_ambiguous_candidates",
+            "basis": "Same API categories occur in multiple paths or source context similarity is insufficient for a unique identity decision.",
+            "candidate_count": 8,
+            "top_candidate": {
+              "tool_flow_index": 5,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 0.359,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 0.344,
+              "actual_sink_context_similarity": 0.265,
+              "source_remark_match": true,
+              "specific_sink_remark_match": false,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.552,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:chrome:jlalnhjkfiogoeonamcnngdndjbneina:5.0.22:2092d11f154fd6df:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

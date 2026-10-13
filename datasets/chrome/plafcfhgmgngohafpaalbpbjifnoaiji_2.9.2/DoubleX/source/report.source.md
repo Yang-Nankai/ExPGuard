@@ -1,0 +1,18 @@
+# DoubleX / ExPGuard aligned flow report
+
+- Extension: `plafcfhgmgngohafpaalbpbjifnoaiji.2.9.2`
+- Status: `partial`
+- Duration: `1653.177ms`
+- Flows: `3`
+
+## Flow 1 — PRIVILEGE_ESCALATION
+
+`WINDOW_MESSAGE_EVENT` (L1316) → `CHROME_NOTIFICATIONS_CLEAR_ID` (L1079)
+
+## Flow 2 — PRIVILEGE_ESCALATION
+
+`WINDOW_MESSAGE_EVENT` (L1316) → `CHROME_NOTIFICATIONS_CREATE_OPTIONS` (L1082)
+
+## Flow 3 — PRIVILEGE_ESCALATION
+
+`WINDOW_MESSAGE_EVENT` (L1316) → `CHROME_TABS_CREATE_OPTIONS` (L467)

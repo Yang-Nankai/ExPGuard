@@ -1,0 +1,88 @@
+{
+  "extension_id": "jkmpbdjckkgdaopigpfkahgomgcojlpg",
+  "extension_version": "2.3.3",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I inspected the raw `background.js` around the external-message `getItem` handler that contains both the reported source and sink.\n\n## Decision ledger\n\n**(a) Source control / reachability**\nThe source is `chrome.storage.sync.get(key, cb)` inside:\n\n```js\nchrome.runtime.onMessageExternal.addListener((e, r, t) => {\n  if (r.url && r.url.includes(\"appbox.space\"))\n    if (\"supabase-auth-adapter\" === e.source)\n      switch (e.action) {\n        case \"getItem\":\n          const { key: r } = e.data;\n          return chrome.storage.sync.get(r, (e => {\n            ...\n```\n\nThis is reachable from `https://appbox.space/*` (manifest `externally_connectable.matches`), and the guard is a substring `r.url.includes(\"appbox.space\")` check, not a fixed `sender.id` allowlist. So the source is real and external-origin reachable.\n\n**(b) Source-to-sink path**\nThe exact sink shown in the flow is the **error branch** of the storage callback:\n\n```js\nif (chrome.runtime.lastError) {\n  const e = chrome.runtime.lastError.message;\n  console.error(\"Storage error:\", e), t({ status: \"error\", message: e });\n} else {\n  t({ status: \"success\", value: e[r] || null });\n}\n```\n\nThe storage-result callback parameter `e` is **s",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": null,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "Sensitive extension data is returned to a web-accessible channel.",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L315",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L322",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://appbox.space/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "NEEDS_SEMANTIC_CLASSIFICATION",
+          "rule": "Inspect the invoked API and the precise tainted argument before assigning a security label."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 0 true-positive, 1 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

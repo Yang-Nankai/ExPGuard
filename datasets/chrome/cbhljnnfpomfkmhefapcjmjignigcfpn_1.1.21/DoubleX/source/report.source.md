@@ -1,0 +1,22 @@
+# DoubleX / ExPGuard aligned flow report
+
+- Extension: `cbhljnnfpomfkmhefapcjmjignigcfpn.1.1.21`
+- Status: `success`
+- Duration: `4945.065ms`
+- Flows: `4`
+
+## Flow 1 — PRIVILEGE_ESCALATION
+
+`WINDOW_MESSAGE_EVENT` (L244) → `CHROME_TABS_EXECUTE` (L258)
+
+## Flow 2 — PRIVILEGE_ESCALATION
+
+`WINDOW_MESSAGE_EVENT` (L244) → `CHROME_TABS_EXECUTE` (L267)
+
+## Flow 3 — PRIVILEGE_ESCALATION
+
+`WINDOW_MESSAGE_EVENT` (L244) → `CHROME_TABS_EXECUTE` (L278)
+
+## Flow 4 — PRIVILEGE_ESCALATION
+
+`WINDOW_MESSAGE_EVENT` (L244) → `CHROME_DOWNLOADS_OPTIONS` (L391)

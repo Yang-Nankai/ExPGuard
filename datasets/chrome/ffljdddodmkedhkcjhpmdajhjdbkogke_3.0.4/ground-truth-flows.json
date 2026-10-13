@@ -1,0 +1,167 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "ffljdddodmkedhkcjhpmdajhjdbkogke",
+  "version": "3.0.4",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-d3222b8f3ebb4a55",
+      "verification": "TP",
+      "source_family": "storage",
+      "sink_family": "WINDOW_POSTMESSAGE",
+      "matched_tools": [
+        "DoubleX"
+      ],
+      "match_region": "DoubleX only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:ffljdddodmkedhkcjhpmdajhjdbkogke:3.0.4:5ce99e086b51771e:01",
+          "flow": {
+            "flow_id": "doublex:chrome:ffljdddodmkedhkcjhpmdajhjdbkogke:3.0.4:5ce99e086b51771e:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "5ce99e086b51771e996493e0a0f8ff66d1219cfc32258d3116d930b20540971e",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "DATA_LEAK",
+            "rule_id": "doublex-sensitive-api-egress",
+            "severity": "HIGH",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "chrome.storage.sync.get",
+              "file": "content_scripts.js",
+              "loc": "L14",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "http://*/*",
+                      "https://*/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "{\n\t\t\t\taction: 'SET_INITIAL_SETTINGS',\n\t\t\t\tsettings: settings\n\t\t\t}",
+              "file": "content_scripts.js",
+              "loc": "L18",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "Sensitive extension data is returned to a web-accessible channel."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_chrome_r3_user_manual",
+                  "source": "Manual",
+                  "kind": "doublex_chrome_r3_user_manual",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证为 TP：扩展状态可经页面消息桥暴露。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\ffljdddodmkedhkcjhpmdajhjdbkogke_3.0.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "report_sha256": "30825597da88815c5630f4f5b0249630e54485846c067a37aef947e5ad947507"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #0 — DATA_LEAK (chrome.storage.sync → window.postMessage)\n\n### Four-part decision ledger\n\n**(a) Who controls the source?**\nThe source is `chrome.storage.sync.get(['settings'], ...)` at `content.js:14`. This is extension-private storage (not writable by the page). The value is extension configuration: `consoleLog`, `jsonDefaultViewMode`, `gtm_injector`, `gtm_injector_datalayer`, `gtm_injector_container` (per `js/popup.js:235-242`). This is genuine sensitive-data/extension-state material, though not high-value secrets — it is still data the page cannot obtain directly via the `chrome.*` API.\n\n**(b) The source-to-sink path.**\nConfirmed directly in source:\n- `content.js:9-23` — `injectScript()` injects the web-accessible `js/datalayer-checker.js` into the page and, in the injected `<script>`'s `onload`, calls `chrome.storage.sync.get(['settings'], ...)`.\n- `content.js:15-19` — the result `result.settings` is placed into `settings` and then broadcast:\n  ```js\n  window.postMessage({\n      action: 'SET_INITIAL_SETTINGS',\n      settings: settings\n  }, '*');\n  ```\nThe target origin is the wildcard `'*'`, and there is **no guard, sanitizer, or allow-list** between the",
+              "path": "extensions/ffljdddodmkedhkcjhpmdajhjdbkogke_3.0.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/ffljdddodmkedhkcjhpmdajhjdbkogke_3.0.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T16:34:40.260705Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "doublex_chrome_r3_user_manual",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-24T02:22:09.900918Z",
+                "notes": "人工验证为 TP：扩展状态可经页面消息桥暴露。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\ffljdddodmkedhkcjhpmdajhjdbkogke_3.0.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\ffljdddodmkedhkcjhpmdajhjdbkogke_3.0.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-24T02:22:09.900918Z",
+                  "sha256": "30825597da88815c5630f4f5b0249630e54485846c067a37aef947e5ad947507"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "DoubleX Chrome r3 manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "3.0.4",
+        "latest_version": "3.0.4",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

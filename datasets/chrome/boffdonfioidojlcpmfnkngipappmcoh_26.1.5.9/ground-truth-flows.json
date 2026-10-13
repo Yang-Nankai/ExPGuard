@@ -1,0 +1,476 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "boffdonfioidojlcpmfnkngipappmcoh",
+  "version": "26.1.5.9",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-810ea83d31dcceab",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_ALARMS_CLEAR_NAME",
+      "matched_tools": [
+        "DoubleX"
+      ],
+      "match_region": "DoubleX only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:boffdonfioidojlcpmfnkngipappmcoh:26.1.5.9:5c5b01a053babb2c:01",
+          "flow": {
+            "flow_id": "doublex:chrome:boffdonfioidojlcpmfnkngipappmcoh:26.1.5.9:5c5b01a053babb2c:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "5c5b01a053babb2c35011d4ae8eb1636e3a0ba6af73d80a0d8855fe28c9c63fc",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L15",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_ALARMS_CLEAR_NAME",
+              "remark": "chrome.alarms.clear",
+              "file": "background.js",
+              "loc": "L63",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content_scripts.js",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_chrome_r3_user_manual",
+                  "source": "Manual",
+                  "kind": "doublex_chrome_r3_user_manual",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证均为 TP：页面消息可控制浏览器通知和 alarm 特权操作。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\boffdonfioidojlcpmfnkngipappmcoh_26.1.5.9\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                  "report_sha256": "d71e8792fece996706e90b462be1d4cd0d2241fae0d8317846d6f4d9b765531c"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow 1: `WINDOW_MESSAGE_EVENT → chrome.alarms.clear(name)`\n\n### 1. Source control\nThe actual content script is `contentscript.js` (manifest maps `contentscript.js`, not `content_scripts.js`). Its entire logic is one minified line. The relevant listener is:\n\n```js\nwindow.addEventListener(\"message\", handleScriptEvents);\n```\n\n`handleScriptEvents` accepts `e.data.type` and `e.data.payload` from any `window` `message` event. There is **no `event.source`, `event.origin`, or sender-id check**. Since the content script runs on `https://www.ea.com/.../ultimate-team/web-app/*`, page-context JavaScript on that origin (or XSS on that origin) controls `e.data` fully.\n\n### 2. Source-to-sink path\nIn `contentscript.js`:\n\n```js\nconst supportedMessageTypes = new Set([\"notification\",\"createAlarm\",\"clearAlarm\"]);\n...\nsupportedMessageTypes.has(e.data.type) &&\n  chrome.runtime.sendMessage({\n    options: { type: e.data.type, ...e.data.payload }\n  });\n```\n\nSo a page can post:\n\n```js\n{ type: \"clearAlarm\", payload: { alarmType: \"transferList\" } }\n```\n\nThis produces a runtime message to the background:\n\n```js\n{ options: { type: \"clearAlarm\", alarmType: \"transferList\" } }\n```\n\nIn `backgroun",
+              "path": "extensions/boffdonfioidojlcpmfnkngipappmcoh_26.1.5.9/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.45,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 4,
+              "reasoning": "sink 断点已就绪且候选输入已重放，但 sink 断点/ tap 均未命中；source 可能未到达后台，或需要额外的页面前置条件。",
+              "path": "extensions/boffdonfioidojlcpmfnkngipappmcoh_26.1.5.9/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T05:02:03.873938Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "doublex_chrome_r3_user_manual",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-24T02:22:09.900918Z",
+                "notes": "人工验证均为 TP：页面消息可控制浏览器通知和 alarm 特权操作。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\boffdonfioidojlcpmfnkngipappmcoh_26.1.5.9\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\boffdonfioidojlcpmfnkngipappmcoh_26.1.5.9\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-24T02:22:09.900918Z",
+                  "sha256": "d71e8792fece996706e90b462be1d4cd0d2241fae0d8317846d6f4d9b765531c"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "DoubleX Chrome r3 manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "26.1.5.9",
+        "latest_version": "27.0.1.0",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\boffdonfioidojlcpmfnkngipappmcoh_27.0.1.0\\boffdonfioidojlcpmfnkngipappmcoh.27.0.1.0.crx",
+        "tool_assessments": [
+          {
+            "tool": "DoubleX",
+            "original_source_flow_id": "doublex:chrome:boffdonfioidojlcpmfnkngipappmcoh:26.1.5.9:5c5b01a053babb2c:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_ALARMS_CLEAR_NAME",
+            "revalidation_job_key": "chrome__boffdonfioidojlcpmfnkngipappmcoh__27.0.1.0__DoubleX",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\boffdonfioidojlcpmfnkngipappmcoh_27.0.1.0\\revalidation\\DoubleX\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\boffdonfioidojlcpmfnkngipappmcoh_27.0.1.0\\revalidation\\DoubleX\\attempt-01\\report.flows.json",
+            "duration_seconds": 2.016,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 2,
+                "sink_index": 1,
+                "flow_type": "PRIVILEGE_ESCALATION",
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_ALARMS_CLEAR_NAME",
+                "source": {
+                  "type": "WINDOW_MESSAGE_EVENT",
+                  "remark": "DoubleX web-accessible message input",
+                  "file": "content_scripts.js",
+                  "loc": "L15",
+                  "code": "e"
+                },
+                "sink": {
+                  "type": "CHROME_ALARMS_CLEAR_NAME",
+                  "remark": "chrome.alarms.clear",
+                  "file": "background.js",
+                  "loc": "L58",
+                  "code": "chrome.alarms.clear(e.alarmType)"
+                },
+                "propagation_step_count": null
+              }
+            ],
+            "tool_report_flow_count": 2,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_ambiguous_candidates",
+            "basis": "Same API categories occur in multiple paths or source context similarity is insufficient for a unique identity decision.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 2,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 0.0,
+              "actual_sink_context_similarity": 0.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.5,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "DoubleX",
+            "original_flow_id": "doublex:chrome:boffdonfioidojlcpmfnkngipappmcoh:26.1.5.9:5c5b01a053babb2c:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-cfe53091b890f355",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_NOTIFICATIONS_CREATE_OPTIONS",
+      "matched_tools": [
+        "DoubleX"
+      ],
+      "match_region": "DoubleX only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:boffdonfioidojlcpmfnkngipappmcoh:26.1.5.9:80d705eefbc20d0c:01",
+          "flow": {
+            "flow_id": "doublex:chrome:boffdonfioidojlcpmfnkngipappmcoh:26.1.5.9:80d705eefbc20d0c:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "80d705eefbc20d0c365d72573f218ab77f77888015036d4c924201eb04b5ca10",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L15",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_NOTIFICATIONS_CREATE_OPTIONS",
+              "remark": "chrome.notifications.create",
+              "file": "background.js",
+              "loc": "L42",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content_scripts.js",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_chrome_r3_user_manual",
+                  "source": "Manual",
+                  "kind": "doublex_chrome_r3_user_manual",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证均为 TP：页面消息可控制浏览器通知和 alarm 特权操作。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\boffdonfioidojlcpmfnkngipappmcoh_26.1.5.9\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "report_sha256": "97244dddcbb140dbdec5bc2cefe2f1f0dd27c8f3bb574cf78176db1fd3ac0131"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have the full source of both files now. Let me trace the complete chain.\n\n**Source (contentscript.js, minified single line):**\n\n```js\nconst supportedMessageTypes=new Set([\"notification\",\"createAlarm\",\"clearAlarm\"]);\nhandleScriptEvents=e=>{\n  ...\n  : supportedMessageTypes.has(e.data.type) &&\n    chrome.runtime.sendMessage({options:{type:e.data.type,...e.data.payload}})\n};\nwindow.addEventListener(\"message\",handleScriptEvents);\n```\n\nThere is **no** `event.origin`, `event.source`, or `sender` check. The content script runs only on `https://www.ea.com/.../ea-sports-fc/ultimate-team/web-app/*`, but any script executing on that page (the page's own scripts, injected page-context scripts, or an XSS payload) can post a forged message.\n\n**Bridge:** page `window.postMessage` → content-script `handleScriptEvents` → `chrome.runtime.sendMessage({options:{type, ...payload}})` → background `chrome.runtime.onMessage`.\n\n**Sink (background.js, minified single line):**\n\n```js\n\"notification\"===n.type ? (sendNotification(n.message,n.message,{}), !1) : ...\n```\n\nand\n\n```js\nsendNotification=(e,t,{notificationId:a,...n})=>\n  chrome.notifications.create(a??\"\",{title:e,message:t,iconUrl:\"/icon128.png\",type:",
+              "path": "extensions/boffdonfioidojlcpmfnkngipappmcoh_26.1.5.9/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/boffdonfioidojlcpmfnkngipappmcoh_26.1.5.9/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T05:02:03.873938Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "doublex_chrome_r3_user_manual",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-24T02:22:09.900918Z",
+                "notes": "人工验证均为 TP：页面消息可控制浏览器通知和 alarm 特权操作。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\boffdonfioidojlcpmfnkngipappmcoh_26.1.5.9\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\boffdonfioidojlcpmfnkngipappmcoh_26.1.5.9\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-24T02:22:09.900918Z",
+                  "sha256": "97244dddcbb140dbdec5bc2cefe2f1f0dd27c8f3bb574cf78176db1fd3ac0131"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "DoubleX Chrome r3 manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "26.1.5.9",
+        "latest_version": "27.0.1.0",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\boffdonfioidojlcpmfnkngipappmcoh_27.0.1.0\\boffdonfioidojlcpmfnkngipappmcoh.27.0.1.0.crx",
+        "tool_assessments": [
+          {
+            "tool": "DoubleX",
+            "original_source_flow_id": "doublex:chrome:boffdonfioidojlcpmfnkngipappmcoh:26.1.5.9:80d705eefbc20d0c:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_NOTIFICATIONS_CREATE_OPTIONS",
+            "revalidation_job_key": "chrome__boffdonfioidojlcpmfnkngipappmcoh__27.0.1.0__DoubleX",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\boffdonfioidojlcpmfnkngipappmcoh_27.0.1.0\\revalidation\\DoubleX\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\boffdonfioidojlcpmfnkngipappmcoh_27.0.1.0\\revalidation\\DoubleX\\attempt-01\\report.flows.json",
+            "duration_seconds": 2.016,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": "PRIVILEGE_ESCALATION",
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_NOTIFICATIONS_CREATE_OPTIONS",
+                "source": {
+                  "type": "WINDOW_MESSAGE_EVENT",
+                  "remark": "DoubleX web-accessible message input",
+                  "file": "content_scripts.js",
+                  "loc": "L15",
+                  "code": "e"
+                },
+                "sink": {
+                  "type": "CHROME_NOTIFICATIONS_CREATE_OPTIONS",
+                  "remark": "chrome.notifications.create",
+                  "file": "background.js",
+                  "loc": "L42",
+                  "code": "chrome.notifications.create(None, <pdg_js.node.ValueExpr object at 0x000001B7CC6502B0>)"
+                },
+                "propagation_step_count": null
+              }
+            ],
+            "tool_report_flow_count": 2,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_ambiguous_candidates",
+            "basis": "Same API categories occur in multiple paths or source context similarity is insufficient for a unique identity decision.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 1,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 0.0,
+              "actual_sink_context_similarity": 0.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.5,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "DoubleX",
+            "original_flow_id": "doublex:chrome:boffdonfioidojlcpmfnkngipappmcoh:26.1.5.9:80d705eefbc20d0c:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

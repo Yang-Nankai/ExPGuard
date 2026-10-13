@@ -1,0 +1,323 @@
+{
+  "extension_id": "bogabmgabnjabjbiggmfkdocbjgackfo",
+  "extension_version": "6.2.2",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "flow_count": 3,
+  "verified_count": 3,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have all the evidence I need. Let me lay out the decision ledger.\n\n## Analysis\n\n**(a) Who controls the source?**\nThe source is `chrome.runtime.onMessageExternal.addListener` in `background.js`. The manifest's `externally_connectable.matches` lists web origins:\n`*://*.custom-cursor.com/*`, `*://*.custom-cursor-helper.com/*`, `*://*.cursor-helper.com/*`, `*://*.custom-cursors.com/*` — with **wildcard subdomain matching**, so any page served from those (sub)domains can reach the listener via `chrome.runtime.sendMessage(extensionId, msg)`. Per the trust rules, externally-connectable web hosts are attacker-reachable via XSS/subdomain takeover on those domains → attacker-controllable (`EXTERNAL_MESSAGE` provenance).\n\n**(b) The source→sink path (confirmed in raw source at C10242+):**\n```js\nchrome.runtime.onMessageExternal.addListener(async(t,o,s)=>{  // t = message, o = sender (SHADOWED!)\n  try{ let o=await u(); switch(o.collections||(o.collections=[]), t.action){\n    case\"addPack\": {const{collection:r,pack:i}=t; ... chrome.storage.local.set(o) ... }\n    case\"addCollection\": {... o.collections=...; chrome.storage.local.set(o)...}\n    case\"toogleFavoritePack\": {... chrome.storage.local.s",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "AUTHENTICATED_EXTENSION_IPC",
+          "browserFacts": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised)."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C10242 -> L1:C10243",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C10242-10243: …ner(async(t,o,s)=>{try{let o=await u();switch(o.collections||(o.collections=[]),t.action){case\"addPack\":{const{collection:r,pack:i}=t;if(o.collections.some(({id:…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C3458 -> L1:C3519",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C3458-3519: …tError)return t(chrome.runtime.lastError);e(o)})}),g=e=>new Promise((t,o)=>{try{chrome.storage.local.set(e,function(){t({status:!0,data:e})})}catch(e){o(e)}});function h(e,t){return new Promise(async(o,s)=>{fetch(e).then(…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.custom-cursor.com/*",
+            "*://*.custom-cursor-helper.com/*",
+            "*://*.cursor-helper.com/*",
+            "*://*.custom-cursors.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": {
+          "class": "PA_PARTIAL_TRUSTED_IPC",
+          "reason": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised).",
+          "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+          "boundaryType": "FIXED_SENDER_ID_ALLOWLIST",
+          "codeEvidence": [
+            {
+              "file": "background.js",
+              "fixedExtensionIds": [
+                "bogabmgabnjabjbiggmfkdocbjgackfo",
+                "ilngnjopnchkedjkdjlalnlbfpkhmbie",
+                "nbkomboflhdlliegkaiepilnfmophgfg"
+              ],
+              "senderIdCheck": false,
+              "allowlistCue": true,
+              "fixedRecipient": false
+            }
+          ],
+          "manifestExtensionIds": [],
+          "manifestIdsOnly": false
+        },
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 2,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Decision ledger\n\n**(a) Who controls the source.** The source is the `message` argument `t` of the handler registered at `background.js` L1:C10182:\n`chrome.runtime.onMessageExternal.addListener(async(t,o,s)=>{try{let o=await u();switch(o.collections||(o.collections=[]),t.action){...}})`.\n`onMessageExternal` messages are delivered from any sender permitted by the manifest `externally_connectable` block, which here is web origins `*://*.custom-cursor.com/*`, `*://*.custom-cursor-helper.com/*`, `*://*.cursor-helper.com/*`, `*://*.custom-cursors.com/*` (wildcard subdomains, `*://` = http allowed). No `event.origin`/`sender.url` validation appears in the handler.\n\n**(b) The exact source→sink path.** Two concrete, reachable legs, both fully attacker-controlled:\n- `case \"set_config\"`: `t.data.selectedCursorPack` → `w(e, o.size)` → `chrome.storage.local.set({selectedCursorPack:o,size:t}, …)` at L1:C4533 (the reported sink). The first argument `e` is `t.data.selectedCursorPack`, and inside `w` it becomes the `selectedCursorPack:` value written to storage.\n- Fallback: `await g(t.data).then(e=>s(e))` where `g = e=>new Promise(... chrome.storage.local.set(e,...))` (L1:C3458) — this writes th",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "AUTHENTICATED_EXTENSION_IPC",
+          "browserFacts": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised)."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C10242 -> L1:C10243",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C10242-10243: …ner(async(t,o,s)=>{try{let o=await u();switch(o.collections||(o.collections=[]),t.action){case\"addPack\":{const{collection:r,pack:i}=t;if(o.collections.some(({id:…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C4533 -> L1:C4727",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C4533-4727: …zeX=i.nextPointerOffsetX,o.pointer.offsetSizeY=i.nextPointerOffsetY,o}(e,t);try{chrome.storage.local.set({selectedCursorPack:o,size:t},()=>{chrome.tabs.query({active:!0,currentWindow:!0},e=>{e.forEach(e=>{chrome.tabs.sendMessage(e.id,{action:\"changeCursorPack\"},e=>{})})})})}catch(e){}return o}Array.prototype.current=0,Array.prototype.next=function(){re…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.custom-cursor.com/*",
+            "*://*.custom-cursor-helper.com/*",
+            "*://*.cursor-helper.com/*",
+            "*://*.custom-cursors.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": {
+          "class": "PA_PARTIAL_TRUSTED_IPC",
+          "reason": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised).",
+          "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+          "boundaryType": "FIXED_SENDER_ID_ALLOWLIST",
+          "codeEvidence": [
+            {
+              "file": "background.js",
+              "fixedExtensionIds": [
+                "bogabmgabnjabjbiggmfkdocbjgackfo",
+                "ilngnjopnchkedjkdjlalnlbfpkhmbie",
+                "nbkomboflhdlliegkaiepilnfmophgfg"
+              ],
+              "senderIdCheck": false,
+              "allowlistCue": true,
+              "fixedRecipient": false
+            }
+          ],
+          "manifestExtensionIds": [],
+          "manifestIdsOnly": false
+        },
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification\n\n**Deterministic ledger**\n\n**(a) Who controls the source.** The source is the `message` parameter `t` of `chrome.runtime.onMessageExternal.addListener(async(t,o,s)=>{…switch(t.action)…})` (background.js, C≈10140–10243). The receiver performs **no** `sender.id` / `sender.origin` / `sender.url` validation — the sender object is shadowed by `let o=await u()`. Reachability is governed by `externally_connectable.matches`, which are **web origins** (`*://*.custom-cursor.com/*`, `*://*.custom-cursor-helper.com/*`, `*://*.cursor-helper.com/*`, `*://*.custom-cursors.com/*`). Any page on those origins (or via XSS/subdomain on them) can `chrome.runtime.sendMessage(extId, payload)`. Source = attacker-influenced web input.\n\n**Harness caveat resolved.** The harness's `authenticatedExtensionAllowlist` / `PA_PARTIAL_TRUSTED_IPC` (with `senderIdCheck:false`) is a **false artifact**: the three \"fixed extension ids\" (`bogabmgabnjabjbiggmfkdocbjgackfo`, `ilngnjopnchkedjkdjlalnlbfpkhmbie`, `nbkomboflhdlliegkaiepilnfmophgfg`) are merely Chrome‑Web‑Store *listing* IDs of the developer's other products embedded in notification HTML strings (read at C6000–14200). There is no `sender.id === ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "AUTHENTICATED_EXTENSION_IPC",
+          "browserFacts": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised)."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C10242 -> L1:C10243",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C10242-10243: …ner(async(t,o,s)=>{try{let o=await u();switch(o.collections||(o.collections=[]),t.action){case\"addPack\":{const{collection:r,pack:i}=t;if(o.collections.some(({id:…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C3585 -> L1:C3593",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C3585-3593: …:!0,data:e})})}catch(e){o(e)}});function h(e,t){return new Promise(async(o,s)=>{fetch(e).then(e=>e.blob()).then(createImageBitmap).then(function(e){const s=new Offscree…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.custom-cursor.com/*",
+            "*://*.custom-cursor-helper.com/*",
+            "*://*.cursor-helper.com/*",
+            "*://*.custom-cursors.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": {
+          "class": "PA_PARTIAL_TRUSTED_IPC",
+          "reason": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised).",
+          "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+          "boundaryType": "FIXED_SENDER_ID_ALLOWLIST",
+          "codeEvidence": [
+            {
+              "file": "background.js",
+              "fixedExtensionIds": [
+                "bogabmgabnjabjbiggmfkdocbjgackfo",
+                "ilngnjopnchkedjkdjlalnlbfpkhmbie",
+                "nbkomboflhdlliegkaiepilnfmophgfg"
+              ],
+              "senderIdCheck": false,
+              "allowlistCue": true,
+              "fixedRecipient": false
+            }
+          ],
+          "manifestExtensionIds": [],
+          "manifestIdsOnly": false
+        },
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 3 flow(s): 3 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

@@ -1,0 +1,267 @@
+{
+  "extensionId": "igkkmokkmlbkkgdnkkancbonkbbmkioc",
+  "extensionVersion": "2.0.2",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 6,
+    "totalFiles": 6,
+    "distinctFlows": 2,
+    "rawIssueEntries": 2,
+    "sinklessSourcesSkipped": 10
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "ct.bundle",
+      "frame": "CS_3",
+      "constraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "ct.bundle",
+        "loc": "L1:C153 -> L1:C154",
+        "line": 1,
+        "col": [
+          153,
+          154
+        ],
+        "spansTo": null,
+        "code": "…der-screenshot-v3\",t=\"https://apv3.s3.ap-northeast-2.amazonaws.com\";window.addEventListener(\"message\",(t=>{let a=t.data;»a«.p==e&&\"tobg\"==a.cmd&&chrome.runtime.sendMessage(a.data,(e=>{a.cb&&window.postMessage({cmd:\"ctcb\",cb:a.cb,data:e})}))}))…"
+      },
+      "sinks": [
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "[UNKNOWN ORIGIN]",
+          "file": "ct.bundle",
+          "loc": "L1:C221 -> L1:C268",
+          "line": 1,
+          "col": [
+            221,
+            268
+          ],
+          "spansTo": null,
+          "code": "…window.addEventListener(\"message\",(t=>{let a=t.data;a.p==e&&\"tobg\"==a.cmd&&chrome.runtime.sendMessage(a.data,(e=>{a.cb&&»window.postMessage({cmd:\"ctcb\",cb:a.cb,data:e})«}))}));{chrome.storage.local.get(\"updateTime\",(e=>{e.updateTime&&Date.now()-e.updateTime>2592e5&&chrome.storage.local.se…",
+          "frame": "CS_3",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 46,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "ct.bundle",
+            "line": 1,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right",
+              "ELEMENT:object.setProperty",
+              "MESSAGE"
+            ],
+            "code": "…\",(t=>{let a=t.data;»a.p==e&&\"tobg\"==a.cmd&&chrome.runtime.sendMessage(a.data,(e=>{a.cb&&window.postMessage({cmd:\"ctcb\",cb:a.cb,data:e})}))}) …⟨tainted span: 578 chars⟩… cument.body.setAttribute(\"inMainTabUse\",1),chrome.runtime.onMessage.addListener(((e,t,a)=>{\"canbeuse\"==e.topic&&a(!0)}))«)})();",
+            "crossContextHop": [
+              "runtime.single.response.message[background->ct.bundle]",
+              "runtime.single.sender.message[background->ct.bundle]"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "background",
+        "loc": "L2:C3456 -> L2:C4771",
+        "line": 2,
+        "col": [
+          3456,
+          4771
+        ],
+        "spansTo": null,
+        "code": "…;let c={},s=!1,i=-1;»chrome.runtime.onMessage.addListener(((t,a,r)=>{switch(t.cmd){case\"get_bg\":chrome.storage.local.get([\"uid\"],(t=>{let o=t …⟨tainted span: 1315 chars⟩… etRequest.updateDynamicRules(t.data);break;case\"usr\":chrome.declarativeNetRequest.updateSessionRules(t.data)}return!0}))«,function(){let e=\"\"…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "storage.fuzzy.settings",
+          "file": "background",
+          "loc": "L2:C3807 -> L2:C3841",
+          "line": 2,
+          "col": [
+            3807,
+            3841
+          ],
+          "spansTo": null,
+          "code": "…id,htab:i,mf:t.mf||\"\"})}));break;case\"get_mf\":chrome.storage.local.get(\"mf\",(e=>{r(e.mf||\"\")}));break;case\"set_storage\":»chrome.storage.local.set(t.data,r)«;break;case\"get_storage\":chrome.storage.local.get(t.data,r);break;case\"set_res\":c[t.url]=t.data;break;case\"get_res\":r(c[…",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_WINDOWS_CREATE_OPTIONS",
+          "remark": null,
+          "file": "background",
+          "loc": "L2:C4039 -> L2:C4113",
+          "line": 2,
+          "col": [
+            4039,
+            4113
+          ],
+          "spansTo": null,
+          "code": "…\":c[t.url]=t.data;break;case\"get_res\":r(c[t.url]);break;case\"l2inited\":r(s),s=!0;break;case\"htab\":\"create\"==t.fun?-1==i?»chrome.windows.create(t.data,(e=>{i=e.tabs[0].id,r({winId:e.id,htab:i})}))«:chrome.tabs.get(i,(e=>{e?(chrome.tabs.update(i,{url:t.data.url}),r({winId:e.windowId,htab:e.id})):chrome.windows.create…",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_WINDOWS_UPDATE_OPTIONS",
+          "remark": null,
+          "file": "background",
+          "loc": "L2:C4306 -> L2:C4343",
+          "line": 2,
+          "col": [
+            4306,
+            4343
+          ],
+          "spansTo": null,
+          "code": "…d:e.windowId,htab:e.id})):chrome.windows.create(t.data,(e=>{i=e.tabs[0].id,r({winId:e.id,htab:i})}))})):\"update\"==t.fun?»chrome.windows.update(t.winId,t.data)«:\"remove\"==t.fun&&chrome.windows.remove(t.winId);break;case\"tab\":if(\"create\"==t.fun){var o={...t.data};o.index||(o.index…",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_DECLARATIVENETREQUEST_RULES",
+          "remark": null,
+          "file": "background",
+          "loc": "L2:C4632 -> L2:C4687",
+          "line": 2,
+          "col": [
+            4632,
+            4687
+          ],
+          "spansTo": null,
+          "code": "…}))}else\"update\"==t.fun?chrome.tabs.update(t.tabId,t.data):\"remove\"==t.fun&&chrome.tabs.remove(t.tabId);break;case\"udr\":»chrome.declarativeNetRequest.updateDynamicRules(t.data)«;break;case\"usr\":chrome.declarativeNetRequest.updateSessionRules(t.data)}return!0})),function(){let e=\"\",t=1;chrome.stor…",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_DECLARATIVENETREQUEST_RULES",
+          "remark": null,
+          "file": "background",
+          "loc": "L2:C4704 -> L2:C4759",
+          "line": 2,
+          "col": [
+            4704,
+            4759
+          ],
+          "spansTo": null,
+          "code": "…un&&chrome.tabs.remove(t.tabId);break;case\"udr\":chrome.declarativeNetRequest.updateDynamicRules(t.data);break;case\"usr\":»chrome.declarativeNetRequest.updateSessionRules(t.data)«}return!0})),function(){let e=\"\",t=1;chrome.storage.local.get([\"installTime\",\"uid\"],(function(a){a.uid?e=a.uid:(e=a.uid|…",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_TABS_CREATE_OPTIONS",
+          "remark": null,
+          "file": "background",
+          "loc": "L2:C4479 -> L2:C4515",
+          "line": 2,
+          "col": [
+            4479,
+            4515
+          ],
+          "spansTo": null,
+          "code": "…&&chrome.windows.remove(t.winId);break;case\"tab\":if(\"create\"==t.fun){var o={...t.data};o.index||(o.index=a.tab.index+1),»chrome.tabs.create(o,(e=>{r(e.id)}))«}else\"update\"==t.fun?chrome.tabs.update(t.tabId,t.data):\"remove\"==t.fun&&chrome.tabs.remove(t.tabId);break;case\"udr\":chr…",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_DOWNLOADS_OPTIONS",
+          "remark": null,
+          "file": "background",
+          "loc": "L4:C34685 -> L4:C34769",
+          "line": 4,
+          "col": [
+            34685,
+            34769
+          ],
+          "spansTo": null,
+          "code": "…itor.html?nanoId=\"+h})})):\"copy\"===t&&chrome.tabs.sendMessage(n.tab.id,{type:\"area_copy\",data:y[h]})}))}function O(e,t){»chrome.downloads.download({url:e,filename:\"Apex_\".concat(Date.now(),\".\").concat(t)})«}function N(e){g=e,\"cancel\"===e||\"stop\"===e?(\"cancel\"===e&&(S=0,chrome.runtime.sendMessage({type:\"close_window\"})),x(),w…",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_WINDOWS_CREATE_OPTIONS",
+          "remark": null,
+          "file": "background",
+          "loc": "L2:C4212 -> L2:C4286",
+          "line": 2,
+          "col": [
+            4212,
+            4286
+          ],
+          "spansTo": null,
+          "code": "…inId:e.id,htab:i})})):chrome.tabs.get(i,(e=>{e?(chrome.tabs.update(i,{url:t.data.url}),r({winId:e.windowId,htab:e.id})):»chrome.windows.create(t.data,(e=>{i=e.tabs[0].id,r({winId:e.id,htab:i})}))«})):\"update\"==t.fun?chrome.windows.update(t.winId,t.data):\"remove\"==t.fun&&chrome.windows.remove(t.winId);break;case\"tab…",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 303,
+        "distinctLines": 2,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 2,
+            "ops": [
+              "MESSAGE",
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:object.setProperty",
+              "ELEMENT:computed-member-unknown-alternative",
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-right",
+              "COPY:object-spread",
+              "ASSIGN:logical-left"
+            ],
+            "code": "…{e=t.jdRules||[]})),»chrome.runtime.onMessage.addListener(((e,t,r)=>(\"dojd\"==e.cmd&&this.check(t.tab,e.data)&&a(e.data),!0)))},check:function …⟨tainted span: 3836 chars⟩… etRequest.updateDynamicRules(t.data);break;case\"usr\":chrome.declarativeNetRequest.updateSessionRules(t.data)}return!0}))«,function(){let e=\"\"…",
+            "crossContextHop": "runtime.single.sender.message[ct.bundle->background]"
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 4,
+            "ops": [
+              "MESSAGE",
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-right",
+              "ELEMENT:object.setProperty",
+              "RETURN:string.concat",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right",
+              "ASSIGN:unary",
+              "ELEMENT:implicit.add",
+              "ELEMENT:member-element-container",
+              "ELEMENT:computed-member-unknown-alternative",
+              "RETURN:fallback-return"
+            ],
+            "code": "…1];t[r]=o})),t};var »y={},m={},g=\"stop\",_=-1,w=null,I=null,S=0;function E(e,t,n,r){chrome.tabs.captureVisibleTab(t[0].windowId,{format:\"png\"} …⟨tainted span: 5249 chars⟩… unction(t){chrome.tabs.sendMessage(t[0].id,{type:\"show_count_down\",count_down_number:e.count_down_number})}))}var r,o}))«,chrome.runtime.onIn…",
+            "crossContextHop": "runtime.single.sender.message[ct.bundle->background]"
+          }
+        ]
+      }
+    }
+  ]
+}

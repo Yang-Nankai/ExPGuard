@@ -1,0 +1,100 @@
+{
+  "extension_id": "ogdlpmhglpejoiomcodnpjnfgcpmgale",
+  "extension_version": "3.7.9",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ### Verification of Flow #1 \u2014 STORAGE_POSOING (attacker external message \u2192 `chrome.storage.local.set`)\n\n**(a) Who controls the source?**\nThe source is `chrome.runtime.onMessageExternal.addListener((t, r, e) => \u2026)`. The tainted span is the message object `t` itself (`S=\u00abt\u00bb.action`), not merely a literal. The manifest `externally_connectable.matches` allows `https://custom-cursor.com/*` and `https://*.custom-cursor.com/*`, so a webpage on those origins (or XSS/subdomain on those origins) can call `chrome.runtime.sendMessage(EXT_ID, payload)` and fully control `t.action` and `t.rotator`.\n\n**(b) Source-to-sink data path**\nI inspected `background.js` around the reported anchors. The listener dispatches on `t.action`:\n\n- `case 0`: `S = t.action` routes `\"update_rotator\"` \u2192 `case 15`.\n- `case 15`: `w = t.rotator` (validated only as `typeof w === \"object\"`).\n- `case 16`: builds `j = { status: !!w.status, type: [\"time\",\"request\"].includes(w.type) ? w.type : \"time\", value: Math.max(3, Math.min(1e3, parseInt(w.value)||30)) }`.\n- `case 16` sink: `chrome.storage.local.set({rotator: j}, \u2026)`.\n\nThe reported source span taints the whole message object `t`, so the `t.rotator` read inherits the taint",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {
+        "sanitized": false,
+        "duplicatePaths": 1,
+        "rawSteps": 238,
+        "distinctLines": 1,
+        "crossContextHops": [],
+        "sinkUrlControl": []
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C30311 -> L1:C30312",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C30311-30312: \u2026s,l,p,y,h,v,b,d,g,O,w,j,S;return Q().w((function(r){for(;;)switch(r.n){case 0:S=t.action,r.n=\"getInstalled\"===S||\"get_config\"===S?1:\"install_collection\"===S?2:\"s\u2026"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C33087 -> L1:C33170",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C33087-33170: \u2026es(w.type)?w.type:\"time\",value:Math.max(3,Math.min(1e3,parseInt(w.value)||30))},chrome.storage.local.set({rotator:j},(function(){j.status?B():W(),e({status:!0})})),r.a(3,17);case 17:return r.a(2)}}),r)})));return function(t){return r.apply(thi\u2026"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://custom-cursor.com/*",
+            "https://*.custom-cursor.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

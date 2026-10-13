@@ -1,0 +1,302 @@
+{
+  "extensionId": "bdhficnphioomdjhdfbhdepjgggekodf",
+  "extensionVersion": "6.0.1",
+  "sourceType": "CRX",
+  "status": "success",
+  "duration": 50.507,
+  "files": [
+    {
+      "file": "background-scripts/index.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 121476,
+      "durationMs": 12377.177866999999
+    },
+    {
+      "file": "index.js",
+      "frame": "CS_1",
+      "frameTags": [
+        "CS_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "*://*.smartschool.be/*"
+            ],
+            "excludeMatches": [
+              "*://www.smartschool.be/*",
+              "*://status.smartschool.be/*",
+              "*://smartschool.be/bb/*",
+              "*://*.smartschool.be/online-session/meeting/redirect/*",
+              "*://*.smartschool.be/html5client/*",
+              "*://conference03-gs.smartschool.be/*"
+            ]
+          }
+        }
+      ],
+      "size": 748778,
+      "durationMs": 32416.795362999997
+    },
+    {
+      "file": "theme_sharing_content.js",
+      "frame": "CS_2",
+      "frameTags": [
+        "CS_2"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_2",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "*://theme.smpp.be/*"
+            ]
+          }
+        }
+      ],
+      "size": 1625,
+      "durationMs": 24.763801000000967
+    }
+  ],
+  "totalFiles": 3,
+  "totalSize": 871879,
+  "cacheStats": {
+    "totalCalls": 0,
+    "hits": 0,
+    "misses": 0,
+    "evictions": 0,
+    "hitRate": 0,
+    "cacheSize": 0,
+    "maxEntries": 4096
+  },
+  "coverage": {
+    "totalNodes": 12906,
+    "coveredNodes": 5170,
+    "nodeCoverage": 0.40058887339222066,
+    "totalScopes": 1512,
+    "coveredScopes": 494,
+    "scopeCoverage": 0.32671957671957674,
+    "analyzedScripts": 3,
+    "scripts": [
+      {
+        "file": "background-scripts/index",
+        "frame": "BG_1",
+        "totalNodes": 3229,
+        "coveredNodes": 1000,
+        "nodeCoverage": 0.3096934035305048,
+        "totalScopes": 282,
+        "coveredScopes": 91,
+        "scopeCoverage": 0.32269503546099293
+      },
+      {
+        "file": "index",
+        "frame": "CS_1",
+        "totalNodes": 9653,
+        "coveredNodes": 4146,
+        "nodeCoverage": 0.42950378120791466,
+        "totalScopes": 1227,
+        "coveredScopes": 400,
+        "scopeCoverage": 0.32599837000814996
+      },
+      {
+        "file": "theme_sharing_content",
+        "frame": "CS_2",
+        "totalNodes": 24,
+        "coveredNodes": 24,
+        "nodeCoverage": 1,
+        "totalScopes": 3,
+        "coveredScopes": 3,
+        "scopeCoverage": 1
+      }
+    ]
+  },
+  "hasFlows": true,
+  "flows": [
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(smppPageScriptMessage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "theme_sharing_content",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "theme_sharing_content",
+      "sourceFrame": "CS_2",
+      "sourceFrameConstraint": {
+        "matches": [
+          "*://theme.smpp.be/*"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_2",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "*://theme.smpp.be/*"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L23:C15 -> L23:C23",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "[Unknown URL]",
+      "sinkUrlTaintControl": "PARTIAL",
+      "sinkFile": "background-scripts/index",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L1993:C23 -> L1998:C6",
+      "ctx": "background-scripts/index",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[theme_sharing_content->background-scripts/index]",
+      "messageSender": "theme_sharing_content",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "*://theme.smpp.be/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "function() {\n       >>>     ret<<<urn t3[r2];\n        ",
+      "sinkCode": " const resp = await >>>fetch(\"https://theme.smpp.be/\" + shareId, {\n      method: \"GET\",\n      headers: {\n        \"Content-Type\": \"application/json\"\n      }\n    })<<<;\n    const json = a"
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "attacker-input-storage-write",
+      "ruleDescription": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(smppPageScriptMessage)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "theme_sharing_content",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "theme_sharing_content",
+      "sourceFrame": "CS_2",
+      "sourceFrameConstraint": {
+        "matches": [
+          "*://theme.smpp.be/*"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_2",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "*://theme.smpp.be/*"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L23:C15 -> L23:C23",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "themeShareCache",
+      "sinkFile": "background-scripts/index",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L2062:C10 -> L2062:C62",
+      "ctx": "background-scripts/index",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[theme_sharing_content->background-scripts/index]",
+      "messageSender": "theme_sharing_content",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "*://theme.smpp.be/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "function() {\n       >>>     ret<<<urn t3[r2];\n        ",
+      "sinkCode": " shareId;\n    await >>>browser.storage.local.set({ themeShareCache: data })<<<;\n  }\n  async functi"
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "attacker-input-storage-write",
+      "ruleDescription": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "From storage.local.set('themeShareCache') in background-scripts/index",
+      "sourceProvenance": "UNTRUSTED_STORAGE",
+      "sourceOriginContext": "theme_sharing_content",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "theme_sharing_content",
+      "sourceFrame": "CS_2",
+      "sourceFrameConstraint": {
+        "matches": [
+          "*://theme.smpp.be/*"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_2",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "*://theme.smpp.be/*"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L2333:C2 -> L2338:C3",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "themeShareCache",
+      "sinkFile": "background-scripts/index",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L2062:C10 -> L2062:C62",
+      "ctx": "background-scripts/index",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[theme_sharing_content->background-scripts/index]",
+      "messageSender": "theme_sharing_content",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": true,
+      "area": "STORAGE_FLOW[area: local, key: themeShareCache, sender: background-scripts/index, receiver: background-scripts/index]",
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "*://theme.smpp.be/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "-scripts/index.ts\n  >>>browser.runtime.onMessage.addListener(\n    (message, _sender, sendResponse) => {\n      handleMessage(message, sendResponse);\n      return true;\n    }\n  )<<<;\n  async function h",
+      "sinkCode": " shareId;\n    await >>>browser.storage.local.set({ themeShareCache: data })<<<;\n  }\n  async functi"
+    }
+  ],
+  "privilegeSuppressedCount": 0,
+  "privilegeSuppressed": []
+}

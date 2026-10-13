@@ -1,0 +1,65 @@
+{
+  "manifest_version": 3,
+  "name": "GitZip for github",
+  "description": "Simplifies the process of downloading specific files or folders from a GitHub repository",
+  "version": "3.9.8.843",
+  "icons": {
+    "128": "images/icon-128px.png"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "cookies",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://api.github.com/*",
+    "*://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://github.com/*"
+      ],
+      "js": [
+        "js/content/jszip.min.js",
+        "js/content/FileSaver.min.js",
+        "js/content/main.js"
+      ],
+      "css": [
+        "css/main.css"
+      ]
+    },
+    {
+      "matches": [
+        "*://kinolien.github.io/gitzip/*"
+      ],
+      "js": [
+        "js/content/keysync.js"
+      ]
+    },
+    {
+      "matches": [
+        "*://gitzip.org/gettoken/success"
+      ],
+      "js": [
+        "js/content/autosave.js"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; worker-src 'self'"
+  },
+  "update_url": "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
+}

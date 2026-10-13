@@ -1,0 +1,93 @@
+{
+  "extension_id": "cpofhfeclnhnhodbcabgcihloffdpgpd",
+  "extension_version": "1.1.0",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 6,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 4,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Ledger\n\n**(a) Who controls the source?**\nThe source is `chrome.runtime.onMessageExternal.addListener(function (request, sender, sendResponse) {...})` at `background.js:496`. `request` is the message payload sent by an externally-connectable web origin. The flow's tainted value is `request.data` (specifically `request.data.animationType`, `duration`, `collection`, `pattern`, etc.). This is attacker/untrusted input. The manifest `externally_connectable.matches` restricts which origins may call it (`*://*.custom-cursor.com/*`, `*://custom-cursor.com/*`), but that is an origin restriction, not an unforgeable browser-authenticated `sender.id` boundary — XSS or control of a matched origin still allows injection.\n\n**(b) Exact source-to-sink data path:**\nConfirmed in real source:\n- `background.js:503` `_t = request.action;` dispatches to `case 8` (`\"setAnimation\"`).\n- `background.js:639` `_data3 = request.data;`\n- `background.js:640-642` reads `current` from storage, then `current.animationType = _data3.animationType;`\n- `background.js:643-645` `chrome.storage.local.set({ current: current, animationType: _data3.animationType }, ...)`.\n\nThis matches the reported propagation ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L503:C17 -> L503:C24",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L503 C17-24:             _t = request.action;"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L643:C14 -> L668:C16",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   643|               chrome.storage.local.set({\n>>   644|                 current: current,\n>>   645|                 animationType: _data3.animationType\n>>   646|               }, function () {\n>>   647|                 chrome.tabs.query({\n>>   648|                   active: true,\n>>   649|                   currentWindow: true\n>>   650|                 }, function (tabs) {\n>>   651|                   if (tabs && tabs[0]) {\n>>   652|                     chrome.tabs.sendMessage(tabs[0].id, {\n>>   653|                       action: \"changeTrails\"\n>>   654|                     }, function (content) {\n>>   655|                       sendResponse({\n>>   656|                         status: true,\n>>   657|                         action: 'setAnimation',\n>>   658|                         content: content\n>>   659|                       });\n>>   660|                     });\n>>   661|                   } else {\n>>   662|                     sendResponse({\n>>   663|                       status: true,\n>>   664|                       action: 'setAnimation'\n>>   665|                     });\n>>   666|                   }\n>>   667|                 });\n>>   668|               });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.custom-cursor.com/*",
+            "*://custom-cursor.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

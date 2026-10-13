@@ -1,0 +1,104 @@
+{
+  "extension_id": "fmdnmmbkngflkenkpfgeoonodjohnapj",
+  "extension_version": "1.0.2",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 3,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 2,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #2 (REQUEST_FORGERY)\n\n### Decision ledger\n\n**(a) Who controls the source — CONFIRMED attacker-controllable.**\nThe real source anchor is `content.js:98-99`:\n```js\nwindow.addEventListener('message', (event) => {\n    if (event.source === window && event.origin === location.origin && event.data && event.data.source === 'echo360-cc-inject') {\n```\nAll three guard conditions are satisfied by a same-origin page calling `window.postMessage(...)` with a chosen `data.source`. The `event.origin === location.origin` check is trivially true for a page on the matched origin; `event.data.source`, `event.data.type`, `requestId`, and `payload` are all attacker-chosen fields. No `sender.id`/extension-ID trust boundary exists. The content script runs on `*://echo360.net.au/*` and `*://canvas.lms.unimelb.edu.au/*`, so the triggering page must be on (or have XSS on) one of those two origins — hence MEDIUM rather than CRITICAL.\n\n**(b) Source-to-sink path — UNBROKEN.**\n- `content.js:100-101`: `if (event.data.type === 'TRANSLATE_REQUEST' && ...)` → `forwardTranslateRequest('TRANSLATE_TEXT', requestId, event.data.payload)`.\n- `content.js:61-62`: `chrome.runtime.sendMessage({ type: me",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 2,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L99:C8 -> L99:C81",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": "L99 C8-81:     if (event.source === window && event.origin === location.origin && event.data && event.data.source === 'echo360-cc-inject') {"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L88:C31 -> L88:C74",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L88 C31-74:         const response = await fetch(gtUrl, { signal: controller.signal });"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://echo360.net.au/*",
+              "*://canvas.lms.unimelb.edu.au/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

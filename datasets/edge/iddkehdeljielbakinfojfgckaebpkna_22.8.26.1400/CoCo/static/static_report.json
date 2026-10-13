@@ -1,0 +1,112 @@
+{
+  "extension_id": "iddkehdeljielbakinfojfgckaebpkna",
+  "extension_version": "22.8.26.1400",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — STORAGE_POSOING (WINDOW_MESSAGE_EVENT → CHROME_SYNC_STORAGE)\n\n### 1. Who controls the source\n\nThe source is a `window` message listener in `content-script-webapp.js`, which runs (per manifest) only on `*://web.organizeat.com/*`:\n\n```js\nwindow.addEventListener(\"message\", (function(e) {\n  e.source == window &&\n  e.data.type &&\n  e.data.type.startsWith(\"organizeat.\") &&\n  n(e.data)\n}), false);\n```\n\n`n(e)` does `chrome.runtime.sendMessage(e, ...)`. The page's own script can satisfy `e.source === window` by calling `window.postMessage(...)`, and the `startsWith(\"organizeat.\")` check is attacker-satisfiable (any `type` beginning with `organizeat.`). So any JavaScript executing on a `web.organizeat.com` page fully controls `e.data`, including `payload`.\n\n**Caveat on reachability:** the content script is scoped to the vendor's own origin `web.organizeat.com`, not `<all_urls>`. The practical trigger therefore requires code execution on that origin (XSS/compromised web app). That reduces the attack surface/severity but does not break the data path — consistent with the \"specific host is exploitable via XSS on that domain\" rule.\n\n### 2. Source-to-sink path\n\nThe br",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "CoCo reported cross-boundary flow; verify with source",
+      "report_evidence": {
+        "tool": "coco",
+        "sourceCapability": "ATTACKER_INPUT",
+        "sinkCapability": "STORAGE_WRITE",
+        "flowMeta": {
+          "totalSteps": 4,
+          "omitted": 0
+        },
+        "propagation": "e.data | e.data"
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content-script-webapp.js",
+          "reportedLoc": "L1:C1 -> L1:C1",
+          "resolvedFile": "content-script-webapp.js",
+          "resolved": true,
+          "snippet": "L1 C1-1: (()=>{\"use strict\";var e=chrome.runtime.getManifest(),t=(e.version,e.name,{login:…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L1:C1 -> L1:C1",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C1-1: (()=>{\"use strict\";var e=chrome.runtime.getManifest(),o=(e.version,e.name,\"https:…"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://web.organizeat.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content-script-webapp.js"
+            ],
+            "runAt": "document_idle",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

@@ -1,0 +1,167 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "pnpapokldhgeofbkljienpjofgjkafkm",
+  "version": "1.0.8",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-79070243dfee8bfd",
+      "verification": "TP",
+      "source_family": "storage",
+      "sink_family": "WINDOW_POSTMESSAGE",
+      "matched_tools": [
+        "DoubleX"
+      ],
+      "match_region": "DoubleX only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:pnpapokldhgeofbkljienpjofgjkafkm:1.0.8:096f70c88f99ad39:01",
+          "flow": {
+            "flow_id": "doublex:chrome:pnpapokldhgeofbkljienpjofgjkafkm:1.0.8:096f70c88f99ad39:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "096f70c88f99ad39ad46bde60ab81ec2f7128207c99ab4f68161ab4fe780dbb4",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "DATA_LEAK",
+            "rule_id": "doublex-sensitive-api-egress",
+            "severity": "HIGH",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "chrome.storage.local.get",
+              "file": "content_scripts.js",
+              "loc": "L403",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "http://*/*",
+                      "https://*/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "{\n\t\t\t\t\ttype: \"FROM_EXTENSION\",\n\t\t\t\t\tuser_id_cursors: a.user_Id_custom_cursors\n\t\t\t\t}",
+              "file": "content_scripts.js",
+              "loc": "L404",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "Sensitive extension data is returned to a web-accessible channel."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_chrome_r5_user_manual",
+                  "source": "Manual",
+                  "kind": "doublex_chrome_r5_user_manual",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证为 TP：任意网页可读取扩展 local storage 状态。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\pnpapokldhgeofbkljienpjofgjkafkm_1.0.8\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "report_sha256": "54996e0ba6c5717f079f12f69f0f5ca4b7e8899ea7ec84310ca8079b1dcee129"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow 0 — DATA_LEAK (chrome.storage → window.postMessage)\n\n### 1. Who controls the source\nThe source is `chrome.storage.local.get([\"user_Id_custom_cursors\"])`. This is **extension-private storage data** (`STORAGE_DATA`), not webpage input. The value is `user_Id_custom_cursors` — a stored per-user field (appears to be a user identifier/cursor state). A webpage cannot read `chrome.storage.local` directly; only the content script (extension authority) can.\n\n### 2. Source-to-sink path (from the actual minified source)\nI located the exact code in `contentScript.js` (the bundle is a single minified line; the reported `content_scripts.js L403/L404` is the source-mapped/legacy name):\n\n```js\nwindow.addEventListener(\"message\", function(a){\n  a.data.type && \"FROM_PAGE\" === a.data.type &&\n  chrome.storage.local.get([\"user_Id_custom_cursors\"], function(a){\n    window.postMessage({type:\"FROM_EXTENSION\", user_id_cursors:a.user_Id_custom_cursors},\"*\")\n  })\n}, !1);\n```\n\nThe chain is unbroken and concrete:\n- Page posts `{type:\"FROM_PAGE\"}` → content-script `message` listener fires.\n- Listener reads `chrome.storage.local` key `user_Id_custom_cursors`.\n- The **raw stored value** (`a.",
+              "path": "extensions/pnpapokldhgeofbkljienpjofgjkafkm_1.0.8/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/pnpapokldhgeofbkljienpjofgjkafkm_1.0.8/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T17:41:03.987525Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "doublex_chrome_r5_user_manual",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-24T04:15:56.254224Z",
+                "notes": "人工验证为 TP：任意网页可读取扩展 local storage 状态。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\pnpapokldhgeofbkljienpjofgjkafkm_1.0.8\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\pnpapokldhgeofbkljienpjofgjkafkm_1.0.8\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-24T04:15:56.254224Z",
+                  "sha256": "54996e0ba6c5717f079f12f69f0f5ca4b7e8899ea7ec84310ca8079b1dcee129"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "DoubleX Chrome r5 manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.0.8",
+        "latest_version": "1.0.8",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

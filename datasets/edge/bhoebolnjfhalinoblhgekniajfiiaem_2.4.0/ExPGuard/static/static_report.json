@@ -1,0 +1,134 @@
+{
+  "extension_id": "bhoebolnjfhalinoblhgekniajfiiaem",
+  "extension_version": "2.4.0",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've verified the chain end-to-end. Here is my analysis.\n\n## (a) Who controls the source\nThe reported source `content.js:250` — `sel = el.value.substring(el.selectionStart, el.selectionEnd);` — reads a shared-DOM element's `value` from inside the content script. `el` comes from `event.target` in `document.ondblclick` (L199–201) or the mobile `contextmenu` handler (L296–298). A page can set both `value` and `selectionStart/selectionEnd` on a text-like input and dispatch a synthetic `dblclick`, so the value is genuinely page-controlled. Source control: **confirmed**.\n\n## (b) Source-to-sink path\n- `fCapturaSel(el)` (L246–253) returns the page-controlled `el.value` substring.\n- `fcargapalabra(sel.trim())` (L74–86) validates it (non-empty, `isNaN`, not `,`/`.`/`;`/`:`, single word on the dblclick path), lowercases it, and — **only when** `gsResDobleclic == \"ventana\"` — sends `chrome.runtime.sendMessage({palabra_a_buscar:palabra})` (L84).\n- Background/service worker (`popup.js`, which is the MV3 service worker) receives it at `onMessage` (L285), and at L316–317 calls `fNuevaVentanaDLEsearch(request.palabra_a_buscar)`.\n- That function (L68–70) does `palabra = encodeURIComponent(palabra)` ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L250:C12 -> L250:C30",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": "L250 C12-30:       sel = el.value.substring(el.selectionStart, el.selectionEnd);"
+        },
+        "sinkAnchor": {
+          "reportedFile": "popup",
+          "reportedLoc": "L70:C2 -> L70:C101",
+          "resolvedFile": "popup.js",
+          "resolved": true,
+          "snippet": "L70 C2-101:   chrome.windows.create({url:gURLdle + palabra, type:\"popup\", width:600, height:420, state:\"normal\"});"
+        },
+        "sourceExpectedMarkers": [
+          "document",
+          "window",
+          "value",
+          "textContent",
+          "innerHTML"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "<all_urls>"
+            ],
+            "excludeMatches": [
+              "*://dle.rae.es/*"
+            ],
+            "js": [
+              "content.js",
+              "contentlab.js"
+            ],
+            "runAt": null,
+            "allFrames": true,
+            "world": "ISOLATED"
+          },
+          {
+            "matches": [
+              "<all_urls>"
+            ],
+            "excludeMatches": [],
+            "js": [],
+            "runAt": null,
+            "allFrames": true,
+            "world": "ISOLATED"
+          },
+          {
+            "matches": [
+              "*://dle.rae.es/*",
+              "*://dle.rae.es/srv/search*"
+            ],
+            "excludeMatches": [
+              "*://dle.rae.es/",
+              "*://dle.rae.es/?w=",
+              "*://dle.rae.es/*m=form*",
+              "*://dle.rae.es/*m=3*",
+              "*://dle.rae.es/*m=random*",
+              "*://dle.rae.es/*m=anagram*",
+              "*://dle.rae.es/*/*"
+            ],
+            "js": [],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 0 true-positive, 1 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

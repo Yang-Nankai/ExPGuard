@@ -1,0 +1,218 @@
+{
+  "flow_index": 2,
+  "outcome": "CONFIRMED",
+  "final_verdict": "UNCERTAIN",
+  "confidence": 0.85,
+  "reproduced": true,
+  "trajectory": [
+    {
+      "action": "instrument_sink",
+      "detail": "all",
+      "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_3468083e9d594823\", \"targetId\": \"D4019F590A342850650E820D2852B9E0\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+    },
+    {
+      "action": "new_page",
+      "detail": "https://api.aigaea.net:54675/page",
+      "result": "{\"openedUrl\": \"https://api.aigaea.net:54675/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:55342/devt"
+    },
+    {
+      "action": "contract_stimulus_batch",
+      "detail": "CUSTOM_EVENT",
+      "result": "{\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"requestPluginVersion\", \"eventTarget\": \"window\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 1740, \"topLevelKeys\": [\"Action\", \"Message\", \"action\", \"auth\", \"cmd\", \"content\", \"data\", \"email\", \"fileInspectionData\", \"fun\", \"gaea_plugin_status\", \"gaea_plugin_token\", \"guid\", \"id\", \"initiatingPage\", \"key\", \"kind\", \"li"
+    },
+    {
+      "action": "observe",
+      "detail": "sink tap + local beacon",
+      "result": "{\"sink_type\": \"storage.local.set\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_3468083e9d594823\", \"actualGeneration\": "
+    }
+  ],
+  "planned_trajectory": {
+    "flow_index": 2,
+    "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+    "target_url": "https://api.aigaea.net:54675/page",
+    "preconditions": [
+      "A page where the relevant content script/source frame runs.",
+      "Loaded extension must expose extension CDP targets.",
+      "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+    ],
+    "steps": [
+      {
+        "action": "list_cdp_targets",
+        "detail": "Confirm extension target/background/service-worker exists.",
+        "result": ""
+      },
+      {
+        "action": "get_extension_runtime_state",
+        "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+        "result": ""
+      },
+      {
+        "action": "new_page/navigate_page",
+        "detail": "Open approved source target: https://api.aigaea.net:54675/page",
+        "result": ""
+      },
+      {
+        "action": "list_scripts/search_in_sources",
+        "detail": "Confirm relevant content script/listener is injected.",
+        "result": ""
+      },
+      {
+        "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+        "detail": "Inject a JSON test marker through the matching local source surface.",
+        "result": ""
+      },
+      {
+        "action": "observe",
+        "detail": "Check beacon/network/console/runtime state/screenshot.",
+        "result": ""
+      },
+      {
+        "action": "ReAct-adjust",
+        "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+        "result": ""
+      }
+    ],
+    "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+    "expected_observation": "Instrument and observe CHROME_LOCAL_STORAGE; use a beacon when its security-relevant argument is a URL.",
+    "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+  },
+  "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"content_scripts.js\", \"location\": \"L38:C0 -> L96:C2\", \"eventNames\": [\"requestPluginVersion\", \"openPlugin\"], \"eventTarget\": \"window\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"\", \"scalarMessageValue\": \"\", \"requirements\": {\"token\": \"true\"}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"window.onload = () => {\\n  let gaea_plugin_token = localStorage.getItem(\\\"gaea_plugin_token\\\");\\n  let gaea_plugin_status = localStorage.getItem(\\\"gaea_plugin_status\\\");\\n  console.log(\\\"gaea_plugin_token\\\", gaea_plugin_token);\\n  console.log(\\\"gaea_plugin_status\\\", gaea_plugin_status);\\n  if (gaea_plugin_token) {\\n    chrome.runtime.sendMessage({\\n      gaea_plugin_token: gaea_plugin_token,\\n    });\\n  }\\n\\n  if (gaea_plugin_status) {\\n    chrome.runtime.sendMessage({\\n      gaea_plugin_status: gaea_plugin_status,\\n    });\\n  }\\n};\\n\\nwindow.onstorage = (event) => {\\n  if (event.key === \\\"gaea_plugin_token\\\") {\\n    chrome.runtime.sendMessage({\\n      gaea_plugin_token: event.newValue,\\n    });\\n  }\\n  if (event.key === \\\"gaea_plugin_status\\\") {\\n    chrome.runtime.sendMessage({\\n      gaea_plugin_status: event.newValue,\\n    });\\n  }\\n\\n\\n};\\n// background--->content_scripts\\nchrome.runtime.onMessage.addListener((message, sender,\", \"notes\": [\"已从 source/sink 附近提取字面量分支。\", \"已从 sink 文件推导消息分发字段 `type` 及候选值。\", \"已从 sink 调用推导 URL 承载字段 `url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"type\", \"discriminatorValues\": [\"REQUEST_PLUGIN_VERSION\"], \"urlField\": \"url\", \"sinkTapKey\": \"storage.local.set\", \"messageAlias\": \"\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [\"token\", \"gaea_plugin_token\", \"gaea_plugin_status\"], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"HIGH\", \"contractWarnings\": []}\npage-target={\"targetId\": \"16B72DFB0A558CEB4CBC0646D5C2427A\", \"url\": \"https://api.aigaea.net:54675/page\"}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_3468083e9d594823\", \"targetId\": \"D4019F590A342850650E820D2852B9E0\", \"lifecycle\": {\"ok\": true, \"targetId\": \"D4019F590A342850650E820D2852B9E0\", \"targetType\": \"service_worker\", \"targetUrl\": \"chrome-extension://lcbdincklagajongobglojmfcbjikidm/background.js\", \"attachCo\nsource-bridge-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_08066ebf299b4242\", \"targetId\": \"16B72DFB0A558CEB4CBC0646D5C2427A\", \"pageUrl\": \"https://api.aigaea.net:54675/page\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\",\\\"observerToken\\\":\\\"observer_08066ebf299b4242\\\"}\"}\nstimulus-batch={\"action\": \"dispatchStimulusBatch\", \"surface\": \"CustomEvent\", \"event\": \"requestPluginVersion\", \"eventTarget\": \"window\", \"targetUrl\": \"top-frame\", \"frameScoped\": false, \"count\": 2, \"inputs\": [{\"bytes\": 1740, \"topLevelKeys\": [\"Action\", \"Message\", \"action\", \"auth\", \"cmd\", \"content\", \"data\", \"email\", \"fileInspectionData\", \"fun\", \"gaea_plugin_status\", \"gaea_plugin_token\", \"guid\", \"id\", \"initiatingPage\", \"key\", \"kind\", \"listenerKey\", \"marker\", \"message\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_1f6c1e198d24\"]}, {\"bytes\": 2049, \"topLevelKeys\": [\"Action\", \"Message\", \"action\", \"auth\", \"cmd\", \"content\", \"data\", \"email\", \"fileInspectionData\", \"fun\", \"gaea_plugin_status\", \"gaea_plugin_token\", \"guid\", \"id\", \"initiatingPage\", \"key\", \"kind\", \"listenerKey\", \"marker\", \"message\"], \"testMarkers\": [\"EXPAGENT_TEST_expa_1f6c1e198d24\"]}], \"result\": {\"scheduled\": true, \"count\": 2, \"surface\": \"CustomEvent\", \"spacing\nsink-tap={\"sink_type\": \"storage.local.set\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_3468083e9d594823\", \"actualGeneration\": \"observer_3468083e9d594823\", \"previousTargetId\": \"D4019F590A342850650E820D2852B9E0\", \"currentTargetId\": \"D4019F590A342850650E820D2852B9E0\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"storage.local.set\\\",\\\"calls\\\":[{\\\"ts\\\":1790095690281,\\\"arg\\\":{\\\"gaea_plugin_token\\\":\\\"[REDACTED]\\\",\\\"__expagentTestMarker\\\":\\\"EXPAGENT_TEST_expa_1f6c1e198d24\\\"}},{\\\"ts\\\":1790095690281,\\\"arg\\\":{\\\"gaea_plugin_status\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_1f6c1e198d24\\\"},\\\"__expagentTestMarker\\\":\\\"EXPAGENT_TEST_expa_1f6c1e198d24\\\"}}],\\\"observerToken\\\":\\\"observer_3468083e9d594823\\\"}\"}\nbeacon={\"token\": \"expa_2e0d2d92824f\", \"hit\": false, \"count\": 0}\nsource-bridge-tap={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_08066ebf299b4242\", \"actualGeneration\": \"observer_08066ebf299b4242\", \"recoveryReason\": \"\", \"targetId\": \"16B72DFB0A558CEB4CBC0646D5C2427A\", \"pageUrl\": \"https://api.aigaea.net:54675/page\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"storage.onChanged\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__dom_innerHTML__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__runtime_sendMessage__\\\":true,\\\"storage.onChanged\\\":[{\\\"ts\\\":1790095690282,\\\"area\\\":\\\"local\\\",\\\"changes\\\":{\\\"gaea_plugin_token\\\":\\\"[REDACTED]\\\",\\\"__expagentTestMarker\\\":\\\"EXPAGENT_TEST_expa_1f6c1e198d24\\\"}},{\\\"ts\\\":1790095",
+  "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+  "evidence_stage": "MARKER_REACHED",
+  "blocked_reason": "",
+  "observer_status": {
+    "semanticFixturesInstalled": true,
+    "semanticFixtureUsed": false,
+    "semanticFixtureKinds": [
+      "custom-event-handler-semantic-fixture",
+      "external-response-port-semantic-fixture"
+    ],
+    "semanticFixture": true,
+    "positiveOnly": true,
+    "environmentReady": true,
+    "listenerReady": true,
+    "sinkObserverReady": true,
+    "sourceContractConfidence": "HIGH",
+    "sourceContractReady": true,
+    "runtimeSourceContractProven": true,
+    "sourceReached": true,
+    "bridgeReached": true,
+    "sinkReached": true,
+    "markerReached": true,
+    "capabilityAssessment": {
+      "requiredContexts": [
+        "serviceWorker",
+        "contentScriptIsolatedWorld"
+      ],
+      "unsupportedContexts": [],
+      "limitations": [],
+      "deterministicReplaySupported": true,
+      "lineBreakpointSupported": true
+    }
+  },
+  "payload_used": "[{\"marker\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"url\": \"http://127.0.0.1:54675/beacon/expa_2e0d2d92824f\", \"data\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"value\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"message\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"title\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"text\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"number\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"listenerKey\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"pollingUrl\": \"http://127.0.0.1:54675/beacon/expa_2e0d2d92824f\", \"pollingInterval\": 1000, \"pollingAuthorization\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"pollingContentType\": \"text/plain\", \"storageKey\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"name\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"id\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"key\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"type\": \"REQUEST_PLUGIN_VERSION\", \"action\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"cmd\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"Action\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"Message\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"fun\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"auth\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"phone\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"email\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"version\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"token\": \"true\", \"content\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"payload\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"kind\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"requestId\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"revision\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"guid\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"initiatingPage\": \"EXPAGENT_TEST_expa_1f6c1e198d24\", \"referringPage\": \"EXPAGENT_TEST_expa_1f6c1e198",
+  "evidence_artifacts": [
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\cpjicfogbgognnifjgmenmaldnmeeeib\\3.0.21\\dynamic-evidence\\flow-2\\step-source-open.png",
+      "description": "Step `source-open`: https://api.aigaea.net:54675/page",
+      "stage": "source-open",
+      "captured_at": "2026-09-22T16:48:10.248858+00:00",
+      "target_url": "https://api.aigaea.net:54675/page",
+      "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\cpjicfogbgognnifjgmenmaldnmeeeib\\3.0.21\\dynamic-evidence\\flow-2\\step-after-trigger.png",
+      "description": "Step `after-trigger`: https://api.aigaea.net:54675/page",
+      "stage": "after-trigger",
+      "captured_at": "2026-09-22T16:48:10.385310+00:00",
+      "target_url": "https://api.aigaea.net:54675/page",
+      "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+    },
+    {
+      "kind": "transcript",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\cpjicfogbgognnifjgmenmaldnmeeeib\\3.0.21\\dynamic-evidence\\flow-2\\storage-after-trigger.json",
+      "description": "Storage state at `after-trigger` (markers shown, others redacted)",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\cpjicfogbgognnifjgmenmaldnmeeeib\\3.0.21\\dynamic-evidence\\flow-2\\storage-after-trigger.png",
+      "description": "Storage panel (DevTools-style) at `after-trigger`",
+      "stage": "storage-after-trigger",
+      "captured_at": "2026-09-22T16:48:10.495504+00:00",
+      "target_url": "https://api.aigaea.net:54675/page",
+      "sha256": "48e9c4f18bc2bb7b6e0b23de370b46701f564e7fe4fd7d84126070f69728212f"
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\cpjicfogbgognnifjgmenmaldnmeeeib\\3.0.21\\dynamic-evidence\\flow-2\\step-after-observation.png",
+      "description": "Step `after-observation`: https://api.aigaea.net:54675/page",
+      "stage": "after-observation",
+      "captured_at": "2026-09-22T16:48:10.618615+00:00",
+      "target_url": "https://api.aigaea.net:54675/page",
+      "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+    },
+    {
+      "kind": "transcript",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\cpjicfogbgognnifjgmenmaldnmeeeib\\3.0.21\\dynamic-evidence\\flow-2\\storage-after-observation.json",
+      "description": "Storage state at `after-observation` (markers shown, others redacted)",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\cpjicfogbgognnifjgmenmaldnmeeeib\\3.0.21\\dynamic-evidence\\flow-2\\storage-after-observation.png",
+      "description": "Storage panel (DevTools-style) at `after-observation`",
+      "stage": "storage-after-observation",
+      "captured_at": "2026-09-22T16:48:10.752470+00:00",
+      "target_url": "https://api.aigaea.net:54675/page",
+      "sha256": "ee58ad6d1a4338956928bdc456512f7a30bb85785964c602b6a4f0181aa63f87"
+    },
+    {
+      "kind": "transcript",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\cpjicfogbgognnifjgmenmaldnmeeeib\\3.0.21\\dynamic-evidence\\flow-2\\trajectory.txt",
+      "description": "Bounded ReAct trajectory and tool evidence.",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    },
+    {
+      "kind": "source-contract",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\cpjicfogbgognnifjgmenmaldnmeeeib\\3.0.21\\dynamic-evidence\\flow-2\\source-contract.json",
+      "description": "Source-adjacent literal guards and generated local-input contract.",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    },
+    {
+      "kind": "screenshot",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\cpjicfogbgognnifjgmenmaldnmeeeib\\3.0.21\\dynamic-evidence\\flow-2\\step-final-state.png",
+      "description": "Step `final-state`: https://api.aigaea.net:54675/page",
+      "stage": "final-state",
+      "captured_at": "2026-09-22T16:48:10.832307+00:00",
+      "target_url": "https://api.aigaea.net:54675/page",
+      "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+    },
+    {
+      "kind": "screenshot-manifest",
+      "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-r6\\_runs\\chrome\\cpjicfogbgognnifjgmenmaldnmeeeib\\3.0.21\\dynamic-evidence\\flow-2\\screenshot-evidence.json",
+      "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+      "stage": "",
+      "captured_at": "",
+      "target_url": "",
+      "sha256": ""
+    }
+  ],
+  "human_handoff": null,
+  "debugger_summary": "",
+  "notes": "sinkTapKey=storage.local.set sourceBridgeReached=false semanticFixture=true"
+}

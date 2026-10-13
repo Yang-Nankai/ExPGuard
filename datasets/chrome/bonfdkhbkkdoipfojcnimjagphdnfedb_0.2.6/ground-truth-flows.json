@@ -1,0 +1,296 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "bonfdkhbkkdoipfojcnimjagphdnfedb",
+  "version": "0.2.6",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-4339fe64af648c3d",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:bonfdkhbkkdoipfojcnimjagphdnfedb:0.2.6:f834bace2fb708c7:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:bonfdkhbkkdoipfojcnimjagphdnfedb:0.2.6:f834bace2fb708c7:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "f834bace2fb708c7980e38754a4d7f8470795e0b14ce503fa93f3f6385306591",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "assets/index.ts-C5kIJibv",
+              "loc": "L2:C121028 -> L2:C121029",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "assets/index.ts-C5kIJibv",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "email",
+              "file": "assets/index.ts-C5kIJibv",
+              "loc": "L1:C1033 -> L1:C1125",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "flow_index": 0,
+                  "outcome": "CONFIRMED",
+                  "confidence": 0.85,
+                  "detail": "A controlled loopback web origin permitted by externally_connectable reached the onMessageExternal listener and the exact sink recorded the marker."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've now recovered the actual code. Here is my verification. ## What the source actually does From `assets/index.ts-C5kIJibv.js` (line 3, the background/service-worker bundle), the real handler is: ```js chrome.runtime.onMessageExternal.addListener((e,t,n)=>{ switch(e.action){ case\"login\": return ta=!1, e.email && e.jwt && chrome.storage.local.get([\"jwt\",\"isConnected\"],({jwt:t,isConnected:r})=>{ l({email:e.email, jwt:e.jwt, isConnected:!t||r}) // <-- storage WRITE with attacker values .t…",
+              "path": "extensions/bonfdkhbkkdoipfojcnimjagphdnfedb_0.2.6/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.85,
+              "reproduced": true,
+              "basis": "runtime_reproduced",
+              "usable_for_label": true,
+              "evidence_stage": "MARKER_REACHED",
+              "evidence_artifact_count": 3,
+              "reasoning": "A controlled loopback web origin permitted by externally_connectable reached the onMessageExternal listener and the exact sink recorded the marker.",
+              "notes": "controlledWebSender=true semanticFixture=true originalSenderIdentityNotClaimed=true",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\bonfdkhbkkdoipfojcnimjagphdnfedb_0.2.6\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-22T16:37:59.090Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\bonfdkhbkkdoipfojcnimjagphdnfedb_0.2.6\\dynamic\\evidence\\flow-0",
+              "files": [
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "step-final-state.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. ReAct response omitted the required FINAL_VERDICT marker.",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/bonfdkhbkkdoipfojcnimjagphdnfedb_0.2.6/final/final_report.json",
+              "report_mtime": "2026-08-18T03:42:14.01Z"
+            },
+            "manual_verification": null,
+            "notes": [],
+            "snapshot_drift": {
+              "static_verdict": {
+                "flow_summary": "",
+                "current_report": "TRUE_POSITIVE"
+              },
+              "dynamic_outcome": {
+                "flow_summary": "",
+                "current_report": "INCONCLUSIVE_AFTER_DEBUG"
+              },
+              "dynamic_final_verdict": {
+                "flow_summary": "",
+                "current_report": "UNCERTAIN"
+              }
+            },
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "0.2.6",
+        "latest_version": "0.2.8",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\bonfdkhbkkdoipfojcnimjagphdnfedb_0.2.8\\bonfdkhbkkdoipfojcnimjagphdnfedb.0.2.8.crx",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:chrome:bonfdkhbkkdoipfojcnimjagphdnfedb:0.2.6:f834bace2fb708c7:01",
+            "original_source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "chrome__bonfdkhbkkdoipfojcnimjagphdnfedb__0.2.8__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\bonfdkhbkkdoipfojcnimjagphdnfedb_0.2.8\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\bonfdkhbkkdoipfojcnimjagphdnfedb_0.2.8\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 56.672,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 3,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+                  "file": "assets/index.ts-pXyw4-o4",
+                  "loc": "L2:C121061 -> L2:C121062",
+                  "code": "…UUID();l({deviceId:e})}})).catch(ta.captureException)})),chrome.runtime.onMessageExternal.addListener(((e,t,n)=>{switch(»e«.action){case\"login\":return na=!1,e.email&&e.jwt&&chrome.storage.local.get([\"jwt\",\"isConnected\"],(({jwt:t,isConnected:r}…"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "email",
+                  "file": "assets/Text-DEKrB_cy",
+                  "loc": "L1:C1033 -> L1:C1125",
+                  "code": "…toStringTag,{value:\"Module\"}))}const i=\"isThemeDark\",s=\"fetcherType\",c={color:\"#ff9736\",colorHover:\"#ff8c02\",colorBackgr»ound:\"#000000\",colorGray70to100:\"#f6f6f6\",colorGray80to90:\"#c7c7c7\",colorGray90to80:\"#4e4e4e«\",colorGray100to70:\"#262626\",colorWhite:\"#FFFFFF\",colorWhiteToBlack:\"#FFFFFF\",colorBlackToWhite:\"#151515\",colorError:\"#e…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 1,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+                  "file": "assets/index.ts-pXyw4-o4",
+                  "loc": "L2:C121061 -> L2:C121062",
+                  "code": "…UUID();l({deviceId:e})}})).catch(ta.captureException)})),chrome.runtime.onMessageExternal.addListener(((e,t,n)=>{switch(»e«.action){case\"login\":return na=!1,e.email&&e.jwt&&chrome.storage.local.get([\"jwt\",\"isConnected\"],(({jwt:t,isConnected:r}…"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "jwt",
+                  "file": "assets/Text-DEKrB_cy",
+                  "loc": "L1:C1033 -> L1:C1125",
+                  "code": "…toStringTag,{value:\"Module\"}))}const i=\"isThemeDark\",s=\"fetcherType\",c={color:\"#ff9736\",colorHover:\"#ff8c02\",colorBackgr»ound:\"#000000\",colorGray70to100:\"#f6f6f6\",colorGray80to90:\"#c7c7c7\",colorGray90to80:\"#4e4e4e«\",colorGray100to70:\"#262626\",colorWhite:\"#FFFFFF\",colorWhiteToBlack:\"#FFFFFF\",colorBlackToWhite:\"#151515\",colorError:\"#e…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 2,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "From storage.local.set('jwt') in assets/index.ts-pXyw4-o4",
+                  "file": "assets/index.ts-pXyw4-o4",
+                  "loc": "L2:C121061 -> L2:C121062",
+                  "code": "…UUID();l({deviceId:e})}})).catch(ta.captureException)})),chrome.runtime.onMessageExternal.addListener(((e,t,n)=>{switch(»e«.action){case\"login\":return na=!1,e.email&&e.jwt&&chrome.storage.local.get([\"jwt\",\"isConnected\"],(({jwt:t,isConnected:r}…"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "isConnected",
+                  "file": "assets/Text-DEKrB_cy",
+                  "loc": "L1:C1033 -> L1:C1125",
+                  "code": "…toStringTag,{value:\"Module\"}))}const i=\"isThemeDark\",s=\"fetcherType\",c={color:\"#ff9736\",colorHover:\"#ff8c02\",colorBackgr»ound:\"#000000\",colorGray70to100:\"#f6f6f6\",colorGray80to90:\"#c7c7c7\",colorGray90to80:\"#4e4e4e«\",colorGray100to70:\"#262626\",colorWhite:\"#FFFFFF\",colorWhiteToBlack:\"#FFFFFF\",colorBlackToWhite:\"#151515\",colorError:\"#e…"
+                },
+                "propagation_step_count": 1
+              }
+            ],
+            "tool_report_flow_count": 2,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_ambiguous_candidates",
+            "basis": "Same API categories occur in multiple paths or source context similarity is insufficient for a unique identity decision.",
+            "candidate_count": 3,
+            "top_candidate": {
+              "tool_flow_index": 1,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 1.0,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 1.0,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:chrome:bonfdkhbkkdoipfojcnimjagphdnfedb:0.2.6:f834bace2fb708c7:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

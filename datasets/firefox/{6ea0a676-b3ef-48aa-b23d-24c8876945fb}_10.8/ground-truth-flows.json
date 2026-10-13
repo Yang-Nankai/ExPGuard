@@ -1,0 +1,466 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "firefox",
+  "extension_id": "{6ea0a676-b3ef-48aa-b23d-24c8876945fb}",
+  "version": "10.8",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-e2bf8afadd5131ae",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_SESSION_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:{6ea0a676-b3ef-48aa-b23d-24c8876945fb}:10.8:ce9714965b4917b0:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:{6ea0a676-b3ef-48aa-b23d-24c8876945fb}:10.8:ce9714965b4917b0:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "ce9714965b4917b0fe2964732543440336a681b162f6a6d95ac25af3a7a5e2d3",
+            "semantic_key": {
+              "rule_id": "attacker-input-storage-write",
+              "flow_type": "STORAGE_POSOING",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_file": "content_w2g.530d247b",
+              "source_loc": "1662716650",
+              "source_frame": "CS_1",
+              "sink_type": "CHROME_SESSION_STORAGE",
+              "sink_file": "sw.98b6defa",
+              "sink_loc": "2091621118",
+              "sink_frame": "BG_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://w2g.tv/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content_w2g.530d247b",
+              "loc": "L166:C27 -> L166:C50",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://stage.watch2gether.com/rooms/*",
+                      "https://w2g.tv/*",
+                      "https://rooms.w2g.tv/*",
+                      "https://stage-rooms.w2g.tv/*",
+                      "https://stage.w2g.tv/*",
+                      "https://staging.w2g.tv/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_w2g.530d247b",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://stage.watch2gether.com/rooms/*",
+                  "https://w2g.tv/*",
+                  "https://rooms.w2g.tv/*",
+                  "https://stage-rooms.w2g.tv/*",
+                  "https://stage.w2g.tv/*",
+                  "https://staging.w2g.tv/*"
+                ]
+              },
+              "code_preview": "s\n    var mainExport>>>s = newRequire(mainEntr<<<y);\n\n    // CommonJS"
+            },
+            "sink": {
+              "type": "CHROME_SESSION_STORAGE",
+              "remark": "db",
+              "file": "sw.98b6defa",
+              "loc": "L209:C16 -> L211:C18",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": " };\n                >>>chrome.storage.session.set({\n                    db: db\n                })<<<.then(function() {\n "
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content_w2g.530d247b",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[content_w2g.530d247b->sw.98b6defa]",
+              "storage_area": null
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual/Source Analysis",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户验证为 TP：openSite 成功后确实写入 chrome.storage.session.db。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 2,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #2 (STORAGE_POSOING)\n\n### 1. Source control — attacker-controllable ✓\n\nThe source anchor in `content_w2g.530d247b.js`:\n\n```js\nwindow.addEventListener(\"message\", function(event) {\n    if (event.origin === window.origin) {\n        if (event.data && !event.data._skipForward) chrome.runtime.sendMessage(event.data);\n    }\n});\n```\n\n- A page running on the content-script match host (e.g. `https://w2g.tv/*`) can call `window.postMessage(attackerData, \"*\")`.\n- `event.origin === window.origin` is trivially satisfied by the page's own same-origin `postMessage`; it is **not** an unforgeable trust anchor.\n- `event.data._skipForward` is only set by the extension's own outbound relay (`chrome.runtime.onMessage` → `window.postMessage`), so the page's attacker-controlled object passes through unchanged.\n- Therefore `event.data` (and every field, including `openSite.url`) is fully page-controlled.\n\n### 2. Source-to-sink path — intact ✓\n\nThe cross-boundary bridge is a real runtime message:\n\n`content_w2g` `chrome.runtime.sendMessage(event.data)` → `sw.98b6defa` `chrome.runtime.onMessage`.\n\nIn the background service worker:\n\n```js\nchrome.runtime.onMessage.addListener(function(ms",
+              "dynamic_guidance": {
+                "triggerable": false,
+                "trigger_mechanism": "OTHER",
+                "injection_context": "",
+                "origin_requirement": "",
+                "trigger_surface": "",
+                "target_urls": [],
+                "payload_sketch": "",
+                "dom_forgery": "",
+                "beacon_pointable": false,
+                "beacon_param": "",
+                "observation": "",
+                "notes": ""
+              },
+              "path": "extensions/{6ea0a676-b3ef-48aa-b23d-24c8876945fb}_10.8/static/static_report.json",
+              "report_mtime": "2026-08-14T16:27:05.268Z"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": null,
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "evidence": "deep-trace=source-contract={\"surface\": \"WINDOW_MESSAGE\", \"sourcePath\": \"content_w2g.530d247b.js\", \"location\": \"L166:C27 -> L166:C50\", \"eventNames\": [], \"eventTarget\": \"window\", \"eventDetailKey\": \"data\", \"envelope\": {}, \"forwardField\": \"data\", \"requirements\": {}, \"selectors\": [], \"mediaTags\": [], \"snippet\": \"nd or\\n        // we exhaust the require chain.\\n        if (previousRequire) {\\n          return previousRequire(name, true);\\n        }\\n\\n        // Try the node require function if it exists.\\n        if (nodeRequire && typeof name === 'string') {\\n          return nodeRequire(name);\\n        }\\n\\n        var err = new Error(\\\"Cannot find module '\\\" + name + \\\"'\\\");\\n        err.code = 'MODULE_NOT_FOUND';\\n        throw err;\\n      }\\n\\n      localRequire.resolve = resolve;\\n      localRequire.cache = {};\\n\\n      var module = (cache[name] = new newRequire.Module(name));\\n\\n      modules[nam",
+              "path": "extensions/{6ea0a676-b3ef-48aa-b23d-24c8876945fb}_10.8/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T10:43:47.221Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "evidence_summary": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "conflict_resolution": "Strict final decision table applied.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "static_supported",
+              "usable_for_label": true,
+              "path": "../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/firefox/extensions/{6ea0a676-b3ef-48aa-b23d-24c8876945fb}_10.8/final-verified-v2/final_report.json",
+              "report_mtime": "2026-08-20T13:39:23.913Z"
+            },
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user/source-based manual validation",
+              "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户验证为 TP：openSite 成功后确实写入 chrome.storage.session.db。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user or derived from the supplied source and vulnerability reports when the user could not decide."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual/Source Analysis",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_and_source_analysis",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+                "notes": "用户验证为 TP：openSite 成功后确实写入 chrome.storage.session.db。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "10.8",
+        "latest_version": "10.8",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-e42fc2b042f03566",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_SESSION_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:{6ea0a676-b3ef-48aa-b23d-24c8876945fb}:10.8:b96bfe2d4a73ffd8:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:{6ea0a676-b3ef-48aa-b23d-24c8876945fb}:10.8:b96bfe2d4a73ffd8:01",
+            "flow_index": 4,
+            "flow_order": 5,
+            "flow_label": "F005",
+            "semantic_sha256": "b96bfe2d4a73ffd8851c04282fd43f9b29a52c16d580bcf64c3d66908b79bead",
+            "semantic_key": {
+              "rule_id": "attacker-input-storage-write",
+              "flow_type": "STORAGE_POSOING",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_file": "content_w2g.530d247b",
+              "source_loc": "19002782",
+              "source_frame": "CS_1",
+              "sink_type": "CHROME_SESSION_STORAGE",
+              "sink_file": "sw.98b6defa",
+              "sink_loc": "2091621118",
+              "sink_frame": "BG_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 5,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://w2g.tv/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "From storage.session.set('db') in sw.98b6defa",
+              "file": "content_w2g.530d247b",
+              "loc": "L190:C0 -> L278:C2",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://stage.watch2gether.com/rooms/*",
+                      "https://w2g.tv/*",
+                      "https://rooms.w2g.tv/*",
+                      "https://stage-rooms.w2g.tv/*",
+                      "https://stage.w2g.tv/*",
+                      "https://staging.w2g.tv/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "UNTRUSTED_STORAGE",
+              "origin_context": "content_w2g.530d247b",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://stage.watch2gether.com/rooms/*",
+                  "https://w2g.tv/*",
+                  "https://rooms.w2g.tv/*",
+                  "https://stage-rooms.w2g.tv/*",
+                  "https://stage.w2g.tv/*",
+                  "https://staging.w2g.tv/*"
+                ]
+              },
+              "code_preview": "olve();\n    });\n});\n>>>chrome.runtime.onMessage.addListener(function(msg, sender) {\n    db_promise.then(function() {\n        if (sender.url.match(allowed_hosts)) {\n            if (msg.openSite) chrome.windows.create({\n                left: 10,\n                top: 10,\n                width: 1024,\n                height: 680,\n                type: navigator.userAgent.toLowerCase().indexOf('firefox') > -1 || navigator.userAgent.indexOf(\"OPR\") > -1 ? \"normal\" : \"popup\",\n                url: msg.openSite.url\n            }).then(function(w) {\n                db[sender.tab.id] = {\n                    type: \"window\",\n                    stab: w.tabs[w.tabs.length - 1].id,\n                    tframe: null,\n                    vframe: null,\n                    vidscore: 0,\n                    syncurl: msg.openSite.url\n                };\n                chrome.storage.session.set({\n                    db: db\n                }).then(function() {\n                    chrome.tabs.sendMessage(sender.tab.id, {\n                        \"windowOpened\": true\n                    }, {\n                        frameId: 0\n                    });\n                });\n            });\n            if (db[sender.tab.id]) {\n                if (db[sender.tab.id].type === \"window\") {\n                    if (msg.closeSite) _closeWindow(sender.tab.id);\n                    else if (msg.focusSite) chrome.tabs.get(db[sender.tab.id].stab).then(function(tab) {\n                        chrome.windows.update(tab.windowId, {\n                            focused: true\n                        });\n                    });\n                }\n                if (msg.urlok) {\n                    msg.urlok.syncurl = db[sender.tab.id].syncurl;\n                    chrome.tabs.sendMessage(db[sender.tab.id].stab, msg);\n                } else if (db[sender.tab.id].vframe !== null) chrome.tabs.sendMessage(db[sender.tab.id].stab, msg, {\n                    frameId: db[sender.tab.id].vframe\n                });\n            }\n        } else if (sender.tab) {\n            let m = _getKeyByTab(sender.tab.id);\n            if (m) {\n                if (msg.newurl && sender.frameId === db[m].tframe) chrome.tabs.get(sender.tab.id).then(function(controlledTab) {\n                    chrome.tabs.sendMessage(m, {\n                        \"content_loaded\": {\n                            url: msg.newurl.url,\n                            title: msg.newurl.title,\n                            thumb: controlledTab.favIconUrl && controlledTab..."
+            },
+            "sink": {
+              "type": "CHROME_SESSION_STORAGE",
+              "remark": "db",
+              "file": "sw.98b6defa",
+              "loc": "L209:C16 -> L211:C18",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": " };\n                >>>chrome.storage.session.set({\n                    db: db\n                })<<<.then(function() {\n "
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": true,
+              "message_sender": "content_w2g.530d247b",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[content_w2g.530d247b->sw.98b6defa]",
+              "storage_area": "STORAGE_FLOW[area: session, key: db, sender: sw.98b6defa, receiver: sw.98b6defa]"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual/Source Analysis",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户验证为 TP：建立 openSite 映射后，后续 branch 确实更新 session db。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 2,
+              "source_provenance": "UNTRUSTED_STORAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #4 (STORAGE_POSOING)\n\n### 1. Source controllability — CONFIRMED\nThe actual chain starts in the content script, which is a raw page→background bridge:\n\n```js\n// content_w2g.530d247b.js\nwindow.addEventListener(\"message\", function(event) {\n    if (event.origin === window.origin) {\n        if (event.data && !event.data._skipForward) chrome.runtime.sendMessage(event.data);\n    }\n});\n```\n\nAny script executing on the matched `https://w2g.tv/*` page can call `window.postMessage({openSite:{url:...}}, \"*\")`. The `event.origin === window.origin` check is trivially satisfied by a same-origin script (or XSS payload), and `_skipForward` is attacker-chosen (simply omit it). This is attacker/untrusted web content per the harness. The manifest restricts injection to W2G hosts, but that only narrows the surface to XSS on those hosts — the source is still genuinely web-controlled.\n\n### 2. Source→sink path — CONFIRMED\n```\npage postMessage({openSite:{url}})\n  → content_w2g window \"message\" listener (L164-166)\n  → chrome.runtime.sendMessage(event.data)          [HOP: content → background]\n  → sw.98b6defa chrome.runtime.onMessage (L190)\n  → sender.url.match(allowed_hosts)         ",
+              "dynamic_guidance": {
+                "triggerable": false,
+                "trigger_mechanism": "OTHER",
+                "injection_context": "",
+                "origin_requirement": "",
+                "trigger_surface": "",
+                "target_urls": [],
+                "payload_sketch": "",
+                "dom_forgery": "",
+                "beacon_pointable": false,
+                "beacon_param": "",
+                "observation": "",
+                "notes": ""
+              },
+              "path": "extensions/{6ea0a676-b3ef-48aa-b23d-24c8876945fb}_10.8/static/static_report.json",
+              "report_mtime": "2026-08-14T16:27:05.268Z"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": null,
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "evidence": "deep-trace=source-contract={\"surface\": \"WINDOW_MESSAGE\", \"sourcePath\": \"content_w2g.530d247b.js\", \"location\": \"L190:C0 -> L278:C2\", \"eventNames\": [], \"eventTarget\": \"window\", \"eventDetailKey\": \"data\", \"envelope\": {}, \"forwardField\": \"data\", \"requirements\": {}, \"selectors\": [], \"mediaTags\": [], \"snippet\": \"   localRequire.resolve = resolve;\\n      localRequire.cache = {};\\n\\n      var module = (cache[name] = new newRequire.Module(name));\\n\\n      modules[name][0].call(\\n        module.exports,\\n        localRequire,\\n        module,\\n        module.exports,\\n        globalObject\\n      );\\n    }\\n\\n    return cache[name].exports;\\n\\n    function localRequire(x) {\\n      var res = localRequire.resolve(x);\\n      return res === false ? {} : newRequire(res);\\n    }\\n\\n    function resolve(x) {\\n      var id = modules[name][1][x];\\n      return id != null ? id : x;\\n    }\\n  }\\n\\n  function Module(modul",
+              "path": "extensions/{6ea0a676-b3ef-48aa-b23d-24c8876945fb}_10.8/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T10:43:47.221Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "evidence_summary": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "conflict_resolution": "Strict final decision table applied.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "static_supported",
+              "usable_for_label": true,
+              "path": "../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/firefox/extensions/{6ea0a676-b3ef-48aa-b23d-24c8876945fb}_10.8/final-verified-v2/final_report.json",
+              "report_mtime": "2026-08-20T13:39:23.913Z"
+            },
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user/source-based manual validation",
+              "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户验证为 TP：建立 openSite 映射后，后续 branch 确实更新 session db。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user or derived from the supplied source and vulnerability reports when the user could not decide."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual/Source Analysis",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_and_source_analysis",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+                "notes": "用户验证为 TP：建立 openSite 映射后，后续 branch 确实更新 session db。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "10.8",
+        "latest_version": "10.8",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

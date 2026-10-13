@@ -1,0 +1,272 @@
+{
+  "extension_id": "mhmphnocemakkjdampibehejoaleebpo",
+  "extension_version": "0.93",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 4,
+  "verified_count": 3,
+  "verdicts": [
+    {
+      "flow_index": 1,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #3 (STORAGE_POSOING: attacker → `chrome.storage` \"playedgames\")\n\n### (a) Who controls the source?\nAttacker/untrusted web page. The source is `window.addEventListener('supernova-message', …)` in the content script, which runs on `http://*/*` and `https://*/*`. A page can dispatch:\n\n```js\nwindow.dispatchEvent(new MessageEvent('supernova-message', {\n  data: { key: 'supernova-jslauncher-message', message: JSON.stringify({...}) }\n}));\n```\n\nThe \"guards\" are `e.data.key == \"supernova-jslauncher-message\"` and `message.command == \"loggame\"` — both are attacker-supplied fields, not authentication. There is no `sender.id`/origin allow-list. Source is fully attacker-controllable.\n\n### (b) Exact source-to-sink path (confirmed in source)\n1. L264–268: handler parses `e.data.message` via `JSON.parse`.\n2. L274 `switch (message.command)` → L291–294 case `\"loggame\"`: `let apiobject = message.data; logGame(apiobject);`.\n3. `logGame` (L115–179): validates only `game.url != null && game.title != null` (attacker supplies both), then:\n   - L171 `games[game.url] = game;`\n   - L174 `lib.syncdata.set({ playedgames: lib.entries(games) });`\n4. `lib.entries` (scripts/lib.js L126–134) wra",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "scripts/content",
+          "reportedLoc": "L264:C7 -> L264:C13",
+          "resolvedFile": "scripts/content.js",
+          "resolved": true,
+          "snippet": "L264 C7-13:   if (!e.data || !e.data.message) return;"
+        },
+        "sinkAnchor": {
+          "reportedFile": "scripts/content",
+          "reportedLoc": "L39:C16 -> L42:C18",
+          "resolvedFile": "scripts/content.js",
+          "resolved": true,
+          "snippet": ">>    39|   notify({\n>>    40|     type: \"bookmark\",\n>>    41|     data: {\n>>    42|       message: `"
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://*/*",
+              "http://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "scripts/lib/jquery.js",
+              "scripts/lib.js",
+              "scripts/content.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 2,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Ledger\n\n**(a) Who controls the source?** — Any webpage matching `http://*/*` / `https://*/*`. The content script (`scripts/content.js`) registers `window.addEventListener(\"supernova-message\", superNovaMessageEventHandler)` (L299, helper L238-240). The page can dispatch a `MessageEvent('supernova-message', {data: {...}})` on the shared DOM and the isolated-world listener receives it. The only checks are `if (!e.data || !e.data.message) return` (L264) and `if (e.data.key != \"supernova-jslauncher-message\") return` (L265) — both are attacker-chosen fields, with no origin/sender.id trust boundary. **Attacker-controlled: confirmed.**\n\n**(b) Exact data path into the sink** — \n- Page `MessageEvent` → `superNovaMessageEventHandler` (L263-298) → `JSON.parse(e.data.message)` (L268) → `case \"loggame\"` (L291-295) → `logGame(apiobject)` where `apiobject = message.data` (fully page-controlled).\n- `logGame` (L115-178) requires only `game.url != null && game.title != null` (attacker supplies both), then sets `games[game.url] = game` (L171) and calls `lib.syncdata.set({ playedgames: lib.entries(games) })` (L174).\n- `lib.syncdata.set` resolves to `writeSortedArrayLossy` in `scripts/li",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 4,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "scripts/content",
+          "reportedLoc": "L264:C7 -> L264:C13",
+          "resolvedFile": "scripts/content.js",
+          "resolved": true,
+          "snippet": "L264 C7-13:   if (!e.data || !e.data.message) return;"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L49:C12 -> L55:C14",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>    49|             chrome.storage.local.set(wrappeddata, function () {\n>>    50|                 wrappeddata[key].data = trimByteSize(wrappeddata[key].data);\n>>    51|                 chrome.storage.sync.set(wrappeddata, function () {\n>>    52|                     if (cb)\n>>    53|                         cb();\n>>    54|                 });\n>>    55|             });"
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://*/*",
+              "http://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "scripts/lib/jquery.js",
+              "scripts/lib.js",
+              "scripts/content.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 3,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence to verify this flow. Let me reconstruct the full chain from source.\n\n## (a) Who controls the source?\n\n**Any webpage** (content script runs at `document_start` on `http://*/*` and `https://*/*`). The content script registers:\n\n```js\n// scripts/content.js:263-298\nfunction superNovaMessageEventHandler(e) {\n  if (!e.data || !e.data.message) return;\n  if (e.data.key != \"supernova-jslauncher-message\") return;\n  var message = null;\n  try { message = JSON.parse(e.data.message); } catch (e) { return; }\n  ...\n  switch (message.command) {\n    ...\n    case \"loggame\":\n      if (message.data) {\n        let apiobject = message.data;\n        logGame(apiobject);\n      }\n      break;\n  }\n}\naddEventHandler(\"supernova-message\", superNovaMessageEventHandler);\n```\n\nThe only guards are `e.data.message` present and `e.data.key === \"supernova-jslauncher-message\"`, both of which the page supplies. There is no `event.source`/origin check and no sender authentication. This matches the deterministic harness (\"a page can forge window.postMessage/CustomEvent fields\").\n\n## (b) Exact source-to-sink path\n\n1. Page dispatches `new MessageEvent('supernova-message', { data: { key: 'supernova-jsla",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 4,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "scripts/content",
+          "reportedLoc": "L264:C7 -> L264:C13",
+          "resolvedFile": "scripts/content.js",
+          "resolved": true,
+          "snippet": "L264 C7-13:   if (!e.data || !e.data.message) return;"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L51:C16 -> L54:C18",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>    51|                 chrome.storage.sync.set(wrappeddata, function () {\n>>    52|                     if (cb)\n>>    53|                         cb();\n>>    54|                 });"
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://*/*",
+              "http://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "scripts/lib/jquery.js",
+              "scripts/lib.js",
+              "scripts/content.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 3 flow(s): 3 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

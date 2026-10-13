@@ -1,0 +1,204 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "edge",
+  "extension_id": "lmphiinjkobfnpifgpcggcpicomibhpp",
+  "version": "0.7",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-4aac11ed569ecd8d",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/edge/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:edge:lmphiinjkobfnpifgpcggcpicomibhpp:0.7:316da31c64706e93:01",
+          "flow": {
+            "flow_id": "expguard-opti:edge:lmphiinjkobfnpifgpcggcpicomibhpp:0.7:316da31c64706e93:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "316da31c64706e93bf423dccddb3234c1bcbb5e08d22602a910c3785a87fa565",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "HIGH",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content.min",
+              "loc": "L1:C3552 -> L1:C3563",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.youtube.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content.min",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "cc_contribute",
+              "file": "content.min",
+              "loc": "L1:C3674 -> L1:C3717",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.youtube.com/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "flow_index": 0,
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "User manually confirmed TP for the YouTube page-message storage path."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence to decide. Let me summarize the verification. ## Decision ledger **(a) Who controls the source?** Any script running on a page matching `https://*.youtube.com/*` (including `www.youtube.com`) can call `window.postMessage`. The content script gates the message with `e.data.exId === c`, where `c` is a module-scope random token (`const c = Object(r.a)(\"20\")` — 20 random alphanumerics). Crucially, this token is **leaked to the page**: when the extension is enabled, the…",
+              "path": "extensions/lmphiinjkobfnpifgpcggcpicomibhpp_0.7/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.45,
+              "reproduced": false,
+              "basis": "non_decisive",
+              "usable_for_label": false,
+              "evidence_stage": "LISTENER_READY",
+              "evidence_artifact_count": 5,
+              "reasoning": "sink 断点已就绪且候选输入已重放，但 sink 断点/ tap 均未命中；source 可能未到达后台，或需要额外的页面前置条件。",
+              "notes": "deepTraceCode=SINK_NOT_REACHED_AFTER_BREAKPOINT react=skippedDeterministicResolved",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\lmphiinjkobfnpifgpcggcpicomibhpp_0.7\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-23T11:36:08.634Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\lmphiinjkobfnpifgpcggcpicomibhpp_0.7\\dynamic\\evidence\\flow-0",
+              "files": [
+                "extension-debug.json",
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "source-contract.json",
+                "step-after-observation.png",
+                "step-after-trigger.png",
+                "step-final-state.png",
+                "step-source-open.png",
+                "storage-after-observation.json",
+                "storage-after-observation.png",
+                "storage-after-trigger.json",
+                "storage-after-trigger.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.82,
+              "reasoning": "Dynamic phase performed a source-contract-aware sink rebuttal. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountRateLimitExceeded', 'message': 'Requests are too frequent. Please reduce your request frequency, wait a short moment, and retry your request. Request id: 0217870262445244c81961e630bce638d970dc275335873b14bbc', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Dynamic phase performed a source-contract-aware sink rebuttal.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "SINK_NOT_FIRED",
+              "tool_reports_consulted": [
+                "primary",
+                "coco",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/edge/extensions/lmphiinjkobfnpifgpcggcpicomibhpp_0.7/final/final_report.json",
+              "report_mtime": "2026-08-18T04:10:43.410Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-23T11:36:08.634Z",
+                "notes": "User manually confirmed TP for the YouTube page-message storage path.",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\lmphiinjkobfnpifgpcggcpicomibhpp_0.7\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\lmphiinjkobfnpifgpcggcpicomibhpp_0.7\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-23T11:36:08.634Z",
+                  "sha256": "34a14a3ec59a35961f6c72bf9eadb08171b0d9e43e881270ff0f611d7d98937e"
+                }
+              }
+            ],
+            "notes": [
+              "Latest manual attestation overrides the aggregate label while preserving the automated outcome for audit."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "0.7",
+        "latest_version": "0.7",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

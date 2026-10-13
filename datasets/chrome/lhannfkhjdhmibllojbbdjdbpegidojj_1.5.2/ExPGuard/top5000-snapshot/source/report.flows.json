@@ -1,0 +1,266 @@
+{
+  "extensionId": "lhannfkhjdhmibllojbbdjdbpegidojj",
+  "extensionVersion": "1.5.2",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 6,
+    "totalFiles": 6,
+    "distinctFlows": 2,
+    "rawIssueEntries": 2,
+    "sinklessSourcesSkipped": 12
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "js/content/ct",
+      "frame": "CS_3",
+      "constraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "js/content/ct",
+        "loc": "L1:C183 -> L1:C184",
+        "line": 1,
+        "col": [
+          183,
+          184
+        ],
+        "spansTo": null,
+        "code": "…trict\";const e=\"recorder-screenshot-v3\",t=chrome.runtime.getURL(\"\");window.addEventListener(\"message\",(t=>{let n=t.data;»n«.p==e&&\"tobg\"==n.cmd&&chrome.runtime.sendMessage(n.data,(e=>{n.cb&&window.postMessage({cmd:\"ctcb\",cb:n.cb,data:e})}))}))…"
+      },
+      "sinks": [
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "[UNKNOWN ORIGIN]",
+          "file": "js/content/ct",
+          "loc": "L1:C251 -> L1:C298",
+          "line": 1,
+          "col": [
+            251,
+            298
+          ],
+          "spansTo": null,
+          "code": "…window.addEventListener(\"message\",(t=>{let n=t.data;n.p==e&&\"tobg\"==n.cmd&&chrome.runtime.sendMessage(n.data,(e=>{n.cb&&»window.postMessage({cmd:\"ctcb\",cb:n.cb,data:e})«}))}));{let n=document.createElement(\"script\");n.src=chrome.runtime.getURL(\"/js/content/sm.js\"),n.dataset.pname=e,n.data…",
+          "frame": "CS_3",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 46,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "js/content/ct",
+            "line": 1,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right",
+              "ELEMENT:object.setProperty",
+              "MESSAGE"
+            ],
+            "code": "…\",(t=>{let n=t.data;»n.p==e&&\"tobg\"==n.cmd&&chrome.runtime.sendMessage(n.data,(e=>{n.cb&&window.postMessage({cmd:\"ctcb\",cb:n.cb,data:e})}))}) …⟨tainted span: 447 chars⟩… cument.body.setAttribute(\"inMainTabUse\",1),chrome.runtime.onMessage.addListener(((e,t,n)=>{\"canbeuse\"==e.topic&&n(!0)}))«)})()}));",
+            "crossContextHop": [
+              "runtime.single.response.message[serviceWorker/sw->js/content/ct]",
+              "runtime.single.sender.message[serviceWorker/sw->js/content/ct]"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "serviceWorker/sw",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "serviceWorker/sw",
+        "loc": "L1:C569 -> L1:C1927",
+        "line": 1,
+        "col": [
+          569,
+          1927
+        ],
+        "spansTo": null,
+        "code": "…;let o={},a=!1,i=-1;»chrome.runtime.onMessage.addListener(((t,r,c)=>{switch(t.cmd){case\"get_bg\":chrome.storage.local.get([\"uid\"],(t=>{let o=t …⟨tainted span: 1358 chars⟩… etRequest.updateDynamicRules(t.data);break;case\"usr\":chrome.declarativeNetRequest.updateSessionRules(t.data)}return!0}))«,function(){let e=\"\"…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "storage.fuzzy.settings",
+          "file": "serviceWorker/sw",
+          "loc": "L1:C920 -> L1:C954",
+          "line": 1,
+          "col": [
+            920,
+            954
+          ],
+          "spansTo": null,
+          "code": "…id,htab:i,mf:t.mf||\"\"})}));break;case\"get_mf\":chrome.storage.local.get(\"mf\",(e=>{c(e.mf||\"\")}));break;case\"set_storage\":»chrome.storage.local.set(t.data,c)«;break;case\"get_storage\":chrome.storage.local.get(t.data,c);break;case\"set_res\":o[t.url]=t.data;break;case\"get_res\":c(o[…",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_WINDOWS_CREATE_OPTIONS",
+          "remark": null,
+          "file": "serviceWorker/sw",
+          "loc": "L1:C1152 -> L1:C1226",
+          "line": 1,
+          "col": [
+            1152,
+            1226
+          ],
+          "spansTo": null,
+          "code": "…\":o[t.url]=t.data;break;case\"get_res\":c(o[t.url]);break;case\"l2inited\":c(a),a=!0;break;case\"htab\":\"create\"==t.fun?-1==i?»chrome.windows.create(t.data,(e=>{i=e.tabs[0].id,c({winId:e.id,htab:i})}))«:chrome.tabs.get(i,(e=>{if(e){try{chrome.tabs.update(i,{url:t.data.url})}catch(e){}c({winId:e.windowId,htab:e.id})}else …",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_WINDOWS_UPDATE_OPTIONS",
+          "remark": null,
+          "file": "serviceWorker/sw",
+          "loc": "L1:C1440 -> L1:C1477",
+          "line": 1,
+          "col": [
+            1440,
+            1477
+          ],
+          "spansTo": null,
+          "code": "…windowId,htab:e.id})}else chrome.windows.create(t.data,(e=>{i=e.tabs[0].id,c({winId:e.id,htab:i})}))})):\"update\"==t.fun?»chrome.windows.update(t.winId,t.data)«:\"remove\"==t.fun&&chrome.windows.remove(t.winId);break;case\"tab\":if(\"create\"==t.fun){var u={...t.data};u.index||(u.index…",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_DECLARATIVENETREQUEST_RULES",
+          "remark": null,
+          "file": "serviceWorker/sw",
+          "loc": "L1:C1788 -> L1:C1843",
+          "line": 1,
+          "col": [
+            1788,
+            1843
+          ],
+          "spansTo": null,
+          "code": "…t.fun)try{chrome.tabs.update(t.tabId,t.data)}catch(e){}else\"remove\"==t.fun&&chrome.tabs.remove(t.tabId);break;case\"udr\":»chrome.declarativeNetRequest.updateDynamicRules(t.data)«;break;case\"usr\":chrome.declarativeNetRequest.updateSessionRules(t.data)}return!0})),function(){let e=\"\",t=1;chrome.stor…",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_DECLARATIVENETREQUEST_RULES",
+          "remark": null,
+          "file": "serviceWorker/sw",
+          "loc": "L1:C1860 -> L1:C1915",
+          "line": 1,
+          "col": [
+            1860,
+            1915
+          ],
+          "spansTo": null,
+          "code": "…un&&chrome.tabs.remove(t.tabId);break;case\"udr\":chrome.declarativeNetRequest.updateDynamicRules(t.data);break;case\"usr\":»chrome.declarativeNetRequest.updateSessionRules(t.data)«}return!0})),function(){let e=\"\",t=1;chrome.storage.local.get([\"installTime\",\"uid\"],(function(r){r.uid?e=r.uid:(e=r.uid|…",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_TABS_CREATE_OPTIONS",
+          "remark": null,
+          "file": "serviceWorker/sw",
+          "loc": "L1:C1613 -> L1:C1649",
+          "line": 1,
+          "col": [
+            1613,
+            1649
+          ],
+          "spansTo": null,
+          "code": "…&&chrome.windows.remove(t.winId);break;case\"tab\":if(\"create\"==t.fun){var u={...t.data};u.index||(u.index=r.tab.index+1),»chrome.tabs.create(u,(e=>{c(e.id)}))«}else if(\"update\"==t.fun)try{chrome.tabs.update(t.tabId,t.data)}catch(e){}else\"remove\"==t.fun&&chrome.tabs.remove(t.tabI…",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_DOWNLOADS_OPTIONS",
+          "remark": null,
+          "file": "serviceWorker/sw",
+          "loc": "L3:C34698 -> L3:C34789",
+          "line": 3,
+          "col": [
+            34698,
+            34789
+          ],
+          "spansTo": null,
+          "code": "…anoId=\"+h})}catch(e){}})):\"copy\"===t&&chrome.tabs.sendMessage(r.tab.id,{type:\"area_copy\",data:p[h]})}))}function O(e,t){»chrome.downloads.download({url:e,filename:\"Video Screen\".concat(Date.now(),\".\").concat(t)})«}function k(e){g=e,\"cancel\"===e||\"stop\"===e?(\"cancel\"===e&&(S=0,chrome.runtime.sendMessage({type:\"close_window\"})),x(),w…",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_WINDOWS_CREATE_OPTIONS",
+          "remark": null,
+          "file": "serviceWorker/sw",
+          "loc": "L1:C1346 -> L1:C1420",
+          "line": 1,
+          "col": [
+            1346,
+            1420
+          ],
+          "spansTo": null,
+          "code": "…:chrome.tabs.get(i,(e=>{if(e){try{chrome.tabs.update(i,{url:t.data.url})}catch(e){}c({winId:e.windowId,htab:e.id})}else »chrome.windows.create(t.data,(e=>{i=e.tabs[0].id,c({winId:e.id,htab:i})}))«})):\"update\"==t.fun?chrome.windows.update(t.winId,t.data):\"remove\"==t.fun&&chrome.windows.remove(t.winId);break;case\"tab…",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 293,
+        "distinctLines": 2,
+        "steps": [
+          {
+            "n": 1,
+            "file": "serviceWorker/sw",
+            "line": 1,
+            "ops": [
+              "MESSAGE",
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:object.setProperty",
+              "ELEMENT:computed-member-unknown-alternative",
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-right",
+              "COPY:object-spread"
+            ],
+            "code": "…g\"),\"\")}r=r||\"\";let »o={},a=!1,i=-1;chrome.runtime.onMessage.addListener(((t,r,c)=>{switch(t.cmd){case\"get_bg\":chrome.storage.local.get([\"uid …⟨tainted span: 1373 chars⟩… etRequest.updateDynamicRules(t.data);break;case\"usr\":chrome.declarativeNetRequest.updateSessionRules(t.data)}return!0}))«,function(){let e=\"\"…",
+            "crossContextHop": "runtime.single.sender.message[js/content/ct->serviceWorker/sw]"
+          },
+          {
+            "n": 2,
+            "file": "serviceWorker/sw",
+            "line": 3,
+            "ops": [
+              "MESSAGE",
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-right",
+              "ELEMENT:object.setProperty",
+              "RETURN:string.concat",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right",
+              "ASSIGN:unary",
+              "ELEMENT:implicit.add",
+              "ELEMENT:member-element-container",
+              "ELEMENT:computed-member-unknown-alternative",
+              "RETURN:fallback-return"
+            ],
+            "code": "…1];t[n]=o})),t};var »p={},y={},g=\"stop\",_=-1,w=null,I=null,S=0;function E(e,t,r,n){chrome.tabs.captureVisibleTab(t[0].windowId,{format:\"png\"} …⟨tainted span: 5305 chars⟩… unction(t){chrome.tabs.sendMessage(t[0].id,{type:\"show_count_down\",count_down_number:e.count_down_number})}))}var n,o}))«,chrome.runtime.onIn…",
+            "crossContextHop": "runtime.single.sender.message[js/content/ct->serviceWorker/sw]"
+          }
+        ]
+      }
+    }
+  ]
+}

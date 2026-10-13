@@ -1,0 +1,190 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "edge",
+  "extension_id": "jolbglpclnpdolcmbgdipkdimneiplof",
+  "version": "1.0.3",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-2220536826a96e50",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "FETCH_BODY",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/edge/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:edge:jolbglpclnpdolcmbgdipkdimneiplof:1.0.3:a333c3600d9b0c89:01",
+          "flow": {
+            "flow_id": "expguard-opti:edge:jolbglpclnpdolcmbgdipkdimneiplof:1.0.3:a333c3600d9b0c89:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "a333c3600d9b0c89d64cf33715ac98adb29351e66d89dfeb4b8044893cde4c50",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "HIGH",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "js/content",
+              "loc": "L13:C8 -> L13:C23",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.1688.com/*",
+                      "https://*.taobao.com/*",
+                      "https://*.tmall.com/*",
+                      "https://*.tmall.hk/*",
+                      "https://*.jd.com/*",
+                      "https://*.jd.hk/*",
+                      "https://*.yangkeduo.com/*",
+                      "https://*.vipglobal.hk/*",
+                      "https://*.vip.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/content",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_BODY",
+              "remark": "[Unknown URL]",
+              "file": "js/background",
+              "loc": "L51:C26 -> L51:C51",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "js/content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "round_edge_r5_user_manual",
+                  "source": "Manual",
+                  "kind": "round_edge_r5_user_manual",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证为 TP，但利用有限：依赖目标电商页面和扩展后台消息处理前置条件。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\jolbglpclnpdolcmbgdipkdimneiplof_1.0.3\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "report_sha256": "76c75ab9f0f5b12de524c265f17d6e6740cc13f53c5ad1d6e0119d11bbbf7e34"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": true,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "FALSE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 (WINDOW_MESSAGE_EVENT → FETCH_BODY) ### 1. Source control — confirmed attacker-controllable `js/content.js`: ``` 7 window.addEventListener('message', function (event) { 9 if (event.source !== window) { return; } 13 if (event.data.type && (event.data.type === 'FROM_PAGE')) { 15 buyer_nick = event.data.buyer_nick; 18 chrome.runtime.sendMessage( 19 { type: \"BUYER_LOGINID1688\", data: buyer_nick }, ...); ``` A page running on one of the `content_scripts.matches` hos…",
+              "path": "extensions/jolbglpclnpdolcmbgdipkdimneiplof_1.0.3/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "PARTIAL",
+              "final_verdict": "FALSE_POSITIVE",
+              "recorded_label": null,
+              "confidence": 0.72,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": "SINK_REACHED",
+              "evidence_artifact_count": 0,
+              "reasoning": "The controlled page input reached the content-script source, which called runtime.sendMessage with the marker, but the privileged background sink did not execute. This isolates the remaining failure to the content-to-background bridge.",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r5\\summary.json",
+              "report_mtime": "2026-09-23T21:27:00Z",
+              "run_id": "after-fixes-edge-r5",
+              "run_evidence_sha256": "4511c99e8719bde078e40f90edf7769f86dcdaa73e80994df69b01a982c71743"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 02178702621335878af8113c224ccdd69578c3b63d1e71ab0a506', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "FALSE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/edge/extensions/jolbglpclnpdolcmbgdipkdimneiplof_1.0.3/final/final_report.json",
+              "report_mtime": "2026-08-18T04:10:12.085Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "round_edge_r5_user_manual",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-23T15:12:28.881092Z",
+                "notes": "人工验证为 TP，但利用有限：依赖目标电商页面和扩展后台消息处理前置条件。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\jolbglpclnpdolcmbgdipkdimneiplof_1.0.3\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\jolbglpclnpdolcmbgdipkdimneiplof_1.0.3\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-23T15:12:28.881092Z",
+                  "sha256": "76c75ab9f0f5b12de524c265f17d6e6740cc13f53c5ad1d6e0119d11bbbf7e34"
+                }
+              }
+            ],
+            "notes": [
+              "after-fixes-edge-r5 non-decisive outcome: PARTIAL.",
+              "Round edge r5 manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.0.3",
+        "latest_version": "1.0.3",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

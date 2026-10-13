@@ -1,0 +1,230 @@
+{
+  "extension_id": "nbhfcmbdimdbbclfngkjfmgmjhnkjocl",
+  "extension_version": "4.1.2",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 2,
+  "verified_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.3,
+      "reasoning": "Structured extraction unavailable; preserved analyst notes: ## Four-part decision ledger\n\n**(a) Who controls the source?**\nThe source is `ELEMENT_INNER_HTML` from `account.js` (content script, `CS_2`), specifically `document.getElementById(\"user\")`'s `innerHTML` (and the `MutationObserver` path on `textContent`). This runs in an ISOLATED content-script world, but the DOM is shared with the page. A page script \u2014 or XSS on `https://account.alisave.app/*` \u2014 can freely set `#user.innerHTML` / insert text-node children. So the value is genuinely page/untrusted-controlled at runtime. The harness note confirms this: pages can mutate shared DOM values, and a content-script DOM read is not authentication.\n\n**(b) Source-to-sink path**\nConfirmed from the full minified line:\n\n```\nvar e = function(e){ !0 !== e.loading && chrome.storage.local.set({user: e}).then(...) };\n...\nn = document.getElementById(\"user\");\nd = JSON.parse(n.innerHTML);   // source: page DOM\ne(d);                          // direct call into the storage function\nt.observe(n, {childList:!0});  // observer path: parse textContent -> e(d)\n```\n\nThe report's propagation is correct: `#user` innerHTML \u2192 `JSON.parse` \u2192 `e(d)` \u2192 `chrome.storage.local.set({user: e})`. No cross-context hop is inv",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {
+        "sanitized": false,
+        "duplicatePaths": 1,
+        "rawSteps": 4,
+        "distinctLines": 1,
+        "crossContextHops": [],
+        "sinkUrlControl": []
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "account",
+          "reportedLoc": "L1:C413 -> L1:C436",
+          "resolvedFile": "account.js",
+          "resolved": true,
+          "snippet": "L1 C413-436: \u2026des[0].textContent,d=JSON.parse(n);e(d)}})),n=document.getElementById(\"user\"),d=JSON.parse(n.innerHTML);e(d),t.observe(n,{childList:!0});var o=window.document.createElement(\"div\");o.s\u2026"
+        },
+        "sinkAnchor": {
+          "reportedFile": "account",
+          "reportedLoc": "L1:C53 -> L1:C87",
+          "resolvedFile": "account.js",
+          "resolved": true,
+          "snippet": "L1 C53-87: (()=>{\"use strict\";var e=function(e){!0!==e.loading&&chrome.storage.local.set({user:e}).then((function(){-1!==window.location.pathname.indexOf(\"/account/refresh\")&&win\u2026"
+        },
+        "sourceExpectedMarkers": [
+          "document",
+          "window",
+          "value",
+          "textContent",
+          "innerHTML"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://account.alisave.app/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "account.js"
+            ],
+            "runAt": null,
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "No structured verdict or explicit labelled transcript verdict was available.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #2 (DOCUMENT_LOCATION \u2192 chrome.storage.local `logs`)\n\n### Decision ledger\n\n**(a) Who controls the source?**\n`window.location.href` inside the content script is the page URL of the matched AliExpress/AliBaba page. The page controls the path/query/hash of that URL (within `*://*.aliexpress.*`), so it is web-content-controllable input. This is a valid `DOCUMENT_LOCATION` source.\n\n**(b) Exact source-to-sink path?**\nThe report's source anchor points at the `v=function(e){return /^https:\\/\\/(?:[^\\.]+\\.)?aliexpress\\./.test(e)}` helper, which is only a boolean gate. However, raw source inspection shows the **real data path**:\n\n```\nv(window.location.href) ? ... :\n  K({ file:\"buttonsBoot.jsx\",\n      message:\"Cannot find AliExpress design.\",\n      url: window.location.href })          // real tainted argument\n```\n\nand `K` is:\n\n```js\nvar K = function(e) {\n  return chrome.storage.local.get(\"logs\")\n    .then(e => e.logs || [])\n    .then(t => chrome.storage.local.set({\n      logs: [].concat(J(t), [e]).slice(-250)\n    }))\n}\n```\n\nSo the entire object containing `url: window.location.href` is stored under the `logs` key. The sink argument is not a constant and is not sanitize",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SOURCE_REPORT_ONLY",
+      "source_report_id": 2,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "Recovered source-level flow; inspect propagation and code",
+      "report_evidence": {
+        "sanitized": false,
+        "duplicatePaths": 1,
+        "rawSteps": 23,
+        "distinctLines": 1,
+        "crossContextHops": [],
+        "sinkUrlControl": []
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "contentButtons",
+          "reportedLoc": "L1:C29237 -> L1:C29238",
+          "resolvedFile": "contentButtons.js",
+          "resolved": true,
+          "snippet": "L1 C29237-29238: \u20265438),w=r(4150),v=function(e){return/^https:\\/\\/(?:[^\\.]+\\.)?aliexpress\\./.test(e)},y=r(3019),x=r(2951),k=r(5192),A=r(8413),O=r(1500),S=(0,g.vs)('<div class=\"h-[\u2026"
+        },
+        "sinkAnchor": {
+          "reportedFile": "contentButtons",
+          "reportedLoc": "L1:C38316 -> L1:C38380",
+          "resolvedFile": "contentButtons.js",
+          "resolved": true,
+          "snippet": "L1 C38316-38380: \u2026cal.get(\"logs\").then((function(e){return e.logs||[]})).then((function(t){return chrome.storage.local.set({logs:[].concat(J(t),[e]).slice(-250)})}))};function ee(e,t){var r=\"undefined\"!=typeof Symbol&&e[Symbol.iterator]||e[\"@\u2026"
+        },
+        "sourceExpectedMarkers": [
+          "document",
+          "window",
+          "value",
+          "textContent",
+          "innerHTML"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://*.aliexpress.us/*",
+              "*://*.aliexpress.com/*",
+              "*://*.aliexpress.ru/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "front-vendors.js",
+              "aliExpressMedias.js",
+              "contentButtons.js",
+              "contentApp.js",
+              "contentModal.js"
+            ],
+            "runAt": null,
+            "allFrames": false,
+            "world": "ISOLATED"
+          },
+          {
+            "matches": [
+              "*://*.alibaba.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "front-vendors.js",
+              "alibabaMedias.js",
+              "contentButtons.js",
+              "contentApp.js",
+              "contentModal.js"
+            ],
+            "runAt": null,
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 2 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 1 uncertain, 0 duplicate; 2 flagged triggerable for dynamic testing."
+}

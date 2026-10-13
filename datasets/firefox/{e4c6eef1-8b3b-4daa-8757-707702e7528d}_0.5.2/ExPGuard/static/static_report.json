@@ -1,0 +1,87 @@
+{
+  "extension_id": "{e4c6eef1-8b3b-4daa-8757-707702e7528d}",
+  "extension_version": "0.5.2",
+  "browser": "firefox",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification: Flow #1 — `CHROME_ONCONNECTEXTERNAL_ONMESSAGE` → `chrome.windows.create`\n\n### (a) Who controls the source\nThe source is the `request` object received by the `onConnectExternal` port message listener in `worker.js`:\n\n```js\nchrome.runtime.onConnectExternal.addListener(eport => {\n  ...\n  eport.onMessage.addListener(async request => {\n    console.log(request);\n    if (request.cmd === 'request-ocr') {\n      ...\n      win = await standalone(request);\n```\n\n`externally_connectable` is absent from the manifest, and there is **no `sender.id` / `sender.origin` check** anywhere in this listener. The `cmd` value is part of the attacker-supplied message and is not a trust anchor. Under the harness model, any external extension can connect; the message payload is fully attacker-controlled.\n\n### (b) Source-to-sink path\nThe propagation is unbroken:\n\n1. `request` (external message) → `request.cmd === 'request-ocr'` branch.\n2. `request` is passed to `standalone(request)`.\n3. `standalone` destructures attacker-controlled fields:\n   - `proceed`, `selector`, `agent`, `title`, `message`\n4. Those fields are appended to a `URLSearchParams` object:\n   - `args.set('proceed', proceed)`\n   - `",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "worker",
+          "reportedLoc": "L349:C16 -> L349:C23",
+          "resolvedFile": "worker.js",
+          "resolved": true,
+          "snippet": "L349 C16-23:     console.log(request);"
+        },
+        "sinkAnchor": {
+          "reportedFile": "worker",
+          "reportedLoc": "L188:C20 -> L193:C4",
+          "resolvedFile": "worker.js",
+          "resolved": true,
+          "snippet": ">>   188|   const win = await chrome.windows.create({\n>>   189|     url: '/data/blank/index.html?' + args.toString(),\n>>   190|     width: 600,\n>>   191|     height: 600,\n>>   192|     type: 'popup'\n>>   193|   });"
+        },
+        "sourceExpectedMarkers": [
+          "onConnectExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

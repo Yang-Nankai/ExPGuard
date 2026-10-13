@@ -1,0 +1,121 @@
+{
+  "extension_id": "jpfpinbbmcpbnnohhdhpibfpfoikgjjf",
+  "extension_version": "1.4.0",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 2,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 1,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Analysis\n\n### 1. Source control (attacker-controlled?)\nThe true source is in **options.js**, not the mislabeled `gcpd730` loc in the normalized record:\n\n```js\n// options.js L2-5\nvar customapikey = document.getElementById('customapikey').value;\nif (document.getElementById('radioCustom').checked && customapikey != '') {\n  chrome.storage.sync.set({ customapikey: customapikey }, ...);\n```\n\nThe normalized flow's `gcpd730 L3:C56` anchor is a misattribution (the harness warns: *\"The exact source anchor does not contain the expected source API/token\"*). The injected `report.source.md` correctly points at `options L3` → `options L5` `chrome.storage.sync.set`.\n\n`options.js` is shipped as a content script, and on the gcpd frames it does **not** stay dead. `gcpd730.js`'s `showSettings()` fetches `options.html`, injects it into the live `steamcommunity.com` page via `innerHTML`, and then calls `initOptions()`:\n\n```js\n// gcpd730.js L642-653\nfetch(chrome.runtime.getURL('/options.html'))\n  .then(resp => resp.text())\n  .then(settingsHTML => {\n    settingsDiv.innerHTML = settingsHTML;\n    document.body.appendChild(settingsDiv);\n    ...\n    initOptions();   // binds: #save.addEventLis",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "gcpd730",
+          "reportedLoc": "L3:C56 -> L3:C68",
+          "resolvedFile": "gcpd730.js",
+          "resolved": true,
+          "snippet": "L3 C56-68: let profileURI = null;"
+        },
+        "sinkAnchor": {
+          "reportedFile": "gcpd730",
+          "reportedLoc": "L5:C4 -> L16:C6",
+          "resolvedFile": "gcpd730.js",
+          "resolved": true,
+          "snippet": ">>     5| \n>>     6| const maxRetries = 3;\n>>     7| \n>>     8| let loadingWholeHistoryCounter = 0;\n>>     9| let loadingWholeHistory = false;\n>>    10| \n>>    11| let providedCustomAPIKey = false;\n>>    12| let apikey = '';\n>>    13| \n>>    14| const banStats = {\n>>    15|   vacBans: 0,\n>>    16|   gameBans: 0,"
+        },
+        "sourceExpectedMarkers": [
+          "document",
+          "window",
+          "value",
+          "textContent",
+          "innerHTML"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://steamcommunity.com/id/*/gcpd/730*tab=matchhistorycompetitive",
+              "*://steamcommunity.com/profiles/*/gcpd/730*tab=matchhistorycompetitive",
+              "*://steamcommunity.com/id/*/gcpd/730*tab=matchhistorypremier",
+              "*://steamcommunity.com/profiles/*/gcpd/730*tab=matchhistorypremier",
+              "*://steamcommunity.com/id/*/gcpd/730*tab=matchhistorycompetitivepermap",
+              "*://steamcommunity.com/profiles/*/gcpd/730*tab=matchhistorycompetitivepermap",
+              "*://steamcommunity.com/id/*/gcpd/730*tab=matchhistorywingman",
+              "*://steamcommunity.com/profiles/*/gcpd/730*tab=matchhistorywingman",
+              "*://steamcommunity.com/id/*/gcpd/730*tab=matchhistoryscrimmage",
+              "*://steamcommunity.com/profiles/*/gcpd/730*tab=matchhistoryscrimmage",
+              "*://steamcommunity.com/id/*/gcpd/730*tab=matchhistoryophydra",
+              "*://steamcommunity.com/profiles/*/gcpd/730*tab=matchhistoryophydra",
+              "*://steamcommunity.com/id/*/gcpd/730*tab=playerreports",
+              "*://steamcommunity.com/profiles/*/gcpd/730*tab=playerreports",
+              "*://steamcommunity.com/id/*/gcpd/730*tab=playercommends",
+              "*://steamcommunity.com/profiles/*/gcpd/730*tab=playercommends"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "options.js",
+              "gcpd730.js"
+            ],
+            "runAt": "document_end",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

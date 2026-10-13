@@ -1,0 +1,161 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "mkaocfkkgijdkejknbfblgfbelppnfci",
+  "version": "2.3",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-8b0a151c22ed329c",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "CoCo"
+      ],
+      "match_region": "CoCo only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:mkaocfkkgijdkejknbfblgfbelppnfci:2.3:4753df73c33fb6c6:01",
+          "flow": {
+            "flow_id": "coco:chrome:mkaocfkkgijdkejknbfblgfbelppnfci:2.3:4753df73c33fb6c6:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "4753df73c33fb6c63753ac785f775aabf27f951919794023a56172af726231da",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "coco-storage_posoing",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "CoCo source evidence",
+              "file": "scripts/storage.js",
+              "loc": "L32:C1 -> L32:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "scripts/storage.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "CoCo sink evidence",
+              "file": "scripts/storage.js",
+              "loc": "L96:C1 -> L96:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "scripts/storage.js",
+              "message_sender_provenance": "UNKNOWN",
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_chrome_user_manual_r2",
+                  "source": "Manual",
+                  "kind": "coco_chrome_user_manual_r2",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证为 TP：页面消息可以写入扩展 local storage。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\mkaocfkkgijdkejknbfblgfbelppnfci_2.3\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "report_sha256": "b8c39c725a05e7006b03f34b931a650feb117b4bcf302d7e4df56fc8d6244663"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have the primary evidence and the raw source. Let me verify the complete picture.\n\n## Four-part decision ledger\n\n**(a) Who controls the source — attacker-controlled.**\n`scripts/storage.js` is a content script registered with `matches: [\"http://*/*\", \"https://*/*\", \"file://*/\", \"*://*/\"]` and `allFrames: true`. Any webpage (or iframe) can drive `window.addEventListener(\"message\", ...)` at L32. The guard at L34 (`event.source != window || event.isTrusted == false`) is a self-origin guard, which the harness explicitly flags as attacker-satisfiable in a page-to-content-script bridge: the malicious page's own `window.postMessage` yields `event.source === window` and `isTrusted === true`. The L37 `type` check and the L74 `switch (msg.action)` are checks on attacker-supplied message fields — also attacker-chosen. The only precondition (L23: a `#ADHelperCheck`/`#ADSharedStorageCheck` element) is page-controlled DOM; a malicious page simply includes `<div id=\"ADHelperCheck\"></div>` in its markup before `document_end`.\n\n**(b) Source-to-sink path — unbroken.**\n`event.data` (L37) → `event.data.msg` (L42, `var msg = event.data.msg`) → `msg.value` (L96) → `String(msg.value)` → `chrome.storage.",
+              "path": "extensions/mkaocfkkgijdkejknbfblgfbelppnfci_2.3/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/mkaocfkkgijdkejknbfblgfbelppnfci_2.3/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T04:56:59.286212Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "coco_chrome_user_manual_r2",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-24T08:46:12.279679Z",
+                "notes": "人工验证为 TP：页面消息可以写入扩展 local storage。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\mkaocfkkgijdkejknbfblgfbelppnfci_2.3\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\mkaocfkkgijdkejknbfblgfbelppnfci_2.3\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-24T08:46:12.279679Z",
+                  "sha256": "b8c39c725a05e7006b03f34b931a650feb117b4bcf302d7e4df56fc8d6244663"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "CoCo Chrome r2 manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "2.3",
+        "latest_version": "2.3",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,1306 @@
+{
+  "extension_id": "ohjgplijcfdlhdmmdlkigbelaonpdach",
+  "extension_version": "1.0.7",
+  "browser": "edge",
+  "runtime_extension_id": "onfnobmiehblpfdlpinhcanibebgmpdc",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "tested_count": 6,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "outcome": "CONFIRMED",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.85,
+      "reproduced": true,
+      "trajectory": [
+        {
+          "action": "instrument_sink",
+          "detail": "all",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_ce8aa6acd18c4fe0\", \"targetId\": \"4014062538A4876C6DB07409C3A8ACE1\", \"pageUrl\": \"https://www.xiaoheihe.cn:57012"
+        },
+        {
+          "action": "new_page",
+          "detail": "https://www.xiaoheihe.cn:57012/page",
+          "result": "{\"openedUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@73c14f6228d7cd537c855007e8f88678969cc0eb/inspector.html?ws=127.0.0.1:60611/de"
+        },
+        {
+          "action": "contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"boundCustomEventBatch\", \"events\": {\"better-xiaoheihe-ai-settings-save\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-settings-save\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 227, \\\"topLevelKeys\\\": [\\\"apiKey\\\", \\\"baseUrl\\\", \\\"enabled\\\", \\\"endpointMode\\\", \\\"model\\\", \\\""
+        },
+        {
+          "action": "observe",
+          "detail": "sink tap + local beacon",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_ce8aa6acd18c4fe0\", \"actualGeneration\": \"observer_ce8aa6acd"
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 0,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "https://www.xiaoheihe.cn:57012/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: https://www.xiaoheihe.cn:57012/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_LOCAL_STORAGE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"src/ai-bridge.js\", \"location\": \"L450:C62 -> L450:C74\", \"eventNames\": [\"better-xiaoheihe-ai-settings-save\", \"better-xiaoheihe-ai-settings-request\", \"better-xiaoheihe-ai-chat-request\", \"better-xiaoheihe-ai-model-list-request\", \"better-xiaoheihe-sanitized-cookie-rule-request\", \"better-xiaoheihe-ai-bot-runtime-request\", \"better-xiaoheihe-local-settings-request\", \"better-xiaoheihe-local-settings-save\"], \"eventTarget\": \"window\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"\", \"scalarMessageValue\": \"\", \"requirements\": {\"values\": \"object\"}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"elease\\\" : \\\"activate\\\";\\n    sendRuntimeMessageSafely({\\n      type: action === \\\"release\\\"\\n        ? \\\"better-xiaoheihe-release-sanitized-comment-cookie\\\"\\n        : \\\"better-xiaoheihe-activate-sanitized-comment-cookie\\\",\\n      detail: {\\n        id,\\n        cookieHeader: String(detail?.cookieHeader || \\\"\\\")\\n      }\\n    }, \\\"请求头规则处理失败\\\", (response) => {\\n      sendSanitizedCookieRuleResponse(id, response || {\\n        ok: false,\\n        error: \\\"请求头规则处理失败\\\"\\n      });\\n    });\\n  }\\n\\n  function requestAiBotRuntime(detail = {}) {\\n    const id = detail?.id || \\\"\\\";\\n    const type = String(detail?.type || \\\"\\\");\\n    if (!id || !type) {\\n      return;\\n    }\\n\\n    sendRuntimeMessageSafely({\\n      type,\\n      detail: detail?.detail || {}\\n    }, \\\"请求失败\\\", (response) => {\\n      window.dispatchEvent(new CustomEvent(AI_BOT_RUNTIME_RESPONSE_EVENT, {\\n        detail: stringifyEventDetail({\\n          id,\\n          ...(response || {\", \"notes\": [\"contract warning: missing discriminator field\", \"已从 source/sink 附近提取字面量分支。\", \"已从 sink 调用推导 URL 承载字段 `url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"\", \"discriminatorValues\": [], \"urlField\": \"url\", \"sinkTapKey\": \"storage.local.set\", \"messageAlias\": \"message\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"LOW\", \"contractWarnings\": [\"missing discriminator field\"]}\npage-target={\"targetId\": \"4014062538A4876C6DB07409C3A8ACE1\", \"url\": \"https://www.xiaoheihe.cn:57012/page\"}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_ce8aa6acd18c4fe0\", \"targetId\": \"4014062538A4876C6DB07409C3A8ACE1\", \"pageUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\",\\\"observerToken\\\":\\\"observer_ce8aa6acd18c4fe0\\\"}\"}\nstimulus-batch={\"action\": \"boundCustomEventBatch\", \"events\": {\"better-xiaoheihe-ai-settings-save\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-settings-save\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 227, \\\"topLevelKeys\\\": [\\\"apiKey\\\", \\\"baseUrl\\\", \\\"enabled\\\", \\\"endpointMode\\\", \\\"model\\\", \\\"provider\\\"], \\\"testMarkers\\\": [\\\"EXPAGENT_TEST_expa_be8410d16a82\\\"]}], \\\"result\\\": {\\\"scheduled\\\": true, \\\"count\\\": 1, \\\"surface\\\": \\\"CustomEvent\\\", \\\"spacingMs\\\": 250}}\", \"better-xiaoheihe-ai-chat-request\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-chat-request\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 129, \\\"topLevelKeys\\\": [\\\"id\\\"\nsink-tap={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_ce8aa6acd18c4fe0\", \"actualGeneration\": \"observer_ce8aa6acd18c4fe0\", \"recoveryReason\": \"\", \"targetId\": \"4014062538A4876C6DB07409C3A8ACE1\", \"pageUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"storage.onChanged\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__dom_innerHTML__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__runtime_sendMessage__\\\":true,\\\"storage.onChanged\\\":[{\\\"ts\\\":1790160108226,\\\"area\\\":\\\"local\\\",\\\"changes\\\":{\\\"better-xiaoheihe-ai-settings\\\":{\\\"newValue\\\":{\\\"allowEmoji\\\":true,\\\"apiKey\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_ex\nbeacon={\"token\": \"expa_0697fac4201f\", \"hit\": false, \"count\": 0}",
+      "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+      "evidence_stage": "MARKER_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": false,
+        "semanticFixtureKinds": [
+          "external-response-port-semantic-fixture"
+        ],
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "LOW",
+        "sourceContractReady": true,
+        "runtimeSourceContractProven": true,
+        "sourceReached": true,
+        "bridgeReached": true,
+        "sinkReached": true,
+        "markerReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[{\"enabled\": true, \"provider\": \"openai-compatible\", \"endpointMode\": \"openai-compatible\", \"baseUrl\": \"http://127.0.0.1:57012/beacon/expa_0697fac4201f\", \"model\": \"EXPAGENT_TEST_expa_be8410d16a82\", \"apiKey\": \"EXPAGENT_TEST_expa_be8410d16a82\"}, {\"id\": \"EXPAGENT_TEST_expa_be8410d16a82\", \"messages\": [{\"role\": \"user\", \"content\": \"EXPAGENT_TEST_expa_be8410d16a82\"}], \"temperature\": 0}, {\"id\": \"EXPAGENT_TEST_expa_be8410d16a82\", \"settings\": {\"enabled\": true, \"provider\": \"openai-compatible\", \"endpointMode\": \"openai-compatible\", \"baseUrl\": \"http://127.0.0.1:57012/beacon/expa_0697fac4201f\", \"model\": \"EXPAGENT_TEST_expa_be8410d16a82\", \"apiKey\": \"EXPAGENT_TEST_expa_be8410d16a82\"}}, {\"id\": \"EXPAGENT_TEST_expa_be8410d16a82\", \"type\": \"better-xiaoheihe-ai-chat\", \"detail\": {\"messages\": [{\"role\": \"user\", \"content\": \"EXPAGENT_TEST_expa_be8410d16a82\"}], \"temperature\": 0}}, {\"id\": \"EXPAGENT_TEST_expa_be8410d16a82\", \"type\": \"better-xiaoheihe-ai-list-models\", \"detail\": {\"settings\": {\"enabled\": true, \"provider\": \"openai-compatible\", \"endpointMode\": \"openai-compatible\", \"baseUrl\": \"http://127.0.0.1:57012/beacon/expa_0697fac4201f\", \"model\": \"EXPAGENT_TEST_expa_be8410d16a82\", \"apiKey\": \"EXPAGENT_TEST_expa_be8410d16a82\"}}}, {\"values\": {\"better-xiaoheihe-ai-bot-consent\": {\"marker\": \"EXPAGENT_TEST_expa_be8410d16a82\"}}}, {\"marker\": \"EXPAGENT_TEST_expa_be8410d16a82\", \"url\": \"http://127.0.0.1:57012/beacon/expa_0697fac4201f\", \"data\": \"EXPAGENT_TEST_expa_be8410d16a82\", \"value\": \"EXPAGENT_TEST_expa_be8410d16a82\", \"message\": \"EXPAGENT_TEST_expa_be8410d16a82\", \"title\": \"EXPAGENT_TEST_expa_be8410d16a82\", \"text\": \"EX",
+      "evidence_artifacts": [
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-0\\step-source-open.png",
+          "description": "Step `source-open`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "source-open",
+          "captured_at": "2026-09-23T10:41:48.221664+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-0\\step-after-trigger.png",
+          "description": "Step `after-trigger`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "after-trigger",
+          "captured_at": "2026-09-23T10:41:48.366917+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-0\\storage-after-trigger.json",
+          "description": "Storage state at `after-trigger` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-0\\storage-after-trigger.png",
+          "description": "Storage panel (DevTools-style) at `after-trigger`",
+          "stage": "storage-after-trigger",
+          "captured_at": "2026-09-23T10:41:48.500354+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "89115ae328db8b9a40fede7582fe3b40738ad4f022ea545f0cb3b24ff79e57d8"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-0\\step-after-observation.png",
+          "description": "Step `after-observation`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "after-observation",
+          "captured_at": "2026-09-23T10:42:02.282657+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-0\\storage-after-observation.json",
+          "description": "Storage state at `after-observation` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-0\\storage-after-observation.png",
+          "description": "Storage panel (DevTools-style) at `after-observation`",
+          "stage": "storage-after-observation",
+          "captured_at": "2026-09-23T10:42:02.405543+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "0144467ccaff236901d41c06960371689c0da076c44631d0c03858bf57eb8471"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-0\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-0\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "debug",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-0\\extension-debug.json",
+          "description": "Persistent CDP extension debugger breakpoint/pause state.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-0\\step-final-state.png",
+          "description": "Step `final-state`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-23T10:42:02.494689+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-0\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "Extension debugger recorded 4 breakpoint(s); see artifact for line-level state.",
+      "notes": "sinkTapKey=storage.local.set sourceBridgeReached=false semanticFixture=true"
+    },
+    {
+      "flow_index": 1,
+      "outcome": "CONFIRMED",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.85,
+      "reproduced": true,
+      "trajectory": [
+        {
+          "action": "instrument_sink",
+          "detail": "all",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_ea370db49b1f4b29\", \"targetId\": \"F71196E8B501893E603CC937E529B23F\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+        },
+        {
+          "action": "new_page",
+          "detail": "https://www.xiaoheihe.cn:57012/page",
+          "result": "{\"openedUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@73c14f6228d7cd537c855007e8f88678969cc0eb/inspector.html?ws=127.0.0.1:60611/de"
+        },
+        {
+          "action": "contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"boundCustomEventBatch\", \"events\": {\"better-xiaoheihe-ai-settings-save\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-settings-save\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 227, \\\"topLevelKeys\\\": [\\\"apiKey\\\", \\\"baseUrl\\\", \\\"enabled\\\", \\\"endpointMode\\\", \\\"model\\\", \\\""
+        },
+        {
+          "action": "observe",
+          "detail": "sink tap + local beacon",
+          "result": "{\"sink_type\": \"fetch\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_ea370db49b1f4b29\", \"actualGeneration\": \"observer_ea"
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 1,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "https://www.xiaoheihe.cn:57012/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: https://www.xiaoheihe.cn:57012/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe FETCH_RESOURCE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"src/ai-bridge.js\", \"location\": \"L459:C104 -> L459:C116\", \"eventNames\": [\"better-xiaoheihe-ai-bot-runtime-request\", \"better-xiaoheihe-ai-settings-request\", \"better-xiaoheihe-ai-settings-save\", \"better-xiaoheihe-ai-chat-request\", \"better-xiaoheihe-ai-model-list-request\", \"better-xiaoheihe-sanitized-cookie-rule-request\", \"better-xiaoheihe-local-settings-request\", \"better-xiaoheihe-local-settings-save\"], \"eventTarget\": \"window\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"\", \"scalarMessageValue\": \"\", \"requirements\": {\"values\": \"object\"}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \") {\\n      return;\\n    }\\n\\n    sendRuntimeMessageSafely({\\n      type,\\n      detail: detail?.detail || {}\\n    }, \\\"请求失败\\\", (response) => {\\n      window.dispatchEvent(new CustomEvent(AI_BOT_RUNTIME_RESPONSE_EVENT, {\\n        detail: stringifyEventDetail({\\n          id,\\n          ...(response || { ok: false, error: \\\"请求失败\\\" })\\n        })\\n      }));\\n    });\\n  }\\n\\n  function getRequestedLocalSettingsKeys(detail) {\\n    const requestedKeys = Array.isArray(detail?.keys) ? detail.keys : LOCAL_SETTINGS_STORAGE_KEYS;\\n    return requestedKeys.filter((key) => LOCAL_SETTINGS_STORAGE_KEYS.includes(key));\\n  }\\n\\n  function dispatchLocalSettingsResponse(id, payload) {\\n    window.dispatchEvent(new CustomEvent(LOCAL_SETTINGS_RESPONSE_EVENT, {\\n      detail: stringifyEventDetail({\\n        id,\\n        ...payload\\n      })\\n    }));\\n  }\\n\\n  function readLocalSettings(detail = {}) {\\n    const id = detail?.id || \\\"\\\";\\n    cons\", \"notes\": [\"contract warning: missing discriminator field\", \"已从 source/sink 附近提取字面量分支。\", \"已从 sink 调用推导 URL 承载字段 `url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"\", \"discriminatorValues\": [], \"urlField\": \"url\", \"sinkTapKey\": \"fetch\", \"messageAlias\": \"message\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"LOW\", \"contractWarnings\": [\"missing discriminator field\"]}\npage-target={\"targetId\": \"0FC74FBBC414AA382FA08B96546C60A0\", \"url\": \"https://www.xiaoheihe.cn:57012/page\"}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_ea370db49b1f4b29\", \"targetId\": \"F71196E8B501893E603CC937E529B23F\", \"lifecycle\": {\"ok\": true, \"targetId\": \"F71196E8B501893E603CC937E529B23F\", \"targetType\": \"service_worker\", \"targetUrl\": \"chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/background.js\", \"atta\nsource-bridge-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_c1ff03193a484189\", \"targetId\": \"0FC74FBBC414AA382FA08B96546C60A0\", \"pageUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\",\\\"observerToken\\\":\\\"observer_c1ff03193a484189\\\"}\"}\nstimulus-batch={\"action\": \"boundCustomEventBatch\", \"events\": {\"better-xiaoheihe-ai-settings-save\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-settings-save\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 227, \\\"topLevelKeys\\\": [\\\"apiKey\\\", \\\"baseUrl\\\", \\\"enabled\\\", \\\"endpointMode\\\", \\\"model\\\", \\\"provider\\\"], \\\"testMarkers\\\": [\\\"EXPAGENT_TEST_expa_4624acafa20e\\\"]}], \\\"result\\\": {\\\"scheduled\\\": true, \\\"count\\\": 1, \\\"surface\\\": \\\"CustomEvent\\\", \\\"spacingMs\\\": 250}}\", \"better-xiaoheihe-ai-chat-request\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-chat-request\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 129, \\\"topLevelKeys\\\": [\\\"id\\\"\nsink-tap={\"sink_type\": \"fetch\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_ea370db49b1f4b29\", \"actualGeneration\": \"observer_ea370db49b1f4b29\", \"previousTargetId\": \"F71196E8B501893E603CC937E529B23F\", \"currentTargetId\": \"F71196E8B501893E603CC937E529B23F\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"fetch\\\",\\\"calls\\\":[{\\\"ts\\\":1790160081420,\\\"request\\\":{\\\"testMarker\\\":\\\"expa_8ce5a6d6aa95\\\"},\\\"method\\\":\\\"POST\\\",\\\"body\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_d98cc0a4e7fb\\\"}},{\\\"ts\\\":1790160081422,\\\"request\\\":{\\\"testMarker\\\":\\\"expa_8ce5a6d6aa95\\\"},\\\"method\\\":\\\"GET\\\",\\\"body\\\":{\\\"redacted\\\":true,\\\"length\\\":0}},{\\\"ts\\\":1790160081427,\\\"request\\\":{\\\"testMarker\\\":\\\"expa_8ce5a6d6aa95\\\"},\\\"method\\\":\\\"POST\\\",\\\"body\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_d98cc0a4e7fb\\\"\nbeacon={\"token\": \"expa_936e426bebed\", \"hit\": false, \"count\": 0}\nsource-bridge-tap={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_c1ff03193a484189\", \"actualGeneration\": \"observer_c1ff03193a484189\", \"recoveryReason\": \"\", \"targetId\": \"0FC74FBBC414AA382FA08B96546C60A0\", \"pageUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"storage.onChanged\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__dom_innerHTML__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__runtime_sendMessage__\\\":true,\\\"storage.onChanged\\\":[{\\\"ts\\\":1790160105400,\\\"area\\\":\\\"local\\\",\\\"changes\\\":{\\\"better-xiaoheihe-ai-settings\\\":{\\\"newValue\\\":{\\\"allowEmoji\\\":true,\\\"apiKey\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_ex",
+      "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+      "evidence_stage": "MARKER_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": false,
+        "semanticFixtureKinds": [
+          "external-response-port-semantic-fixture"
+        ],
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "LOW",
+        "sourceContractReady": true,
+        "runtimeSourceContractProven": true,
+        "sourceReached": true,
+        "bridgeReached": true,
+        "sinkReached": true,
+        "markerReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[{\"enabled\": true, \"provider\": \"openai-compatible\", \"endpointMode\": \"openai-compatible\", \"baseUrl\": \"http://127.0.0.1:57012/beacon/expa_936e426bebed\", \"model\": \"EXPAGENT_TEST_expa_4624acafa20e\", \"apiKey\": \"EXPAGENT_TEST_expa_4624acafa20e\"}, {\"id\": \"EXPAGENT_TEST_expa_4624acafa20e\", \"messages\": [{\"role\": \"user\", \"content\": \"EXPAGENT_TEST_expa_4624acafa20e\"}], \"temperature\": 0}, {\"id\": \"EXPAGENT_TEST_expa_4624acafa20e\", \"settings\": {\"enabled\": true, \"provider\": \"openai-compatible\", \"endpointMode\": \"openai-compatible\", \"baseUrl\": \"http://127.0.0.1:57012/beacon/expa_936e426bebed\", \"model\": \"EXPAGENT_TEST_expa_4624acafa20e\", \"apiKey\": \"EXPAGENT_TEST_expa_4624acafa20e\"}}, {\"id\": \"EXPAGENT_TEST_expa_4624acafa20e\", \"type\": \"better-xiaoheihe-ai-chat\", \"detail\": {\"messages\": [{\"role\": \"user\", \"content\": \"EXPAGENT_TEST_expa_4624acafa20e\"}], \"temperature\": 0}}, {\"id\": \"EXPAGENT_TEST_expa_4624acafa20e\", \"type\": \"better-xiaoheihe-ai-list-models\", \"detail\": {\"settings\": {\"enabled\": true, \"provider\": \"openai-compatible\", \"endpointMode\": \"openai-compatible\", \"baseUrl\": \"http://127.0.0.1:57012/beacon/expa_936e426bebed\", \"model\": \"EXPAGENT_TEST_expa_4624acafa20e\", \"apiKey\": \"EXPAGENT_TEST_expa_4624acafa20e\"}}}, {\"values\": {\"better-xiaoheihe-ai-bot-consent\": {\"marker\": \"EXPAGENT_TEST_expa_4624acafa20e\"}}}, {\"marker\": \"EXPAGENT_TEST_expa_4624acafa20e\", \"url\": \"http://127.0.0.1:57012/beacon/expa_936e426bebed\", \"data\": \"EXPAGENT_TEST_expa_4624acafa20e\", \"value\": \"EXPAGENT_TEST_expa_4624acafa20e\", \"message\": \"EXPAGENT_TEST_expa_4624acafa20e\", \"title\": \"EXPAGENT_TEST_expa_4624acafa20e\", \"text\": \"EX",
+      "evidence_artifacts": [
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-1\\step-source-open.png",
+          "description": "Step `source-open`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "source-open",
+          "captured_at": "2026-09-23T10:41:45.393234+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-1\\step-after-trigger.png",
+          "description": "Step `after-trigger`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "after-trigger",
+          "captured_at": "2026-09-23T10:41:45.517019+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-1\\storage-after-trigger.json",
+          "description": "Storage state at `after-trigger` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-1\\storage-after-trigger.png",
+          "description": "Storage panel (DevTools-style) at `after-trigger`",
+          "stage": "storage-after-trigger",
+          "captured_at": "2026-09-23T10:41:45.648943+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "02430f1984ca694626f84f6800336c9f70fd45ee08bf719d86eb531d52d4d826"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-1\\step-after-observation.png",
+          "description": "Step `after-observation`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "after-observation",
+          "captured_at": "2026-09-23T10:41:45.814725+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-1\\storage-after-observation.json",
+          "description": "Storage state at `after-observation` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-1\\storage-after-observation.png",
+          "description": "Storage panel (DevTools-style) at `after-observation`",
+          "stage": "storage-after-observation",
+          "captured_at": "2026-09-23T10:41:45.921928+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "930922ec74a85ce57d769df2e4a52b32930fbb73f55297a43cc3332e6959c2b9"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-1\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-1\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "debug",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-1\\extension-debug.json",
+          "description": "Persistent CDP extension debugger breakpoint/pause state.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-1\\step-final-state.png",
+          "description": "Step `final-state`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-23T10:41:46.029786+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-1\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "Extension debugger recorded 4 breakpoint(s); see artifact for line-level state.",
+      "notes": "sinkTapKey=fetch sourceBridgeReached=false semanticFixture=true"
+    },
+    {
+      "flow_index": 3,
+      "outcome": "PARTIAL",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.72,
+      "reproduced": false,
+      "trajectory": [
+        {
+          "action": "instrument_sink",
+          "detail": "all",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_8e02352c1b544b0f\", \"targetId\": \"F71196E8B501893E603CC937E529B23F\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+        },
+        {
+          "action": "new_page",
+          "detail": "https://www.xiaoheihe.cn:57012/page",
+          "result": "{\"openedUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@73c14f6228d7cd537c855007e8f88678969cc0eb/inspector.html?ws=127.0.0.1:60611/de"
+        },
+        {
+          "action": "contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"boundCustomEventBatch\", \"events\": {\"better-xiaoheihe-ai-settings-save\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-settings-save\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 227, \\\"topLevelKeys\\\": [\\\"apiKey\\\", \\\"baseUrl\\\", \\\"enabled\\\", \\\"endpointMode\\\", \\\"model\\\", \\\""
+        },
+        {
+          "action": "observe",
+          "detail": "sink tap + local beacon",
+          "result": "{\"sink_type\": \"storage.local.set\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_8e02352c1b544b0f\", \"actualGeneration\": "
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 3,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "https://www.xiaoheihe.cn:57012/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: https://www.xiaoheihe.cn:57012/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_LOCAL_STORAGE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"src/ai-bridge.js\", \"location\": \"L459:C104 -> L459:C116\", \"eventNames\": [\"better-xiaoheihe-ai-bot-runtime-request\", \"better-xiaoheihe-ai-settings-request\", \"better-xiaoheihe-ai-settings-save\", \"better-xiaoheihe-ai-chat-request\", \"better-xiaoheihe-ai-model-list-request\", \"better-xiaoheihe-sanitized-cookie-rule-request\", \"better-xiaoheihe-local-settings-request\", \"better-xiaoheihe-local-settings-save\"], \"eventTarget\": \"window\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"\", \"scalarMessageValue\": \"\", \"requirements\": {\"values\": \"object\"}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \") {\\n      return;\\n    }\\n\\n    sendRuntimeMessageSafely({\\n      type,\\n      detail: detail?.detail || {}\\n    }, \\\"请求失败\\\", (response) => {\\n      window.dispatchEvent(new CustomEvent(AI_BOT_RUNTIME_RESPONSE_EVENT, {\\n        detail: stringifyEventDetail({\\n          id,\\n          ...(response || { ok: false, error: \\\"请求失败\\\" })\\n        })\\n      }));\\n    });\\n  }\\n\\n  function getRequestedLocalSettingsKeys(detail) {\\n    const requestedKeys = Array.isArray(detail?.keys) ? detail.keys : LOCAL_SETTINGS_STORAGE_KEYS;\\n    return requestedKeys.filter((key) => LOCAL_SETTINGS_STORAGE_KEYS.includes(key));\\n  }\\n\\n  function dispatchLocalSettingsResponse(id, payload) {\\n    window.dispatchEvent(new CustomEvent(LOCAL_SETTINGS_RESPONSE_EVENT, {\\n      detail: stringifyEventDetail({\\n        id,\\n        ...payload\\n      })\\n    }));\\n  }\\n\\n  function readLocalSettings(detail = {}) {\\n    const id = detail?.id || \\\"\\\";\\n    cons\", \"notes\": [\"contract warning: missing discriminator field\", \"已从 source/sink 附近提取字面量分支。\", \"已从 sink 调用推导 URL 承载字段 `url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"\", \"discriminatorValues\": [], \"urlField\": \"url\", \"sinkTapKey\": \"storage.local.set\", \"messageAlias\": \"message\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"LOW\", \"contractWarnings\": [\"missing discriminator field\"]}\npage-target={\"targetId\": \"5900CCD5AA1ACD2DD1E6B63705B4BC77\", \"url\": \"https://www.xiaoheihe.cn:57012/page\"}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_8e02352c1b544b0f\", \"targetId\": \"F71196E8B501893E603CC937E529B23F\", \"lifecycle\": {\"ok\": true, \"targetId\": \"F71196E8B501893E603CC937E529B23F\", \"targetType\": \"service_worker\", \"targetUrl\": \"chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/background.js\", \"atta\nsource-bridge-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_b4dcbabf69984c8e\", \"targetId\": \"5900CCD5AA1ACD2DD1E6B63705B4BC77\", \"pageUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\",\\\"observerToken\\\":\\\"observer_b4dcbabf69984c8e\\\"}\"}\nstimulus-batch={\"action\": \"boundCustomEventBatch\", \"events\": {\"better-xiaoheihe-ai-settings-save\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-settings-save\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 227, \\\"topLevelKeys\\\": [\\\"apiKey\\\", \\\"baseUrl\\\", \\\"enabled\\\", \\\"endpointMode\\\", \\\"model\\\", \\\"provider\\\"], \\\"testMarkers\\\": [\\\"EXPAGENT_TEST_expa_d98cc0a4e7fb\\\"]}], \\\"result\\\": {\\\"scheduled\\\": true, \\\"count\\\": 1, \\\"surface\\\": \\\"CustomEvent\\\", \\\"spacingMs\\\": 250}}\", \"better-xiaoheihe-ai-chat-request\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-chat-request\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 129, \\\"topLevelKeys\\\": [\\\"id\\\"\nsink-tap={\"sink_type\": \"storage.local.set\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_8e02352c1b544b0f\", \"actualGeneration\": \"observer_8e02352c1b544b0f\", \"previousTargetId\": \"F71196E8B501893E603CC937E529B23F\", \"currentTargetId\": \"F71196E8B501893E603CC937E529B23F\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"storage.local.set\\\",\\\"calls\\\":[{\\\"ts\\\":1790160079933,\\\"arg\\\":{\\\"reduce\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"slice\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"find\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"detail\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"feedSelectStrategy\\\":{\\\"redacted\\\":true,\\\"length\\\":6}}}],\\\"observerToken\\\":\\\"observer_8e02352c1b544b0f\\\"}\"}\nbeacon={\"token\": \"expa_8ce5a6d6aa95\", \"hit\": false, \"count\": 0}\nsource-bridge-tap={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_b4dcbabf69984c8e\", \"actualGeneration\": \"observer_b4dcbabf69984c8e\", \"recoveryReason\": \"\", \"targetId\": \"5900CCD5AA1ACD2DD1E6B63705B4BC77\", \"pageUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"storage.local.set\\\",\\\"storage.onChanged\\\",\\\"runtime.sendMessage\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__dom_innerHTML__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__runtime_sendMessage__\\\":true,\\\"storage.local.set\\\":[{\\\"ts\\\":1790160081414,\\\"arg\\\":{\\\"better-xiaoheihe-ai-settings\\\":{\\\"enabled\\\":true,\\\"provider\\\":{\\\"redacted\\\":true,\\\"lengt",
+      "reasoning": "The controlled page input reached the content-script source, which called runtime.sendMessage with the marker, but the privileged background sink did not execute. This isolates the remaining failure to the content-to-background bridge.",
+      "evidence_stage": "SINK_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": false,
+        "semanticFixtureKinds": [
+          "external-response-port-semantic-fixture"
+        ],
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "LOW",
+        "sourceContractReady": false,
+        "sinkReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[{\"enabled\": true, \"provider\": \"openai-compatible\", \"endpointMode\": \"openai-compatible\", \"baseUrl\": \"http://127.0.0.1:57012/beacon/expa_8ce5a6d6aa95\", \"model\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\", \"apiKey\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\"}, {\"id\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\", \"messages\": [{\"role\": \"user\", \"content\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\"}], \"temperature\": 0}, {\"id\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\", \"settings\": {\"enabled\": true, \"provider\": \"openai-compatible\", \"endpointMode\": \"openai-compatible\", \"baseUrl\": \"http://127.0.0.1:57012/beacon/expa_8ce5a6d6aa95\", \"model\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\", \"apiKey\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\"}}, {\"id\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\", \"type\": \"better-xiaoheihe-ai-chat\", \"detail\": {\"messages\": [{\"role\": \"user\", \"content\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\"}], \"temperature\": 0}}, {\"id\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\", \"type\": \"better-xiaoheihe-ai-list-models\", \"detail\": {\"settings\": {\"enabled\": true, \"provider\": \"openai-compatible\", \"endpointMode\": \"openai-compatible\", \"baseUrl\": \"http://127.0.0.1:57012/beacon/expa_8ce5a6d6aa95\", \"model\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\", \"apiKey\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\"}}}, {\"values\": {\"better-xiaoheihe-ai-bot-consent\": {\"marker\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\"}}}, {\"marker\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\", \"url\": \"http://127.0.0.1:57012/beacon/expa_8ce5a6d6aa95\", \"data\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\", \"value\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\", \"message\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\", \"title\": \"EXPAGENT_TEST_expa_d98cc0a4e7fb\", \"text\": \"EX",
+      "evidence_artifacts": [
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-3\\step-source-open.png",
+          "description": "Step `source-open`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "source-open",
+          "captured_at": "2026-09-23T10:41:21.408302+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-3\\step-after-trigger.png",
+          "description": "Step `after-trigger`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "after-trigger",
+          "captured_at": "2026-09-23T10:41:21.544806+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-3\\storage-after-trigger.json",
+          "description": "Storage state at `after-trigger` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-3\\storage-after-trigger.png",
+          "description": "Storage panel (DevTools-style) at `after-trigger`",
+          "stage": "storage-after-trigger",
+          "captured_at": "2026-09-23T10:41:21.721574+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "c5d0a73785c9b3141e8031bc3730ba31fb05f4ac5cd5451ad4d42118ce106c2e"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-3\\step-after-observation.png",
+          "description": "Step `after-observation`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "after-observation",
+          "captured_at": "2026-09-23T10:41:21.851221+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-3\\storage-after-observation.json",
+          "description": "Storage state at `after-observation` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-3\\storage-after-observation.png",
+          "description": "Storage panel (DevTools-style) at `after-observation`",
+          "stage": "storage-after-observation",
+          "captured_at": "2026-09-23T10:41:21.993717+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "162a2692dd33c2b96297b13d52cd639a05b9d6cfbf522d38f1c91870acec226d"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-3\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-3\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-3\\step-final-state.png",
+          "description": "Step `final-state`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-23T10:41:22.119577+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-3\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "manual-attestation",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\ohjgplijcfdlhdmmdlkigbelaonpdach_1.0.7\\dynamic\\evidence\\flow-3\\manual\\manual_validation.json",
+          "description": "User manually confirmed TP for the remaining Xiaoheihe flows.",
+          "stage": "manual-confirmation",
+          "captured_at": "2026-09-23T11:36:08.634Z",
+          "target_url": "",
+          "sha256": "841a17d64aab6dccbe1d0f8067ff119ce76e551c7c8ccf89bccf19c11a07b65b"
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "",
+      "notes": "sinkTapKey=storage.local.set sourceBridgeReached=true manualValidation=true; automatedOutcomePreserved=PARTIAL",
+      "manual_validation": {
+        "extension_id": "ohjgplijcfdlhdmmdlkigbelaonpdach",
+        "extension_version": "1.0.7",
+        "flow_index": 3,
+        "verdict": "TP",
+        "observation": "User manually confirmed TP for the remaining Xiaoheihe flows.",
+        "operator": "user-provided manual validation",
+        "validated_at": "2026-09-23T11:36:08.634Z",
+        "evidence_type": "operator_attestation",
+        "attestation_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\ohjgplijcfdlhdmmdlkigbelaonpdach_1.0.7\\dynamic\\evidence\\flow-3\\manual\\manual_validation.json",
+        "attestation_sha256": "841a17d64aab6dccbe1d0f8067ff119ce76e551c7c8ccf89bccf19c11a07b65b"
+      }
+    },
+    {
+      "flow_index": 4,
+      "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.45,
+      "reproduced": false,
+      "trajectory": [
+        {
+          "action": "new_page",
+          "detail": "https://www.xiaoheihe.cn:57012/page",
+          "result": "{\"openedUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@73c14f6228d7cd537c855007e8f88678969cc0eb/inspector.html?ws=127.0.0.1:60611/de"
+        },
+        {
+          "action": "set_source_breakpoint",
+          "detail": "src/ai-bridge.js L3702:C2 -> L3766:C4",
+          "result": "{\"ok\": false, \"sourceFile\": \"src/ai-bridge.js\", \"url\": \"chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/ai-bridge.js\", \"line\": 3702, \"column\": 2, \"targetHint\": \"content\", \"breakpointId\": \"br:1:3701:2:chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/ai-bridge.js\", \"resolved\": false, \"locations\": [], \"targetType\": \"page\", \"targetUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"error\": \"Breakpoint was regist"
+        },
+        {
+          "action": "set_sink_breakpoint",
+          "detail": "src/background L370:C6 -> L386:C17",
+          "result": "{\"ok\": true, \"sourceFile\": \"src/background.js\", \"url\": \"chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/background.js\", \"line\": 370, \"column\": 6, \"targetHint\": \"background\", \"breakpointId\": \"1:369:6:chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/background.js\", \"resolved\": true, \"locations\": [{\"scriptId\": \"3\", \"lineNumber\": 369, \"columnNumber\": 6}], \"targetType\": \"service_worker\", \"targetUrl\": \"chrom"
+        },
+        {
+          "action": "sink_contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"boundCustomEventBatch\", \"events\": {\"better-xiaoheihe-ai-settings-save\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-settings-save\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 227, \\\"topLevelKeys\\\": [\\\"apiKey\\\", \\\"baseUrl\\\", \\\"enabled\\\", \\\"endpointMode\\\", \\\"model\\\", \\\""
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 4,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "https://www.xiaoheihe.cn:57012/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: https://www.xiaoheihe.cn:57012/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_LOCAL_STORAGE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"src/ai-bridge.js\", \"location\": \"L3702:C2 -> L3766:C4\", \"eventNames\": [\"better-xiaoheihe-ai-settings-request\", \"better-xiaoheihe-ai-settings-save\", \"better-xiaoheihe-ai-chat-request\", \"better-xiaoheihe-ai-model-list-request\", \"better-xiaoheihe-sanitized-cookie-rule-request\", \"better-xiaoheihe-ai-bot-runtime-request\", \"better-xiaoheihe-local-settings-request\", \"better-xiaoheihe-local-settings-save\"], \"eventTarget\": \"window\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"\", \"scalarMessageValue\": \"\", \"requirements\": {}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"(AI_SETTINGS_REQUEST_EVENT, readSettings);\\n  window.addEventListener(AI_SETTINGS_SAVE_EVENT, (event) => {\\n    const nextSettings = normalizeAiSettings(parseEventDetail(event.detail));\\n    dispatchSettings(nextSettings);\\n    writeStorageLocalSafely({\\n      [AI_SETTINGS_STORAGE_KEY]: nextSettings\\n    });\\n  });\\n  window.addEventListener(AI_CHAT_REQUEST_EVENT, (event) => requestChat(parseEventDetail(event.detail)));\\n  window.addEventListener(AI_MODEL_LIST_REQUEST_EVENT, (event) => requestModelList(parseEventDetail(event.detail)));\\n  window.addEventListener(SANITIZED_COOKIE_RULE_REQUEST_EVENT, (event) => requestSanitizedCookieRuleChange(parseEventDetail(event.detail)));\\n  window.addEventListener(AI_BOT_RUNTIME_REQUEST_EVENT, (event) => requestAiBotRuntime(parseEventDetail(event.detail)));\\n  window.addEventListener(LOCAL_SETTINGS_REQUEST_EVENT, (event) => readLocalSettings(parseEventDetail(eve\", \"notes\": [\"contract warning: missing discriminator field\", \"已从 sink 调用推导 URL 承载字段 `url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"\", \"discriminatorValues\": [], \"urlField\": \"url\", \"sinkTapKey\": \"storage.local.set\", \"messageAlias\": \"message\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"LOW\", \"contractWarnings\": [\"missing discriminator field\"]}\nisolated-context={\"origin\": \"https://www.xiaoheihe.cn:57012\", \"dsShell\": \"undefined\", \"dsCommon\": \"undefined\", \"jquery\": \"undefined\", \"shellFrame\": false}\nsource-breakpoint={\"ok\": false, \"sourceFile\": \"src/ai-bridge.js\", \"url\": \"chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/ai-bridge.js\", \"line\": 3702, \"column\": 2, \"targetHint\": \"content\", \"breakpointId\": \"br:1:3701:2:chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/ai-bridge.js\", \"resolved\": false, \"locations\": [], \"targetType\": \"page\", \"targetUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"error\": \"Breakpoint was registered by CDP but did not resolve to a loaded script location. The source URL/path or execution context may not match the active target.\"}\nsink-breakpoint=armed\nsink-pause={\"paused\": false, \"reason\": \"\", \"target\": {\"type\": \"service_worker\", \"url\": \"chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/background.js\"}, \"frames\": []}\ndeep-observe-window={\"elapsedSeconds\": 0.016, \"pollAttempts\": 1, \"firstObservedSeconds\": 0.016, \"sinkObserved\": true, \"beaconObserved\": false, \"observerRecoveredDuringWindow\": false}\nsink-tap={\"sink_type\": \"storage.local.set\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_2e7298a8ecb64af6\", \"actualGeneration\": \"observer_2e7298a8ecb64af6\", \"previousTargetId\": \"F71196E8B501893E603CC937E529B23F\", \"currentTargetId\": \"F71196E8B501893E603CC937E529B23F\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"storage.local.set\\\",\\\"calls\\\":[{\\\"ts\\\":1790160079933,\\\"arg\\\":{\\\"reduce\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"slice\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"find\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"detail\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"feedSelectStrategy\\\":{\\\"redacted\\\":true,\\\"length\\\":6}}},{\\\"ts\\\":1790160083800,\\\"arg\\\":{\\\"reduce\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"slice\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"find\\\":{\\\"redacted\\\":true,\\\"length\\\":6\nbeacon={\"token\": \"expa_ac02bac1b9ee\", \"hit\": false, \"count\": 0, \"hits\": []}\nbaseline=source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"src/ai-bridge.js\", \"location\": \"L3702:C2 -> L3766:C4\", \"eventNames\": [\"better-xiaoheihe-ai-settings-request\", \"better-xiaoheihe-ai-settings-save\", \"better-xiaoheihe-ai-chat-request\", \"better-xiaoheihe-ai-model-list-request\", \"better-xiaoheihe-sanitized-cookie-rule-request\", \"better-xiaoheihe-ai-bot-runtime-request\", \"better-xiaoheihe-local-settings-request\", \"better-xiaoheihe-local-settings-save\"], \"eventTarget\": \"window\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"\", \"scalarMessageValue\": \"\", \"requirements\": {}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"(AI_SETTINGS_REQUEST_EVENT, readSettings);\\n  window.addEventListener(AI_SETTINGS_SAVE_EVENT, (event) => {\\n    const nextSettings = normalizeAiSettings(parseEventDetail(event.detail));\\n    dispatchSettings(nextSettings);\\n    wri",
+      "reasoning": "sink 已执行，但安全化 sink tap 中没有同一 marker/beacon；需要人工复核路径值。",
+      "evidence_stage": "LISTENER_READY",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": false,
+        "semanticFixtureKinds": [
+          "external-response-port-semantic-fixture"
+        ],
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "LOW",
+        "sourceContractReady": false,
+        "markerReached": false,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "",
+      "evidence_artifacts": [
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-4\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-4\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "debug",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-4\\extension-debug.json",
+          "description": "Persistent CDP extension debugger breakpoint/pause state.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-4\\step-final-state.png",
+          "description": "Step `final-state`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-23T10:41:32.231703+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-4\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "manual-attestation",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\ohjgplijcfdlhdmmdlkigbelaonpdach_1.0.7\\dynamic\\evidence\\flow-4\\manual\\manual_validation.json",
+          "description": "User manually confirmed TP for the remaining Xiaoheihe flows.",
+          "stage": "manual-confirmation",
+          "captured_at": "2026-09-23T11:36:08.634Z",
+          "target_url": "",
+          "sha256": "7f83e214499084faf5bb99ca192a72ff953b351b6c05e8704fb66a05a24c0f48"
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "Extension debugger recorded 2 breakpoint(s); see artifact for line-level state.",
+      "notes": "deepTraceCode=MARKER_NOT_OBSERVED_AT_SINK react=skippedDeterministicResolved manualValidation=true; automatedOutcomePreserved=INCONCLUSIVE_AFTER_DEBUG",
+      "manual_validation": {
+        "extension_id": "ohjgplijcfdlhdmmdlkigbelaonpdach",
+        "extension_version": "1.0.7",
+        "flow_index": 4,
+        "verdict": "TP",
+        "observation": "User manually confirmed TP for the remaining Xiaoheihe flows.",
+        "operator": "user-provided manual validation",
+        "validated_at": "2026-09-23T11:36:08.634Z",
+        "evidence_type": "operator_attestation",
+        "attestation_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\ohjgplijcfdlhdmmdlkigbelaonpdach_1.0.7\\dynamic\\evidence\\flow-4\\manual\\manual_validation.json",
+        "attestation_sha256": "7f83e214499084faf5bb99ca192a72ff953b351b6c05e8704fb66a05a24c0f48"
+      }
+    },
+    {
+      "flow_index": 5,
+      "outcome": "CONFIRMED",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.85,
+      "reproduced": true,
+      "trajectory": [
+        {
+          "action": "instrument_sink",
+          "detail": "all",
+          "result": "{\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_851860c13f004bab\", \"targetId\": \"F71196E8B501893E603CC937E529B23F\", \"lifecycle\": {\"ok\": true, \"targetId\":"
+        },
+        {
+          "action": "new_page",
+          "detail": "https://www.xiaoheihe.cn:57012/page",
+          "result": "{\"openedUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@73c14f6228d7cd537c855007e8f88678969cc0eb/inspector.html?ws=127.0.0.1:60611/de"
+        },
+        {
+          "action": "contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"boundCustomEventBatch\", \"events\": {\"better-xiaoheihe-ai-settings-save\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-settings-save\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 227, \\\"topLevelKeys\\\": [\\\"apiKey\\\", \\\"baseUrl\\\", \\\"enabled\\\", \\\"endpointMode\\\", \\\"model\\\", \\\""
+        },
+        {
+          "action": "observe",
+          "detail": "sink tap + local beacon",
+          "result": "{\"sink_type\": \"fetch\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_851860c13f004bab\", \"actualGeneration\": \"observer_85"
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 5,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "https://www.xiaoheihe.cn:57012/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: https://www.xiaoheihe.cn:57012/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe FETCH_RESOURCE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"src/ai-bridge.js\", \"location\": \"L450:C62 -> L450:C74\", \"eventNames\": [\"better-xiaoheihe-ai-settings-request\", \"better-xiaoheihe-ai-settings-save\", \"better-xiaoheihe-ai-chat-request\", \"better-xiaoheihe-ai-model-list-request\", \"better-xiaoheihe-sanitized-cookie-rule-request\", \"better-xiaoheihe-ai-bot-runtime-request\", \"better-xiaoheihe-local-settings-request\", \"better-xiaoheihe-local-settings-save\"], \"eventTarget\": \"window\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"\", \"scalarMessageValue\": \"\", \"requirements\": {\"values\": \"object\"}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"elease\\\" : \\\"activate\\\";\\n    sendRuntimeMessageSafely({\\n      type: action === \\\"release\\\"\\n        ? \\\"better-xiaoheihe-release-sanitized-comment-cookie\\\"\\n        : \\\"better-xiaoheihe-activate-sanitized-comment-cookie\\\",\\n      detail: {\\n        id,\\n        cookieHeader: String(detail?.cookieHeader || \\\"\\\")\\n      }\\n    }, \\\"请求头规则处理失败\\\", (response) => {\\n      sendSanitizedCookieRuleResponse(id, response || {\\n        ok: false,\\n        error: \\\"请求头规则处理失败\\\"\\n      });\\n    });\\n  }\\n\\n  function requestAiBotRuntime(detail = {}) {\\n    const id = detail?.id || \\\"\\\";\\n    const type = String(detail?.type || \\\"\\\");\\n    if (!id || !type) {\\n      return;\\n    }\\n\\n    sendRuntimeMessageSafely({\\n      type,\\n      detail: detail?.detail || {}\\n    }, \\\"请求失败\\\", (response) => {\\n      window.dispatchEvent(new CustomEvent(AI_BOT_RUNTIME_RESPONSE_EVENT, {\\n        detail: stringifyEventDetail({\\n          id,\\n          ...(response || {\", \"notes\": [\"contract warning: missing discriminator field\", \"已从 source/sink 附近提取字面量分支。\", \"已从 sink 调用推导 URL 承载字段 `url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"\", \"discriminatorValues\": [], \"urlField\": \"url\", \"sinkTapKey\": \"fetch\", \"messageAlias\": \"message\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"LOW\", \"contractWarnings\": [\"missing discriminator field\"]}\npage-target={\"targetId\": \"A24A3364DE24670BBF7152AD3F9FADA9\", \"url\": \"https://www.xiaoheihe.cn:57012/page\"}\nsink-tap-instrument={\"sink_type\": \"all\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerGeneration\": \"observer_851860c13f004bab\", \"targetId\": \"F71196E8B501893E603CC937E529B23F\", \"lifecycle\": {\"ok\": true, \"targetId\": \"F71196E8B501893E603CC937E529B23F\", \"targetType\": \"service_worker\", \"targetUrl\": \"chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/background.js\", \"atta\nsource-bridge-instrument={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerGeneration\": \"observer_36fade60953e49de\", \"targetId\": \"A24A3364DE24670BBF7152AD3F9FADA9\", \"pageUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"result\": \"{\\\"tapped\\\":\\\"all\\\",\\\"keys\\\":[],\\\"tapVar\\\":\\\"self.__expagentSinks\\\",\\\"observerToken\\\":\\\"observer_36fade60953e49de\\\"}\"}\nstimulus-batch={\"action\": \"boundCustomEventBatch\", \"events\": {\"better-xiaoheihe-ai-settings-save\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-settings-save\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 227, \\\"topLevelKeys\\\": [\\\"apiKey\\\", \\\"baseUrl\\\", \\\"enabled\\\", \\\"endpointMode\\\", \\\"model\\\", \\\"provider\\\"], \\\"testMarkers\\\": [\\\"EXPAGENT_TEST_expa_8eda88f75ed5\\\"]}], \\\"result\\\": {\\\"scheduled\\\": true, \\\"count\\\": 1, \\\"surface\\\": \\\"CustomEvent\\\", \\\"spacingMs\\\": 250}}\", \"better-xiaoheihe-ai-chat-request\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-chat-request\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 129, \\\"topLevelKeys\\\": [\\\"id\\\"\nsink-tap={\"sink_type\": \"fetch\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_851860c13f004bab\", \"actualGeneration\": \"observer_851860c13f004bab\", \"previousTargetId\": \"F71196E8B501893E603CC937E529B23F\", \"currentTargetId\": \"F71196E8B501893E603CC937E529B23F\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"fetch\\\",\\\"calls\\\":[{\\\"ts\\\":1790160081420,\\\"request\\\":{\\\"testMarker\\\":\\\"expa_8ce5a6d6aa95\\\"},\\\"method\\\":\\\"POST\\\",\\\"body\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_d98cc0a4e7fb\\\"}},{\\\"ts\\\":1790160081422,\\\"request\\\":{\\\"testMarker\\\":\\\"expa_8ce5a6d6aa95\\\"},\\\"method\\\":\\\"GET\\\",\\\"body\\\":{\\\"redacted\\\":true,\\\"length\\\":0}},{\\\"ts\\\":1790160081427,\\\"request\\\":{\\\"testMarker\\\":\\\"expa_8ce5a6d6aa95\\\"},\\\"method\\\":\\\"POST\\\",\\\"body\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_expa_d98cc0a4e7fb\\\"\nbeacon={\"token\": \"expa_2083c3c420ed\", \"hit\": false, \"count\": 0}\nsource-bridge-tap={\"sink_type\": \"all\", \"target_hint\": \"content\", \"context\": \"isolated-world\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_36fade60953e49de\", \"actualGeneration\": \"observer_36fade60953e49de\", \"recoveryReason\": \"\", \"targetId\": \"A24A3364DE24670BBF7152AD3F9FADA9\", \"pageUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"recoveryResult\": null, \"result\": \"{\\\"keys\\\":[\\\"storage.onChanged\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__dom_innerHTML__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_session_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__runtime_sendMessage__\\\":true,\\\"storage.onChanged\\\":[{\\\"ts\\\":1790160125373,\\\"area\\\":\\\"local\\\",\\\"changes\\\":{\\\"better-xiaoheihe-ai-settings\\\":{\\\"newValue\\\":{\\\"allowEmoji\\\":true,\\\"apiKey\\\":{\\\"testMarker\\\":\\\"EXPAGENT_TEST_ex",
+      "reasoning": "The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink recorded the controlled marker.",
+      "evidence_stage": "MARKER_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": false,
+        "semanticFixtureKinds": [
+          "external-response-port-semantic-fixture"
+        ],
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "environmentReady": true,
+        "listenerReady": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "LOW",
+        "sourceContractReady": true,
+        "runtimeSourceContractProven": true,
+        "sourceReached": true,
+        "bridgeReached": true,
+        "sinkReached": true,
+        "markerReached": true,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "[{\"enabled\": true, \"provider\": \"openai-compatible\", \"endpointMode\": \"openai-compatible\", \"baseUrl\": \"http://127.0.0.1:57012/beacon/expa_2083c3c420ed\", \"model\": \"EXPAGENT_TEST_expa_8eda88f75ed5\", \"apiKey\": \"EXPAGENT_TEST_expa_8eda88f75ed5\"}, {\"id\": \"EXPAGENT_TEST_expa_8eda88f75ed5\", \"messages\": [{\"role\": \"user\", \"content\": \"EXPAGENT_TEST_expa_8eda88f75ed5\"}], \"temperature\": 0}, {\"id\": \"EXPAGENT_TEST_expa_8eda88f75ed5\", \"settings\": {\"enabled\": true, \"provider\": \"openai-compatible\", \"endpointMode\": \"openai-compatible\", \"baseUrl\": \"http://127.0.0.1:57012/beacon/expa_2083c3c420ed\", \"model\": \"EXPAGENT_TEST_expa_8eda88f75ed5\", \"apiKey\": \"EXPAGENT_TEST_expa_8eda88f75ed5\"}}, {\"id\": \"EXPAGENT_TEST_expa_8eda88f75ed5\", \"type\": \"better-xiaoheihe-ai-chat\", \"detail\": {\"messages\": [{\"role\": \"user\", \"content\": \"EXPAGENT_TEST_expa_8eda88f75ed5\"}], \"temperature\": 0}}, {\"id\": \"EXPAGENT_TEST_expa_8eda88f75ed5\", \"type\": \"better-xiaoheihe-ai-list-models\", \"detail\": {\"settings\": {\"enabled\": true, \"provider\": \"openai-compatible\", \"endpointMode\": \"openai-compatible\", \"baseUrl\": \"http://127.0.0.1:57012/beacon/expa_2083c3c420ed\", \"model\": \"EXPAGENT_TEST_expa_8eda88f75ed5\", \"apiKey\": \"EXPAGENT_TEST_expa_8eda88f75ed5\"}}}, {\"values\": {\"better-xiaoheihe-ai-bot-consent\": {\"marker\": \"EXPAGENT_TEST_expa_8eda88f75ed5\"}}}, {\"marker\": \"EXPAGENT_TEST_expa_8eda88f75ed5\", \"url\": \"http://127.0.0.1:57012/beacon/expa_2083c3c420ed\", \"data\": \"EXPAGENT_TEST_expa_8eda88f75ed5\", \"value\": \"EXPAGENT_TEST_expa_8eda88f75ed5\", \"message\": \"EXPAGENT_TEST_expa_8eda88f75ed5\", \"title\": \"EXPAGENT_TEST_expa_8eda88f75ed5\", \"text\": \"EX",
+      "evidence_artifacts": [
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-5\\step-source-open.png",
+          "description": "Step `source-open`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "source-open",
+          "captured_at": "2026-09-23T10:42:05.367328+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-5\\step-after-trigger.png",
+          "description": "Step `after-trigger`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "after-trigger",
+          "captured_at": "2026-09-23T10:42:05.484035+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-5\\storage-after-trigger.json",
+          "description": "Storage state at `after-trigger` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-5\\storage-after-trigger.png",
+          "description": "Storage panel (DevTools-style) at `after-trigger`",
+          "stage": "storage-after-trigger",
+          "captured_at": "2026-09-23T10:42:05.644557+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "1e60a3c27a033412503ec93e713a400cca3813f690b723723fcc512296078d8f"
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-5\\step-after-observation.png",
+          "description": "Step `after-observation`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "after-observation",
+          "captured_at": "2026-09-23T10:42:05.757799+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-5\\storage-after-observation.json",
+          "description": "Storage state at `after-observation` (markers shown, others redacted)",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-5\\storage-after-observation.png",
+          "description": "Storage panel (DevTools-style) at `after-observation`",
+          "stage": "storage-after-observation",
+          "captured_at": "2026-09-23T10:42:05.886485+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "a242c111038e4d43c45a3e0ea1d5ca43bf87bb888793c5d7731c48bf0aa0dbc6"
+        },
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-5\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-5\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "debug",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-5\\extension-debug.json",
+          "description": "Persistent CDP extension debugger breakpoint/pause state.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-5\\step-final-state.png",
+          "description": "Step `final-state`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-23T10:42:05.980318+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-5\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "Extension debugger recorded 4 breakpoint(s); see artifact for line-level state.",
+      "notes": "sinkTapKey=fetch sourceBridgeReached=false semanticFixture=true"
+    },
+    {
+      "flow_index": 6,
+      "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+      "final_verdict": "TRUE_POSITIVE",
+      "confidence": 0.45,
+      "reproduced": false,
+      "trajectory": [
+        {
+          "action": "new_page",
+          "detail": "https://www.xiaoheihe.cn:57012/page",
+          "result": "{\"openedUrl\": \"https://www.xiaoheihe.cn:57012/page\", \"target\": {\"description\": \"\", \"devtoolsFrontendUrl\": \"https://chrome-devtools-frontend.appspot.com/serve_rev/@73c14f6228d7cd537c855007e8f88678969cc0eb/inspector.html?ws=127.0.0.1:60611/de"
+        },
+        {
+          "action": "set_source_breakpoint",
+          "detail": "src/ai-bridge.js L450:C62 -> L450:C74",
+          "result": "{\"ok\": true, \"sourceFile\": \"src/ai-bridge.js\", \"url\": \"chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/ai-bridge.js\", \"line\": 450, \"column\": 62, \"targetHint\": \"content\", \"breakpointId\": \"br:1:449:62:chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/ai-bridge.js\", \"resolved\": true, \"locations\": [{\"scriptId\": \"3\", \"lineNumber\": 450, \"columnNumber\": 4}], \"targetType\": \"page\", \"targetUrl\": \"https://www.xiao"
+        },
+        {
+          "action": "source_contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"boundCustomEventBatch\", \"events\": {\"better-xiaoheihe-ai-settings-save\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-settings-save\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 227, \\\"topLevelKeys\\\": [\\\"apiKey\\\", \\\"baseUrl\\\", \\\"enabled\\\", \\\"endpointMode\\\", \\\"model\\\", \\\""
+        },
+        {
+          "action": "set_sink_breakpoint",
+          "detail": "src/background L370:C6 -> L386:C17",
+          "result": "{\"ok\": true, \"sourceFile\": \"src/background.js\", \"url\": \"chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/background.js\", \"line\": 370, \"column\": 6, \"targetHint\": \"background\", \"breakpointId\": \"1:369:6:chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/background.js\", \"resolved\": true, \"locations\": [{\"scriptId\": \"3\", \"lineNumber\": 369, \"columnNumber\": 6}], \"targetType\": \"service_worker\", \"targetUrl\": \"chrom"
+        },
+        {
+          "action": "sink_contract_stimulus_batch",
+          "detail": "CUSTOM_EVENT",
+          "result": "{\"action\": \"boundCustomEventBatch\", \"events\": {\"better-xiaoheihe-ai-settings-save\": \"{\\\"action\\\": \\\"dispatchStimulusBatch\\\", \\\"surface\\\": \\\"CustomEvent\\\", \\\"event\\\": \\\"better-xiaoheihe-ai-settings-save\\\", \\\"eventTarget\\\": \\\"window\\\", \\\"targetUrl\\\": \\\"top-frame\\\", \\\"frameScoped\\\": false, \\\"count\\\": 1, \\\"inputs\\\": [{\\\"bytes\\\": 227, \\\"topLevelKeys\\\": [\\\"apiKey\\\", \\\"baseUrl\\\", \\\"enabled\\\", \\\"endpointMode\\\", \\\"model\\\", \\\""
+        }
+      ],
+      "planned_trajectory": {
+        "flow_index": 6,
+        "goal": "Trigger the static source-to-sink path and decide TP/FP from runtime evidence.",
+        "target_url": "https://www.xiaoheihe.cn:57012/page",
+        "preconditions": [
+          "A page where the relevant content script/source frame runs.",
+          "Loaded extension must expose extension CDP targets.",
+          "Only the local sandbox or an explicitly configured controlled fixture may be opened."
+        ],
+        "steps": [
+          {
+            "action": "list_cdp_targets",
+            "detail": "Confirm extension target/background/service-worker exists.",
+            "result": ""
+          },
+          {
+            "action": "get_extension_runtime_state",
+            "detail": "Snapshot pre-trigger badge/storage/runtime state.",
+            "result": ""
+          },
+          {
+            "action": "new_page/navigate_page",
+            "detail": "Open approved source target: https://www.xiaoheihe.cn:57012/page",
+            "result": ""
+          },
+          {
+            "action": "list_scripts/search_in_sources",
+            "detail": "Confirm relevant content script/listener is injected.",
+            "result": ""
+          },
+          {
+            "action": "post_controlled_message/set_controlled_dom/dispatch_controlled_event",
+            "detail": "Inject a JSON test marker through the matching local source surface.",
+            "result": ""
+          },
+          {
+            "action": "observe",
+            "detail": "Check beacon/network/console/runtime state/screenshot.",
+            "result": ""
+          },
+          {
+            "action": "ReAct-adjust",
+            "detail": "If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.",
+            "result": ""
+          }
+        ],
+        "payload": "Use a bounded JSON payload with an EXPAGENT_TEST_* marker; substitute a local beacon only for URL-bearing fields.",
+        "expected_observation": "Instrument and observe CHROME_LOCAL_STORAGE; use a beacon when its security-relevant argument is a URL.",
+        "adjustment_strategy": "Use runtime CDP/MCP feedback to refine payload fields, postMessage targetOrigin, DOM selectors/values, URL host, and observation sink; preserve extension logic while allowing non-semantic diagnostic probes."
+      },
+      "evidence": "source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"src/ai-bridge.js\", \"location\": \"L450:C62 -> L450:C74\", \"eventNames\": [\"better-xiaoheihe-ai-settings-request\", \"better-xiaoheihe-ai-settings-save\", \"better-xiaoheihe-ai-chat-request\", \"better-xiaoheihe-ai-model-list-request\", \"better-xiaoheihe-sanitized-cookie-rule-request\", \"better-xiaoheihe-ai-bot-runtime-request\", \"better-xiaoheihe-local-settings-request\", \"better-xiaoheihe-local-settings-save\"], \"eventTarget\": \"window\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"\", \"scalarMessageValue\": \"\", \"requirements\": {\"values\": \"object\"}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"elease\\\" : \\\"activate\\\";\\n    sendRuntimeMessageSafely({\\n      type: action === \\\"release\\\"\\n        ? \\\"better-xiaoheihe-release-sanitized-comment-cookie\\\"\\n        : \\\"better-xiaoheihe-activate-sanitized-comment-cookie\\\",\\n      detail: {\\n        id,\\n        cookieHeader: String(detail?.cookieHeader || \\\"\\\")\\n      }\\n    }, \\\"请求头规则处理失败\\\", (response) => {\\n      sendSanitizedCookieRuleResponse(id, response || {\\n        ok: false,\\n        error: \\\"请求头规则处理失败\\\"\\n      });\\n    });\\n  }\\n\\n  function requestAiBotRuntime(detail = {}) {\\n    const id = detail?.id || \\\"\\\";\\n    const type = String(detail?.type || \\\"\\\");\\n    if (!id || !type) {\\n      return;\\n    }\\n\\n    sendRuntimeMessageSafely({\\n      type,\\n      detail: detail?.detail || {}\\n    }, \\\"请求失败\\\", (response) => {\\n      window.dispatchEvent(new CustomEvent(AI_BOT_RUNTIME_RESPONSE_EVENT, {\\n        detail: stringifyEventDetail({\\n          id,\\n          ...(response || {\", \"notes\": [\"contract warning: missing discriminator field\", \"已从 source/sink 附近提取字面量分支。\", \"已从 sink 调用推导 URL 承载字段 `url`。\", \"已提取页面可达事件名。\"], \"discriminatorField\": \"\", \"discriminatorValues\": [], \"urlField\": \"url\", \"sinkTapKey\": \"storage.local.set\", \"messageAlias\": \"message\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"eventDetailIsJson\": false, \"sinkDataFields\": [], \"runtimeMessageKeyPrefix\": \"\", \"contractConfidence\": \"LOW\", \"contractWarnings\": [\"missing discriminator field\"]}\nisolated-context={\"origin\": \"https://www.xiaoheihe.cn:57012\", \"dsShell\": \"undefined\", \"dsCommon\": \"undefined\", \"jquery\": \"undefined\", \"shellFrame\": false}\nsource-breakpoint=armed\nsource-pause={\"paused\": true, \"reason\": \"other\", \"target\": {\"type\": \"page\", \"url\": \"https://www.xiaoheihe.cn:57012/page\"}, \"frames\": [{\"function\": \"<anonymous>\", \"scriptId\": \"3\", \"line\": 451, \"column\": 4, \"url\": \"\"}, {\"function\": \"<anonymous>\", \"scriptId\": \"31\", \"line\": 1, \"column\": 31, \"url\": \"\"}]}\nsink-breakpoint=armed\nsink-pause={\"paused\": false, \"reason\": \"\", \"target\": {\"type\": \"service_worker\", \"url\": \"chrome-extension://hbokdcpejpmibinnbdpfkdmhmcdnjgfg/src/background.js\"}, \"frames\": []}\ndeep-observe-window={\"elapsedSeconds\": 0.0, \"pollAttempts\": 1, \"firstObservedSeconds\": 0.0, \"sinkObserved\": true, \"beaconObserved\": false, \"observerRecoveredDuringWindow\": false}\nsink-tap={\"sink_type\": \"storage.local.set\", \"target_hint\": \"background\", \"context\": \"extension-target\", \"observerReady\": true, \"observerLost\": false, \"observerRecovered\": false, \"expectedGeneration\": \"observer_1335d1f487144c0b\", \"actualGeneration\": \"observer_1335d1f487144c0b\", \"previousTargetId\": \"F71196E8B501893E603CC937E529B23F\", \"currentTargetId\": \"F71196E8B501893E603CC937E529B23F\", \"recoveryReason\": \"\", \"recoveryResult\": null, \"result\": \"{\\\"sink\\\":\\\"storage.local.set\\\",\\\"calls\\\":[{\\\"ts\\\":1790160079933,\\\"arg\\\":{\\\"reduce\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"slice\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"find\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"detail\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"feedSelectStrategy\\\":{\\\"redacted\\\":true,\\\"length\\\":6}}},{\\\"ts\\\":1790160083800,\\\"arg\\\":{\\\"reduce\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"slice\\\":{\\\"redacted\\\":true,\\\"length\\\":6},\\\"find\\\":{\\\"redacted\\\":true,\\\"length\\\":6\nbeacon={\"token\": \"expa_7af7837fb674\", \"hit\": false, \"count\": 0, \"hits\": []}\nbaseline=source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"src/ai-bridge.js\", \"location\": \"L450:C62 -> L450:C74\", \"eventNames\": [\"better-xiaoheihe-ai-settings-request\", \"better-xiaoheihe-ai-settings-save\", \"better-xiaoheihe-ai-chat-request\", \"better-xiaoheihe-ai-model-list-request\", \"better-xiaoheihe-sanitized-cookie-rule-request\", \"better-xiaoheihe-ai-bot-runtime-request\", \"better-xiaoheihe-local-settings-request\", \"better-xiaoheihe-local-settings-save\"], \"eventTarget\": \"window\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"\", \"scalarMessageValue\": \"\", \"requirements\": {\"values\": \"object\"}, \"preconditionActions\": [], \"selectors\": [], \"mediaTags\": [], \"snippet\": \"elease\\\" : \\\"activate\\\";\\n    sendRuntimeMessageSafely({\\n      type: action === \\\"release\\\"\\n        ? \\\"better-xiaoheihe-release-sanitized-comment-cookie\\\"\\n        : \\\"better-xiaoheihe-activate-sanitized-commen",
+      "reasoning": "sink 已执行，但安全化 sink tap 中没有同一 marker/beacon；需要人工复核路径值。",
+      "evidence_stage": "SOURCE_REACHED",
+      "blocked_reason": "",
+      "observer_status": {
+        "semanticFixturesInstalled": true,
+        "semanticFixtureUsed": false,
+        "semanticFixtureKinds": [
+          "external-response-port-semantic-fixture"
+        ],
+        "semanticFixture": true,
+        "positiveOnly": true,
+        "environmentReady": true,
+        "listenerReady": true,
+        "sourceReached": true,
+        "sinkObserverReady": true,
+        "sourceContractConfidence": "LOW",
+        "sourceContractReady": false,
+        "markerReached": false,
+        "capabilityAssessment": {
+          "requiredContexts": [
+            "serviceWorker",
+            "contentScriptIsolatedWorld"
+          ],
+          "unsupportedContexts": [],
+          "limitations": [],
+          "deterministicReplaySupported": true,
+          "lineBreakpointSupported": true
+        }
+      },
+      "payload_used": "",
+      "evidence_artifacts": [
+        {
+          "kind": "transcript",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-6\\trajectory.txt",
+          "description": "Bounded ReAct trajectory and tool evidence.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "source-contract",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-6\\source-contract.json",
+          "description": "Source-adjacent literal guards and generated local-input contract.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "debug",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-6\\extension-debug.json",
+          "description": "Persistent CDP extension debugger breakpoint/pause state.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "screenshot",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-6\\step-final-state.png",
+          "description": "Step `final-state`: https://www.xiaoheihe.cn:57012/page",
+          "stage": "final-state",
+          "captured_at": "2026-09-23T10:41:42.428506+00:00",
+          "target_url": "https://www.xiaoheihe.cn:57012/page",
+          "sha256": "9c16cc1c546bbd53b8d7ea2c905f697efafdebd9f4d8e030c14149cd93646c59"
+        },
+        {
+          "kind": "screenshot-manifest",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\dynamic-batch\\after-fixes-edge-r3b\\_runs\\edge\\ohjgplijcfdlhdmmdlkigbelaonpdach\\1.0.7\\dynamic-evidence\\flow-6\\screenshot-evidence.json",
+          "description": "Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.",
+          "stage": "",
+          "captured_at": "",
+          "target_url": "",
+          "sha256": ""
+        },
+        {
+          "kind": "manual-attestation",
+          "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\ohjgplijcfdlhdmmdlkigbelaonpdach_1.0.7\\dynamic\\evidence\\flow-6\\manual\\manual_validation.json",
+          "description": "User manually confirmed TP for the remaining Xiaoheihe flows.",
+          "stage": "manual-confirmation",
+          "captured_at": "2026-09-23T11:36:08.634Z",
+          "target_url": "",
+          "sha256": "f32bb0ee89b132448b698c59ff216803f6e584390a6bd66b5bf48f09e1989dfa"
+        }
+      ],
+      "human_handoff": null,
+      "debugger_summary": "Extension debugger recorded 4 breakpoint(s); see artifact for line-level state.",
+      "notes": "deepTraceCode=MARKER_NOT_OBSERVED_AT_SINK react=skippedDeterministicResolved manualValidation=true; automatedOutcomePreserved=INCONCLUSIVE_AFTER_DEBUG",
+      "manual_validation": {
+        "extension_id": "ohjgplijcfdlhdmmdlkigbelaonpdach",
+        "extension_version": "1.0.7",
+        "flow_index": 6,
+        "verdict": "TP",
+        "observation": "User manually confirmed TP for the remaining Xiaoheihe flows.",
+        "operator": "user-provided manual validation",
+        "validated_at": "2026-09-23T11:36:08.634Z",
+        "evidence_type": "operator_attestation",
+        "attestation_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\edge\\extensions\\ohjgplijcfdlhdmmdlkigbelaonpdach_1.0.7\\dynamic\\evidence\\flow-6\\manual\\manual_validation.json",
+        "attestation_sha256": "f32bb0ee89b132448b698c59ff216803f6e584390a6bd66b5bf48f09e1989dfa"
+      }
+    }
+  ],
+  "environment": {
+    "browserUrl": "http://127.0.0.1:9222",
+    "runtimeExtensionId": "onfnobmiehblpfdlpinhcanibebgmpdc",
+    "beaconBaseUrl": "http://127.0.0.1:57283",
+    "headless": true,
+    "safety": {
+      "mode": "isolated-controlled-validation",
+      "allowedTestOrigins": [
+        "http://127.0.0.1",
+        "http://[::1]",
+        "http://localhost"
+      ],
+      "network": "loopback and explicitly configured controlled origins only",
+      "testInput": "bounded JSON with harmless EXPAGENT_TEST_* markers",
+      "sensitiveData": "credentials, cookies, tokens, and personal data are not read or collected"
+    },
+    "networkIsolation": true
+  },
+  "summary": "Round-20 r4 merged 6 dynamic/manual flow verdict(s).",
+  "skipped_reason": ""
+}

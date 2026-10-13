@@ -1,0 +1,91 @@
+{
+  "extension_id": "mjgbhohbanahpldkmnaafjgpoflgnklk",
+  "extension_version": "2.0.1.3",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Ledger\n\n**(a) Who controls the source?**\nThe source is `chrome.runtime.onConnectExternal.addListener(... e.onMessage.addListener(function(t){...}))` in `background.js` (BG context). The entire message object `t` is supplied by whatever page opens an external port. The manifest restricts `externally_connectable.matches` to `*://*.cloudhq.net/*`, so the attack surface is any page on any `*.cloudhq.net` subdomain (plus XSS on those origins / subdomain takeover). No `sender.id`, `sender.origin`, or `sender.url` check exists anywhere in `background.js` (confirmed by search: no matches). The source is genuinely attacker-controllable under the XSS/subdomain precondition.\n\n**(b) Exact source-to-sink path**\nDirect, no cross-context hop:\n```\nonConnectExternal(port e)\n  -> name = e.name; n = o[name]; r = n.gmail_port\n  -> if (r) e.onMessage.addListener(function(t) {\n       ...\n       t && \"CHQ_UPDATE_HEIGHT_OF_VIDEO_MANAGER\" == t.type && a && t.height\n         && chrome.windows.update(a, {height: parseInt(t.height), focused: true})\n     })\n```\nThe report evidence (`report.source.md` flow #1) and the minified slice both show the same continuous code. The message field `t.height",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L2:C265559 -> L2:C265560",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L2 C265559-265560: …),e.postMessage(t),t&&\"CHQ_VIDEO_MANAGER_CLOSE\"==t.type?(console.log(\"gmail_VIDEO: fosucing gmail since we received CHQ_VIDEO_MANAGER_CLOSE from the popup \"),chr…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L2:C266107 -> L2:C266170",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L2 C266107-266170: …cused:!0})})),e.onDisconnect.addListener((function(e){console.log(\"gmail_video: sending CHQ_VIDEO_MANAGER_CLOSE to popup since gmail got disconnected\"),r.postMessage({type:\"CHQ_VIDEO_MANAGER_CLOSE\"})}))):(console.log(\"gmail…"
+        },
+        "sourceExpectedMarkers": [
+          "onConnectExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.cloudhq.net/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "NEEDS_SEMANTIC_CLASSIFICATION",
+          "rule": "Inspect the invoked API and the precise tainted argument before assigning a security label."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

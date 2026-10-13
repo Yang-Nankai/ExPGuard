@@ -1,0 +1,93 @@
+{
+  "extension_id": "fkhddgplfbdjopphepkohfgdkikfleai",
+  "extension_version": "1.0.9",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 3,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 1,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.3,
+      "reasoning": "Structured extraction unavailable; preserved analyst notes: ## Verification — Flow #1 (REQUEST_FORGERY, `CHROME_ONMESSAGEEXTERNAL_MESSAGE` → `fetch`)\n\n### Decision ledger\n\n**(a) Who controls the source?**\nThe source is `request` in `chrome.runtime.onMessageExternal.addListener(...)` (background.js L354–358). The manifest `externally_connectable.matches` is restricted to `https://lcx.bambuser.com/*` and `https://lcx-eu.bambuser.com/*`, and there are no content scripts. So the message can only originate from a page on those two dashboard origins — i.e., an attacker needs script execution there (XSS) or a DevTools console on the trusted page. Per the harness rules, a specific-host `externally_connectable` restriction does *not* eliminate the finding; it reduces reachability/severity with an XSS prerequisite.\n\n**(b) Exact source→sink path (confirmed in real source).**\nL356 `queueWork(() => handleCommand(request.command, request.params || {}, sender, sendResponse))` →\nL243 `handleCommand(command, params, ...)` →\nL244 `command === 'activateMerchant'` →\nL245 `const { orgId, idToken, defaultOrigin } = params` (attacker-controlled) →\nL246 truthiness check only (no value sanitization) →\nL250 `backend = backendMap[sender.origin]` (fixed per origin; `s",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L356:C32 -> L356:C39",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L356 C32-39:   queueWork(() => handleCommand(request.command, request.params || {}, sender, sendResponse));"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L257:C29 -> L262:C8",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   257|       const response = await fetch(`${backend}/o/${orgId}/settings/calls/agent/surf-behind`, {\n>>   258|         method: 'GET',\n>>   259|         headers: {\n>>   260|           Authorization: `Bearer ${idToken}`,\n>>   261|         },\n>>   262|       });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://lcx.bambuser.com/*",
+            "https://lcx-eu.bambuser.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "No structured verdict or explicit labelled transcript verdict was available.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 0 true-positive, 0 false-positive, 0 partial-available (PA), 1 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

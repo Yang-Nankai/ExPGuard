@@ -1,0 +1,229 @@
+{
+  "extensionId": "phgddhgfnjjaobkeekohieahfingldac",
+  "extensionVersion": "5.14.1.142",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 2,
+    "totalFiles": 2,
+    "distinctFlows": 2,
+    "rawIssueEntries": 2,
+    "sinklessSourcesSkipped": 8
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "content-script",
+      "frame": "CS_1",
+      "constraint": {
+        "matches": [
+          "http://*/*",
+          "https://*/*",
+          "file:///*"
+        ]
+      },
+      "source": {
+        "kind": "TARGET_CUSTOM_EVENT",
+        "remark": "target.addEventListener(fdWebExtension.saveToStorage)",
+        "file": "content-script",
+        "loc": "L50:C14 -> L50:C22",
+        "line": 50,
+        "col": [
+          14,
+          22
+        ],
+        "spansTo": null,
+        "code": "var key = »e.detail«.key;"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "unknown",
+          "file": "content-script",
+          "loc": "L53:C4 -> L53:C46",
+          "line": 53,
+          "col": [
+            4,
+            46
+          ],
+          "spansTo": null,
+          "code": "»chrome.storage.local.set({ [key]: value })«;",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*",
+              "file:///*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 7,
+        "distinctLines": 3,
+        "steps": [
+          {
+            "n": 1,
+            "file": "content-script",
+            "line": 50,
+            "ops": [
+              "ELEMENT:member-element"
+            ],
+            "code": "var key = »e.detail.key«;"
+          },
+          {
+            "n": 2,
+            "file": "content-script",
+            "line": 51,
+            "ops": [
+              "ELEMENT:member-element"
+            ],
+            "code": "var value = »e.detail.value«;"
+          },
+          {
+            "n": 3,
+            "file": "content-script",
+            "line": 53,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.storage.local.set({ [key]: value })«;"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "TARGET_CUSTOM_EVENT",
+        "remark": "target.addEventListener(fdWebExtension.multipleConnectionSupport)",
+        "file": "background",
+        "loc": "L301:C0 -> L339:C2",
+        "line": 301,
+        "col": [
+          0,
+          2
+        ],
+        "spansTo": 339,
+        "code": "»chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){«"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "fdWebExtension.multipleConnectionSupport",
+          "file": "background",
+          "loc": "L88:C2 -> L88:C80",
+          "line": 88,
+          "col": [
+            2,
+            80
+          ],
+          "spansTo": null,
+          "code": "»chrome.storage.local.set({'fdWebExtension.multipleConnectionSupport':enabled})«;",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 22,
+        "distinctLines": 9,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 301,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){«",
+            "spansTo": 339,
+            "crossContextHop": "runtime.single.sender.message[content-script->background]"
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 305,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»isSupported« !== wasSupported) {"
+          },
+          {
+            "n": 3,
+            "file": "background",
+            "line": 306,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "storeMultipleConnectionSupport(»isSupported«);"
+          },
+          {
+            "n": 4,
+            "file": "background",
+            "line": 87,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "multipleConnectionSupport = »enabled«;"
+          },
+          {
+            "n": 5,
+            "file": "background",
+            "line": 88,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.storage.local.set({'fdWebExtension.multipleConnectionSupport':enabled})«;"
+          },
+          {
+            "n": 6,
+            "file": "background",
+            "line": 307,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!isSupported«) {"
+          },
+          {
+            "n": 7,
+            "file": "background",
+            "line": 93,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»multipleConnectionSupport« !== undefined) {"
+          },
+          {
+            "n": 8,
+            "file": "background",
+            "line": 94,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:template-literal"
+            ],
+            "code": "console.log(»`multiple connection support not undefined: ${multipleConnectionSupport}`«)"
+          },
+          {
+            "n": 9,
+            "file": "background",
+            "line": 95,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "resolve(»multipleConnectionSupport«);"
+          }
+        ]
+      }
+    }
+  ]
+}

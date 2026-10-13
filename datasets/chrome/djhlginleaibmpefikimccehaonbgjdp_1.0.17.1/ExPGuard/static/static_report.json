@@ -1,0 +1,87 @@
+{
+  "extension_id": "djhlginleaibmpefikimccehaonbgjdp",
+  "extension_version": "1.0.17.1",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 2,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Ledger\n\n**(a) Source control — attacker-controlled:**  \n`content/twitch.integrity.bridge.js` is an isolated-world content script that listens for a DOM CustomEvent:\n\n```js\ndocument.addEventListener('ggsel:integrity-captured', function (ev) {\n  const integrity = ev && ev.detail && typeof ev.detail.integrity === 'string' ? ev.detail.integrity : '';\n  if (!integrity) return;\n  chrome.runtime.sendMessage({ type: 'GGSEL_INTEGRITY_CAPTURED', integrity, ts: ev.detail.ts || Date.now() }, ...)\n```\n\nThe event name is fixed and publicly known. A page running on any matched `*://*.twitch.tv/*` origin can dispatch the same event on `document`:\n\n```js\ndocument.dispatchEvent(new CustomEvent('ggsel:integrity-captured', {\n  detail: { integrity: 'v4.local.attacker-controlled' }\n}));\n```\n\nDOM events dispatched by the page are visible to isolated-world listeners, so the page can forge `ev.detail.integrity`. There is no `event.source`, origin, sender.id, or authenticity check in the bridge.\n\n**(b) Path is unbroken:**  \nBridge (`L7`) → `chrome.runtime.sendMessage` (`L10-13`) → background `chrome.runtime.onMessage` (`L419`) → `message.type === 'GGSEL_INTEGRITY_CAPTURED'` branch (`L437`) →",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content/twitch.integrity.bridge",
+          "reportedLoc": "L7:C83 -> L7:C92",
+          "resolvedFile": "content/twitch.integrity.bridge.js",
+          "resolved": true,
+          "snippet": "L7 C83-92: … const integrity = ev && ev.detail && typeof ev.detail.integrity === 'string' ? ev.detail.integrity : '';"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L409:C10 -> L412:C6",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   409|     await chrome.storage.local.set({\n>>   410|       [INTEGRITY_STORAGE_KEY]: value,\n>>   411|       [INTEGRITY_UPDATED_AT_KEY]: Date.now(),\n>>   412|     });"
+        },
+        "sourceExpectedMarkers": [
+          "addEventListener",
+          "detail"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

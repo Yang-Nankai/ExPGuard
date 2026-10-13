@@ -1,0 +1,122 @@
+{
+  "extension_id": "bcmoplgjpddohaelhnnodojbamdobbhc",
+  "extension_version": "1.1.0",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.96,
+      "reasoning": "Deterministic CoCo calibration [COCO_AUTH_TOKEN_PAGE_BRIDGE]: Authentication token material is read from extension storage and returned across the extension/page postMessage boundary.",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "Authentication token material is read from extension storage and returned across the extension/page postMessage boundary.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "CoCo reported cross-boundary flow; verify with source",
+      "report_evidence": {
+        "tool": "coco",
+        "sourceCapability": "SENSITIVE_DATA",
+        "sinkCapability": "MESSAGE_RESPONSE",
+        "flowMeta": {
+          "totalSteps": 3,
+          "omitted": 0
+        },
+        "propagation": "t.isLoggedIn"
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "crx_headers/cs_header.js",
+          "reportedLoc": "L165:C1 -> L165:C1",
+          "resolvedFile": "",
+          "resolved": false,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "extension-content.js",
+          "reportedLoc": "L1:C1 -> L1:C1",
+          "resolvedFile": "extension-content.js",
+          "resolved": true,
+          "snippet": "L1 C1-1: !function(){\"use strict\";window.addEventListener(\"message\",function(e){if(\"https:…"
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "NEEDS_SEMANTIC_CLASSIFICATION",
+          "rule": "Inspect the invoked API and the precise tainted argument before assigning a security label."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "Source report file could not be resolved in the unpacked CRX/XPI."
+        ],
+        "cocoCalibration": {
+          "verdict": "TRUE_POSITIVE",
+          "rule": "COCO_AUTH_TOKEN_PAGE_BRIDGE",
+          "reason": "Authentication token material is read from extension storage and returned across the extension/page postMessage boundary.",
+          "confidence": 0.96,
+          "evidenceFacts": {
+            "syntheticSource": true,
+            "configEndpoint": false,
+            "localEndpoint": true,
+            "identifierLike": false,
+            "secretLike": true,
+            "configurationLike": false,
+            "fullSerialization": false,
+            "fullStoragePayload": false,
+            "fixedOriginGuard": false,
+            "wildcardOrigin": false,
+            "dynamicCode": false,
+            "responseField": true,
+            "propagationHasData": true
+          },
+          "matchedSignals": [
+            "storage-source",
+            "credential-shaped-payload",
+            "page-boundary-sink"
+          ],
+          "negativeSignals": []
+        }
+      },
+      "verdict_basis": "Deterministic CoCo calibration [COCO_AUTH_TOKEN_PAGE_BRIDGE]: Authentication token material is read from extension storage and returned across the extension/page postMessage boundary. Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

@@ -1,0 +1,113 @@
+{
+  "extension_id": "hboaocjifmkibpeajkgaliiaaiodikon",
+  "extension_version": "2.0.8",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification ledger\n\n**(a) Who controls the source?**\nThe source is `window.addEventListener(\"message\", ...)` inside the content script. I inspected the minified `content-script.js` and confirmed the actual listener:\n\n```js\nwindow.addEventListener(\"message\",(function(e){\n  if(void 0!==e.data.businessFlagResult &&\n     chrome.storage.local.set({businessFlag:e.data.businessFlagResult},()=>{...}),\n     e.data.groupsInfoTwoInject){...}\n  ...\n}))\n```\n\nThere is no `event.origin`, `event.source`, or message-field allow-list check. Any script running in the page on `*.whatsapp.com` can call `window.postMessage(...)` with an arbitrary `businessFlagResult` field, and the content-script listener accepts it. The presence check `void 0 !== e.data.businessFlagResult` only tests existence, not the value.\n\n**(b) Exact source-to-sink path**\n`e.data.businessFlagResult` (attacker-controlled `MessageEvent.data`) flows directly into the first argument of `chrome.storage.local.set`:\n\n```js\nchrome.storage.local.set({businessFlag:e.data.businessFlagResult}, callback)\n```\n\nThis is a same-context window-message bridge: page world → content-script isolated world. No intermediate runtime message or storage",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "CoCo reported cross-boundary flow; verify with source",
+      "report_evidence": {
+        "tool": "coco",
+        "sourceCapability": "ATTACKER_INPUT",
+        "sinkCapability": "STORAGE_WRITE",
+        "flowMeta": {
+          "totalSteps": 3,
+          "omitted": 0
+        },
+        "propagation": "e.data"
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content-script.js",
+          "reportedLoc": "L1:C1 -> L1:C1",
+          "resolvedFile": "content-script.js",
+          "resolved": true,
+          "snippet": "L1 C1-1: (function(e){var t={};function o(n){if(t[n])return t[n].exports;var c=t[n]={i:n,l…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "content-script.js",
+          "reportedLoc": "L1:C1 -> L1:C1",
+          "resolvedFile": "content-script.js",
+          "resolved": true,
+          "snippet": "L1 C1-1: (function(e){var t={};function o(n){if(t[n])return t[n].exports;var c=t[n]={i:n,l…"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://*.whatsapp.com/*",
+              "http://*.whatsapp.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content-script.js"
+            ],
+            "runAt": "document_end",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

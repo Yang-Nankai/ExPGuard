@@ -1,0 +1,196 @@
+{
+  "extension_id": "youtube-volume-scroll@github.com",
+  "extension_version": "3.4.1",
+  "browser": "firefox",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 4,
+  "verified_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 2,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #6 (STORAGE_POSOING)\n\n### (a) Who controls the source\nThe effective source is the `message` listener in the content script `index.js` (`init()`):\n\n```js\nwindow.addEventListener('message', e => {\n    if (e.origin !== window.location.origin) return;\n    ...\n    } else if (\n        e.data.type === 'YoutubeVolumeScroll-config-save' &&\n        typeof e.data.config === 'object'\n    ) {\n        configFromPageAccess = e.data.config;\n        browserApi.storage.sync.set({ config: e.data.config });\n    }\n});\n```\n\n`e.data.config` is attacker/page-controlled. The only checks are:\n\n- `e.origin === window.location.origin` — this is not an authentication boundary for a page-to-content-script bridge. A script running in the YouTube page can trivially `window.postMessage(..., window.location.origin)`, satisfying the origin check.\n- `typeof e.data.config === 'object'` — an attacker can supply any object; no schema or allow-list validation occurs.\n\nSo the source is genuinely untrusted at runtime.\n\n### (b) Source-to-sink path\nThe path is real and unbroken:\n\n1. `index.js` L85–L89: page `message` event `e.data.config` is written directly to `browserApi.storage.sync` under key `con",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 6,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "index",
+          "reportedLoc": "L80:C12 -> L80:C23",
+          "resolvedFile": "index.js",
+          "resolved": true,
+          "snippet": "L80 C12-23:             e.data.type === 'YoutubeVolumeScroll-volume' &&"
+        },
+        "sinkAnchor": {
+          "reportedFile": "popup/popup",
+          "reportedLoc": "L58:C8 -> L58:C48",
+          "resolvedFile": "popup/popup.js",
+          "resolved": true,
+          "snippet": "L58 C8-48:         browserApi.storage.local.set({ config });"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://www.youtube.com/*",
+              "https://music.youtube.com/*",
+              "https://www.youtube-nocookie.com/embed/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "index.js"
+            ],
+            "runAt": "document_end",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 3,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #6 — STORAGE_POSOING\n\n### 1. Source control (attacker-controllable?)\n\n**Confirmed.** In `index.js` (content script, runs on `https://www.youtube.com/*`, `music.youtube.com/*`, `youtube-nocookie.com/embed/*`):\n\n```js\nwindow.addEventListener('message', e => {\n    if (e.origin !== window.location.origin) return;\n    if (e.data.type === 'YoutubeVolumeScroll-volume' && ...) {\n        saveVolume(e.data.newVolume);\n    } else if (\n        e.data.type === 'YoutubeVolumeScroll-config-save' &&\n        typeof e.data.config === 'object'\n    ) {\n        configFromPageAccess = e.data.config;\n        browserApi.storage.sync.set({ config: e.data.config });   // L89\n    }\n});\n```\n\nThe guards are exactly the bypassable class described in the harness:\n- `e.origin !== window.location.origin` is a same-page origin check; a page (or injected/XSS script) calling `window.postMessage(msg, window.location.origin)` trivially satisfies it.\n- `e.data.type === 'YoutubeVolumeScroll-config-save'` and `typeof e.data.config === 'object'` are checks on attacker-supplied message *fields*, not a trust anchor.\n- There is no `sender.id` allowlist (this is not extension messaging), no fixed-truste",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 6,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "index",
+          "reportedLoc": "L80:C12 -> L80:C23",
+          "resolvedFile": "index.js",
+          "resolved": true,
+          "snippet": "L80 C12-23:             e.data.type === 'YoutubeVolumeScroll-volume' &&"
+        },
+        "sinkAnchor": {
+          "reportedFile": "popup/popup",
+          "reportedLoc": "L73:C8 -> L73:C47",
+          "resolvedFile": "popup/popup.js",
+          "resolved": true,
+          "snippet": "L73 C8-47:         browserApi.storage.sync.set({ config });"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://www.youtube.com/*",
+              "https://music.youtube.com/*",
+              "https://www.youtube-nocookie.com/embed/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "index.js"
+            ],
+            "runAt": "document_end",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 2 flow(s): 2 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

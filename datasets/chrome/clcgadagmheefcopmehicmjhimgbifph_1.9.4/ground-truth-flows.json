@@ -1,0 +1,318 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "clcgadagmheefcopmehicmjhimgbifph",
+  "version": "1.9.4",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-423a6d269619656b",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "FETCH_RESOURCE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:clcgadagmheefcopmehicmjhimgbifph:1.9.4:81e156cc6d02a3dc:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:clcgadagmheefcopmehicmjhimgbifph:1.9.4:81e156cc6d02a3dc:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "81e156cc6d02a3dcb483f57ee3af372ad476d08f8e333c05c67fb16a3d4d2cbe",
+            "identity_occurrence": 1,
+            "source_report_id": 4,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "HIGH",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content/relay",
+              "loc": "L358:C20 -> L358:C35",
+              "frame": "CS_2",
+              "frames": [
+                {
+                  "id": "CS_2",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://*.lootspectrum.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content/relay",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "background",
+              "loc": "L77:C29 -> L96:C8",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "FULL"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content/relay",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "confirmed_inventory_expagent_dynamic",
+                  "confidence": 0.95,
+                  "detail": "Beacon hit 3 times at /beacon/expa_b5356dd41726/inventoryhistory//, confirming the background fetch() executed on the attacker-controlled profileUrl. Sink tap shows 3 fetch calls in the background. The message contract matched exactly: {type:'relay/fetchLatestEventsPage', profileUrl} was forwarded from the content script to the background, which appended '/inventoryhistory//' and fetched. Hard proof of the full source-to-sink path."
+                },
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "CONFIRMED",
+                  "basis": "runtime_reproduced",
+                  "confidence": 0.95,
+                  "detail": "Beacon hit 3 times at /beacon/expa_b5356dd41726/inventoryhistory//, confirming the background fetch() executed on the attacker-controlled profileUrl. Sink tap shows 3 fetch calls in the background. The message contract matched exactly: {type:'relay/fetchLatestEventsPage', profileUrl} was forwarded from the content script to the background, which appended '/inventoryhistory//' and fetched. Hard proof of the full source-to-sink path."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 4,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence to render a verdict. Let me consolidate the analysis. ## Verification of Flow #4 — REQUEST_FORGERY (WINDOW_MESSAGE_EVENT → network send) ### (a) Who controls the source — CONFIRMED `content/relay.js` runs on `*://*.lootspectrum.com/*` (wildcard subdomains) and registers `window.addEventListener(\"message\", ...)` at L351. The only inbound guard is `event.source === window` (L353), which a page's own `window.postMessage` trivially satisfies. There is no origin allowli…",
+              "path": "extensions/clcgadagmheefcopmehicmjhimgbifph_1.9.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "CONFIRMED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.95,
+              "reproduced": true,
+              "basis": "runtime_reproduced",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 3,
+              "reasoning": "Beacon hit 3 times at /beacon/expa_b5356dd41726/inventoryhistory//, confirming the background fetch() executed on the attacker-controlled profileUrl. Sink tap shows 3 fetch calls in the background. The message contract matched exactly: {type:'relay/fetchLatestEventsPage', profileUrl} was forwarded from the content script to the background, which appended '/inventoryhistory//' and fetched. Hard proof of the full source-to-sink path.",
+              "path": "extensions/clcgadagmheefcopmehicmjhimgbifph_1.9.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-15T18:39:24.123Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.95,
+              "reasoning": "Dynamic phase confirmed the sensitive sink with attacker-controlled runtime evidence. Final ReAct/extraction error: Request timed out.",
+              "evidence_summary": "Dynamic phase confirmed the sensitive sink with attacker-controlled runtime evidence.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "CONFIRMED",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/clcgadagmheefcopmehicmjhimgbifph_1.9.4/final/final_report.json",
+              "report_mtime": "2026-08-18T03:46:52.283Z"
+            },
+            "manual_verification": [
+              {
+                "source": "ExPAgent",
+                "kind": "confirmed_inventory_expagent_dynamic",
+                "verification_origin": "expguard_opti_inventory",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-08-15T18:39:24.1232708Z",
+                "notes": "Beacon hit 3 times at /beacon/expa_b5356dd41726/inventoryhistory//, confirming the background fetch() executed on the attacker-controlled profileUrl. Sink tap shows 3 fetch calls in the background. The message contract matched exactly: {type:'relay/fetchLatestEventsPage', profileUrl} was forwarded from the content script to the background, which appended '/inventoryhistory//' and fetched. Hard proof of the full source-to-sink path.",
+                "report_path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/clcgadagmheefcopmehicmjhimgbifph_1.9.4/dynamic/dynamic_report.json",
+                "report_artifact": {
+                  "path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/clcgadagmheefcopmehicmjhimgbifph_1.9.4/dynamic/dynamic_report.json",
+                  "kind": "dynamic_report.json",
+                  "mtime": "2026-08-15T18:39:24.123Z",
+                  "entry": {
+                    "outcome": "CONFIRMED",
+                    "final_verdict": "TRUE_POSITIVE",
+                    "verdict": null,
+                    "confidence": 0.95,
+                    "reproduced": true
+                  }
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "disappeared",
+        "dataset_version": "1.9.4",
+        "latest_version": "2.1.0",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\clcgadagmheefcopmehicmjhimgbifph_2.1.0\\clcgadagmheefcopmehicmjhimgbifph.2.1.0.crx",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:chrome:clcgadagmheefcopmehicmjhimgbifph:1.9.4:81e156cc6d02a3dc:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "FETCH_RESOURCE",
+            "revalidation_job_key": "chrome__clcgadagmheefcopmehicmjhimgbifph__2.1.0__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\clcgadagmheefcopmehicmjhimgbifph_2.1.0\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\clcgadagmheefcopmehicmjhimgbifph_2.1.0\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 3.0,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "disappeared",
+            "comparison": "no_exact_source_and_sink_api_pair",
+            "candidate_match_count": 0,
+            "same_source_candidates": [
+              {
+                "tool_flow_index": 2,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "WINDOW_POSTMESSAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "content/relay",
+                  "loc": "L400:C20 -> L400:C35",
+                  "code": "if (event.data && »event.data.type« === RELAY.PING) {"
+                },
+                "sink": {
+                  "kind": "WINDOW_POSTMESSAGE",
+                  "remark": "[UNKNOWN ORIGIN]",
+                  "file": "content/relay",
+                  "loc": "L478:C6 -> L486:C7",
+                  "code": "»window.postMessage(«"
+                },
+                "propagation_step_count": 58
+              },
+              {
+                "tool_flow_index": 2,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "WINDOW_POSTMESSAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "content/relay",
+                  "loc": "L400:C20 -> L400:C35",
+                  "code": "if (event.data && »event.data.type« === RELAY.PING) {"
+                },
+                "sink": {
+                  "kind": "WINDOW_POSTMESSAGE",
+                  "remark": "[UNKNOWN ORIGIN]",
+                  "file": "content/relay",
+                  "loc": "L777:C6 -> L792:C7",
+                  "code": "»window.postMessage(«"
+                },
+                "propagation_step_count": 58
+              },
+              {
+                "tool_flow_index": 2,
+                "sink_index": 3,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "WINDOW_POSTMESSAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "content/relay",
+                  "loc": "L400:C20 -> L400:C35",
+                  "code": "if (event.data && »event.data.type« === RELAY.PING) {"
+                },
+                "sink": {
+                  "kind": "WINDOW_POSTMESSAGE",
+                  "remark": "[UNKNOWN ORIGIN]",
+                  "file": "content/relay",
+                  "loc": "L838:C6 -> L846:C7",
+                  "code": "»window.postMessage(«"
+                },
+                "propagation_step_count": 58
+              }
+            ],
+            "same_sink_candidates": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "DOCUMENT_LOCATION",
+                "sink_type": "FETCH_RESOURCE",
+                "source": {
+                  "kind": "DOCUMENT_LOCATION",
+                  "remark": "location.href",
+                  "file": "content/dataProcessing",
+                  "loc": "L897:C6 -> L897:C32",
+                  "code": "? »window.location.href.split«(\"/?\")[0]"
+                },
+                "sink": {
+                  "kind": "FETCH_RESOURCE",
+                  "remark": "[Unknown URL]",
+                  "file": "content/dataProcessing",
+                  "loc": "L904:C29 -> L923:C8",
+                  "code": "const response = await »fetch(url, {«"
+                },
+                "propagation_step_count": 5
+              }
+            ],
+            "tool_report_flow_count": 2,
+            "source_review_required": true,
+            "interpretation": "The original source/sink pair was not reported in the successful rerun; this alone does not prove a security fix."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_no_matching_candidate",
+            "basis": "No same-source/sink candidate was available in the successful new report; source absence is not proof of a fix.",
+            "candidate_count": 0,
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:chrome:clcgadagmheefcopmehicmjhimgbifph:1.9.4:81e156cc6d02a3dc:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

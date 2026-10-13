@@ -1,0 +1,251 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "enokdcnimpdlohalipcbkknffnhhdnac",
+  "version": "1.0.4",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-46880d55e8314515",
+      "verification": "TP",
+      "source_family": "custom",
+      "sink_family": "CHROME_SYNC_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:enokdcnimpdlohalipcbkknffnhhdnac:1.0.4:2391d24857d4a8c5:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:enokdcnimpdlohalipcbkknffnhhdnac:1.0.4:2391d24857d4a8c5:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "2391d24857d4a8c5413d34e105a005706790a489ace4c7e82bac438c7b72d923",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "TARGET_CUSTOM_EVENT",
+              "remark": "target.addEventListener(contentscript_host:storageChange)",
+              "file": "scripts/content",
+              "loc": "L1:C497 -> L1:C505",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "scripts/content",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "storage.fuzzy.settings",
+              "file": "scripts/content",
+              "loc": "L1:C568 -> L1:C603",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_final",
+                  "source": "ExPAgent",
+                  "kind": "final_report",
+                  "verdict": "TP",
+                  "confidence": 0.6,
+                  "detail": "Static phase is the strongest available completed review. Final ReAct/extraction error: Request timed out."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification: Flow #1 — `contentscript_host:storageChange` → `chrome.storage.sync.set` ### Decision ledger **(a) Who controls the source — ATTACKER (any webpage).** The content script `scripts/content.js` runs at `document_start` on `<all_urls>` (all frames, isolated world). Its listener is: ```js document.addEventListener(\"contentscript_host:storageChange\", e => { let {eventType: t, key: n, data: o} = e.detail; \"amconnect\" === n && (\"removed\" === t ? chrome.storage.sync.remove(n) : c…",
+              "path": "extensions/enokdcnimpdlohalipcbkknffnhhdnac_1.0.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/enokdcnimpdlohalipcbkknffnhhdnac_1.0.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T05:57:45.349Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/enokdcnimpdlohalipcbkknffnhhdnac/1.0.4/dynamic-evidence/flow-0",
+              "files": [
+                "flow-result.json",
+                "key-state.png",
+                "source-contract.json",
+                "step-after-trigger.png",
+                "step-source-open.png",
+                "storage-after-trigger.json",
+                "storage-after-trigger.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Request timed out.",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "aligned",
+              "usable_for_label": true,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/enokdcnimpdlohalipcbkknffnhhdnac_1.0.4/final/final_report.json",
+              "report_mtime": "2026-08-18T03:59:25.909Z"
+            },
+            "manual_verification": null,
+            "notes": [],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "1.0.4",
+        "latest_version": "1.0.7",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\enokdcnimpdlohalipcbkknffnhhdnac_1.0.7\\enokdcnimpdlohalipcbkknffnhhdnac.1.0.7.crx",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:chrome:enokdcnimpdlohalipcbkknffnhhdnac:1.0.4:2391d24857d4a8c5:01",
+            "original_source_type": "TARGET_CUSTOM_EVENT",
+            "original_sink_type": "CHROME_SYNC_STORAGE",
+            "revalidation_job_key": "chrome__enokdcnimpdlohalipcbkknffnhhdnac__1.0.7__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\enokdcnimpdlohalipcbkknffnhhdnac_1.0.7\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\enokdcnimpdlohalipcbkknffnhhdnac_1.0.7\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 111.641,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "TARGET_CUSTOM_EVENT",
+                "sink_type": "CHROME_SYNC_STORAGE",
+                "source": {
+                  "kind": "TARGET_CUSTOM_EVENT",
+                  "remark": "target.addEventListener(contentscript_host:storageChange)",
+                  "file": "scripts/content",
+                  "loc": "L1:C497 -> L1:C505",
+                  "code": "…n n({success:!0}),!0})),document.addEventListener(\"contentscript_host:storageChange\",(e=>{let{eventType:t,key:n,data:o}=»e.detail«;\"amconnect\"===n&&(\"removed\"===t?chrome.storage.sync.remove(n):chrome.storage.sync.set(o,(()=>{})))}));"
+                },
+                "sink": {
+                  "kind": "CHROME_SYNC_STORAGE",
+                  "remark": "storage.fuzzy.settings",
+                  "file": "scripts/content",
+                  "loc": "L1:C568 -> L1:C603",
+                  "code": "…torageChange\",(e=>{let{eventType:t,key:n,data:o}=e.detail;\"amconnect\"===n&&(\"removed\"===t?chrome.storage.sync.remove(n):»chrome.storage.sync.set(o,(()=>{}))«)}));"
+                },
+                "propagation_step_count": 1
+              }
+            ],
+            "tool_report_flow_count": 1,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "likely_unchanged",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 1,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 1.0,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": false,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.9,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:chrome:enokdcnimpdlohalipcbkknffnhhdnac:1.0.4:2391d24857d4a8c5:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

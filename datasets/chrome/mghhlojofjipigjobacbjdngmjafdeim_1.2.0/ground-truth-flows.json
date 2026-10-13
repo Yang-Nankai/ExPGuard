@@ -1,0 +1,449 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "mghhlojofjipigjobacbjdngmjafdeim",
+  "version": "1.2.0",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-66eaf48d13217ecf",
+      "verification": "TP",
+      "source_family": "custom",
+      "sink_family": "CHROME_ACTION_BADGE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard",
+        "CoCo"
+      ],
+      "match_region": "ExPGuard + CoCo",
+      "match_basis": "explicit_reuse_and_normalized_signature",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:mghhlojofjipigjobacbjdngmjafdeim:1.2.0:2f76557f1efeb5a7:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:mghhlojofjipigjobacbjdngmjafdeim:1.2.0:2f76557f1efeb5a7:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "2f76557f1efeb5a77affdc6ac4913b221a7d2ddb75ff5c75c8f0296136ecf083",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "TARGET_CUSTOM_EVENT",
+              "remark": "target.addEventListener(updateCounter)",
+              "file": "content_script",
+              "loc": "L154:C34 -> L154:C42",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://open.spotify.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_script",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_ACTION_BADGE_OPTIONS",
+              "remark": "",
+              "file": "background",
+              "loc": "L9:C3 -> L9:C75",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content_script",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工判定：Spotify 页面可派发 updateCounter，并控制扩展 Badge 文本。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "人工判定：Spotify 页面可派发 updateCounter，并控制扩展 Badge 文本。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "FALSE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Decision Ledger **(a) Who controls the source?** A web page on `https://open.spotify.com/*`. `content_script.js` registers `document.addEventListener('updateCounter', ...)` and reads `e.detail`. DOM CustomEvents are shared across the isolated-world boundary, so a page can dispatch `new CustomEvent('updateCounter', {detail: ...})` with arbitrary JSON. Source is genuinely attacker-controllable. ✔ **(b) Source-to-sink path.** Confirmed in raw source: - `content_script.js` L151–156: `docu…",
+              "path": "extensions/mghhlojofjipigjobacbjdngmjafdeim_1.2.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 60s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/mghhlojofjipigjobacbjdngmjafdeim_1.2.0/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T02:49:57.883Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787025961476ff228b459645a66c98f2a46916338f8eafdc28', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "FALSE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary",
+                "coco"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/mghhlojofjipigjobacbjdngmjafdeim_1.2.0/final/final_report.json",
+              "report_mtime": "2026-08-18T04:06:00.207Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T18:39:43+08:00",
+                "observation": "人工判定：Spotify 页面可派发 updateCounter，并控制扩展 Badge 文本。",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/mghhlojofjipigjobacbjdngmjafdeim_1.2.0/dynamic/evidence/flow-0/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-22T10:39:43.036Z",
+                "notes": "人工判定：Spotify 页面可派发 updateCounter，并控制扩展 Badge 文本。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\mghhlojofjipigjobacbjdngmjafdeim_1.2.0\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\mghhlojofjipigjobacbjdngmjafdeim_1.2.0\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T10:39:43.036Z",
+                  "sha256": "856968c731d2c81340554cd9144299fce5dd6fa0a7dff24234b6813eaaf51b54"
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        },
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:mghhlojofjipigjobacbjdngmjafdeim:1.2.0:d9d1a5b3a656d956:01",
+          "flow": {
+            "flow_id": "coco:chrome:mghhlojofjipigjobacbjdngmjafdeim:1.2.0:d9d1a5b3a656d956:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "d9d1a5b3a656d956f620d18c9cfb7fb14b7fa7b24478b26b7f486e8e2ee3dfa7",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "coco-privilege_escalation",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "TARGET_CUSTOM_EVENT",
+              "remark": "CoCo source evidence",
+              "file": "content_script.js",
+              "loc": "L151:C1 -> L151:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "content_script.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "CHROME_ACTION_BADGE_OPTIONS",
+              "remark": "CoCo sink evidence",
+              "file": "background.js",
+              "loc": "L9:C1 -> L9:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Reused/ExPGuard-Opti"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_reused_expguard-opti",
+                  "source": "Reused/ExPGuard-Opti",
+                  "kind": "coco_reused_expguard-opti",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "Reused ExPGuard-Opti F001 (flow_index=0) via source_type_normalized_sink_type_exact/all_candidates_agree.",
+                  "reused_flow_id": "expguard-opti:chrome:mghhlojofjipigjobacbjdngmjafdeim:1.2.0:2f76557f1efeb5a7:01",
+                  "package_sha256": "70b39f309b831079b3bf6905778c5f9c935604b2a10fe077b1f42d169ef1d55a"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "reused_confirmation_match",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Decision ledger\n\n**(a) Who controls the source — ATTACKER-CONTROLLABLE (with an XSS/compromise prerequisite on the host page).**\n`content_script.js` L151 registers `document.addEventListener('updateCounter', ...)` in the content-script world. The event is normally fired by the extension's own `injected/ads_removal.js` (`document.dispatchEvent(new CustomEvent('updateCounter', {detail: totalAdsRemoved}))`), but the listener performs **no source/origin/type check**. Because isolated-world content scripts share the DOM with the page, any script running on `https://open.spotify.com/*` (the page itself, an injected ad script, or XSS on that origin) can dispatch:\n\n```js\ndocument.dispatchEvent(new CustomEvent('updateCounter', { detail: JSON.stringify('PWN') }));\n```\n\nand the content-script listener will receive it. `e.detail` is therefore genuinely untrusted/attacker-controllable.\n\n**(b) Exact source→sink path — unbroken.**\n`content_script.js` L154: `var counterValue = JSON.parse(e.detail);`\nL155: `chrome.runtime.sendMessage({ name: \"updateCounter\", counterValue: counterValue });`\n`background.js` L2/L4: `chrome.runtime.onMessage.addListener(onMessage)` receives the message.\nL6 checks `m",
+              "path": "extensions/mghhlojofjipigjobacbjdngmjafdeim_1.2.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/mghhlojofjipigjobacbjdngmjafdeim_1.2.0/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T04:18:04.139996Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": {
+              "source_dataset": "ExPGuard-Opti",
+              "extension_key": "mghhlojofjipigjobacbjdngmjafdeim@1.2.0",
+              "flow_id": "expguard-opti:chrome:mghhlojofjipigjobacbjdngmjafdeim:1.2.0:2f76557f1efeb5a7:01",
+              "flow_index": 0,
+              "flow_label": "F001",
+              "verification": "TP",
+              "verification_source": [
+                "Manual"
+              ],
+              "match_mode": "source_type_normalized_sink_type_exact",
+              "match_reason": "all_candidates_agree",
+              "source_type": "TARGET_CUSTOM_EVENT",
+              "source_loc": "L154:C34 -> L154:C42",
+              "source_file": "content_script",
+              "sink_type": "CHROME_ACTION_BADGE_OPTIONS",
+              "sink_loc": "L9:C3 -> L9:C75",
+              "sink_file": "background",
+              "package_evidence": {
+                "same_package": true,
+                "same_crx": true,
+                "same_manifest": true,
+                "same_source_manifest": true,
+                "coco_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\mghhlojofjipigjobacbjdngmjafdeim_1.2.0\\crx\\mghhlojofjipigjobacbjdngmjafdeim.1.2.0.crx",
+                "external_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\mghhlojofjipigjobacbjdngmjafdeim_1.2.0\\crx\\mghhlojofjipigjobacbjdngmjafdeim.1.2.0.crx",
+                "coco_package_sha256": "70b39f309b831079b3bf6905778c5f9c935604b2a10fe077b1f42d169ef1d55a",
+                "external_package_sha256": "70b39f309b831079b3bf6905778c5f9c935604b2a10fe077b1f42d169ef1d55a",
+                "coco_manifest_sha256": "36e39410995113228167f6a1659dfaa69370b84a03bd99c6d7e3e0b5e2aa4df2",
+                "external_manifest_sha256": "36e39410995113228167f6a1659dfaa69370b84a03bd99c6d7e3e0b5e2aa4df2",
+                "coco_source_manifest_sha256": "b1ca4d80c38ec924d7df1c76a2819ab722ca683a02fb981ba090308807685dab",
+                "external_source_manifest_sha256": "b1ca4d80c38ec924d7df1c76a2819ab722ca683a02fb981ba090308807685dab"
+              },
+              "supporting_matches": []
+            },
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "mixed_tool_outcome",
+        "dataset_version": "1.2.0",
+        "latest_version": "1.2.5",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\mghhlojofjipigjobacbjdngmjafdeim_1.2.5\\mghhlojofjipigjobacbjdngmjafdeim.1.2.5.crx",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:chrome:mghhlojofjipigjobacbjdngmjafdeim:1.2.0:2f76557f1efeb5a7:01",
+            "original_source_type": "TARGET_CUSTOM_EVENT",
+            "original_sink_type": "CHROME_ACTION_BADGE_OPTIONS",
+            "revalidation_job_key": "chrome__mghhlojofjipigjobacbjdngmjafdeim__1.2.5__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\mghhlojofjipigjobacbjdngmjafdeim_1.2.5\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\mghhlojofjipigjobacbjdngmjafdeim_1.2.5\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 2.469,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "TARGET_CUSTOM_EVENT",
+                "sink_type": "CHROME_ACTION_BADGE_OPTIONS",
+                "source": {
+                  "kind": "TARGET_CUSTOM_EVENT",
+                  "remark": "target.addEventListener(updateCounter)",
+                  "file": "background",
+                  "loc": "L2:C0 -> L2:C47",
+                  "code": "»chrome.runtime.onMessage.addListener(onMessage)«;"
+                },
+                "sink": {
+                  "kind": "CHROME_ACTION_BADGE_OPTIONS",
+                  "file": "background",
+                  "loc": "L9:C3 -> L9:C75",
+                  "code": "»chrome.action.setBadgeText({text: messageEvent.counterValue.toString()})«;"
+                },
+                "propagation_step_count": 2
+              }
+            ],
+            "tool_report_flow_count": 1,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          },
+          {
+            "tool": "CoCo",
+            "original_source_flow_id": "coco:chrome:mghhlojofjipigjobacbjdngmjafdeim:1.2.0:d9d1a5b3a656d956:01",
+            "original_source_type": "TARGET_CUSTOM_EVENT",
+            "original_sink_type": "CHROME_ACTION_BADGE_OPTIONS",
+            "revalidation_job_key": "chrome__mghhlojofjipigjobacbjdngmjafdeim__1.2.5__CoCo",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\mghhlojofjipigjobacbjdngmjafdeim_1.2.5\\revalidation\\CoCo\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\mghhlojofjipigjobacbjdngmjafdeim_1.2.5\\revalidation\\CoCo\\attempt-01\\report.flows.json",
+            "duration_seconds": 0.547,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "disappeared",
+            "comparison": "no_exact_source_and_sink_api_pair",
+            "candidate_match_count": 0,
+            "same_source_candidates": [],
+            "same_sink_candidates": [],
+            "tool_report_flow_count": 0,
+            "source_review_required": true,
+            "interpretation": "The original source/sink pair was not reported in the successful rerun; this alone does not prove a security fix."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "mixed_or_inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 1,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 1.0,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": false,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.9,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:chrome:mghhlojofjipigjobacbjdngmjafdeim:1.2.0:2f76557f1efeb5a7:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          },
+          {
+            "status": "inconclusive_no_matching_candidate",
+            "basis": "No same-source/sink candidate was available in the successful new report; source absence is not proof of a fix.",
+            "candidate_count": 0,
+            "tool": "CoCo",
+            "original_flow_id": "coco:chrome:mghhlojofjipigjobacbjdngmjafdeim:1.2.0:d9d1a5b3a656d956:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

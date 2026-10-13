@@ -1,0 +1,106 @@
+# ExPAgent Dynamic Test — bnofologaglcigfnbljobhnglbaicmci v1.0.1
+
+- Target browser: `chrome`  |  Runtime browser: `chrome`  |  LLM: `deepseek` / `deepseek-flash`
+- Runtime extension id: `pffoflkkbfpjlaidekdidillbjhlhgpk`
+- Environment: `{'browserUrl': 'http://127.0.0.1:9222', 'runtimeExtensionId': 'pffoflkkbfpjlaidekdidillbjhlhgpk', 'targetBrowser': 'chrome', 'runtimeBrowser': 'chrome', 'compatibilityRuntime': False, 'beaconBaseUrl': 'http://127.0.0.1:53420', 'headless': True, 'safety': {'mode': 'isolated-controlled-validation', 'allowedTestOrigins': ['http://127.0.0.1', 'http://[::1]', 'http://localhost'], 'network': 'loopback and explicitly configured controlled origins only', 'testInput': 'bounded JSON with harmless EXPAGENT_TEST_* markers', 'sensitiveData': 'credentials, cookies, tokens, and personal data are not read or collected'}, 'networkIsolation': True, 'harnessPatches': [], 'capabilityMatrix': {'version': 3, 'browser': 'chrome', 'manifestVersion': 3, 'runtimeProduct': 'Chrome/153.0.8010.48', 'runtimeCompatibility': {'available': True, 'observer': 'manifest/browser runtime', 'reason': ''}, 'contexts': {'pageMainWorld': {'available': True, 'observer': 'CDP/RDP page evaluation', 'reason': ''}, 'contentScriptIsolatedWorld': {'available': True, 'observer': 'extension content-script bridge', 'reason': ''}, 'backgroundPage': {'available': False, 'observer': 'extension background target', 'reason': 'The manifest has no persistent background page/scripts.'}, 'serviceWorker': {'available': True, 'observer': 'Chromium service-worker wake + persistent CDP attachment', 'reason': ''}, 'iframe': {'available': True, 'observer': 'frameId-scoped main/isolated execution contexts', 'reason': ''}, 'webWorker': {'available': False, 'observer': 'worker target', 'reason': 'Dedicated/shared worker target discovery and replay are not implemented.'}, 'companionExtension': {'available': True, 'observer': 'bundled controlled companion extension', 'reason': ''}}, 'observers': {'sinkInstrumentation': {'available': True, 'observer': 'runtime sink tap with observer-generation validation', 'reason': ''}, 'beacon': {'available': True, 'observer': 'loopback HTTP(S) beacon', 'reason': ''}, 'lineBreakpoint': {'available': True, 'observer': 'CDP Debugger.setBreakpointByUrl', 'reason': ''}, 'mcpPageTools': {'available': True, 'observer': 'js-reverse-mcp', 'reason': ''}}}}`
+
+**Assessment:** Dynamically tested 2 flow(s): 0 CONFIRMED, 1 PARTIAL, 1 INCONCLUSIVE_AFTER_DEBUG.
+
+---
+
+## Flow #0 — 🟠 PARTIAL  (reproduced=False, confidence 0.78)
+
+**Reasoning:** The exact content-script source breakpoint fired for the controlled page event, but the privileged sink did not. The remaining failure is isolated to message routing or a background-side payload precondition.
+
+**Payload:** `[{"marker": "EXPAGENT_TEST_expa_c836c41dc47f", "url": "http://127.0.0.1:53420/beacon/expa_dd51e9ef17b5", "data": "EXPAGENT_TEST_expa_c836c41dc47f", "value": "EXPAGENT_TEST_expa_c836c41dc47f", "message": "EXPAGENT_TEST_expa_c836c41dc47f", "title": "EXPAGENT_TEST_expa_c836c41dc47f", "text": "EXPAGENT_TEST_expa_c836c41dc47f", "number": "EXPAGENT_TEST_expa_c836c41dc47f", "name": "EXPAGENT_TEST_expa_c836c41dc47f", "id": "EXPAGENT_TEST_expa_c836c41dc47f", "key": "EXPAGENT_TEST_expa_c836c41dc47f", "type": "EXPAGENT_TEST_expa_c836c41dc47f", "action": "getTabId", "cmd": "EXPAGENT_TEST_expa_c836c41dc47f", "Action": "EXPAGENT_TEST_expa_c836c41dc47f", "Message": "EXPAGENT_TEST_expa_c836c41dc47f", "fun": "EXPAGENT_TEST_expa_c836c41dc47f", "auth": "EXPAGENT_TEST_expa_c836c41dc47f", "phone": "EXPAGENT_TEST_expa_c836c41dc47f", "email": "EXPAGENT_TEST_expa_c836c41dc47f", "version": "EXPAGENT_TEST_expa_c836c41dc47f", "token": "EXPAGENT_TEST_expa_c836c41dc47f", "content": "EXPAGENT_TEST_expa_c836c41dc47f", "payload": "EXPAGENT_TEST_expa_c836c41dc47f", "kind": "EXPAGENT_TEST_expa_c836c41dc47f", "requestId": "EXPAGENT_TEST_expa_c836c41dc47f", "revision": "EXPAGENT_TEST_expa_c836c41dc47f", "guid": "EXPAGENT_TEST_expa_c836c41dc47f", "initiatingPage": "EXPAGENT_TEST_expa_c836c41dc47f", "referringPage": "EXPAGENT_TEST_expa_c836c41dc47f", "fileInspectionData": "EXPAGENT_TEST_expa_c836c41dc47f", "sha256": "EXPAGENT_TEST_expa_c836c41dc47f", "textSpeecher": "EXPAGENT_TEST_expa_c836c41dc47f", "props": "EXPAGENT_TEST_expa_c836c41dc47f", "speed": "EXPAGENT_TEST_expa_c836c41dc47f", "params": "EXPAGENT_TEST`
+
+**Runtime evidence:** source-contract={"surface": "WINDOW_MESSAGE", "sourcePath": "js/content-script.js", "location": "L71:C17 -> L71:C40", "eventNames": [], "eventTarget": "window", "eventDetailKey": "data", "envelope": {}, "forwardField": "", "requirements": {}, "selectors": [], "mediaTags": [], "snippet": "/******/ (() => { // webpackBootstrap\nvar __webpack_exports__ = {};\n(() => {\n  const setFonts = () => {\n    const links = [{\n      rel: 'preconnect',\n      href: 'https://fonts.googleapis.com'\n    }, {\n      rel: 'preconnect',\n      href: 'https://fonts.gstatic.com',\n      crossorigin: ''\n    }, {\n      rel: 'stylesheet',\n      href: 'https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Kodchasan:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap'\n    }];\n    const fragment = document.createDocumentFragment();\n    links.forEach(linkData => {\n      const link = document.createElement('link');\n      Object.keys(linkData).forEach(key => {\n        link[key] = linkData[key];\n      });\n      fragment.appendChild(link);\n    });\n    document.head.appendChild(fragment);\n  };\n  const initWidget = () => {\n    if (!document.head || !document", "notes": ["已从 sink 文件推导消息分发字段 `action` 及候选值。", "已从 sink 调用推导 URL 承载字段 `url`。"], "discriminatorField": "action", "discriminatorValues": ["getTabId"], "urlField": "url", "sinkTapKey": "storage.local.set", "messageAlias": "request", "messageEventKey": "", "jsonMessageField": "", "sinkDataFields": ["textSpeecher", "message", "props", "type", "speed", "params", "text"], "contractConfidence": "HIGH", "contractWarnings": []}
+source-breakpoint=armed
+source-pause={"paused": true, "reason": "other", "target": {"type": "page", "url": "http://127.0.0.1:53420/page"}, "frames": [{"function": "<anonymous>", "scriptId": "3", "line": 71, "column": 4, "url": ""}]}
+source-pause={"paused": true, "reason": "other", "target": {"type": "page", "url": "http://127.0.0.1:53420/page"}, "frames": [{"function": "<anonymous>", "scriptId": "3", "line": 71, "column": 4, "url": ""}]}
+sink-breakpoint=armed
+sink-pause={"paused": true, "reason": "other", "target": {"type": "page", "url": "http://127.0.0.1:53420/page"}, "frames": [{"function": "<anonymous>", "scriptId": "3", "line": 71, "column": 4, "url": ""}]}
+sink-pause={"paused": true, "reason": "other", "target": {"type": "page", "url": "http://127.0.0.1:53420/page"}, "frames": [{"function": "<anonymous>", "scriptId": "3", "line": 71, "column": 4, "url": ""}]}
+sink-tap={"sink_type": "all", "target_hint": "content", "context": "isolated-world", "observerReady": true, "observerLost": false, "observerRecovered": false, "expectedGeneration": "observer_64696378447347e6", "actualGeneration": "observer_64696378447347e6", "recoveryReason": "", "targetId": "9706322F22BC09B2EDA8249018C784C5", "pageUrl": "http://127.0.0.1:53420/page", "recoveryResult": null, "result": "{\"keys\":[],\"data\":{\"__fetch__\":true,\"__xhr__\":true,\"__function__\":true,\"__eval__\":true,\"__dom_innerHTML__\":true,\"__storage_local_set__\":true,\"__storage_sync_set__\":true,\"__storage_session_set__\":true,\"__storage_onChanged__\":true,\"__runtime_sendMessage__\":true},\"observerToken\":\"observer_64696378447347e6\"}"}
+beacon={"token": "expa_dd51e9ef17b5", "hit": false, "count": 0, "hits": []}
+
+**Trajectory:**
+1. `new_page` http://127.0.0.1:53420/page -> {"openedUrl": "http://127.0.0.1:53420/page", "target": {"description": "", "devtoolsFrontendUrl": "https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:9222/devtools/pa
+2. `set_source_breakpoint` js/content-script L71:C0 -> {"ok": true, "sourceFile": "js/content-script.js", "url": "chrome-extension://pffoflkkbfpjlaidekdidillbjhlhgpk/js/content-script.js", "line": 71, "column": 0, "targetHint": "content", "breakpointId": "br:1:70:0:chrome-extension://pffoflkkbfpjlaidekdidillbjhlhgpk/js/content-script.js", "resolved": true, "locations": [{"scriptId": "3", "lineNumb
+3. `source_contract_stimulus` WINDOW_MESSAGE -> {"action": "postMessage", "targetUrl": "top-frame", "frameScoped": false, "input": {"bytes": 1548, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fileInspectionData", "fun", "guid", "id", "initiatingPage", "key", "kind", "marker", "message", "name", "number", "params"], "testMarkers": ["EXPAGENT_TEST_expa_
+4. `source_contract_stimulus` WINDOW_MESSAGE -> {"action": "postMessage", "targetUrl": "top-frame", "frameScoped": false, "input": {"bytes": 1979, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fileInspectionData", "fun", "guid", "id", "initiatingPage", "key", "kind", "marker", "message", "name", "number", "params"], "testMarkers": ["EXPAGENT_TEST_expa_
+5. `set_sink_breakpoint` js/content-script L93:C10 -> L95:C12 -> {"ok": true, "sourceFile": "js/content-script.js", "url": "chrome-extension://pffoflkkbfpjlaidekdidillbjhlhgpk/js/content-script.js", "line": 93, "column": 10, "targetHint": "content", "breakpointId": "br:1:92:10:chrome-extension://pffoflkkbfpjlaidekdidillbjhlhgpk/js/content-script.js", "resolved": true, "locations": [{"scriptId": "3
+6. `sink_contract_stimulus` WINDOW_MESSAGE -> {"action": "postMessage", "targetUrl": "top-frame", "frameScoped": false, "input": {"bytes": 1548, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fileInspectionData", "fun", "guid", "id", "initiatingPage", "key", "kind", "marker", "message", "name", "number", "params"], "testMarkers": ["EXPAGENT_TEST_expa_c8
+7. `sink_contract_stimulus` WINDOW_MESSAGE -> {"action": "postMessage", "targetUrl": "top-frame", "frameScoped": false, "input": {"bytes": 1979, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fileInspectionData", "fun", "guid", "id", "initiatingPage", "key", "kind", "marker", "message", "name", "number", "params"], "testMarkers": ["EXPAGENT_TEST_expa_c8
+
+**Planned trajectory:**
+1. `list_cdp_targets` Confirm extension target/background/service-worker exists.
+2. `get_extension_runtime_state` Snapshot pre-trigger badge/storage/runtime state.
+3. `new_page/navigate_page` Open approved source fixture only: http://127.0.0.1:53420/page
+4. `list_scripts/search_in_sources` Confirm relevant content script/listener is injected.
+5. `post_controlled_message/set_controlled_dom/dispatch_controlled_event` Inject a JSON test marker through the matching local source surface.
+6. `observe` Check beacon/network/console/runtime state/screenshot.
+7. `ReAct-adjust` If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.
+
+**Line-level debug:** Extension debugger recorded 2 breakpoint(s); see artifact for line-level state.
+
+**Screenshot evidence:**
+- `final-state` — 2026-09-19T13:21:39.691149+00:00 | http://127.0.0.1:53420/page | sha256=27fb6a6b3fafff6376a35e6633687cf5d8de0d2c90136f479c0ee307e091c0b6
+  ![final-state](<D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/bnofologaglcigfnbljobhnglbaicmci/1.0.1/dynamic-evidence/flow-0/step-final-state.png>)
+
+**Evidence artifacts:**
+- `transcript`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\ExPAgent\runs\chrome\bnofologaglcigfnbljobhnglbaicmci\1.0.1\dynamic-evidence\flow-0\trajectory.txt` — Bounded ReAct trajectory and tool evidence.
+- `source-contract`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\ExPAgent\runs\chrome\bnofologaglcigfnbljobhnglbaicmci\1.0.1\dynamic-evidence\flow-0\source-contract.json` — Source-adjacent literal guards and generated local-input contract.
+- `debug`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\ExPAgent\runs\chrome\bnofologaglcigfnbljobhnglbaicmci\1.0.1\dynamic-evidence\flow-0\extension-debug.json` — Persistent CDP extension debugger breakpoint/pause state.
+- `screenshot` [final-state]: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\ExPAgent\runs\chrome\bnofologaglcigfnbljobhnglbaicmci\1.0.1\dynamic-evidence\flow-0\step-final-state.png` — Step `final-state`: http://127.0.0.1:53420/page
+- `screenshot-manifest`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\ExPAgent\runs\chrome\bnofologaglcigfnbljobhnglbaicmci\1.0.1\dynamic-evidence\flow-0\screenshot-evidence.json` — Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.
+
+**Notes:** sourceBreakpointHits=2 sinkBreakpointHits=2
+
+---
+
+## Flow #1 — INCONCLUSIVE AFTER DEBUG  (reproduced=False, confidence 0.45)
+
+**Reasoning:** 已按源码契约（含跨 message 分发的判别字段/值）重放最小候选输入，但没有任何 instrumented sink 记录到调用。
+
+**Runtime evidence:** source-contract={"surface": "WINDOW_MESSAGE", "sourcePath": "js/content-script.js", "location": "L71:C17 -> L71:C40", "eventNames": [], "eventTarget": "window", "eventDetailKey": "data", "envelope": {}, "forwardField": "", "requirements": {}, "selectors": [], "mediaTags": [], "snippet": "/******/ (() => { // webpackBootstrap\nvar __webpack_exports__ = {};\n(() => {\n  const setFonts = () => {\n    const links = [{\n      rel: 'preconnect',\n      href: 'https://fonts.googleapis.com'\n    }, {\n      rel: 'preconnect',\n      href: 'https://fonts.gstatic.com',\n      crossorigin: ''\n    }, {\n      rel: 'stylesheet',\n      href: 'https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Kodchasan:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap'\n    }];\n    const fragment = document.createDocumentFragment();\n    links.forEach(linkData => {\n      const link = document.createElement('link');\n      Object.keys(linkData).forEach(key => {\n        link[key] = linkData[key];\n      });\n      fragment.appendChild(link);\n    });\n    document.head.appendChild(fragment);\n  };\n  const initWidget = () => {\n    if (!document.head || !document", "notes": ["已从 sink 文件推导消息分发字段 `action` 及候选值。", "已从 sink 调用推导 URL 承载字段 `url`。"], "discriminatorField": "action", "discriminatorValues": ["getTabId"], "urlField": "url", "sinkTapKey": "storage.local.set", "messageAlias": "request", "messageEventKey": "", "jsonMessageField": "", "sinkDataFields": ["textSpeecher", "message", "props", "type", "speed", "params", "text"], "contractConfidence": "HIGH", "contractWarnings": []}
+source-breakpoint={"ok": false, "error": {"code": -32000, "message": "Breakpoint at specified location already exists."}}
+sink-breakpoint=armed
+sink-pause={"paused": true, "reason": "other", "target": {"type": "page", "url": "http://127.0.0.1:53420/page"}, "frames": [{"function": "<anonymous>", "scriptId": "3", "line": 71, "column": 4, "url": ""}]}
+sink-pause={"paused": true, "reason": "other", "target": {"type": "page", "url": "http://127.0.0.1:53420/page"}, "frames": [{"function": "<anonymous>", "scriptId": "3", "line": 71, "column": 4, "url": ""}]}
+sink-tap={"sink_type": "all", "target_hint": "content", "context": "isolated-world", "observerReady": true, "observerLost": false, "observerRecovered": false, "expectedGeneration": "observer_093b5528c2394d29", "actualGeneration": "observer_093b5528c2394d29", "recoveryReason": "", "targetId": "BAEE656B5CF3DF851D25A959718F7E09", "pageUrl": "http://127.0.0.1:53420/page", "recoveryResult": null, "result": "{\"keys\":[],\"data\":{\"__fetch__\":true,\"__xhr__\":true,\"__function__\":true,\"__eval__\":true,\"__dom_innerHTML__\":true,\"__storage_local_set__\":true,\"__storage_sync_set__\":true,\"__storage_session_set__\":true,\"__storage_onChanged__\":true,\"__runtime_sendMessage__\":true},\"observerToken\":\"observer_093b5528c2394d29\"}"}
+beacon={"token": "expa_e41e466afbf7", "hit": false, "count": 0, "hits": []}
+baseline=source-contract={"surface": "WINDOW_MESSAGE", "sourcePath": "js/content-script.js", "location": "L71:C17 -> L71:C40", "eventNames": [], "eventTarget": "window", "eventDetailKey": "data", "envelope": {}, "forwardField": "", "requirements": {}, "selectors": [], "mediaTags": [], "snippet": "/******/ (() => { // webpackBootstrap\nvar __webpack_exports__ = {};\n(() => {\n  const setFonts = () => {\n    const links = [{\n      rel: 'preconnect',\n      href: 'https://fonts.googleapis.com'\n    }, {\n      rel: 'preconnect',\n      href: 'https://fonts.gstatic.com',\n      crossorigin: ''\n    }, {\n      rel: 'stylesheet',\n      href: 'https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Kodchasan:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap'\n    }];\n    const fragment = document.createDocumentFragment();\n    links.forEach(li
+
+**Trajectory:**
+1. `new_page` http://127.0.0.1:53420/page -> {"openedUrl": "http://127.0.0.1:53420/page", "target": {"description": "", "devtoolsFrontendUrl": "https://chrome-devtools-frontend.appspot.com/serve_rev/@199a3a541d76237379e353b348e64045584db057/inspector.html?ws=127.0.0.1:9222/devtools/pa
+2. `set_source_breakpoint` js/content-script L71:C0 -> {"ok": false, "error": {"code": -32000, "message": "Breakpoint at specified location already exists."}}
+3. `set_sink_breakpoint` js/content-script L108:C10 -> L113:C12 -> {"ok": true, "sourceFile": "js/content-script.js", "url": "chrome-extension://pffoflkkbfpjlaidekdidillbjhlhgpk/js/content-script.js", "line": 108, "column": 10, "targetHint": "content", "breakpointId": "br:1:107:10:chrome-extension://pffoflkkbfpjlaidekdidillbjhlhgpk/js/content-script.js", "resolved": true, "locations": [{"scriptId"
+4. `sink_contract_stimulus` WINDOW_MESSAGE -> {"action": "postMessage", "targetUrl": "top-frame", "frameScoped": false, "input": {"bytes": 1548, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fileInspectionData", "fun", "guid", "id", "initiatingPage", "key", "kind", "marker", "message", "name", "number", "params"], "testMarkers": ["EXPAGENT_TEST_expa_14
+5. `sink_contract_stimulus` WINDOW_MESSAGE -> {"action": "postMessage", "targetUrl": "top-frame", "frameScoped": false, "input": {"bytes": 1979, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fileInspectionData", "fun", "guid", "id", "initiatingPage", "key", "kind", "marker", "message", "name", "number", "params"], "testMarkers": ["EXPAGENT_TEST_expa_14
+
+**Planned trajectory:**
+1. `list_cdp_targets` Confirm extension target/background/service-worker exists.
+2. `get_extension_runtime_state` Snapshot pre-trigger badge/storage/runtime state.
+3. `new_page/navigate_page` Open approved source fixture only: http://127.0.0.1:53420/page
+4. `list_scripts/search_in_sources` Confirm relevant content script/listener is injected.
+5. `post_controlled_message/set_controlled_dom/dispatch_controlled_event` Inject a JSON test marker through the matching local source surface.
+6. `observe` Check beacon/network/console/runtime state/screenshot.
+7. `ReAct-adjust` If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.
+
+**Line-level debug:** Extension debugger recorded 3 breakpoint(s); see artifact for line-level state.
+
+**Screenshot evidence:**
+- `final-state` — 2026-09-19T13:21:51.656493+00:00 | http://127.0.0.1:53420/page | sha256=27fb6a6b3fafff6376a35e6633687cf5d8de0d2c90136f479c0ee307e091c0b6
+  ![final-state](<D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/bnofologaglcigfnbljobhnglbaicmci/1.0.1/dynamic-evidence/flow-1/step-final-state.png>)
+
+**Evidence artifacts:**
+- `transcript`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\ExPAgent\runs\chrome\bnofologaglcigfnbljobhnglbaicmci\1.0.1\dynamic-evidence\flow-1\trajectory.txt` — Bounded ReAct trajectory and tool evidence.
+- `source-contract`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\ExPAgent\runs\chrome\bnofologaglcigfnbljobhnglbaicmci\1.0.1\dynamic-evidence\flow-1\source-contract.json` — Source-adjacent literal guards and generated local-input contract.
+- `debug`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\ExPAgent\runs\chrome\bnofologaglcigfnbljobhnglbaicmci\1.0.1\dynamic-evidence\flow-1\extension-debug.json` — Persistent CDP extension debugger breakpoint/pause state.
+- `screenshot` [final-state]: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\ExPAgent\runs\chrome\bnofologaglcigfnbljobhnglbaicmci\1.0.1\dynamic-evidence\flow-1\step-final-state.png` — Step `final-state`: http://127.0.0.1:53420/page
+- `screenshot-manifest`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\ExPAgent\runs\chrome\bnofologaglcigfnbljobhnglbaicmci\1.0.1\dynamic-evidence\flow-1\screenshot-evidence.json` — Screenshot stage, controlled target URL, UTC capture time, and SHA-256 integrity metadata for downstream email/report assembly.
+
+**Notes:** deepTraceCode=SOURCE_NOT_REACHED
+
+---

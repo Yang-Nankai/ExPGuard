@@ -1,0 +1,95 @@
+{
+  "extension_id": "aianbfmoodjcijnafbkbfhphjbabijjf",
+  "extension_version": "2.1.7",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification: `script/background.js` — external message → `chrome.storage.local.set`\n\n### Decision ledger\n\n**(a) Who controls the source**\nThe reported source type `WINDOW_MESSAGE_EVENT` is a mislabel. There is no `window.addEventListener('message')` in `script/background.js`. The actual code at the sink is:\n\n```js\nchrome.runtime.onMessageExternal.addListener(function(t,e,n){\n  const o=e&&e.url?e.url:\"\",\n        c=e&&e.id===chrome.runtime.id,\n        s=o.startsWith(\"https://steamcommunity.com/\")||\n          o.startsWith(\"https://store.steampowered.com/\")||\n          \"https://steamlvlup.com/extension/bonus\"===o||\n          o.startsWith(\"https://steamlvlup.com/extension/bonus?\");\n  if(!c&&!s)return n(!1),!1;\n  if(\"queryResult\"==t.contentScriptQuery)\n    return chrome.storage.local.set({queryResult:t.data}), n(!0), !0;\n  ...\n});\n```\n\nThe real attacker-facing source is the external message payload `t`, delivered via `chrome.runtime.onMessageExternal`. A page on an `externally_connectable` origin can send this message with `t.data` fully attacker-chosen.\n\n**(b) Source-to-sink path**\n`onMessageExternal` payload `t` → `\"queryResult\" == t.contentScriptQuery` action branch → `chrome",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": null,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "DoubleX matched external input to a sensitive API parameter.",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L42",
+          "resolvedFile": "script/background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L47",
+          "resolvedFile": "script/background.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://steamcommunity.com/*",
+            "*://steamlvlup.com/extension/bonus",
+            "*://store.steampowered.com/app/*",
+            "*://store.steampowered.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

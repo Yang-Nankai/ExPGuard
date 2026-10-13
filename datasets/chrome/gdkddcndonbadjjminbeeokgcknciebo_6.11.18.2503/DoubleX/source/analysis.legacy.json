@@ -1,0 +1,62 @@
+{
+    "benchmarks": {
+        "crashes": [],
+        "cs: got AST": 0.1242352556437254,
+        "cs: AST": 0.005243590101599693,
+        "cs: CFG": 0.001040271483361721,
+        "cs: PDG": 0.009543049149215221,
+        "bp: got AST": 0.1333177424967289,
+        "bp: AST": 0.05598731432110071,
+        "bp: CFG": 0.0061708735302090645,
+        "bp: PDG": 3.2230066526681185,
+        "collected messages": 0.007852752692997456,
+        "linked messages": 6.482015669345856,
+        "cs: dangers & from WA": 0.0025243116542696953,
+        "bp: dangers & from WA": 0.027200972661376,
+        "cs: got vulnerabilities": 1.5593133866786957e-05,
+        "bp: got vulnerabilities": 0.0006948867812752724,
+        "totalAnalysisSeconds": 10.104204187169671
+    },
+    "extension": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_gdkddcndonbadjjminbeeokgcknciebo_5de77ba29a27/dx_xo8s5lfe/unpacked/gdkddcndonbadjjminbeeokgcknciebo.6.11.18.2503",
+    "cs": {
+        "direct_dangers": {},
+        "indirect_dangers": {},
+        "exfiltration_dangers": {}
+    },
+    "bp": {
+        "direct_dangers": {
+            "danger1": {
+                "danger": "chrome.storage.local.set",
+                "value": "chrome.storage.local.set({'OnboardUDID': 'forge.util.bytesToHex(bytes)'}, <pdg_js.node.FunctionExpression object at 0x7fec32045790>)",
+                "sink-param1": {
+                    "OnboardUDID": "forge.util.bytesToHex(bytes)"
+                },
+                "sink-param2": "function() {\n\t\t\t\t\t\tif (chrome.runtime.lastError) {\n\t\t\t\t\t\t\tclientEnrollment.redirect_error(1, 'Failed to generate device id');\n\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tcallback(item[deviceId]);\n\t\t\t\t\t}",
+                "line": "220 - 226",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_gdkddcndonbadjjminbeeokgcknciebo_5de77ba29a27/dx_xo8s5lfe/unpacked/gdkddcndonbadjjminbeeokgcknciebo.6.11.18.2503/background.js",
+                "dataflow": true,
+                "param_id0": {},
+                "param_id1": {
+                    "received_from_wa_1": {
+                        "wa": "event",
+                        "line": "2 - 2",
+                        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_gdkddcndonbadjjminbeeokgcknciebo_5de77ba29a27/dx_xo8s5lfe/unpacked/gdkddcndonbadjjminbeeokgcknciebo.6.11.18.2503/content_scripts.js",
+                        "where": "event"
+                    }
+                }
+            }
+        },
+        "indirect_dangers": {},
+        "exfiltration_dangers": {
+            "danger1": {
+                "danger": "chrome.storage.local.get",
+                "value": "chrome.storage.local.get(OnboardUDID, <pdg_js.node.FunctionExpression object at 0x7fec32a2a0a0>)",
+                "sink-param1": "OnboardUDID",
+                "sink-param2": "function(item) {\n\t\t\tif (item[deviceId] === undefined) {\n\t\t\t\t// create new id\n\t\t\t\tforge.random.getBytes(16, function(err, bytes) {\n\t\t\t\t\tif (err) {\n\t\t\t\t\t\tclientEnrollment.redirect_error(1, 'Failed to generate device id');\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\titem = {}\n\t\t\t\t\titem[deviceId] = forge.util.bytesToHex(bytes);\n\t\t\t\t\tchrome.storage.local.set(item, function() {\n\t\t\t\t\t\tif (chrome.runtime.lastError) {\n\t\t\t\t\t\t\tclientEnrollment.redirect_error(1, 'Failed to generate device id');\n\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tcallback(item[deviceId]);\n\t\t\t\t\t});\n\t\t\t\t});\n\t\t\t} else {\n\t\t\t\tcallback(item[deviceId]);\n\t\t\t}\n\t\t}",
+                "line": "210 - 231",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_gdkddcndonbadjjminbeeokgcknciebo_5de77ba29a27/dx_xo8s5lfe/unpacked/gdkddcndonbadjjminbeeokgcknciebo.6.11.18.2503/background.js",
+                "dataflow": false
+            }
+        }
+    }
+}

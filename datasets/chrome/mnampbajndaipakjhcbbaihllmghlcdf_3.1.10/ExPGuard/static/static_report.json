@@ -1,0 +1,88 @@
+{
+  "extension_id": "mnampbajndaipakjhcbbaihllmghlcdf",
+  "extension_version": "3.1.10",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1: `CHROME_ONCONNECTEXTERNAL_ONMESSAGE → CHROME_TABS_CREATE_OPTIONS`\n\n### (a) Who controls the source\nThe source is `chrome.runtime.onConnectExternal.addListener(RF(\"external\"))` in the service worker (`service_worker.js` L19). `externally_connectable.matches` restricts connection to four `*.vendoo.co` origins, but the message **payload is fully attacker/page-controlled**: the code passes `o(i,s)` straight through with no `sender.id`, no `sender.origin`, and no message-field allow-list. `search_code(\"sender\")` returned **NO MATCHES**, confirming no browser-authenticated sender trust boundary exists anywhere in the worker.\n\nThe only restriction is the `externally_connectable` origin allow-list. Per the harness rules, a specific-host `externally_connectable` list reduces scope but is **exploitable via XSS on those domains**; it is not an unforgeable boundary.\n\n### (b) Source-to-sink path (verified in raw source)\nFrom the minified worker I traced the concrete dispatch chain:\n\n1. `RF` registers `r.onMessage.addListener((i,s)=>{ … o(i,s) })` where `o = Fv(...)` (L19 C19400–20100). No guard.\n2. `Fv=({logger,type})=>(r,n)=>qn(...,{message:r,msgPort:n})` (L17).\n3. ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "service_worker",
+          "reportedLoc": "L19:C20060 -> L19:C20061",
+          "resolvedFile": "service_worker.js",
+          "resolved": true,
+          "snippet": "L19 C20060-20061: …g(\"[ServiceWorker:Connection] message received\",{type:e,portName:r.name,message:i}),o(i,s)})}};chrome.runtime.onConnectExternal.addListener(RF(\"external\"));var j…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "service_worker",
+          "reportedLoc": "L17:C22394 -> L17:C22430",
+          "resolvedFile": "service_worker.js",
+          "resolved": true,
+          "snippet": "L17 C22394-22430: …chrome.tabs.onUpdated.addListener(r)}),ri=async({url:e,active:t})=>{let r=await chrome.tabs.create({active:t,url:e});if(!r.id)throw new Error(\"ExtV3: Unable to open tab\");return qR(r.id)};var Cg=(…"
+        },
+        "sourceExpectedMarkers": [
+          "onConnectExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://web.vendoo.co/*",
+            "https://internal-beta.vendoo.co/*",
+            "https://enterprise.vendoo.co/*",
+            "https://enterprise-internal-beta.vendoo.co/*"
+          ]
+        },
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

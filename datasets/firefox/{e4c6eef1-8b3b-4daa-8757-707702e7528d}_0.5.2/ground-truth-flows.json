@@ -1,0 +1,365 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "firefox",
+  "extension_id": "{e4c6eef1-8b3b-4daa-8757-707702e7528d}",
+  "version": "0.5.2",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-2ade91d8b85a56c0",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_WINDOWS_CREATE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:{e4c6eef1-8b3b-4daa-8757-707702e7528d}:0.5.2:c5083dee839474dc:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:{e4c6eef1-8b3b-4daa-8757-707702e7528d}:0.5.2:c5083dee839474dc:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "c5083dee839474dc0560682c3b9c2fcde2fb2bb0258ae6f4ba1af2a0b636dde7",
+            "semantic_key": {
+              "rule_id": "attacker-input-privileged-operation",
+              "flow_type": "PRIVILEGE_ESCALATION",
+              "source_type": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+              "source_file": "worker",
+              "source_loc": "3491634923",
+              "source_frame": "BG_1",
+              "sink_type": "CHROME_WINDOWS_CREATE_OPTIONS",
+              "sink_file": "worker",
+              "sink_loc": "188201934",
+              "sink_frame": "BG_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "rule_description": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+            "severity": "CRITICAL",
+            "severity_reason": "`externally_connectable` is not declared; any external extension can connect by default (MV2 and MV3 behave identically here).",
+            "severity_evidence": [
+              "externally_connectable: <missing>"
+            ],
+            "source": {
+              "type": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+              "remark": "chrome.runtime.onConnectExternal.addListener[onMessage]",
+              "file": "worker",
+              "loc": "L349:C16 -> L349:C23",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "worker",
+              "origin_frame_family": "BG",
+              "constraint": null,
+              "code_preview": "> {\n    console.log(>>>request<<<);\n\n    if (request."
+            },
+            "sink": {
+              "type": "CHROME_WINDOWS_CREATE_OPTIONS",
+              "remark": null,
+              "file": "worker",
+              "loc": "L188:C20 -> L193:C4",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "  const win = await >>>chrome.windows.create({\n    url: '/data/blank/index.html?' + args.toString(),\n    width: 600,\n    height: 600,\n    type: 'popup'\n  })<<<;\n  internals.set(wi"
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual/Source Analysis",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification: Flow #1 — `CHROME_ONCONNECTEXTERNAL_ONMESSAGE` → `chrome.windows.create`\n\n### (a) Who controls the source\nThe source is the `request` object received by the `onConnectExternal` port message listener in `worker.js`:\n\n```js\nchrome.runtime.onConnectExternal.addListener(eport => {\n  ...\n  eport.onMessage.addListener(async request => {\n    console.log(request);\n    if (request.cmd === 'request-ocr') {\n      ...\n      win = await standalone(request);\n```\n\n`externally_connectable` is absent from the manifest, and there is **no `sender.id` / `sender.origin` check** anywhere in this listener. The `cmd` value is part of the attacker-supplied message and is not a trust anchor. Under the harness model, any external extension can connect; the message payload is fully attacker-controlled.\n\n### (b) Source-to-sink path\nThe propagation is unbroken:\n\n1. `request` (external message) → `request.cmd === 'request-ocr'` branch.\n2. `request` is passed to `standalone(request)`.\n3. `standalone` destructures attacker-controlled fields:\n   - `proceed`, `selector`, `agent`, `title`, `message`\n4. Those fields are appended to a `URLSearchParams` object:\n   - `args.set('proceed', proceed)`\n   - `",
+              "dynamic_guidance": {
+                "triggerable": false,
+                "trigger_mechanism": "OTHER",
+                "injection_context": "",
+                "origin_requirement": "",
+                "trigger_surface": "",
+                "target_urls": [],
+                "payload_sketch": "",
+                "dom_forgery": "",
+                "beacon_pointable": false,
+                "beacon_param": "",
+                "observation": "",
+                "notes": ""
+              },
+              "path": "extensions/{e4c6eef1-8b3b-4daa-8757-707702e7528d}_0.5.2/static/static_report.json",
+              "report_mtime": "2026-08-14T04:51:01.716Z"
+            },
+            "dynamic_detail": {
+              "outcome": "DEFERRED_COMPANION_EXTENSION",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 1,
+              "reproduced": false,
+              "basis": null,
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 2,
+              "reasoning": "The flow requires a browser-authenticated sender from an extension ID allowlist. ExPAgent deliberately does not create or impersonate a companion extension.",
+              "evidence": "",
+              "path": "extensions/{e4c6eef1-8b3b-4daa-8757-707702e7528d}_0.5.2/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T11:15:52.241Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "evidence_summary": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "conflict_resolution": "Strict final decision table applied.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "DEFERRED_COMPANION_EXTENSION",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "static_supported",
+              "usable_for_label": true,
+              "path": "../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/firefox/extensions/{e4c6eef1-8b3b-4daa-8757-707702e7528d}_0.5.2/final-verified-v2/final_report.json",
+              "report_mtime": "2026-08-20T13:41:38.949Z"
+            },
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user/source-based manual validation",
+              "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+              "vulnerability_summary": "外部 port 消息 request-ocr 进入 standalone(request)，其 proceed/selector/agent/title/message 被拼入 windows.create URL。",
+              "target_sites": [
+                "外部扩展消息，不依赖网页 origin"
+              ],
+              "preconditions": [
+                "临时加载 OCR - Image Reader 的 unpacked 目录。",
+                "准备 companion extension。"
+              ],
+              "payloads": [
+                {
+                  "surface": "companion_extension_console",
+                  "language": "javascript",
+                  "purpose": "通过 external port 触发 standalone OCR 窗口。",
+                  "code": "const port = browser.runtime.connect(\"{e4c6eef1-8b3b-4daa-8757-707702e7528d}\", {\n  name: \"expguard\"\n});\nport.onMessage.addListener(message => console.log(\"OCR message:\", message));\nport.postMessage({\n  cmd: \"request-ocr\",\n  proceed: true,\n  selector: false,\n  title: \"EXPAGENT_OCR_TITLE\",\n  message: \"EXPAGENT_OCR_MESSAGE\"\n});"
+                }
+              ],
+              "steps": [
+                {
+                  "step": 1,
+                  "action": "发送外部 port 消息",
+                  "detail": "在 companion 后台 Console 执行 payload。",
+                  "expected": "Firefox 打开一个新的 600x600 extension popup window。"
+                },
+                {
+                  "step": 2,
+                  "action": "检查窗口 URL",
+                  "detail": "打开窗口 URL 或 Browser Toolbox，查看 data/blank/index.html 的查询参数。",
+                  "expected": "query string 包含 mode=standalone、proceed=true、title=EXPAGENT_OCR_TITLE、message=EXPAGENT_OCR_MESSAGE。"
+                },
+                {
+                  "step": 3,
+                  "action": "检查通信",
+                  "detail": "观察 companion port 是否收到 connected/disconnected/report 类型消息。",
+                  "expected": "外部 port 与扩展窗口之间建立可控通信。"
+                }
+              ],
+              "expected_effect": "任意外部扩展可令 OCR 扩展创建带攻击者指定参数的特权窗口，并与其建立消息通道。",
+              "observation_points": [
+                "新窗口 URL",
+                "port 消息",
+                "worker Console"
+              ],
+              "false_positive_checks": [
+                "若 onConnectExternal 在目标 Firefox 版本仅接受白名单 ID，需记录 sender 限制。",
+                "如果窗口未创建且无消息，判未复现。"
+              ],
+              "safety_notes": [
+                "不传真实图片或 OCR 数据；仅打开空白 standalone 页面。"
+              ],
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user or derived from the supplied source and vulnerability reports when the user could not decide."
+              },
+              "plan_kind": "curated",
+              "selected_flow_id": "expguard-opti:firefox:{e4c6eef1-8b3b-4daa-8757-707702e7528d}:0.5.2:c5083dee839474dc:01",
+              "source_report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\firefox\\extensions\\{e4c6eef1-8b3b-4daa-8757-707702e7528d}_0.5.2\\source\\summary.json",
+              "static_report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\firefox\\extensions\\{e4c6eef1-8b3b-4daa-8757-707702e7528d}_0.5.2\\static\\static_report.json",
+              "dynamic_report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\firefox\\extensions\\{e4c6eef1-8b3b-4daa-8757-707702e7528d}_0.5.2\\dynamic\\dynamic_report.json",
+              "operator_input_template": {
+                "verdict_options": [
+                  "TP",
+                  "FP",
+                  "PARTIAL",
+                  "UNCONFIRMED"
+                ],
+                "result_fields": [
+                  "verdict",
+                  "confidence",
+                  "reproduced",
+                  "observed_effect",
+                  "evidence_paths",
+                  "limitations",
+                  "operator",
+                  "validated_at_utc"
+                ]
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual/Source Analysis",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_and_source_analysis",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-23T03:52:31.503172Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "0.5.2",
+        "latest_version": "0.5.3",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\_e4c6eef1-8b3b-4daa-8757-707702e7528d__0.5.3\\_e4c6eef1-8b3b-4daa-8757-707702e7528d_.0.5.3.xpi",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:firefox:{e4c6eef1-8b3b-4daa-8757-707702e7528d}:0.5.2:c5083dee839474dc:01",
+            "original_source_type": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+            "original_sink_type": "CHROME_WINDOWS_CREATE_OPTIONS",
+            "revalidation_job_key": "firefox___e4c6eef1-8b3b-4daa-8757-707702e7528d___0.5.3__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\_e4c6eef1-8b3b-4daa-8757-707702e7528d__0.5.3\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\_e4c6eef1-8b3b-4daa-8757-707702e7528d__0.5.3\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 4.172,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+                "sink_type": "CHROME_WINDOWS_CREATE_OPTIONS",
+                "source": {
+                  "kind": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+                  "remark": "chrome.runtime.onConnectExternal.addListener[onMessage]",
+                  "file": "worker",
+                  "loc": "L522:C16 -> L522:C23",
+                  "code": "console.log(»request«);"
+                },
+                "sink": {
+                  "kind": "CHROME_WINDOWS_CREATE_OPTIONS",
+                  "file": "worker",
+                  "loc": "L298:C20 -> L303:C4",
+                  "code": "const win = await »chrome.windows.create({«"
+                },
+                "propagation_step_count": 20
+              }
+            ],
+            "tool_report_flow_count": 1,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "likely_unchanged",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 1,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 1.0,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": false,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.9,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:firefox:{e4c6eef1-8b3b-4daa-8757-707702e7528d}:0.5.2:c5083dee839474dc:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

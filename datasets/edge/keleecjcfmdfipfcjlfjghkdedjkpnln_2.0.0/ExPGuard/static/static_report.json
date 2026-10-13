@@ -1,0 +1,103 @@
+{
+  "extension_id": "keleecjcfmdfipfcjlfjghkdedjkpnln",
+  "extension_version": "2.0.0",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Report\n\n### (a) Who controls the source\nThe source is `chrome.runtime.onMessageExternal.addListener` (`background.js` L274–280). The message payload `request` is supplied by any page/extension matching the `externally_connectable` surface:\n\n```json\n\"externally_connectable\": { \"matches\": [\"*://*.starfury.tech/*\", \"*://*.toast.pub/*\"] }\n```\n\nThe listener passes `request` straight into `handleConfigMessage` with **no sender.id check, no origin check, no action allow-list** (`authenticatedExtensionAllowlist` is null in the harness; the code confirms no `sender.id`/`sender.origin` guard). The harness also flags wildcard subdomain matching, which adds subdomain-takeover exposure on top of the XSS prerequisite for `starfury.tech`/`toast.pub`.\n\n### (b) Source-to-sink path\nUnbroken data flow confirmed in `background.js`:\n\n1. **L274–278** — `onMessageExternal` receives `request` and calls `handleConfigMessage(request)`.\n2. **L284** — `let themeTemplate = request.themeTemplate || 'totoro';` — attacker-controlled field assigned verbatim (the `|| 'totoro'` only supplies a default when the field is absent; it never sanitizes a present value).\n3. **L298** — `await chrome.storage.l",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L276:C67 -> L276:C74",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L276 C67-74:         console.log(\"external message received: \" + JSON.stringify(request));"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L298:C10 -> L298:C66",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L298 C10-66:     await chrome.storage.local.set({themeTemplate: themeTemplate});"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "*://*.baidu.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": {
+          "matches": [
+            "*://*.starfury.tech/*",
+            "*://*.toast.pub/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

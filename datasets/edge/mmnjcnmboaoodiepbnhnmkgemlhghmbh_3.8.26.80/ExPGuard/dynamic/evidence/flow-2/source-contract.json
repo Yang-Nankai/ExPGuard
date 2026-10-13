@@ -1,0 +1,52 @@
+{
+  "surface": "WINDOW_MESSAGE",
+  "sourcePath": "js/ContentScript.js",
+  "location": "L2:C8 -> L2:C23",
+  "eventNames": [],
+  "eventTarget": "window",
+  "eventDetailKey": "data",
+  "envelope": {
+    "type": "FROM_PAGE"
+  },
+  "forwardField": "",
+  "scalarMessageValue": "",
+  "requirements": {
+    "type": "FROM_PAGE",
+    "details.action": "closeTab",
+    "getCustCurs": "true"
+  },
+  "preconditionActions": [],
+  "selectors": [],
+  "mediaTags": [],
+  "snippet": "window.addEventListener(\"message\", (event) => {\n    if (event.data.type && (event.data.type === \"FROM_PAGE\")) {\n        chrome.storage.local.get([\"user_Id_custom_cursors\"], function (result) {\n            window.postMessage({ type: \"FROM_EXTENSION\", user_id_cursors : result.user_Id_custom_cursors}, \"*\");\n        });\n    } else if (event.data.getCustCurs) {\n        if (event.data.type === 'getCursorData') {\n            chrome.storage.local.get(['cursorData'], function(data) {\n                !data.cursorData\n                    ? chrome.runtime.sendMessage({type: 'SET_CURSOR_COOKIE'}).then(() => {})\n                    : event.source.postMessage({'_cursor': data.cursorData}, '*');\n            });\n        }\n    } else if (event.data.type && (event.data.type === \"FROM_ADD_CURSOR\")) {\n        chrome.runtime.sendMessage({type: \"REFRESH_COLLECTION\"}, function (response) {\n\n        });\n    } el",
+  "notes": [
+    "已从 source/sink 附近提取字面量分支。",
+    "已从 sink 文件推导消息分发字段 `type` 及候选值。",
+    "已从 sink 调用推导 URL 承载字段 `url`。",
+    "已识别信封桥接（外层字段 + 转发字段）。"
+  ],
+  "discriminatorField": "type",
+  "discriminatorValues": [
+    "FROM_PAGE",
+    "getCursorData",
+    "FROM_ADD_CURSOR",
+    "FROM_PAGE_CURSOR",
+    "CONFIG_VALUE",
+    "sendUpdate"
+  ],
+  "urlField": "url",
+  "sinkTapKey": "fetch",
+  "messageAlias": "request",
+  "messageEventKey": "",
+  "jsonMessageField": "",
+  "eventDetailIsJson": false,
+  "sinkDataFields": [
+    "type",
+    "getCustCurs",
+    "cursorData",
+    "details"
+  ],
+  "runtimeMessageKeyPrefix": "",
+  "contractConfidence": "HIGH",
+  "contractWarnings": []
+}

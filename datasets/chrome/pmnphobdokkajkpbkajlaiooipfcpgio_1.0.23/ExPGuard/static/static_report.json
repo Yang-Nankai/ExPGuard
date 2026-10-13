@@ -1,0 +1,188 @@
+{
+  "extension_id": "pmnphobdokkajkpbkajlaiooipfcpgio",
+  "extension_version": "1.0.23",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 2,
+  "verified_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have confirmed the full chain. Here is my verification.\n\n## Verification\n\n**Source \u2014 attacker-controlled?** Yes. The source is `document.title`, read in the content script (`src/js/contentScript.js`), which runs at `document_start` on `<all_urls>`, all frames. `document.title` is page DOM state; any webpage can set it before the extension reads it. It is not browser-derived, not a literal, and there is no sanitizer (`reportEvidence.sanitized: false`).\n\n**Path \u2014 is it unbroken?** Yes. The source anchor:\n\n```\nawait s.images.set({dataUrl:a,title:document.title,id:Date.now().toString()})\n```\n\nI confirmed the helper mapping in the real source:\n\n```\ns={service:r,images:l}\nl={set:async e=>{const t=await l.get();await chrome.storage.local.set({[i.Images]:[...t,e]})},...}\n```\n\nSo `s.images.set(...)` is exactly `l.set(...)`, which persists the passed object (`e`) \u2014 including `title: document.title` \u2014 into `chrome.storage.local` under the `i.Images` key. The tainted field is stored verbatim.\n\n**Sink \u2014 privileged operation with tainted argument?** Yes. `chrome.storage.local.set` is extension-authority storage. A webpage cannot write to the extension's `chrome.storage.local` directly, so this",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {
+        "sanitized": false,
+        "duplicatePaths": 1,
+        "rawSteps": 8,
+        "distinctLines": 1,
+        "crossContextHops": [],
+        "sinkUrlControl": []
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "src/js/contentScript",
+          "reportedLoc": "L1:C3206 -> L1:C3283",
+          "resolvedFile": "src/js/contentScript.js",
+          "resolved": true,
+          "snippet": "L1 C3206-3283: \u2026eight(i),t.set({left:-e.x1,top:-e.y1}),r.add(t);const a=r.toDataURL();r.clear(),await s.images.set({dataUrl:a,title:document.title,id:Date.now().toString()}),o({action:n.OpenEditor})}))})(i);break;case t.EditContent:alert(\"Now you can ed\u2026"
+        },
+        "sinkAnchor": {
+          "reportedFile": "src/js/contentScript",
+          "reportedLoc": "L1:C693 -> L1:C740",
+          "resolvedFile": "src/js/contentScript.js",
+          "resolved": true,
+          "snippet": "L1 C693-740: \u2026,...t[i.Service]};e(o)}))}))},a=[],l={set:async e=>{const t=await l.get();await chrome.storage.local.set({[i.Images]:[...t,e]})},get:e=>new Promise((t=>{chrome.storage.local.get(i.Images,(o=>{const n=[...a,.\u2026"
+        },
+        "sourceExpectedMarkers": [
+          "document.title"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "<all_urls>"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "src/js/contentScript.js",
+              "/libs/jquery.js",
+              "/libs/detect_zoom.js",
+              "/libs/cropper.js",
+              "/libs/plugin.js",
+              "/libs/fabric.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "DOM_INPUT",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've inspected the actual source and confirmed the full context of the flagged flow. Here is my verification.\n\n## Four-part decision ledger\n\n**(a) Who controls the source?**\nThe reported source is the callback parameter `a` of `chrome.tabs.captureVisibleTab(...)`, i.e., the screenshot data URL produced by the browser's tab-capture engine:\n\n```js\nh = e => {\n  chrome.tabs.query({active:!0}, ([{windowId:a, id:t}]) => {\n    chrome.tabs.captureVisibleTab(a, {format:\"jpeg\",quality:100}, (a => {\n      chrome.storage.local.get(\"tmpImg\", (r => {\n        const s = r.tmpImg ?? [];\n        s.push(a);                       // <-- tainted span \u00bba\u00ab\n        chrome.storage.local.set({tmpImg:s})   // <-- sink\n          .then(() => n.sendMessage(t??0, {action:i.CheckIsScreenshotDone, data:{...e, verticalAnchor:e.verticalAnchor+1}}))\n      }))\n    }))\n  }))\n}\n```\n\nThis is a **browser-generated value**, not attacker/untrusted input. It is not `ATTACKER_INPUT`, `WEB_CONTENT`, `NETWORK_RESPONSE`, `STORAGE_DATA`, or any web-surface source; it is the return value of a privileged `chrome.tabs.captureVisibleTab` call the background itself makes. A visible page can at most influence *pixels* of the captured s",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SOURCE_REPORT_ONLY",
+      "source_report_id": 2,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "Recovered source-level flow; inspect propagation and code",
+      "report_evidence": {
+        "sanitized": false,
+        "duplicatePaths": 1,
+        "rawSteps": 3,
+        "distinctLines": 1,
+        "crossContextHops": [],
+        "sinkUrlControl": []
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "src/js/serviceWorker",
+          "reportedLoc": "L1:C570 -> L1:C571",
+          "resolvedFile": "src/js/serviceWorker.js",
+          "resolved": true,
+          "snippet": "L1 C570-571: \u2026ty:100},(a=>{chrome.storage.local.get(\"tmpImg\",(r=>{const s=r.tmpImg??[];s.push(a),chrome.storage.local.set({tmpImg:s}).then((()=>{n.sendMessage(t??0,{action:i.C\u2026"
+        },
+        "sinkAnchor": {
+          "reportedFile": "src/js/serviceWorker",
+          "reportedLoc": "L1:C573 -> L1:C609",
+          "resolvedFile": "src/js/serviceWorker.js",
+          "resolved": true,
+          "snippet": "L1 C573-609: \u2026100},(a=>{chrome.storage.local.get(\"tmpImg\",(r=>{const s=r.tmpImg??[];s.push(a),chrome.storage.local.set({tmpImg:s}).then((()=>{n.sendMessage(t??0,{action:i.CheckIsScreenshotDone,data:{...e,vertic\u2026"
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 2 flow(s): 1 true-positive, 1 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 2 flagged triggerable for dynamic testing."
+}

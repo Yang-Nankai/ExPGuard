@@ -1,0 +1,1274 @@
+{
+  "extension_id": "acbabkahihnlnpajiajhimlkihphdbfi",
+  "extension_version": "2.17",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 14,
+  "verified_count": 14,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification analysis\n\n### Discrepancy resolution\nThe normalized summary record's `codeContext` shows a `content.js` `chrome.runtime.onMessage.addListener` writing `{myKey: message}` at L33, and the harness warns that the resolved anchor does not contain `onMessageExternal`. However, the authoritative primary evidence (`report.source.md`, flow id #3) and my raw-source inspection both place the real flow in **`background.js` inside `chrome.runtime.onMessageExternal.addListener`**. I verified every propagation line against `background.js` and they match exactly. The `content.js` snippet in the summary is a mis-attributed anchor; the actual source-to-sink chain is the background external-message → storage flow.\n\n### Four-part ledger\n\n**(a) Who controls the source?** `request` in `background.js` L284 `chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => ...)`. This listener is reachable from externally-connectable web origins (`https://examroom.ai/*`, `test`/`dev` subdomains, `http://localhost:8010/*`). A page on those origins — or XSS on them — can `chrome.runtime.sendMessage(EXT_ID, payload)` and fully control `request`. Attacker-controllable, restricted",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "UNTRUSTED_STORAGE",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L31:C0 -> L62:C2",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": ">>    31| chrome.runtime.onMessage.addListener(function (message, sender, reply) {\n>>    32|   console.log(\"start\", message);\n>>    33|   chrome.storage.local.set({ myKey: message });\n>>    34|   storeMsg = message\n>>    35|   if (message.data == 'start') {\n>>    36|     readApijson = message.readData\n>>    37|     allowedUrlsList = message.allowedUrl\n>>    38|     Clientid = message.clientID\n>>    39|     startkeyblocker();\n>>    40|     blockRightAndSelection();\n>>    41|     ClearLocalkeys();\n>>    42|     isAllowed = true;\n>>    43|     // return sendResponse(message);    \n>>    44|     // return true;\n>>    45|   } else if (message.data == \"stop\") {\n>>    46|     isAllowed = false;\n>>    47|     chrome.storage.local.clear();\n>>    48|   } else if (message.data == 'refresh') {\n>>    49|     document.querySelector('body').style.opacity = '1';\n>>    50|   } else if (message.data == \"passwaord\") {\n>>    51|     myData = message;\n>>    52|   }\n>>    53|   if (message.data === \"analysis background\") {\n>>    54|     let obj = parse();\n>>    55|     sendResponse(obj);\n>>    56|     return true;\n>>    57|   }\n>>    58|   if(message.key === \"set-alert-extensions\"){\n>>    59|     return message.data \n>>    60|  }\n>>    61|   // return true;\n>>    62| })"
+        },
+        "sinkAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L33:C2 -> L33:C46",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": "L33 C2-46:   chrome.storage.local.set({ myKey: message });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content.js"
+            ],
+            "runAt": "document_idle",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Ledger\n\n**(a) Who controls the source?**\nThe source is `chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {...})` at `background.js:284`. `request` is fully controlled by whatever external context is permitted to message the extension. The manifest `externally_connectable.matches` restricts this to `https://examroom.ai/*`, `https://test.examroom.ai/*`, `https://dev.examroom.ai/*`, and `http://localhost:8010/*`. There is **no `sender.id` allowlist** (`authenticatedExtensionAllowlist: null` in the harness), and the listener body performs **no origin/field validation** before the sink. Per the rules, a restricted `externally_connectable` origin is not an unforgeable trust boundary — XSS (or control) on those domains still reaches the listener. So the source is attacker/untrusted-controllable with a reduced attack surface.\n\n**(b) Exact source-to-sink path**\nThe listener's first statement (no intervening guard) is:\n\n```\n284  chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {\n...\n292      await chrome.storage.local.set({\n293          Sendmsgcontentscript: request?.key || null,\n294          ClearBlockingkey: requ",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L293:C38 -> L293:C45",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L293 C38-45:                 Sendmsgcontentscript: request?.key || null,"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L292:C18 -> L296:C14",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   292|             await chrome.storage.local.set({\n>>   293|                 Sendmsgcontentscript: request?.key || null,\n>>   294|                 ClearBlockingkey: request || null,\n>>   295|                 examTabId: examTabId || null\n>>   296|             });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 2,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ### Four-part decision ledger\n\n**(a) Who controls the source?**\nThe source is `chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => …)` at `background.js:284`. Any page whose origin matches the manifest's `externally_connectable.matches` list can send a message here:\n\n```\nhttps://examroom.ai/*\nhttps://test.examroom.ai/*\nhttps://dev.examroom.ai/*\nhttp://localhost:8010/*\n```\n\nThere is **no `sender.id` fixed-extension allowlist** and no `sender.origin`/`sender.url` validation inside the listener. The listener begins handling `request` unconditionally. Per the harness rules, origin-only restrictions reduce the attack surface but are still exploitable via XSS/subdomain compromise on those listed origins.\n\n**(b) Exact source-to-sink path**\nThe report's propagation is direct, in the same function:\n\n- `L284` `onMessageExternal.addListener(...)` receives `request`\n- `L292-296` immediately executes:\n\n```js\nawait chrome.storage.local.set({\n    Sendmsgcontentscript: request?.key || null,\n    ClearBlockingkey: request || null,\n    examTabId: examTabId || null\n});\n```\n\nThe tainted span `request` (`L293:C38-45`) flows straight into `chrome.storage.local.set` with no san",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L293:C38 -> L293:C45",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L293 C38-45:                 Sendmsgcontentscript: request?.key || null,"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L292:C18 -> L296:C14",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   292|             await chrome.storage.local.set({\n>>   293|                 Sendmsgcontentscript: request?.key || null,\n>>   294|                 ClearBlockingkey: request || null,\n>>   295|                 examTabId: examTabId || null\n>>   296|             });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 3,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow #3 verification — STORAGE_POSOING (attacker-input-storage-write)\n\n### (a) Who controls the source\nThe source is `chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => ...)` at `background.js:284`. `request` is fully attacker-controlled when the message comes from a page allowed by `externally_connectable`:\n\n```json\n\"matches\": [\n  \"https://examroom.ai/*\",\n  \"https://test.examroom.ai/*\",\n  \"https://dev.examroom.ai/*\",\n  \"http://localhost:8010/*\"\n]\n```\n\nThere is **no `sender.id` allowlist, no `sender.origin`/`sender.url` check, and no action/type allowlist** in the listener. I searched for `sender.id`, `sender.origin`, `sender.url`, `onMessageExternal`, `onConnectExternal`; the only `onMessageExternal` handler is the one at line 284, and it does not authenticate the sender.\n\n### (b) Exact source-to-sink path\nThe listener immediately writes attacker-controlled fields into storage before any branching:\n\n```js\n// L292-296\nawait chrome.storage.local.set({\n    Sendmsgcontentscript: request?.key || null,\n    ClearBlockingkey: request || null,      // entire attacker-controlled object\n    examTabId: examTabId || null\n});\n```\n\nThe flagged sink is the `candida",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L293:C38 -> L293:C45",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L293 C38-45:                 Sendmsgcontentscript: request?.key || null,"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L451:C26 -> L454:C22",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   451|                     await chrome.storage.local.set({\n>>   452|                         candidateData: request.value,\n>>   453|                         isRunningExam: true\n>>   454|                     });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 4,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #4 (report.flows.json id #3)\n\n**Source:** `chrome.runtime.onMessageExternal.addListener` in `background.js` (MV3 service worker). The listener receives `(request, sender, sendResponse)` with no browser-authenticated sender boundary.\n\n**Path:** The external message `request` flows directly into multiple `chrome.storage.local.set` calls. The flagged sink is the `request.key === \"checkInstallation\"` branch:\n\n```js\nif (request.key === \"checkInstallation\") {\n    await chrome.storage.local.set({\n        clientId: request.clientId || null,\n        examId: request.examIdToUnblock || null\n    });\n    ...\n}\n```\n\nI inspected `background.js` L280–522. The listener has **no** `sender.id` allowlist and **no** origin/url validation. The only gate is `request.key === \"checkInstallation\"`, which is an attacker-chosen message field, not a trust anchor. The stored values (`request.clientId`, `request.examIdToUnblock`) are written verbatim with only a `|| null` fallback — no sanitization, type/schema validation, or allow-list.\n\n**Attack surface:** `externally_connectable.matches` restricts senders to `https://examroom.ai/*`, `https://test.examroom.ai/*`, `https://dev.examroom.a",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L293:C38 -> L293:C45",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L293 C38-45:                 Sendmsgcontentscript: request?.key || null,"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L462:C26 -> L465:C22",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   462|                     await chrome.storage.local.set({\n>>   463|                         clientId: request.clientId || null,\n>>   464|                         examId: request.examIdToUnblock || null\n>>   465|                     });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 5,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Analysis — Flow #3 (STORAGE_POSOING)\n\n### (a) Who controls the source?\nThe source is `chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => …)` at `background.js:284`. This listener receives messages from **web pages** on the `externally_connectable.matches` origins (`https://examroom.ai/*`, `https://test.examroom.ai/*`, `https://dev.examroom.ai/*`, `http://localhost:8010/*`). The message body `request` is entirely supplied by the sending page — i.e., the `key`, `clientId`, and `examIdToUnblock` fields are attacker-influenced whenever an attacker can run script on one of those origins (e.g., XSS on examroom.ai, or anything served from `localhost:8010`).\n\n### (b) Exact source-to-sink path\nThe report's propagation is confirmed by reading the raw source:\n\n- L284: `onMessageExternal` registers the handler.\n- L292–296: the handler immediately stores `request?.key` and the raw `request` object into `chrome.storage.local` (this alone is a poisoning write).\n- L448: `if (typeof request === \"object\")`.\n- L460: `if (request.key === \"checkInstallation\")` — a check on an **attacker-chosen field**, not a trust anchor.\n- L462–465:\n  ```js\n  await chrome.s",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L293:C38 -> L293:C45",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L293 C38-45:                 Sendmsgcontentscript: request?.key || null,"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L462:C26 -> L465:C22",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   462|                     await chrome.storage.local.set({\n>>   463|                         clientId: request.clientId || null,\n>>   464|                         examId: request.examIdToUnblock || null\n>>   465|                     });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 6,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've inspected the actual source. The report evidence plus the raw code confirm the chain.\n\n## Analysis\n\n**(a) Who controls the source?**\n`chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => ...)` at `background.js:284`. The message payload (`request`) is controlled by any web page allowed by `externally_connectable`. The manifest restricts it to:\n- `https://examroom.ai/*`\n- `https://test.examroom.ai/*`\n- `https://dev.examroom.ai/*`\n- `http://localhost:8010/*`\n\nThere is **no `sender.id` allowlist and no `sender.origin`/`sender.url` check** anywhere in the listener. The only trust boundary is the `externally_connectable` origin match — a web-origin restriction, which per the harness/browser trust rules is exploitable via XSS on any of those domains (or directly from `http://localhost:8010`). The sender guard is therefore not a browser-authenticated extension-ID boundary.\n\n**(b) Exact source-to-sink path**\n1. `background.js:284` — external message listener receives attacker-controlled `request`.\n2. `background.js:448` — `if (typeof request === \"object\")`.\n3. `background.js:479` — `if (request.key === \"installExtension\")` (attacker-chosen key).\n4. `backgrou",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L293:C38 -> L293:C45",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L293 C38-45:                 Sendmsgcontentscript: request?.key || null,"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L481:C26 -> L484:C22",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   481|                     await chrome.storage.local.set({\n>>   482|                         clientId: request.clientId || null,\n>>   483|                         examId: request.examIdToUnblock || null\n>>   484|                     });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 7,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow Verification: STORAGE_POSOING via `onMessageExternal`\n\n### Decision ledger\n\n**(a) Who controls the source?**\n`chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => ...)` (background.js L284). `request` is a message object fully controlled by any page allowed by `externally_connectable.matches`: `https://examroom.ai/*`, `https://test.examroom.ai/*`, `https://dev.examroom.ai/*`, and `http://localhost:8010/*`. All of these are web origins, not browser-authenticated extension IDs, so an attacker who can execute JS on those origins (e.g. XSS on examroom.ai, or the dev/localhost origin) controls `request` completely. There is no `sender.id` fixed-ID allowlist; the harness confirms `authenticatedExtensionAllowlist: null`.\n\n**(b) Exact source-to-sink path:**\nExternal message object `request` → `request.key === \"installExtension\"` gate (L479, attacker-chosen field) → `chrome.storage.local.set({clientId: request.clientId || null, examId: request.examIdToUnblock || null})` (L481–484). The propagation shows `request` (ASSIGN:identifier) flowing through member accesses into the storage sink. The gate is not a trust boundary — it is a check on an attacker-suppli",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L293:C38 -> L293:C45",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L293 C38-45:                 Sendmsgcontentscript: request?.key || null,"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L481:C26 -> L484:C22",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   481|                     await chrome.storage.local.set({\n>>   482|                         clientId: request.clientId || null,\n>>   483|                         examId: request.examIdToUnblock || null\n>>   484|                     });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 8,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #8 (STORAGE_POSOING / attacker-input-storage-write)\n\n### 1. Source control\nThe source is `chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => ...)` at `background.js:284`. This is a true external-message surface. The manifest `externally_connectable.matches` includes `https://examroom.ai/*`, `https://test.examroom.ai/*`, `https://dev.examroom.ai/*`, and `http://localhost:8010/*`. Any page on those origins can legitimately call `chrome.runtime.sendMessage` to this extension, and an XSS on those same origins can do so as well. The entire `request` object is attacker-controlled.\n\n### 2. Source-to-sink path\nThe propagation is straightforward and confirmed in real source:\n\n- `L284` external listener receives `request`.\n- `L497` gate: `if (request.key === \"candidatePassword\")` — this is a check on an **attacker-chosen field**, not a trust anchor; the attacker trivially sets `key` to `\"candidatePassword\"`.\n- `L499-501`: `await chrome.storage.local.set({ myPassword: request.value })` — the tainted `request.value` is written verbatim into extension storage.\n\nThe bridge is not broken: the action/key gate is attacker-satisfiable and the stor",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L293:C38 -> L293:C45",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L293 C38-45:                 Sendmsgcontentscript: request?.key || null,"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L499:C26 -> L501:C22",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   499|                     await chrome.storage.local.set({\n>>   500|                         myPassword: request.value\n>>   501|                     });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 13,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence to decide. The code confirms the primary report:\n\n- `chrome.runtime.onMessageExternal.addListener` at background.js L284 has **no `sender.id` allowlist, no origin check, no validation** before reaching storage.\n- L292–296 unconditionally executes `chrome.storage.local.set({ Sendmsgcontentscript: request?.key, ClearBlockingkey: request, examTabId })` — the entire `request` object is attacker-controlled.\n- Branches at L451 (`candidateData: request.value`), L462/481 (`clientId: request.clientId`, `examId: request.examIdToUnblock`), and L499 (`myPassword: request.value`) also write raw attacker fields to `chrome.storage.local`.\n\nDecision ledger:\n1. **Source control**: `onMessageExternal` messages come from web origins in `externally_connectable.matches` (`https://examroom.ai/*`, `test/dev` subdomains, `http://localhost:8010/*`). Those are web origins, not browser-authenticated extension IDs; a page there (or XSS on it) controls `request` completely. No fixed-ID allowlist exists (`authenticatedExtensionAllowlist: null`).\n2. **Path**: `onMessageExternal` → `request` fields → `chrome.storage.local.set(...)` with no sanitization/guard (`Sanitized: False` in the repor",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L31:C0 -> L62:C2",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": ">>    31| chrome.runtime.onMessage.addListener(function (message, sender, reply) {\n>>    32|   console.log(\"start\", message);\n>>    33|   chrome.storage.local.set({ myKey: message });\n>>    34|   storeMsg = message\n>>    35|   if (message.data == 'start') {\n>>    36|     readApijson = message.readData\n>>    37|     allowedUrlsList = message.allowedUrl\n>>    38|     Clientid = message.clientID\n>>    39|     startkeyblocker();\n>>    40|     blockRightAndSelection();\n>>    41|     ClearLocalkeys();\n>>    42|     isAllowed = true;\n>>    43|     // return sendResponse(message);    \n>>    44|     // return true;\n>>    45|   } else if (message.data == \"stop\") {\n>>    46|     isAllowed = false;\n>>    47|     chrome.storage.local.clear();\n>>    48|   } else if (message.data == 'refresh') {\n>>    49|     document.querySelector('body').style.opacity = '1';\n>>    50|   } else if (message.data == \"passwaord\") {\n>>    51|     myData = message;\n>>    52|   }\n>>    53|   if (message.data === \"analysis background\") {\n>>    54|     let obj = parse();\n>>    55|     sendResponse(obj);\n>>    56|     return true;\n>>    57|   }\n>>    58|   if(message.key === \"set-alert-extensions\"){\n>>    59|     return message.data \n>>    60|  }\n>>    61|   // return true;\n>>    62| })"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L864:C18 -> L871:C14",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   864|             await chrome.storage.local.set({\n>>   865|                 allowedUrlsList,\n>>   866|                 clientIdlist,\n>>   867|                 passwordAllow,\n>>   868|                 clientPasswaordAllow,\n>>   869|                 cookiesList,\n>>   870|                 domainListForCookies\n>>   871|             });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content.js"
+            ],
+            "runAt": "document_idle",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 9,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have sufficient evidence to decide this flow. Let me lay out the verification.\n\n## Four-part decision ledger\n\n**(a) Who controls the source?**\n`chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => ...)` at background.js L284. `request` is fully controlled by whatever external page/extension sends the message. There is **no `sender.id` or `sender.origin` check inside the listener** — the only boundary is the manifest `externally_connectable.matches` (`https://examroom.ai/*`, `test.`/`dev.` examroom, `http://localhost:8010/*`). Per the browser trust rules, origin/match restrictions reduce scope but are not unforgeable (XSS on those origins, or direct control of `localhost:8010` in dev, lets an attacker drive the message). Source is genuinely attacker-controllable under that prerequisite.\n\n**(b) Exact source-to-sink path.**\n1. External message handler, branch `request.key === \"candidateDetails\"` (L450–454): `await chrome.storage.local.set({ candidateData: request.value, isRunningExam: true })` — the entire `request.value` object is stored raw, no schema/allow-list/sanitization.\n2. `saveGeturLogs` (L525) later reads it back: `const { candidateData } = await",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 6,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L293:C38 -> L293:C45",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": "L293 C38-45:         }"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L570:C31 -> L577:C10",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   570|         const response = await fetch(url, {\n>>   571|             method: \"POST\",\n>>   572|             headers: {\n>>   573|                 \"Content-Type\": \"application/json\"\n>>   574|             },\n>>   575|             body: JSON.stringify(data),\n>>   576|             signal: controller.signal\n>>   577|         });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content.js"
+            ],
+            "runAt": "document_idle",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 10,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #7 — REQUEST_FORGERY (attacker input → network send body)\n\n### 1. Who controls the source?\nThe source is `chrome.runtime.onMessageExternal` at `background.js:284`. The handler signature is `(request, sender, sendResponse)` and there is **no `sender.id` check, no `sender.origin` check, no fixed-extension allowlist** (the harness confirms `authenticatedExtensionAllowlist: null`). The only gate is the manifest `externally_connectable.matches`, restricted to `https://examroom.ai/*`, `https://test.examroom.ai/*`, `https://dev.examroom.ai/*`, and `http://localhost:8010/*`.\n\nPer the audit rules: externally_connectable with specific hosts is a real attack-surface reduction, but it is still exploitable via XSS/subdomain takeover on those origins; it does **not** neutralize the flow. The `request.key === \"checkInstallation\"` branch gate is an attacker-chosen field, not an authentication boundary. So the source is attacker-controllable (subject to XSS on an allow-listed origin).\n\n### 2. Source-to-sink path\nConfirmed from the raw source:\n\n- `background.js:284` — `onMessageExternal` receives `request`.\n- `background.js:460` — `if (request.key === \"checkInstallation\")` (a",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 7,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L293:C38 -> L293:C45",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": "L293 C38-45:         }"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1164:C31 -> L1173:C10",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>  1164|         const response = await fetch('https://examroomapi.com/api/Allowedextensions/Extension', {\n>>  1165|             method: 'POST',\n>>  1166|             headers: {\n>>  1167|                 'Content-Type': 'application/json'\n>>  1168|             },\n>>  1169|             body: JSON.stringify({\n>>  1170|                 clientId: clientId || \"\",\n>>  1171|                 examId: examId || \"\"\n>>  1172|             })\n>>  1173|         });"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content.js"
+            ],
+            "runAt": "document_idle",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 11,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification — Request Forgery via `onMessageExternal` → `storage.local` → `fetch`\n\n### 1. Who controls the source?\nThe source is `chrome.runtime.onMessageExternal` in `background.js:284`. The listener has **no `sender.id`, `sender.url`, or `sender.origin` guard** — I searched for `sender.id` / `sender.url` / `sender.origin` and found no matches.\n\nThe manifest restricts the message surface to:\n- `https://examroom.ai/*`\n- `https://test.examroom.ai/*`\n- `https://dev.examroom.ai/*`\n- `http://localhost:8010/*`\n\nThis is a web-origin restriction, not a browser-authenticated fixed-ID IPC boundary. Per the threat model, these origins are exploitable via XSS (and `localhost:8010` is a dev origin). So the source is attacker/untrusted-controllable.\n\n### 2. The source-to-sink path\nConfirmed in raw source:\n\n- `background.js:284` — `onMessageExternal.addListener((request, sender, sendResponse) => ...)`\n- `background.js:460-465` — branch `request.key === \"checkInstallation\"` stores the attacker-controlled field:\n  ```js\n  await chrome.storage.local.set({\n      clientId: request.clientId || null,\n      examId: request.examIdToUnblock || null\n  });\n  ```\n- `background.js:475` — `await getAl",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 7,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L293:C38 -> L293:C45",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": "L293 C38-45:         }"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L75:C31 -> L77:C9",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>    75|         const response = await fetch(\n>>    76|             `https://examroomapi.com/api/Extension/GetData?clientId=${clientId}`\n>>    77|         );"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content.js"
+            ],
+            "runAt": "document_idle",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 12,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #7 (REQUEST_FORGERY, `attacker-input-network-send`)\n\n### 1. Source control\nThe genuine source (from `report.source.md` Flow #7) is `chrome.runtime.onMessageExternal` in `background.js` L284–296, not the `content.js` `onMessage` anchor shown in the normalized record. The harness itself flagged this anchor mismatch.\n\nI inspected `background.js`:\n\n- L284: `chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {...})`\n- L292–296: immediately stores `request` fields into `chrome.storage.local` (`Sendmsgcontentscript`, `ClearBlockingkey`, `examTabId`).\n- L448: `if (typeof request === \"object\")` → L460 `if (request.key === \"checkInstallation\")` → L462–465 stores `clientId: request.clientId || null` and `examId: request.examIdToUnblock || null`, then L475 calls `getAllowedExtensions()`.\n- A second branch L479–484 (`installExtension`) stores the same `clientId`.\n\n**No sender trust boundary exists.** `search_code` for `sender.id|sender.origin|sender.url|sender.tab` returned **no matches**. The manifest restricts `externally_connectable` to `https://examroom.ai/*`, `test`/`dev` subdomains, and `http://localhost:8010/*`, but there is no fixed-e",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 7,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content",
+          "reportedLoc": "L31:C0 -> L62:C2",
+          "resolvedFile": "content.js",
+          "resolved": true,
+          "snippet": ">>    31| chrome.runtime.onMessage.addListener(function (message, sender, reply) {\n>>    32|   console.log(\"start\", message);\n>>    33|   chrome.storage.local.set({ myKey: message });\n>>    34|   storeMsg = message\n>>    35|   if (message.data == 'start') {\n>>    36|     readApijson = message.readData\n>>    37|     allowedUrlsList = message.allowedUrl\n>>    38|     Clientid = message.clientID\n>>    39|     startkeyblocker();\n>>    40|     blockRightAndSelection();\n>>    41|     ClearLocalkeys();\n>>    42|     isAllowed = true;\n>>    43|     // return sendResponse(message);    \n>>    44|     // return true;\n>>    45|   } else if (message.data == \"stop\") {\n>>    46|     isAllowed = false;\n>>    47|     chrome.storage.local.clear();\n>>    48|   } else if (message.data == 'refresh') {\n>>    49|     document.querySelector('body').style.opacity = '1';\n>>    50|   } else if (message.data == \"passwaord\") {\n>>    51|     myData = message;\n>>    52|   }\n>>    53|   if (message.data === \"analysis background\") {\n>>    54|     let obj = parse();\n>>    55|     sendResponse(obj);\n>>    56|     return true;\n>>    57|   }\n>>    58|   if(message.key === \"set-alert-extensions\"){\n>>    59|     return message.data \n>>    60|  }\n>>    61|   // return true;\n>>    62| })"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L831:C39 -> L833:C17",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": ">>   831|                 const response = await fetch(\n>>   832|                     `https://examroomapi.com/api/Extension/GetData?clientId=${clientId}`\n>>   833|                 );"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content.js"
+            ],
+            "runAt": "document_idle",
+            "allFrames": true,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": {
+          "matches": [
+            "https://examroom.ai/*",
+            "https://test.examroom.ai/*",
+            "https://dev.examroom.ai/*",
+            "http://localhost:8010/*"
+          ],
+          "use_dynamic_url": true
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 14 flow(s): 14 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

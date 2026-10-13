@@ -1,0 +1,88 @@
+{
+  "extension_id": "fcblbbbkcneogddmpmfdchnocbpfpmag",
+  "extension_version": "0.3.0",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 3,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification: Flow #1 — `attacker-input-storage-write` (STORAGE_POSOING)\n\n### (a) Who controls the source\n`worker.js:142` registers `chrome.runtime.onConnectExternal.addListener(eport => ...)`, and `worker.js:143` registers `eport.onMessage.addListener(request => ...)`. The `request` object is entirely supplied by the connecting party.\n\nThe manifest has `externally_connectable: null` (absent). Per Chrome's documented behavior, when `externally_connectable` is not declared, **all other extensions/apps can connect by default** (web pages cannot). A malicious extension installed in the same profile is attacker-controlled, so `request` is genuine attacker input. I searched the whole `worker.js` for `sender.id` / `sender.origin` / `sender.url` and found **no sender guard at all** — there is no browser-authenticated trust boundary here.\n\n### (b) Exact source-to-sink path\nUnbroken and confirmed in real source:\n\n```\n142 chrome.runtime.onConnectExternal.addListener(eport => {\n143   eport.onMessage.addListener(request => {\n144     if (request.cmd === 'keep-awake') { ... }        // dead for this branch\n175     else if (request.cmd === 'set-level') {\n176       chrome.storage.local.set({\n17",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "worker",
+          "reportedLoc": "L144:C8 -> L144:C15",
+          "resolvedFile": "worker.js",
+          "resolved": true,
+          "snippet": "L144 C8-15:     if (request.cmd === 'keep-awake') {"
+        },
+        "sinkAnchor": {
+          "reportedFile": "worker",
+          "reportedLoc": "L176:C6 -> L179:C8",
+          "resolvedFile": "worker.js",
+          "resolved": true,
+          "snippet": ">>   176|       chrome.storage.local.set({\n>>   177|         level: request.level,\n>>   178|         aggressive: request.aggressive || false\n>>   179|       });"
+        },
+        "sourceExpectedMarkers": [
+          "onConnectExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

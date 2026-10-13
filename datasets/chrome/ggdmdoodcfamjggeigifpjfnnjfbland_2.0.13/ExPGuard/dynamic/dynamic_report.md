@@ -1,0 +1,52 @@
+# ExPAgent Dynamic Test — ggdmdoodcfamjggeigifpjfnnjfbland v2.0.13
+
+- Browser: `chrome`  |  LLM: `deepseek` / `deepseek-v4-pro`
+- Runtime extension id: `jeefglamjgliokhlfocjhmalmdekmefm`
+- Environment: `{'browserUrl': 'http://127.0.0.1:9222', 'runtimeExtensionId': 'jeefglamjgliokhlfocjhmalmdekmefm', 'beaconBaseUrl': 'http://127.0.0.1:55064', 'headless': True, 'safety': {'mode': 'isolated-controlled-validation', 'allowedTestOrigins': ['http://127.0.0.1', 'http://[::1]', 'http://localhost'], 'network': 'loopback and explicitly configured controlled origins only', 'testInput': 'bounded JSON with harmless EXPAGENT_TEST_* markers', 'sensitiveData': 'credentials, cookies, tokens, and personal data are not read or collected'}, 'networkIsolation': True}`
+
+**Assessment:** Dynamically tested 1 flow(s): 1 CONFIRMED, 0 PARTIAL.
+
+---
+
+## Flow #1 — CONFIRMED (controlled condition)  (reproduced=True, confidence 0.97)
+
+**Reasoning:** The local beacon was hit (tainted URL reached a network-triggering privileged sink) or the exact static sink fired with the controlled marker (sink tap / breakpoint).
+
+**Payload:** `[{"marker": "EXPAGENT_TEST_expa_e9a68dddfc58", "url": "http://127.0.0.1:55064/beacon/expa_2eedeb55f3e5", "data": {"url": "http://127.0.0.1:55064/beacon/expa_2eedeb55f3e5"}, "value": "EXPAGENT_TEST_expa_e9a68dddfc58", "message": "EXPAGENT_TEST_expa_e9a68dddfc58", "title": "EXPAGENT_TEST_expa_e9a68dddfc58", "text": "EXPAGENT_TEST_expa_e9a68dddfc58", "number": "EXPAGENT_TEST_expa_e9a68dddfc58", "name": "EXPAGENT_TEST_expa_e9a68dddfc58", "id": "EXPAGENT_TEST_expa_e9a68dddfc58", "key": "EXPAGENT_TEST_expa_e9a68dddfc58", "type": "EXPAGENT_TEST_expa_e9a68dddfc58", "action": "EXPAGENT_TEST_expa_e9a68dddfc58", "cmd": "SetPopup", "Action": "EXPAGENT_TEST_expa_e9a68dddfc58", "Message": "EXPAGENT_TEST_expa_e9a68dddfc58", "fun": "EXPAGENT_TEST_expa_e9a68dddfc58", "auth": "EXPAGENT_TEST_expa_e9a68dddfc58", "phone": "EXPAGENT_TEST_expa_e9a68dddfc58", "email": "EXPAGENT_TEST_expa_e9a68dddfc58", "version": "EXPAGENT_TEST_expa_e9a68dddfc58", "token": "EXPAGENT_TEST_expa_e9a68dddfc58", "content": "EXPAGENT_TEST_expa_e9a68dddfc58", "payload": "EXPAGENT_TEST_expa_e9a68dddfc58", "kind": "EXPAGENT_TEST_expa_e9a68dddfc58", "requestId": "EXPAGENT_TEST_expa_e9a68dddfc58", "revision": "EXPAGENT_TEST_expa_e9a68dddfc58"}, {"marker": "EXPAGENT_TEST_expa_e9a68dddfc58", "url": "http://127.0.0.1:55064/beacon/expa_2eedeb55f3e5", "data": {"url": "http://127.0.0.1:55064/beacon/expa_2eedeb55f3e5"}, "value": "EXPAGENT_TEST_expa_e9a68dddfc58", "message": "EXPAGENT_TEST_expa_e9a68dddfc58", "title": "EXPAGENT_TEST_expa_e9a68dddfc58", "text": "EXPAGENT_TEST_expa_e9a68dddfc58", "number": "EXPAGENT_TEST_expa_e9a68ddd`
+
+**Runtime evidence:** source-contract={"surface": "CUSTOM_EVENT", "sourcePath": "injected.js", "location": "L766:C12 -> L766:C20", "eventNames": ["OMC"], "eventTarget": "document", "eventDetailKey": "detail", "envelope": {}, "forwardField": "", "requirements": {}, "selectors": [], "mediaTags": [], "snippet": "  return 'this[\"' + name + '\"]=' + name;\n        }).join(';') + ';with(this)!function(){',\n      ];\n      comm.forEach(require, function (key) {\n        var script = data.require[key];\n        script && code.push(script);\n      });\n      // wrap code to make 'use strict' work\n      code.push('!function(){' + script.code + '\\n}.call(this)');\n      code.push('}.call(this);');\n      code = code.join('\\n');\n      var name = script.custom.name || script.meta.name || script.id;\n      var args = comm.map(wrapperKeys, function (key) {\n        return wrapper[key];\n      });\n      var thisObj = wrapper.window || wrapper;\n      if (comm.injectable) {\n        // normal injection\n        try {\n          var func = Function.apply(null, wrapperKeys.concat([code]));\n        } catch (e) {\n          console.error('Syntax error in script: ' + name + '\\n' + e.message);\n          return;\n        }\n        co", "notes": ["已从 sink 文件推导消息分发字段 `cmd` 及候选值。", "已从 sink 调用推导 URL 承载字段 `data.url`。", "已提取页面可达事件名。"], "discriminatorField": "cmd", "discriminatorValues": ["SetPopup", "SetBadge", "Download", "OpenTab", "SetValue", "EvalFunction", "SetClipboard", "Notification"], "urlField": "data.url", "sinkTapKey": "tabs.create", "messageAlias": "e", "messageEventKey": "", "jsonMessageField": "", "sinkDataFields": []}
+sink-tap={"sink_type": "all", "result": "{\"keys\":[],\"data\":{\"__fetch__\":true,\"__xhr__\":true,\"__function__\":true,\"__eval__\":true,\"__runtime_sendMessage__\":true}}"}
+beacon={"token": "expa_2eedeb55f3e5", "hit": true, "count": 2, "hits": [{"method": "GET", "path": "/beacon/expa_2eedeb55f3e5", "bodyBytes": 0}, {"method": "GET", "path": "/beacon/expa_2eedeb55f3e5", "bodyBytes": 0}]}
+
+**Trajectory:**
+1. `new_page` http://127.0.0.1:55064/page -> [{"type": "text", "text": "# new_page response\n## Pages\nShowing 1-3 of 3 (Page 1 of 1).\n0: http://127.0.0.1:55064/page\n1: http://127.0.0.1:60245/page\n2: http://127.0.0.1:55064/page [selected]", "id": "lc_b230a264-3d66-4944-aace-1fc03b3
+2. `set_sink_breakpoint` background L1:C68748 -> L1:C68795 -> {"ok": true, "sourceFile": "background.js", "url": "chrome-extension://jeefglamjgliokhlfocjhmalmdekmefm/background.js", "line": 1, "column": 68748, "targetHint": "background", "breakpointId": "1:0:68748:chrome-extension://jeefglamjgliokhlfocjhmalmdekmefm/background.js", "locations": []}
+3. `sink_contract_stimulus` CUSTOM_EVENT -> {"action": "dispatchEvent", "targetUrl": "http://127.0.0.1:55064/page", "event": "OMC", "input": {"bytes": 1156, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fun", "id", "key", "kind", "marker", "message", "name", "number", "payload", "phone", "requestId", "revision"], "testMarkers": ["EXPAGENT_TEST_expa_e9a
+4. `sink_contract_stimulus` CUSTOM_EVENT -> {"action": "dispatchEvent", "targetUrl": "http://127.0.0.1:55064/page", "event": "OMC", "input": {"bytes": 1156, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fun", "id", "key", "kind", "marker", "message", "name", "number", "payload", "phone", "requestId", "revision"], "testMarkers": ["EXPAGENT_TEST_expa_e9a
+5. `sink_contract_stimulus` CUSTOM_EVENT -> {"action": "dispatchEvent", "targetUrl": "http://127.0.0.1:55064/page", "event": "OMC", "input": {"bytes": 1156, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fun", "id", "key", "kind", "marker", "message", "name", "number", "payload", "phone", "requestId", "revision"], "testMarkers": ["EXPAGENT_TEST_expa_e9a
+6. `sink_contract_stimulus` CUSTOM_EVENT -> {"action": "dispatchEvent", "targetUrl": "http://127.0.0.1:55064/page", "event": "OMC", "input": {"bytes": 1155, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fun", "id", "key", "kind", "marker", "message", "name", "number", "payload", "phone", "requestId", "revision"], "testMarkers": ["EXPAGENT_TEST_expa_e9a
+7. `sink_contract_stimulus` CUSTOM_EVENT -> {"action": "dispatchEvent", "targetUrl": "http://127.0.0.1:55064/page", "event": "OMC", "input": {"bytes": 1156, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fun", "id", "key", "kind", "marker", "message", "name", "number", "payload", "phone", "requestId", "revision"], "testMarkers": ["EXPAGENT_TEST_expa_e9a
+8. `sink_contract_stimulus` CUSTOM_EVENT -> {"action": "dispatchEvent", "targetUrl": "http://127.0.0.1:55064/page", "event": "OMC", "input": {"bytes": 1160, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fun", "id", "key", "kind", "marker", "message", "name", "number", "payload", "phone", "requestId", "revision"], "testMarkers": ["EXPAGENT_TEST_expa_e9a
+9. `sink_contract_stimulus` CUSTOM_EVENT -> {"action": "dispatchEvent", "targetUrl": "http://127.0.0.1:55064/page", "event": "OMC", "input": {"bytes": 1160, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fun", "id", "key", "kind", "marker", "message", "name", "number", "payload", "phone", "requestId", "revision"], "testMarkers": ["EXPAGENT_TEST_expa_e9a
+10. `sink_contract_stimulus` CUSTOM_EVENT -> {"action": "dispatchEvent", "targetUrl": "http://127.0.0.1:55064/page", "event": "OMC", "input": {"bytes": 1160, "topLevelKeys": ["Action", "Message", "action", "auth", "cmd", "content", "data", "email", "fun", "id", "key", "kind", "marker", "message", "name", "number", "payload", "phone", "requestId", "revision"], "testMarkers": ["EXPAGENT_TEST_expa_e9
+
+**Planned trajectory:**
+1. `list_cdp_targets` Confirm extension target/background/service-worker exists.
+2. `get_extension_runtime_state` Snapshot pre-trigger badge/storage/runtime state.
+3. `new_page/navigate_page` Open approved source fixture only: http://127.0.0.1:55064/page
+4. `list_scripts/search_in_sources` Confirm relevant content script/listener is injected.
+5. `post_controlled_message/set_controlled_dom/dispatch_controlled_event` Inject a JSON test marker through the matching local source surface.
+6. `observe` Check beacon/network/console/runtime state/screenshot.
+7. `ReAct-adjust` If not reproduced, mutate target URL, event/message shape, DOM selectors, action names, timing, then re-observe.
+
+**Line-level debug:** Extension debugger recorded 1 breakpoint(s); see artifact for line-level state.
+
+**Evidence artifacts:**
+- `transcript`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\Temp\dynamic_workspace\runs\chrome\ggdmdoodcfamjggeigifpjfnnjfbland\2.0.13\dynamic-evidence\flow-1\trajectory.txt` — Bounded ReAct trajectory and tool evidence.
+- `source-contract`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\Temp\dynamic_workspace\runs\chrome\ggdmdoodcfamjggeigifpjfnnjfbland\2.0.13\dynamic-evidence\flow-1\source-contract.json` — Source-adjacent literal guards and generated local-input contract.
+- `debug`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\Temp\dynamic_workspace\runs\chrome\ggdmdoodcfamjggeigifpjfnnjfbland\2.0.13\dynamic-evidence\flow-1\extension-debug.json` — Persistent CDP extension debugger breakpoint/pause state.
+- `screenshot`: `D:\Ph0jav7\ExtensionSecurity\ExPGuard-Ablation\Temp\dynamic_workspace\runs\chrome\ggdmdoodcfamjggeigifpjfnnjfbland\2.0.13\dynamic-evidence\flow-1\key-state.png` — Key browser state after replay: http://127.0.0.1:55064/page
+
+**Notes:** sinkTapKey=tabs.create sinkBreakpointHits=0
+
+---

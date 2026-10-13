@@ -1,0 +1,202 @@
+{
+  "extensionId": "scamblocker_extensiondevelopers@pcmatic.com",
+  "extensionVersion": "1.20",
+  "sourceType": "XPI",
+  "status": "success",
+  "duration": 0.624,
+  "files": [
+    {
+      "file": "override.js",
+      "frame": "CS_1",
+      "frameTags": [
+        "CS_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ]
+          }
+        }
+      ],
+      "size": 1750,
+      "durationMs": 139.2186589999999
+    },
+    {
+      "file": "scam-block.js",
+      "frame": "MAIN_scam-block",
+      "frameTags": [
+        "MAIN_scam-block"
+      ],
+      "frameDetails": [
+        {
+          "id": "MAIN_scam-block",
+          "family": "MAIN"
+        }
+      ],
+      "size": 15668,
+      "durationMs": 153.1801049999999
+    },
+    {
+      "file": "service-worker.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 894,
+      "durationMs": 28.23310800000013
+    },
+    {
+      "file": "settings/options.js",
+      "frame": "OPTIONS_1",
+      "frameTags": [
+        "OPTIONS_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "OPTIONS_1",
+          "family": "EX"
+        }
+      ],
+      "size": 840,
+      "durationMs": 23.013795000000073
+    }
+  ],
+  "totalFiles": 4,
+  "totalSize": 19152,
+  "cacheStats": {
+    "totalCalls": 0,
+    "hits": 0,
+    "misses": 0,
+    "evictions": 0,
+    "hitRate": 0,
+    "cacheSize": 0,
+    "maxEntries": 4096
+  },
+  "coverage": {
+    "totalNodes": 225,
+    "coveredNodes": 222,
+    "nodeCoverage": 0.9866666666666667,
+    "totalScopes": 34,
+    "coveredScopes": 34,
+    "scopeCoverage": 1,
+    "analyzedScripts": 4,
+    "scripts": [
+      {
+        "file": "service-worker",
+        "frame": "BG_1",
+        "totalNodes": 16,
+        "coveredNodes": 15,
+        "nodeCoverage": 0.9375,
+        "totalScopes": 3,
+        "coveredScopes": 3,
+        "scopeCoverage": 1
+      },
+      {
+        "file": "scam-block",
+        "frame": "MAIN_scam-block",
+        "totalNodes": 168,
+        "coveredNodes": 166,
+        "nodeCoverage": 0.9880952380952381,
+        "totalScopes": 22,
+        "coveredScopes": 22,
+        "scopeCoverage": 1
+      },
+      {
+        "file": "override",
+        "frame": "CS_1",
+        "totalNodes": 26,
+        "coveredNodes": 26,
+        "nodeCoverage": 1,
+        "totalScopes": 2,
+        "coveredScopes": 2,
+        "scopeCoverage": 1
+      },
+      {
+        "file": "settings/options",
+        "frame": "OPTIONS_1",
+        "totalNodes": 15,
+        "coveredNodes": 15,
+        "nodeCoverage": 1,
+        "totalScopes": 7,
+        "coveredScopes": 7,
+        "scopeCoverage": 1
+      }
+    ]
+  },
+  "hasFlows": true,
+  "flows": [
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(contentEvent)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "override",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "override",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "http://*/*",
+          "https://*/*"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L18:C5 -> L18:C17",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "[Unknown URL]",
+      "sinkUrlTaintControl": "FULL",
+      "sinkFile": "service-worker",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L20:C31 -> L26:C11",
+      "ctx": "service-worker",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[override->service-worker]",
+      "messageSender": "override",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "Wildcard host `*` allows coverage of arbitrary domains.",
+      "severityEvidence": [
+        "http://*/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "nse(message);\n      >>> } catch(err<<<or) {\n        messag",
+      "sinkCode": "st response = await >>>fetch(message.url, {\n         method: 'POST',\n         headers: {\n          'Content-Type': 'application/x-www-form-urlencoded',\n        },\n        body: body\n         })<<<;\n         const dat"
+    }
+  ],
+  "privilegeSuppressedCount": 0,
+  "privilegeSuppressed": []
+}

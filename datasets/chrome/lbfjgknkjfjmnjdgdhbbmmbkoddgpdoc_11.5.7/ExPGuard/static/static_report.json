@@ -1,0 +1,180 @@
+{
+  "extension_id": "lbfjgknkjfjmnjdgdhbbmmbkoddgpdoc",
+  "extension_version": "11.5.7",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 2,
+  "verified_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 \u2014 `CHROME_ONMESSAGEEXTERNAL_MESSAGE` \u2192 `chrome.tabs.create({url: e.url})`\n\n### 1. Source control\nThe source is `chrome.runtime.onMessageExternal.addListener` in the MV3 service worker (`background.js`). The manifest's `externally_connectable.matches` is `[\"*://meet.google.com/*\"]`, so any script running on a `meet.google.com` page (including an injected/XSS payload on that origin) can send an external message to the extension. The message object `e` is fully attacker-controlled. There is no `externally_connectable.ids` allowlist.\n\n### 2. Source \u2192 sink path\nConfirmed directly from the minified source:\n\n```js\nchrome.runtime.onMessageExternal.addListener(async(e,t,o)=>{\n  \"open_new_tab\"===e.type\n    ? chrome.tabs.create({url:e.url}, t=>{ ... })\n    : ...\n})\n```\n\n- `e` (the external message) \u2192 gate `\"open_new_tab\" === e.type` \u2192 `chrome.tabs.create({url: e.url})`.\n- No sanitization, URL-scheme validation, or allow-list is applied to `e.url`.\n- The second listener parameter `t` (the sender object) is **not** consulted in this branch \u2014 no `sender.id`, `sender.origin`, or `sender.url` guard exists.\n\n### 3. Security-relevant argument\nThe `url` field of `chrome.tab",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {
+        "sanitized": false,
+        "duplicatePaths": 1,
+        "rawSteps": 210,
+        "distinctLines": 1,
+        "crossContextHops": [],
+        "sinkUrlControl": []
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C3014 -> L1:C3015",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C3014-3015: \u2026})}chrome.runtime.onMessageExternal.addListener(async(e,t,o)=>{\"open_new_tab\"===e.type?chrome.tabs.create({url:e.url},t=>{e.title&&setTimeout(()=>{chrome.runtime\u2026"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C3021 -> L1:C3210",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C3021-3210: \u2026me.runtime.onMessageExternal.addListener(async(e,t,o)=>{\"open_new_tab\"===e.type?chrome.tabs.create({url:e.url},t=>{e.title&&setTimeout(()=>{chrome.runtime.lastError||chrome.scripting.executeScript({target:{tabId:t.id},func:e=>{document.title=e},args:[e.title]})},5e3)}):\"initGDrive\"===e.type?l(e=>{o({status:e})}):\"logoutGDrive\"===e.type?(await s(),\u2026"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://meet.google.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "FALSE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #2 (CHROME_IDENTITY_TOKEN \u2192 FETCH_RESOURCE)\n\n### Four-part decision ledger\n\n**(a) Who controls the source?**\nThe source is `chrome.identity.getAuthToken` (via the helper `async function s()`). The token `a` is browser-derived: it is the user's own OAuth token for the extension's Google client, obtained with `{interactive:!0}`. It is *not* an attacker-controllable value \u2014 no webpage, content script, or message field can set or influence the token string. It is classified as SENSITIVE_DATA, not ATTACKER_INPUT/WEB_CONTENT/NETWORK_RESPONSE.\n\n**(b) Exact source-to-sink path**\n1. `s()` calls `chrome.identity.getAuthToken({interactive:!0}, t => { t && (a = t, e(t)) })` \u2014 the token is cached in module variable `a`.\n2. In the background message dispatcher, the `\"logoutGDrive\" === e.type` branch awaits `s()`.\n3. `if (a)` then executes:\n   `fetch(\"https://accounts.google.com/o/oauth2/revoke?token=\" + a)`\n   and `chrome.identity.removeCachedAuthToken({token: a}, ...)`.\n\nThe propagation report's single-line \"raw step\" matches this exactly: the token identifier `a` is the value interpolated into the fetch URL.\n\n**(c) Which security-relevant API argument is attacker-contro",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "",
+      "false_positive_reason": "See preserved static analyst transcript.",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SOURCE_REPORT_ONLY",
+      "source_report_id": 2,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "Recovered source-level flow; inspect propagation and code",
+      "report_evidence": {
+        "sanitized": false,
+        "duplicatePaths": 1,
+        "rawSteps": 12,
+        "distinctLines": 1,
+        "crossContextHops": [],
+        "sinkUrlControl": [
+          "PARTIAL"
+        ]
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C2169 -> L1:C2170",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C2169-2170: \u2026 new Promise(e=>{a?e(a):chrome.identity.getAuthToken({interactive:!0},t=>{t&&(a=t,e(t))})})}function u(e,t){e.targetFileId?r(null,e.fileContent,null,e.fileType,e\u2026"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background",
+          "reportedLoc": "L1:C3308 -> L1:C3369",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L1 C3308-3369: \u2026type?l(e=>{o({status:e})}):\"logoutGDrive\"===e.type?(await s(),a&&function(){try{fetch(\"https://accounts.google.com/o/oauth2/revoke?token=\"+a).then(e=>e.json()).then(e=>{}),chrome.identity.removeCachedAuthToken({token:a},e\u2026"
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "*://meet.google.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 2 flow(s): 1 true-positive, 1 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 1 flagged triggerable for dynamic testing."
+}

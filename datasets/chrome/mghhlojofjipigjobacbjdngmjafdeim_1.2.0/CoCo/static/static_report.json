@@ -1,0 +1,109 @@
+{
+  "extension_id": "mghhlojofjipigjobacbjdngmjafdeim",
+  "extension_version": "1.2.0",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Decision ledger\n\n**(a) Who controls the source — ATTACKER-CONTROLLABLE (with an XSS/compromise prerequisite on the host page).**\n`content_script.js` L151 registers `document.addEventListener('updateCounter', ...)` in the content-script world. The event is normally fired by the extension's own `injected/ads_removal.js` (`document.dispatchEvent(new CustomEvent('updateCounter', {detail: totalAdsRemoved}))`), but the listener performs **no source/origin/type check**. Because isolated-world content scripts share the DOM with the page, any script running on `https://open.spotify.com/*` (the page itself, an injected ad script, or XSS on that origin) can dispatch:\n\n```js\ndocument.dispatchEvent(new CustomEvent('updateCounter', { detail: JSON.stringify('PWN') }));\n```\n\nand the content-script listener will receive it. `e.detail` is therefore genuinely untrusted/attacker-controllable.\n\n**(b) Exact source→sink path — unbroken.**\n`content_script.js` L154: `var counterValue = JSON.parse(e.detail);`\nL155: `chrome.runtime.sendMessage({ name: \"updateCounter\", counterValue: counterValue });`\n`background.js` L2/L4: `chrome.runtime.onMessage.addListener(onMessage)` receives the message.\nL6 checks `m",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "",
+      "message_sender_provenance": "",
+      "privilege_reason": "CoCo reported cross-boundary flow; verify with source",
+      "report_evidence": {
+        "tool": "coco",
+        "sourceCapability": "ATTACKER_INPUT",
+        "sinkCapability": "PRIVILEGED_OPERATION",
+        "flowMeta": {
+          "totalSteps": 5,
+          "omitted": 0
+        },
+        "propagation": "e.detail | JSON.parse(e.detail) | JSON.parse(e.detail)"
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "NEEDS_SOURCE_CHECK",
+          "browserFacts": "Determine whether web/external code can actually reach this source; do not infer it only from a variable name."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content_script.js",
+          "reportedLoc": "L151:C1 -> L151:C1",
+          "resolvedFile": "content_script.js",
+          "resolved": true,
+          "snippet": "L151 C1-1: document.addEventListener('updateCounter', function(e)"
+        },
+        "sinkAnchor": {
+          "reportedFile": "background.js",
+          "reportedLoc": "L9:C1 -> L9:C1",
+          "resolvedFile": "background.js",
+          "resolved": true,
+          "snippet": "L9 C1-1: \t\t\tchrome.action.setBadgeText({text: messageEvent.counterValue.toString()});"
+        },
+        "sourceExpectedMarkers": [
+          "addEventListener",
+          "detail"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://open.spotify.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content_script.js"
+            ],
+            "runAt": "document_start",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "PRIVILEGED_EXTENSION_UI_CONTROL",
+          "rule": "Treat attacker-controlled badge/title/icon/notification content or state as a privilege escalation: it controls browser/extension UI outside the page principal. Still prove the untrusted value reaches the actual API argument; a literal, browser-derived value, or disconnected action branch is not a flow."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

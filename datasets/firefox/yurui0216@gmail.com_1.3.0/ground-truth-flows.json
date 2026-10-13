@@ -1,0 +1,245 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "firefox",
+  "extension_id": "yurui0216@gmail.com",
+  "version": "1.3.0",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-5b61056d5b38ec0a",
+      "verification": "TP",
+      "source_family": "custom",
+      "sink_family": "FETCH_BODY",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:yurui0216@gmail.com:1.3.0:bb6b29bdaa2bc673:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:yurui0216@gmail.com:1.3.0:bb6b29bdaa2bc673:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "bb6b29bdaa2bc67334aec28a37404d2743404cce3ec7d1c330137405440037b7",
+            "semantic_key": {
+              "rule_id": "attacker-input-network-send",
+              "flow_type": "REQUEST_FORGERY",
+              "source_type": "TARGET_CUSTOM_EVENT",
+              "source_file": "scripts/docxConverter",
+              "source_loc": "12241236",
+              "source_frame": "CS_1",
+              "sink_type": "FETCH_BODY",
+              "sink_file": "background",
+              "sink_loc": "35313910",
+              "sink_frame": "BG_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "rule_description": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://chat.deepseek.com/*"
+            ],
+            "source": {
+              "type": "TARGET_CUSTOM_EVENT",
+              "remark": "target.addEventListener(deepshare:convertToDocx)",
+              "file": "scripts/docxConverter",
+              "loc": "L12:C24 -> L12:C36",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://chat.deepseek.com/*"
+                    ]
+                  }
+                },
+                {
+                  "id": "CS_3",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://chatgpt.com/*"
+                    ]
+                  }
+                },
+                {
+                  "id": "CS_6",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://gemini.google.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "scripts/docxConverter",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://chat.deepseek.com/*"
+                ]
+              },
+              "code_preview": "p: 'popup/popup.html>>>?action=apiK<<<eyMissing' });\n\n    "
+            },
+            "sink": {
+              "type": "FETCH_BODY",
+              "remark": "[Unknown URL]",
+              "file": "background",
+              "loc": "L35:C31 -> L39:C10",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "st response = await >>>fetch(request.url, {\n            method: request.method,\n            headers: request.headers,\n            body: request.body\n        })<<<;\n\n        if (!resp"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "scripts/docxConverter",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[scripts/docxConverter->background]",
+              "storage_area": null
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — REQUEST_FORGERY (attacker input → background fetch body)\n\n### (a) Who controls the source?\nThe resolved source anchor is `scripts/docxConverter.js:12`:\n\n```js\ndocument.addEventListener('deepshare:convertToDocx', async (event) => {\n    const message = event.detail?.messages || {};\n```\n\n`docxConverter.js` runs as an ISOLATED-world content script on `https://chat.deepseek.com/*`, `https://chatgpt.com/*`, and `https://gemini.google.com/*`. The listener is registered via `initDocxConverter()` at line 395. A page on any of those origins can dispatch the same DOM `CustomEvent` on `document` with an arbitrary `detail.messages` object — there is no `event.isTrusted`, `event.origin`, action allow-list, or sender check. So the source is genuinely web-content/attacker-controllable. The harness confirms this (`PAGE_TO_CONTENT_SCRIPT`, page can forge CustomEvent fields).\n\n### (b) Source-to-sink path\n1. `scripts/docxConverter.js:11-14` — page-forged `deepshare:convertToDocx` → `message = event.detail.messages`.\n2. `convertToDocx(message, sourceButton)` → `convertToDocxViaApi(message.content, settings.docxServerUrl)` (lines 85-88, when `docxMode !== 'local'`).\n3. `conv",
+              "dynamic_guidance": {
+                "triggerable": false,
+                "trigger_mechanism": "OTHER",
+                "injection_context": "",
+                "origin_requirement": "",
+                "trigger_surface": "",
+                "target_urls": [],
+                "payload_sketch": "",
+                "dom_forgery": "",
+                "beacon_pointable": false,
+                "beacon_param": "",
+                "observation": "",
+                "notes": ""
+              },
+              "path": "extensions/yurui0216@gmail.com_1.3.0/static/static_report.json",
+              "report_mtime": "2026-08-14T03:52:44.592Z"
+            },
+            "dynamic_detail": {
+              "outcome": "TOOL_LIMITATION",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": null,
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 1,
+              "reasoning": "The bounded dynamic trajectory did not produce a verdict within 60 seconds; recorded as a tooling limitation rather than treating the absence of an observation as a negative result.",
+              "evidence": "",
+              "path": "extensions/yurui0216@gmail.com_1.3.0/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T10:19:04.625Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "evidence_summary": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "conflict_resolution": "Strict final decision table applied.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "TOOL_LIMITATION",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "static_supported",
+              "usable_for_label": true,
+              "path": "../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/firefox/extensions/yurui0216@gmail.com_1.3.0/final-verified-v2/final_report.json",
+              "report_mtime": "2026-08-20T13:36:58.969Z"
+            },
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user-provided manual validation",
+              "validated_at_utc": "2026-09-22T15:32:00.942835Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user as a manual validation result. No screenshot or HAR bytes were supplied with this conversation."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_report",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-22T15:32:00.942835Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.3.0",
+        "latest_version": "1.3.0",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

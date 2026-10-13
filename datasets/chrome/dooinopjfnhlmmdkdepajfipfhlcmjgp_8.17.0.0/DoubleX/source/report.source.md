@@ -1,0 +1,22 @@
+# DoubleX / ExPGuard aligned flow report
+
+- Extension: `dooinopjfnhlmmdkdepajfipfhlcmjgp.8.17.0.0`
+- Status: `success`
+- Duration: `1202.117ms`
+- Flows: `4`
+
+## Flow 1 — PRIVILEGE_ESCALATION
+
+`WINDOW_MESSAGE_EVENT` (L142) → `CHROME_WINDOWS_CREATE_OPTIONS` (L268)
+
+## Flow 2 — STORAGE_POSOING
+
+`WINDOW_MESSAGE_EVENT` (L142) → `CHROME_LOCAL_STORAGE` (L71)
+
+## Flow 3 — STORAGE_POSOING
+
+`WINDOW_MESSAGE_EVENT` (L142) → `CHROME_LOCAL_STORAGE` (L206)
+
+## Flow 4 — DATA_LEAK
+
+`STORAGE_ALL_ITEMS` (L152) → `WINDOW_POSTMESSAGE` (L161)

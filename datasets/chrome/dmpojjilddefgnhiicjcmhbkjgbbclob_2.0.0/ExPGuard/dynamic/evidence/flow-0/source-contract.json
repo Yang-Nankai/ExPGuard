@@ -1,0 +1,47 @@
+{
+  "surface": "CUSTOM_EVENT",
+  "sourcePath": "injected.js",
+  "location": "L766:C12 -> L766:C20",
+  "eventNames": [
+    "OMC"
+  ],
+  "eventTarget": "document",
+  "eventDetailKey": "detail",
+  "envelope": {},
+  "forwardField": "",
+  "scalarMessageValue": "",
+  "requirements": {
+    "type": "loadend"
+  },
+  "preconditionActions": [],
+  "selectors": [],
+  "mediaTags": [],
+  "snippet": "  return 'this[\"' + name + '\"]=' + name;\n        }).join(';') + ';with(this)!function(){',\n      ];\n      comm.forEach(require, function (key) {\n        var script = data.require[key];\n        script && code.push(script);\n      });\n      // wrap code to make 'use strict' work\n      code.push('!function(){' + script.code + '\\n}.call(this)');\n      code.push('}.call(this);');\n      code = code.join('\\n');\n      var name = script.custom.name || script.meta.name || script.id;\n      var args = comm.map(wrapperKeys, function (key) {\n        return wrapper[key];\n      });\n      var thisObj = wrapper.window || wrapper;\n      if (comm.injectable) {\n        // normal injection\n        try {\n          var func = Function.apply(null, wrapperKeys.concat([code]));\n        } catch (e) {\n          console.error('Syntax error in script: ' + name + '\\n' + e.message);\n          return;\n        }\n        co",
+  "notes": [
+    "已从 source/sink 附近提取字面量分支。",
+    "已从 sink 文件推导消息分发字段 `cmd` 及候选值。",
+    "已从 sink 调用推导 URL 承载字段 `data.url`。",
+    "已提取页面可达事件名。"
+  ],
+  "discriminatorField": "cmd",
+  "discriminatorValues": [
+    "SetPopup",
+    "SetBadge",
+    "Download",
+    "OpenTab",
+    "SetValue",
+    "EvalFunction",
+    "SetClipboard",
+    "Notification"
+  ],
+  "urlField": "data.url",
+  "sinkTapKey": "downloads.download",
+  "messageAlias": "e",
+  "messageEventKey": "",
+  "jsonMessageField": "",
+  "eventDetailIsJson": false,
+  "sinkDataFields": [],
+  "runtimeMessageKeyPrefix": "",
+  "contractConfidence": "HIGH",
+  "contractWarnings": []
+}

@@ -1,0 +1,232 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "edge",
+  "extension_id": "gijhmcgnnbcpigflkfoimbnfjnbcphah",
+  "version": "6.1.0",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-b761ee3974c088a1",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "FETCH_BODY",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/edge/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:edge:gijhmcgnnbcpigflkfoimbnfjnbcphah:6.1.0:0d03bea3cf77dd5a:01",
+          "flow": {
+            "flow_id": "expguard-opti:edge:gijhmcgnnbcpigflkfoimbnfjnbcphah:6.1.0:0d03bea3cf77dd5a:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "0d03bea3cf77dd5aed5d109854efb6adc9a16471eeb5e16f2f11fd3051dc97e1",
+            "identity_occurrence": 1,
+            "source_report_id": 5,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L3:C61468 -> L3:C61469",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "FETCH_BODY",
+              "remark": "https://relayflow.promotino.com/api/external/a",
+              "file": "background",
+              "loc": "L3:C58181 -> L3:C58273",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": "external_condition_required",
+                  "confidence": 0.9,
+                  "detail": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 5,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've confirmed the full chain by reading the actual manifest and the minified background source. Here is my verification. ## Decision ledger **(a) Who controls the source?** An ordinary webpage controls the message. The manifest's `externally_connectable` block contains: ```json \"matches\": [\"<all_urls>\"] ``` so any http/https page can call `chrome.runtime.sendMessage(EXTENSION_ID, ...)`. The `ids` list only enumerates allowed *extensions*; it does not restrict web pages when `matches` is…",
+              "path": "extensions/gijhmcgnnbcpigflkfoimbnfjnbcphah_6.1.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.9,
+              "reproduced": false,
+              "basis": "external_condition_required",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 2,
+              "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+              "path": "extensions/gijhmcgnnbcpigflkfoimbnfjnbcphah_6.1.0/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T19:15:28.608Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountRateLimitExceeded', 'message': 'Requests are too frequent. Please reduce your request frequency, wait a short moment, and retry your request. Request id: 02178702617329096de9f55314d9c1d75ac853e3e9cad7e7f390c', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "EXTERNAL_CONDITION_REQUIRED",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/edge/extensions/gijhmcgnnbcpigflkfoimbnfjnbcphah_6.1.0/final/final_report.json",
+              "report_mtime": "2026-08-18T04:09:32.025Z"
+            },
+            "manual_verification": null,
+            "notes": [
+              "Label rests on a recorded ExPAgent verdict reached with an unmet external precondition (no runtime reproduction)."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "6.1.0",
+        "latest_version": "6.1.1",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\edge\\gijhmcgnnbcpigflkfoimbnfjnbcphah_6.1.1\\gijhmcgnnbcpigflkfoimbnfjnbcphah.6.1.1.crx",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:edge:gijhmcgnnbcpigflkfoimbnfjnbcphah:6.1.0:0d03bea3cf77dd5a:01",
+            "original_source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+            "original_sink_type": "FETCH_BODY",
+            "revalidation_job_key": "edge__gijhmcgnnbcpigflkfoimbnfjnbcphah__6.1.1__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\edge\\gijhmcgnnbcpigflkfoimbnfjnbcphah_6.1.1\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\edge\\gijhmcgnnbcpigflkfoimbnfjnbcphah_6.1.1\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 38.328,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 5,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "FETCH_BODY",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+                  "file": "background",
+                  "loc": "L3:C61468 -> L3:C61469",
+                  "code": "…pdate(t,{url:e})}})),a.browser.runtime.onMessageExternal.addListener(((t,e,r)=>{if(\"night-eye-create-support-message\"===»t«.type){const e=t.payload;J.sendExternalSupportMessage(e,(t=>{r({response:t})}))}}))},9662:(t,e,r)=>{var n=r(614),a=r(633…"
+                },
+                "sink": {
+                  "kind": "FETCH_BODY",
+                  "remark": "https://relayflow.promotino.com/api/external/a",
+                  "file": "background",
+                  "loc": "L3:C58181 -> L3:C58273",
+                  "code": "…){if(void 0!==t)for(var e=t.firstChild;e;)t.removeChild(e),e=t.firstChild}}class z{static send(t,e,r){var n=e.join(\"&\");»fetch(t,{method:\"POST\",headers:{\"Content-Type\":\"application/x-www-form-urlencoded\"},body:n})«.then((t=>t.text())).then((t=>{r(t)})).catch((t=>{}))}}Y.Controllers={MESSAGE:a.SUPPORT_MESSAGE_SYSTEM_URL+\"/api/externa…"
+                },
+                "propagation_step_count": 1
+              }
+            ],
+            "tool_report_flow_count": 5,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "likely_unchanged",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 5,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 1.0,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 1.0,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:edge:gijhmcgnnbcpigflkfoimbnfjnbcphah:6.1.0:0d03bea3cf77dd5a:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

@@ -1,0 +1,674 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "hcjohblbkdgcoikaedjndgbcgcfoojmj",
+  "version": "3.1.13",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-496184bb92c64efa",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_TABS_CREATE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:hcjohblbkdgcoikaedjndgbcgcfoojmj:3.1.13:a163ec28a4e93f6c:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:hcjohblbkdgcoikaedjndgbcgcfoojmj:3.1.13:a163ec28a4e93f6c:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "semantic_sha256": "a163ec28a4e93f6c70e02ddb1548fa984317b5a904a918754b81cf115c568381",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "HIGH",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "js/sac",
+              "loc": "L1:C526 -> L1:C551",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.share-a-cart.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/sac",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_TABS_CREATE_OPTIONS",
+              "remark": "",
+              "file": "js/background",
+              "loc": "L2:C1483153 -> L2:C1483219",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "js/sac",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工复测确认：第二个 tabs.create 分支同样可由页面消息控制 URL，并触发特权标签页创建，判定为 TP。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "人工复测确认：第二个 tabs.create 分支同样可由页面消息控制 URL，并触发特权标签页创建，判定为 TP。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": null,
+            "dynamic_detail": {
+              "outcome": "PARTIAL",
+              "final_verdict": "FALSE_POSITIVE",
+              "recorded_label": null,
+              "confidence": 0.78,
+              "reproduced": false,
+              "basis": "non_decisive",
+              "usable_for_label": false,
+              "evidence_stage": "SINK_REACHED",
+              "evidence_artifact_count": 5,
+              "reasoning": "The exact content-script source breakpoint fired for the controlled page event, but the privileged sink did not. The remaining failure is isolated to message routing or a background-side payload precondition.",
+              "notes": "sourceBreakpointHits=1 sinkBreakpointHits=0 react=skippedDeterministicResolved",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.13\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-22T06:04:16.553Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.13\\dynamic\\evidence\\flow-2",
+              "files": [
+                "extension-debug.json",
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "source-contract.json",
+                "step-after-trigger.png",
+                "step-final-state.png",
+                "step-source-open.png",
+                "storage-after-observation.json",
+                "storage-after-observation.png",
+                "storage-after-trigger.json",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787025819995682583ac3749be18cdf4b3a384433037ded201', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.13/final/final_report.json",
+              "report_mtime": "2026-08-18T04:03:38.73Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T16:14:41+08:00",
+                "observation": "人工复测确认：第二个 tabs.create 分支同样可由页面消息控制 URL，并触发特权标签页创建，判定为 TP。",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.13/dynamic/evidence/flow-2/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-22T08:14:41.985Z",
+                "notes": "人工复测确认：第二个 tabs.create 分支同样可由页面消息控制 URL，并触发特权标签页创建，判定为 TP。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.13\\dynamic\\evidence\\flow-2\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.13\\dynamic\\evidence\\flow-2\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T08:14:41.985Z",
+                  "sha256": "8821645789eaf0e90b3d9e75f6f0acf22f2099157eec3668e764ac0d8ccae4fc"
+                }
+              }
+            ],
+            "notes": [
+              "Flow is absent from dynamic_report.json: no ExPAgent dynamic record for this flow.",
+              "ExPAgent round-20 dynamic result recorded without changing the aggregate verification label (outcome=PARTIAL)."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "3.1.13",
+        "latest_version": "3.1.18",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.18\\hcjohblbkdgcoikaedjndgbcgcfoojmj.3.1.18.crx",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:chrome:hcjohblbkdgcoikaedjndgbcgcfoojmj:3.1.13:a163ec28a4e93f6c:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_TABS_CREATE_OPTIONS",
+            "revalidation_job_key": "chrome__hcjohblbkdgcoikaedjndgbcgcfoojmj__3.1.18__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.18\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.18\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 46.438,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 4,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 7,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_TABS_CREATE_OPTIONS",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "js/background",
+                  "loc": "L2:C1550737 -> L2:C1560442",
+                  "code": "…${a}/api/get/`};p(),»chrome.runtime.onMessage.addListener((n,i,c)=>{const p=t.TS.getInstance().getConfig();if(u.info(\"onMessage\",n),\"fetch\"== …⟨tainted span: 9705 chars⟩… ),!0):\"set-first-cart-celebrated\"===n.action&&(chrome.storage.local.set({firstCartCelebrated:!0},()=>{c({ok:!0})}),!0)})«,chrome.alarms.onAla…"
+                },
+                "sink": {
+                  "kind": "CHROME_TABS_CREATE_OPTIONS",
+                  "file": "js/background",
+                  "loc": "L2:C1553168 -> L2:C1553206",
+                  "code": "…s} for cartId=${t}`);const e=new URL(`${p.site}/get/${encodeURIComponent(t)}`);return d&&e.searchParams.set(\"source\",d),»chrome.tabs.create({url:e.toString()})«,void c()}o&&(m.items=o),m.mobile=n.mobile;const y=l.getVendorByID(m.vendor);y?(chrome.storage.local.set({lastReceivedCa…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 7,
+                "sink_index": 4,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_TABS_CREATE_OPTIONS",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "js/background",
+                  "loc": "L2:C1550737 -> L2:C1560442",
+                  "code": "…${a}/api/get/`};p(),»chrome.runtime.onMessage.addListener((n,i,c)=>{const p=t.TS.getInstance().getConfig();if(u.info(\"onMessage\",n),\"fetch\"== …⟨tainted span: 9705 chars⟩… ),!0):\"set-first-cart-celebrated\"===n.action&&(chrome.storage.local.set({firstCartCelebrated:!0},()=>{c({ok:!0})}),!0)})«,chrome.alarms.onAla…"
+                },
+                "sink": {
+                  "kind": "CHROME_TABS_CREATE_OPTIONS",
+                  "file": "js/background",
+                  "loc": "L2:C1553619 -> L2:C1553685",
+                  "code": "…eive] [${y.displayName}][url=${e}][cartId=${t}]`,n,{name:y.id,tags:{type:\"vendor\",operation:\"receive\",vendor:y.id}})})):»chrome.tabs.create({url:`${p.site}/receive/${t}?source=${d||\"\"}`})«.then(async e=>{await new Promise(e=>setTimeout(e,3e3)),e.id&&(r.A.data.sacTabId=e.id),y.receive(m).catch(e=>{u.errorToS…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 13,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_TABS_CREATE_OPTIONS",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "From storage.local.set('lastReceivedCart') in js/background",
+                  "file": "js/background",
+                  "loc": "L2:C1550737 -> L2:C1560442",
+                  "code": "…${a}/api/get/`};p(),»chrome.runtime.onMessage.addListener((n,i,c)=>{const p=t.TS.getInstance().getConfig();if(u.info(\"onMessage\",n),\"fetch\"== …⟨tainted span: 9705 chars⟩… ),!0):\"set-first-cart-celebrated\"===n.action&&(chrome.storage.local.set({firstCartCelebrated:!0},()=>{c({ok:!0})}),!0)})«,chrome.alarms.onAla…"
+                },
+                "sink": {
+                  "kind": "CHROME_TABS_CREATE_OPTIONS",
+                  "file": "js/background",
+                  "loc": "L2:C1427990 -> L2:C1428037",
+                  "code": "…const{id:e}=await chrome.tabs.create({active:!1,url:t,pinned:!0});i.A.data.sacWorkerTabId=e||-1}}else{const{id:e}=await »chrome.tabs.create({active:!1,url:t,pinned:!0})«;i.A.data.sacWorkerTabId=e||-1}}else o.error(\"[Invalid or missing lastReceivedCart.id] Skipping worker redirect tab upda…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 13,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_TABS_CREATE_OPTIONS",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "From storage.local.set('lastReceivedCart') in js/background",
+                  "file": "js/background",
+                  "loc": "L2:C1550737 -> L2:C1560442",
+                  "code": "…${a}/api/get/`};p(),»chrome.runtime.onMessage.addListener((n,i,c)=>{const p=t.TS.getInstance().getConfig();if(u.info(\"onMessage\",n),\"fetch\"== …⟨tainted span: 9705 chars⟩… ),!0):\"set-first-cart-celebrated\"===n.action&&(chrome.storage.local.set({firstCartCelebrated:!0},()=>{c({ok:!0})}),!0)})«,chrome.alarms.onAla…"
+                },
+                "sink": {
+                  "kind": "CHROME_TABS_CREATE_OPTIONS",
+                  "file": "js/background",
+                  "loc": "L2:C1427888 -> L2:C1427935",
+                  "code": "…{try{await chrome.tabs.update(i.A.data.sacWorkerTabId,{url:t})}catch(e){}if(chrome.runtime.lastError){const{id:e}=await »chrome.tabs.create({active:!1,url:t,pinned:!0})«;i.A.data.sacWorkerTabId=e||-1}}else{const{id:e}=await chrome.tabs.create({active:!1,url:t,pinned:!0});i.A.data.sacWorke…"
+                },
+                "propagation_step_count": 1
+              }
+            ],
+            "tool_report_flow_count": 13,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "likely_unchanged",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 4,
+            "top_candidate": {
+              "tool_flow_index": 7,
+              "sink_index": 4
+            },
+            "identity_evidence": {
+              "source_context_similarity": 0.993,
+              "sink_expression_similarity": 0.917,
+              "actual_source_context_similarity": 0.984,
+              "actual_sink_context_similarity": 0.995,
+              "source_remark_match": true,
+              "specific_sink_remark_match": false,
+              "sink_expression_same_after_short_identifier_normalization": false,
+              "ranking_score": 0.87,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:chrome:hcjohblbkdgcoikaedjndgbcgcfoojmj:3.1.13:a163ec28a4e93f6c:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-891b0ff8ccb4978b",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_TABS_CREATE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:hcjohblbkdgcoikaedjndgbcgcfoojmj:3.1.13:b4b93887b1fb6089:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:hcjohblbkdgcoikaedjndgbcgcfoojmj:3.1.13:b4b93887b1fb6089:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "b4b93887b1fb6089843b407370fa638ce01503c0f7be83f83ad21ff17e520a5f",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "HIGH",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "js/sac",
+              "loc": "L1:C526 -> L1:C551",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.share-a-cart.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/sac",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_TABS_CREATE_OPTIONS",
+              "remark": "",
+              "file": "js/background",
+              "loc": "L2:C1482702 -> L2:C1482740",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "js/sac",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "人工复测确认：share-a-cart 页面消息可经 content script 到达后台 tabs.create，并由页面输入控制新标签页 URL，判定为 TP。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 1,
+                  "detail": "人工复测确认：share-a-cart 页面消息可经 content script 到达后台 tabs.create，并由页面输入控制新标签页 URL，判定为 TP。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": null,
+            "dynamic_detail": {
+              "outcome": "PARTIAL",
+              "final_verdict": "FALSE_POSITIVE",
+              "recorded_label": null,
+              "confidence": 0.78,
+              "reproduced": false,
+              "basis": "non_decisive",
+              "usable_for_label": false,
+              "evidence_stage": "SINK_REACHED",
+              "evidence_artifact_count": 5,
+              "reasoning": "The exact content-script source breakpoint fired for the controlled page event, but the privileged sink did not. The remaining failure is isolated to message routing or a background-side payload precondition.",
+              "notes": "sourceBreakpointHits=1 sinkBreakpointHits=0 react=skippedDeterministicResolved",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.13\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-22T06:04:16.553Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.13\\dynamic\\evidence\\flow-1",
+              "files": [
+                "extension-debug.json",
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "source-contract.json",
+                "step-after-observation.png",
+                "step-after-trigger.png",
+                "step-final-state-fixture.png",
+                "step-source-open.png",
+                "storage-after-observation.json",
+                "storage-after-trigger.json",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 02178702581997559e4692ee8689b9dc112ef0a7e12032fab6236', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "NOT_AVAILABLE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.13/final/final_report.json",
+              "report_mtime": "2026-08-18T04:03:38.73Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T16:14:41+08:00",
+                "observation": "人工复测确认：share-a-cart 页面消息可经 content script 到达后台 tabs.create，并由页面输入控制新标签页 URL，判定为 TP。",
+                "limitations": "记录操作者手工验证结论；本次未附截图或 HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.13/dynamic/evidence/flow-1/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 1,
+                "confirmed_at": "2026-09-22T08:14:41.985Z",
+                "notes": "人工复测确认：share-a-cart 页面消息可经 content script 到达后台 tabs.create，并由页面输入控制新标签页 URL，判定为 TP。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.13\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.13\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-22T08:14:41.985Z",
+                  "sha256": "471c488d8d6de8fbce9390a7cd3d0a60796f920b09b170f344d9bf285850c281"
+                }
+              }
+            ],
+            "notes": [
+              "Flow is absent from dynamic_report.json: no ExPAgent dynamic record for this flow.",
+              "ExPAgent round-20 dynamic result recorded without changing the aggregate verification label (outcome=PARTIAL)."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "3.1.13",
+        "latest_version": "3.1.18",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.18\\hcjohblbkdgcoikaedjndgbcgcfoojmj.3.1.18.crx",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:chrome:hcjohblbkdgcoikaedjndgbcgcfoojmj:3.1.13:b4b93887b1fb6089:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_TABS_CREATE_OPTIONS",
+            "revalidation_job_key": "chrome__hcjohblbkdgcoikaedjndgbcgcfoojmj__3.1.18__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.18\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\hcjohblbkdgcoikaedjndgbcgcfoojmj_3.1.18\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 46.438,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 4,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 7,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_TABS_CREATE_OPTIONS",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "js/background",
+                  "loc": "L2:C1550737 -> L2:C1560442",
+                  "code": "…${a}/api/get/`};p(),»chrome.runtime.onMessage.addListener((n,i,c)=>{const p=t.TS.getInstance().getConfig();if(u.info(\"onMessage\",n),\"fetch\"== …⟨tainted span: 9705 chars⟩… ),!0):\"set-first-cart-celebrated\"===n.action&&(chrome.storage.local.set({firstCartCelebrated:!0},()=>{c({ok:!0})}),!0)})«,chrome.alarms.onAla…"
+                },
+                "sink": {
+                  "kind": "CHROME_TABS_CREATE_OPTIONS",
+                  "file": "js/background",
+                  "loc": "L2:C1553168 -> L2:C1553206",
+                  "code": "…s} for cartId=${t}`);const e=new URL(`${p.site}/get/${encodeURIComponent(t)}`);return d&&e.searchParams.set(\"source\",d),»chrome.tabs.create({url:e.toString()})«,void c()}o&&(m.items=o),m.mobile=n.mobile;const y=l.getVendorByID(m.vendor);y?(chrome.storage.local.set({lastReceivedCa…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 7,
+                "sink_index": 4,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_TABS_CREATE_OPTIONS",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "js/background",
+                  "loc": "L2:C1550737 -> L2:C1560442",
+                  "code": "…${a}/api/get/`};p(),»chrome.runtime.onMessage.addListener((n,i,c)=>{const p=t.TS.getInstance().getConfig();if(u.info(\"onMessage\",n),\"fetch\"== …⟨tainted span: 9705 chars⟩… ),!0):\"set-first-cart-celebrated\"===n.action&&(chrome.storage.local.set({firstCartCelebrated:!0},()=>{c({ok:!0})}),!0)})«,chrome.alarms.onAla…"
+                },
+                "sink": {
+                  "kind": "CHROME_TABS_CREATE_OPTIONS",
+                  "file": "js/background",
+                  "loc": "L2:C1553619 -> L2:C1553685",
+                  "code": "…eive] [${y.displayName}][url=${e}][cartId=${t}]`,n,{name:y.id,tags:{type:\"vendor\",operation:\"receive\",vendor:y.id}})})):»chrome.tabs.create({url:`${p.site}/receive/${t}?source=${d||\"\"}`})«.then(async e=>{await new Promise(e=>setTimeout(e,3e3)),e.id&&(r.A.data.sacTabId=e.id),y.receive(m).catch(e=>{u.errorToS…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 13,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_TABS_CREATE_OPTIONS",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "From storage.local.set('lastReceivedCart') in js/background",
+                  "file": "js/background",
+                  "loc": "L2:C1550737 -> L2:C1560442",
+                  "code": "…${a}/api/get/`};p(),»chrome.runtime.onMessage.addListener((n,i,c)=>{const p=t.TS.getInstance().getConfig();if(u.info(\"onMessage\",n),\"fetch\"== …⟨tainted span: 9705 chars⟩… ),!0):\"set-first-cart-celebrated\"===n.action&&(chrome.storage.local.set({firstCartCelebrated:!0},()=>{c({ok:!0})}),!0)})«,chrome.alarms.onAla…"
+                },
+                "sink": {
+                  "kind": "CHROME_TABS_CREATE_OPTIONS",
+                  "file": "js/background",
+                  "loc": "L2:C1427990 -> L2:C1428037",
+                  "code": "…const{id:e}=await chrome.tabs.create({active:!1,url:t,pinned:!0});i.A.data.sacWorkerTabId=e||-1}}else{const{id:e}=await »chrome.tabs.create({active:!1,url:t,pinned:!0})«;i.A.data.sacWorkerTabId=e||-1}}else o.error(\"[Invalid or missing lastReceivedCart.id] Skipping worker redirect tab upda…"
+                },
+                "propagation_step_count": 1
+              },
+              {
+                "tool_flow_index": 13,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_TABS_CREATE_OPTIONS",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "From storage.local.set('lastReceivedCart') in js/background",
+                  "file": "js/background",
+                  "loc": "L2:C1550737 -> L2:C1560442",
+                  "code": "…${a}/api/get/`};p(),»chrome.runtime.onMessage.addListener((n,i,c)=>{const p=t.TS.getInstance().getConfig();if(u.info(\"onMessage\",n),\"fetch\"== …⟨tainted span: 9705 chars⟩… ),!0):\"set-first-cart-celebrated\"===n.action&&(chrome.storage.local.set({firstCartCelebrated:!0},()=>{c({ok:!0})}),!0)})«,chrome.alarms.onAla…"
+                },
+                "sink": {
+                  "kind": "CHROME_TABS_CREATE_OPTIONS",
+                  "file": "js/background",
+                  "loc": "L2:C1427888 -> L2:C1427935",
+                  "code": "…{try{await chrome.tabs.update(i.A.data.sacWorkerTabId,{url:t})}catch(e){}if(chrome.runtime.lastError){const{id:e}=await »chrome.tabs.create({active:!1,url:t,pinned:!0})«;i.A.data.sacWorkerTabId=e||-1}}else{const{id:e}=await chrome.tabs.create({active:!1,url:t,pinned:!0});i.A.data.sacWorke…"
+                },
+                "propagation_step_count": 1
+              }
+            ],
+            "tool_report_flow_count": 13,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "likely_unchanged",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 4,
+            "top_candidate": {
+              "tool_flow_index": 7,
+              "sink_index": 2
+            },
+            "identity_evidence": {
+              "source_context_similarity": 0.993,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 0.984,
+              "actual_sink_context_similarity": 0.995,
+              "source_remark_match": true,
+              "specific_sink_remark_match": false,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.895,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:chrome:hcjohblbkdgcoikaedjndgbcgcfoojmj:3.1.13:b4b93887b1fb6089:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

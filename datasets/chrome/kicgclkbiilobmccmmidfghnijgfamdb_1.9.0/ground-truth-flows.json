@@ -1,0 +1,210 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "kicgclkbiilobmccmmidfghnijgfamdb",
+  "version": "1.9.0",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-2d3278239b4f8172",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_TABS_CREATE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:kicgclkbiilobmccmmidfghnijgfamdb:1.9.0:06216277d31ec90e:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:kicgclkbiilobmccmmidfghnijgfamdb:1.9.0:06216277d31ec90e:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "06216277d31ec90e4ad2738ebf81bb2e3554d17dea93cb1db8c98eea9b1759f9",
+            "identity_occurrence": 1,
+            "source_report_id": 7,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "js/kodepay-script",
+              "loc": "L1:C5120 -> L1:C5121",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://kodepay.io/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/kodepay-script",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_TABS_CREATE_OPTIONS",
+              "remark": "",
+              "file": "js/background",
+              "loc": "L12:C50991 -> L12:C51110",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "js/kodepay-script",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "manual_validation_artifact",
+                  "source": "Manual",
+                  "kind": "manual_validation_artifact",
+                  "confidence": null,
+                  "detail": "手工验证确认：在 https://kodepay.io/ 页面执行 window.postMessage({code:'FOLLOW_EXPORT', insid:'<页面指定>', follow_type:'<页面指定>'}, 'https://kodepay.io') 后，js/kodepay-script.js 仅校验 origin 与 source 即转发，后台 js/background.js 在 t.code==='FOLLOW_EXPORT' 分支无进一步校验地执行 chrome.tabs.create({url:'options.html?ins='+encodeURIComponent(t.insid)+'&type='+t.follow_type...})。页面可控输入进入特权 tabs 创建，PRIVILEGE_ESCALATION 成立。"
+                },
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 0.95,
+                  "detail": "人工复测确认 kodepay.io 页面 postMessage 的 FOLLOW_EXPORT 消息使后台无校验执行 chrome.tabs.create 打开 options.html?ins=<页面指定>。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "UNCERTAIN",
+              "confidence": 0,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 7,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Verification error: Connection error.",
+              "path": "extensions/kicgclkbiilobmccmmidfghnijgfamdb_1.9.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/kicgclkbiilobmccmmidfghnijgfamdb_1.9.0/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T17:34:19.525Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/kicgclkbiilobmccmmidfghnijgfamdb/1.9.0/dynamic-evidence/flow-0",
+              "files": [
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "source-contract.json",
+                "step-after-observation.png",
+                "step-after-trigger.png",
+                "step-final-state.png",
+                "step-source-open.png",
+                "storage-after-observation.json",
+                "storage-after-observation.png",
+                "storage-after-trigger.json",
+                "storage-after-trigger.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountRateLimitExceeded', 'message': 'Requests are too frequent. Please reduce your request frequency, wait a short moment, and retry your request. Request id: 0217870259028359255aa03547266d00c3fa3dce78057f1a55797', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "UNCERTAIN",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/kicgclkbiilobmccmmidfghnijgfamdb_1.9.0/final/final_report.json",
+              "report_mtime": "2026-08-18T04:05:01.675Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "manual_validation_artifact",
+                "verdict": "TP",
+                "raw_verdict": "TP",
+                "operator": "user-provided manual validation",
+                "validated_at": "2026-09-22T00:48:16+08:00",
+                "observation": "手工验证确认：在 https://kodepay.io/ 页面执行 window.postMessage({code:'FOLLOW_EXPORT', insid:'<页面指定>', follow_type:'<页面指定>'}, 'https://kodepay.io') 后，js/kodepay-script.js 仅校验 origin 与 source 即转发，后台 js/background.js 在 t.code==='FOLLOW_EXPORT' 分支无进一步校验地执行 chrome.tabs.create({url:'options.html?ins='+encodeURIComponent(t.insid)+'&type='+t.follow_type...})。页面可控输入进入特权 tabs 创建，PRIVILEGE_ESCALATION 成立。",
+                "limitations": "记录操作者手工验证结论；本次未附截图/HAR 原始字节。",
+                "evidence_type": "operator_attestation",
+                "path": "extensions/kicgclkbiilobmccmmidfghnijgfamdb_1.9.0/dynamic/evidence/flow-0/manual/manual_validation.json"
+              },
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-22T00:48:16+08:00",
+                "notes": "人工复测确认 kodepay.io 页面 postMessage 的 FOLLOW_EXPORT 消息使后台无校验执行 chrome.tabs.create 打开 options.html?ins=<页面指定>。",
+                "report_path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/kicgclkbiilobmccmmidfghnijgfamdb_1.9.0/dynamic/evidence/flow-0/manual/manual_validation.json",
+                "report_artifact": {
+                  "path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Data/Top5000/ExPGuard-Opti/chrome/extensions/kicgclkbiilobmccmmidfghnijgfamdb_1.9.0/dynamic/evidence/flow-0/manual/manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-21T16:48:31.802Z",
+                  "entry": null
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "extension_delisted",
+        "dataset_version": "1.9.0",
+        "latest_version": null,
+        "reason": "Chrome Web Store has no public details for this ID",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,199 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "pagahecnnmjjlpoakhagcpnalaodfbkk",
+  "version": "24.2.4",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-89cb74c3c80f9ccc",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_SYNC_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:pagahecnnmjjlpoakhagcpnalaodfbkk:24.2.4:2b72dbc4b508bfeb:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:pagahecnnmjjlpoakhagcpnalaodfbkk:24.2.4:2b72dbc4b508bfeb:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "2b72dbc4b508bfebd915e707a77e96734743815daea9ead6d2a842b21eb4a3f1",
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "HIGH",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "src/content-script",
+              "loc": "L402:C61 -> L402:C70",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://*.slack.com/*",
+                      "*://mail.google.com/*",
+                      "*://inbox.google.com/*",
+                      "*://*.chatwork.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "src/content-script",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "options",
+              "file": "src/service_worker",
+              "loc": "L156:C6 -> L156:C42",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "src/content-script",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "flow_index": 0,
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "User manually confirmed the frame message updates chrome.storage.sync options."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 3,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #3 — STORAGE_POSOING (attacker → `chrome.storage.sync.set`) ### (a) Who controls the source? The source is a `window` message event received by the content script. Confirmed in `src/content-script.js`: - L503: `window.addEventListener('message', on_message, false);` — a page-origin `postMessage` reaches this isolated-world listener. - L402: `if (msg.source !== $sa_selector.contentWindow && !msg.data) return;` — this guard is **attacker-satisfiable**: a page `postM…",
+              "path": "extensions/pagahecnnmjjlpoakhagcpnalaodfbkk_24.2.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.4,
+              "reproduced": false,
+              "basis": "non_decisive",
+              "usable_for_label": false,
+              "evidence_stage": "LISTENER_READY",
+              "evidence_artifact_count": 11,
+              "reasoning": "The exact static sink recorded a call, but the controlled marker/beacon was not observed in its security-relevant argument. Semantic-fixture non-observation (PARTIAL) cannot rebut the original extension boundary.",
+              "notes": "sinkTapKey=storage.sync.set sourceBridgeReached=false",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\pagahecnnmjjlpoakhagcpnalaodfbkk_24.2.4\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-23T02:49:05.902Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\pagahecnnmjjlpoakhagcpnalaodfbkk_24.2.4\\dynamic\\evidence\\flow-0",
+              "files": [
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "source-contract.json",
+                "step-after-observation.png",
+                "step-after-trigger.png",
+                "step-final-state.png",
+                "step-source-open.png",
+                "storage-after-observation.json",
+                "storage-after-observation.png",
+                "storage-after-trigger.json",
+                "storage-after-trigger.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountRateLimitExceeded', 'message': 'Requests are too frequent. Please reduce your request frequency, wait a short moment, and retry your request. Request id: 021787026031489b566464da517b102b4cb09cdfd60e7ee1f5bc6', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/pagahecnnmjjlpoakhagcpnalaodfbkk_24.2.4/final/final_report.json",
+              "report_mtime": "2026-08-18T04:07:10.25Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-23T02:49:05.902Z",
+                "notes": "User manually confirmed the frame message updates chrome.storage.sync options.",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\pagahecnnmjjlpoakhagcpnalaodfbkk_24.2.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\pagahecnnmjjlpoakhagcpnalaodfbkk_24.2.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-23T02:49:05.902Z",
+                  "sha256": "dae4a7cfd2e36e32a972bbbbe15d57b3dbe83ca100b3731ce581fa4676357495"
+                }
+              }
+            ],
+            "notes": [
+              "Latest manual attestation overrides the aggregate label while preserving the automated outcome for audit."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "24.2.4",
+        "latest_version": "24.2.4",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

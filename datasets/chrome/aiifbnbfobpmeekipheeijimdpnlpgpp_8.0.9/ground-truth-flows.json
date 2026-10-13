@@ -1,0 +1,152 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "aiifbnbfobpmeekipheeijimdpnlpgpp",
+  "version": "8.0.9",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-fd7c6c144c5016ca",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "DoubleX"
+      ],
+      "match_region": "DoubleX only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:aiifbnbfobpmeekipheeijimdpnlpgpp:8.0.9:ca0e4818f5a3acdc:01",
+          "flow": {
+            "flow_id": "doublex:chrome:aiifbnbfobpmeekipheeijimdpnlpgpp:8.0.9:ca0e4818f5a3acdc:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "ca0e4818f5a3acdccc91cade5032b6aa36a14223ac9d7d21e891df957a1dd619",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L11642",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "browser.storage.local.set",
+              "file": "content_scripts.js",
+              "loc": "L11720",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": false,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification": "TP",
+            "dynamic": false,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_chrome_r2_user_manual",
+                  "source": "Manual",
+                  "kind": "doublex_chrome_r2_user_manual",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证为 TP：页面消息可写入 Station Wallet 本地存储状态。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\aiifbnbfobpmeekipheeijimdpnlpgpp_8.0.9\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "report_sha256": "4146257a7c7aae94dfcb3fdaa44787935ef7eddee3bc8a0382cf70b3256568d5"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Decision ledger\n\n**(a) Who controls the source — CONFIRMED attacker-controllable.**\nThe real bundle file is `contentScript.js` (the report's `content_scripts.js` with L11642/L11720 is not present in the unpacked extension; line numbers are an artifact, but the logical code exists). In `setupStationProvider()` at L9947:\n\n```js\nwindow.addEventListener(\"message\", (event) => {\n  if (!event.data || !event.data.uuid) return\n  ...\n  if (event.origin !== origin) { ... return }   // origin = window.location.origin\n  const { sender, type, data, uuid } = event.data\n  if (sender !== \"web\") return\n  ...\n})\n```\n\nThe content script runs on `<all_urls>` at `document_start` in `all_frames`. Any page can `window.postMessage(...)` to itself, so:\n- `event.data.uuid` is page-supplied → passes.\n- `event.origin === window.location.origin` → the page posting to itself trivially passes the origin check.\n- `sender === \"web\"` is a page-chosen field → passes.\n- `type` and `data` are page-chosen.\n\nNone of these are authentication. Source is genuinely untrusted.\n\n**(b) Source-to-sink path — UNBROKEN data flow.**\nFor `type` of `\"sign\"`, `\"post\"`, or `\"switch-network\"` (L10159–10169), the handler calls `data &",
+              "path": "extensions/aiifbnbfobpmeekipheeijimdpnlpgpp_8.0.9/static/static_report.json"
+            },
+            "dynamic_detail": null,
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "doublex_chrome_r2_user_manual",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-23T17:37:02.188711Z",
+                "notes": "人工验证为 TP：页面消息可写入 Station Wallet 本地存储状态。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\aiifbnbfobpmeekipheeijimdpnlpgpp_8.0.9\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\aiifbnbfobpmeekipheeijimdpnlpgpp_8.0.9\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-23T17:37:02.188711Z",
+                  "sha256": "4146257a7c7aae94dfcb3fdaa44787935ef7eddee3bc8a0382cf70b3256568d5"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX Chrome r2 manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "8.0.9",
+        "latest_version": "8.0.9",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

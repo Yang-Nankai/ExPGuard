@@ -1,0 +1,348 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "nligaijmpjfocilngmacfhfifakkmcgj",
+  "version": "3.01",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-07e6d035e7e5669b",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "XML_HTTP_REQUEST_OPEN",
+      "matched_tools": [
+        "CoCo"
+      ],
+      "match_region": "CoCo only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:nligaijmpjfocilngmacfhfifakkmcgj:3.01:a091c3cc29cf5d9a:01",
+          "flow": {
+            "flow_id": "coco:chrome:nligaijmpjfocilngmacfhfifakkmcgj:3.01:a091c3cc29cf5d9a:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "a091c3cc29cf5d9a9a84da824abe73ed7a11036a7c76abf3b9b5eedc6547a9ea",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "coco-request_forgery",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "CoCo source evidence",
+              "file": "background.js",
+              "loc": "L24:C1 -> L24:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN",
+                  "constraint": {
+                    "matches": [
+                      "*://vm1/*",
+                      "*://h1.dev.akkamal.kz/*",
+                      "*://www.e-security.kz/*",
+                      "https://ib.bcc.kz/*",
+                      "*://starbanking.kz/*",
+                      "*://m.bcc.kz/*",
+                      "*://m10.bcc.kz/*",
+                      "*://bcctrade.kz/*",
+                      "*://*.bcc.kz/*",
+                      "*://*.bank.corp.centercredit.kz/*",
+                      "*://*.bcctest.kz/*",
+                      "http://sdo.1cb.kz/*",
+                      "https://sdossl.1cb.kz/*",
+                      "http://dev.akkamal.kz/*",
+                      "https://*.halykbank.kz/*",
+                      "https://*.myhalyk.kz/*",
+                      "https://myhalyk.kz/*",
+                      "https://172.16.124.113/*",
+                      "https://195.200.74.218/*",
+                      "https://service.mysign.kz/*",
+                      "*://service.docus.kz/*",
+                      "*://eabr.org/*",
+                      "*://*.eabr.org/*",
+                      "*://essmain/*",
+                      "*://essback/*",
+                      "*://ess3/*",
+                      "http://127.0.0.1/*",
+                      "http://localhost/*",
+                      "https://127.0.0.1/*",
+                      "https://localhost/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "background.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "XML_HTTP_REQUEST_OPEN",
+              "remark": "CoCo sink evidence",
+              "file": "background.js",
+              "loc": "L106:C1 -> L106:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "background.js",
+              "message_sender_provenance": "UNKNOWN",
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "coco_dynamic",
+                  "verdict": "TP",
+                  "confidence": 1,
+                  "detail": "The privileged sink is driven by chrome.runtime native messaging, which requires an OS-installed native host that is absent from the isolated environment.",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": "external_condition_required",
+                  "report_path": "extensions/nligaijmpjfocilngmacfhfifakkmcgj_3.01/dynamic/dynamic_report.json"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — REQUEST_FORGERY via `onMessageExternal` → `XMLHttpRequest.open`\n\n### Decision ledger\n\n**(a) Who controls the source?**\nThe source is `chrome.runtime.onMessageExternal.addListener(...)` at `background.js:8`. The `sender` parameter is never inspected — there is **no `sender.id` allowlist, no `sender.origin`/`sender.url` check**, and the manifest's `externally_connectable.matches` is a domain restriction only (not an unforgeable trust boundary). Any page matching `*://*.bcc.kz/*`, `https://ib.bcc.kz/*`, `*://*.bank.corp.centercredit.kz/*`, etc., can invoke this listener. Per the harness, a fixed-domain `externally_connectable` match is exploitable via XSS on those domains, and here there isn't even a runtime origin check. So `request[\"arg\"]` is genuinely attacker-controllable. ✅\n\n**(b) Source→sink path (unbroken?):**\n`background.js:24` `sendHttpRequestToLS(request[\"arg\"], sendResponse)` → `sendHttpRequestToLS(reqObj, ...)` at `background.js:100` → `reqObj.url` reaches `background.js:106` (`re.test(reqObj.url)`) and `background.js:113` (`httpReq.open(\"POST\", reqObj.url)`). No reassignment, no constant overwrite. The path is direct and unbroken. ✅\n\n**(c) Whi",
+              "path": "extensions/nligaijmpjfocilngmacfhfifakkmcgj_3.01/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 1,
+              "reproduced": false,
+              "basis": "external_condition_required",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 3,
+              "reasoning": "The privileged sink is driven by chrome.runtime native messaging, which requires an OS-installed native host that is absent from the isolated environment.",
+              "path": "extensions/nligaijmpjfocilngmacfhfifakkmcgj_3.01/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T04:54:36.212712Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": null,
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: EXTERNAL_CONDITION_REQUIRED; final_verdict=TRUE_POSITIVE."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "3.01",
+        "latest_version": "3.01",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-d6cfd4b034e91644",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "XML_HTTP_REQUEST_SEND",
+      "matched_tools": [
+        "CoCo"
+      ],
+      "match_region": "CoCo only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:nligaijmpjfocilngmacfhfifakkmcgj:3.01:6f22f726a53b3ca1:01",
+          "flow": {
+            "flow_id": "coco:chrome:nligaijmpjfocilngmacfhfifakkmcgj:3.01:6f22f726a53b3ca1:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "6f22f726a53b3ca1901e4a30cc1e7568a16be354da09a2e02d22759a2f8eeb81",
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "coco-request_forgery",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "CoCo source evidence",
+              "file": "background.js",
+              "loc": "L24:C1 -> L24:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN",
+                  "constraint": {
+                    "matches": [
+                      "*://vm1/*",
+                      "*://h1.dev.akkamal.kz/*",
+                      "*://www.e-security.kz/*",
+                      "https://ib.bcc.kz/*",
+                      "*://starbanking.kz/*",
+                      "*://m.bcc.kz/*",
+                      "*://m10.bcc.kz/*",
+                      "*://bcctrade.kz/*",
+                      "*://*.bcc.kz/*",
+                      "*://*.bank.corp.centercredit.kz/*",
+                      "*://*.bcctest.kz/*",
+                      "http://sdo.1cb.kz/*",
+                      "https://sdossl.1cb.kz/*",
+                      "http://dev.akkamal.kz/*",
+                      "https://*.halykbank.kz/*",
+                      "https://*.myhalyk.kz/*",
+                      "https://myhalyk.kz/*",
+                      "https://172.16.124.113/*",
+                      "https://195.200.74.218/*",
+                      "https://service.mysign.kz/*",
+                      "*://service.docus.kz/*",
+                      "*://eabr.org/*",
+                      "*://*.eabr.org/*",
+                      "*://essmain/*",
+                      "*://essback/*",
+                      "*://ess3/*",
+                      "http://127.0.0.1/*",
+                      "http://localhost/*",
+                      "https://127.0.0.1/*",
+                      "https://localhost/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "background.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "XML_HTTP_REQUEST_SEND",
+              "remark": "CoCo sink evidence",
+              "file": "background.js",
+              "loc": "L130:C1 -> L130:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "background.js",
+              "message_sender_provenance": "UNKNOWN",
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "coco_dynamic",
+                  "verdict": "TP",
+                  "confidence": 1,
+                  "detail": "The privileged sink is driven by chrome.runtime native messaging, which requires an OS-installed native host that is absent from the isolated environment.",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": "external_condition_required",
+                  "report_path": "extensions/nligaijmpjfocilngmacfhfifakkmcgj_3.01/dynamic/dynamic_report.json"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 2,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence to decide. Let me verify the exact source and sink anchors and the full function are consistent.\n\nThe report evidence matches the raw source:\n\n- **Source** (background.js L8–24): `chrome.runtime.onMessageExternal.addListener(...)` handles messages from web pages. When `request[\"command\"] === \"sendToLs\"`, it calls `sendHttpRequestToLS(request[\"arg\"], sendResponse)`. So `request[\"arg\"]` is a fully web-controlled object (the page sends `{command, arg}`).\n- **Path**: `request[\"arg\"]` becomes the `reqObj` parameter of `sendHttpRequestToLS` (L100). No modification of `reqObj.data` occurs between L24 and L130.\n- **Sink** (L130): `httpReq.send(reqObj.data)` — `reqObj.data` is placed directly into the XMLHttpRequest POST body. The only sanitization is on `reqObj.url` (L105–110), which restricts the destination to `http://localhost:1033x/` or `http://127.0.0.1:1033x/`; the *body* (`reqObj.data`) is not validated, encoded, or constrained.\n\nDecision ledger:\n1. **Source control**: `onMessageExternal` is reachable from the `externally_connectable.matches` web origins (`*://*.bcc.kz/*`, `https://*.halykbank.kz/*`, etc.). Those are web origins, and a page (or XSS on any of t",
+              "path": "extensions/nligaijmpjfocilngmacfhfifakkmcgj_3.01/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 1,
+              "reproduced": false,
+              "basis": "external_condition_required",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 3,
+              "reasoning": "The privileged sink is driven by chrome.runtime native messaging, which requires an OS-installed native host that is absent from the isolated environment.",
+              "path": "extensions/nligaijmpjfocilngmacfhfifakkmcgj_3.01/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T04:54:36.212712Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": null,
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: EXTERNAL_CONDITION_REQUIRED; final_verdict=TRUE_POSITIVE."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "3.01",
+        "latest_version": "3.01",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

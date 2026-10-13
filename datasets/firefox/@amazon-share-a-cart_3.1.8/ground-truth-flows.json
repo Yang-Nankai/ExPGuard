@@ -1,0 +1,392 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "firefox",
+  "extension_id": "@amazon-share-a-cart",
+  "version": "3.1.8",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-2c5beb5dd4431367",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_TABS_CREATE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:@amazon-share-a-cart:3.1.8:8564cfeb9252a74c:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:@amazon-share-a-cart:3.1.8:8564cfeb9252a74c:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "8564cfeb9252a74cb50933a1af4c58bade823ec895067a61e51569809f1696ed",
+            "semantic_key": {
+              "rule_id": "attacker-input-privileged-operation",
+              "flow_type": "PRIVILEGE_ESCALATION",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_file": "js/sac",
+              "source_loc": "15261551",
+              "source_frame": "CS_1",
+              "sink_type": "CHROME_TABS_CREATE_OPTIONS",
+              "sink_file": "js/background",
+              "sink_loc": "2140750021407566",
+              "sink_frame": "BG_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "rule_description": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+            "severity": "HIGH",
+            "severity_reason": "Wildcard subdomain matching is allowed.",
+            "severity_evidence": [
+              "https://*.share-a-cart.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "js/sac",
+              "loc": "L1:C526 -> L1:C551",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.share-a-cart.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/sac",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://*.share-a-cart.com/*"
+                ]
+              },
+              "code_preview": "unction i(e,t,n){ret>>>urn t&&r(e.prototype,t),n<<<&&r(e,n),Object.defi"
+            },
+            "sink": {
+              "type": "CHROME_TABS_CREATE_OPTIONS",
+              "remark": null,
+              "file": "js/background",
+              "loc": "L2:C1407500 -> L2:C1407566",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "\",vendor:y.id}})})):>>>chrome.tabs.create({url:`${u.site}/receive/${t}?source=${p||\"\"}`})<<<.then(async e=>{awai"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "js/sac",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[js/sac->js/background]",
+              "storage_area": null
+            },
+            "verification": "TP",
+            "dynamic": false,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": null,
+            "dynamic_detail": null,
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user-provided manual validation",
+              "validated_at_utc": "2026-09-22T14:39:11.083860Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user as a manual validation result. No screenshot or HAR bytes were supplied with this conversation."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_report",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-22T14:39:11.083860Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "3.1.8",
+        "latest_version": "3.1.8",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-b90b1290eb3af111",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "FETCH_RESOURCE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:@amazon-share-a-cart:3.1.8:fcd1a03c096d23e5:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:@amazon-share-a-cart:3.1.8:fcd1a03c096d23e5:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "fcd1a03c096d23e5b72c6d0ba80cfbcc6959af5e3dd9c92c679c712aa43d387e",
+            "semantic_key": {
+              "rule_id": "attacker-input-network-send",
+              "flow_type": "REQUEST_FORGERY",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_file": "js/sac",
+              "source_loc": "15261551",
+              "source_frame": "CS_1",
+              "sink_type": "FETCH_RESOURCE",
+              "sink_file": "js/background",
+              "sink_loc": "2140697121407012",
+              "sink_frame": "BG_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "rule_description": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+            "severity": "HIGH",
+            "severity_reason": "Wildcard subdomain matching is allowed.",
+            "severity_evidence": [
+              "https://*.share-a-cart.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "js/sac",
+              "loc": "L1:C526 -> L1:C551",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.share-a-cart.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/sac",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://*.share-a-cart.com/*"
+                ]
+              },
+              "code_preview": "unction i(e,t,n){ret>>>urn t&&r(e.prototype,t),n<<<&&r(e,n),Object.defi"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "js/background",
+              "loc": "L2:C1406971 -> L2:C1407012",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "FULL",
+              "code_preview": "/(GET|SHARE)\\//,\"\"),>>>fetch(r.A.data.get+encodeURIComponent(t))<<<.then(e=>e.json()).t"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "js/sac",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[js/sac->js/background]",
+              "storage_area": null
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": true,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I traced the full bridge and confirmed the data path with the primary evidence plus the raw anchors.\n\n## Decision ledger\n\n**(a) Who controls the source?**\nA page loaded in the content-script origin. The manifest injects `js/sac.js` into `https://*.share-a-cart.com/*` at `document_start`, all frames, isolated world. The content script registers:\n\n```js\nwindow.addEventListener(\"message\", e => {\n  if (e.source === window && e.data && \"from-page-script\" === e.data.direction) {\n    const {action} = e.data.message;\n    if (\"load-cart-from-site\" === action) {\n      const {vendor, cartId, cartItems, sourceParam} = e.data.message;\n      (vendor === SAC_FLAVOR || \"everything\" === vendor && \"sac\" === SAC_FLAVOR)\n        && chrome.runtime.sendMessage({action:\"receive-cart\", id:cartId, cartItems, sourceParam});\n    }\n    ...\n```\n\n`e.source === window`, the `direction` field, `action`, and `vendor` are all page-forgeable fields — no authentication. For this Amazon flavor, `SAC_FLAVOR === \"amazon\"`, so the attacker merely sets `vendor:\"amazon\"`. `cartId` is fully page-controlled.\n\n**(b) Source→sink path**\nPage `cartId` → content script `id` → `chrome.runtime.sendMessage({action:\"receive-cart\", id",
+              "dynamic_guidance": {
+                "triggerable": false,
+                "trigger_mechanism": "OTHER",
+                "injection_context": "",
+                "origin_requirement": "",
+                "trigger_surface": "",
+                "target_urls": [],
+                "payload_sketch": "",
+                "dom_forgery": "",
+                "beacon_pointable": false,
+                "beacon_param": "",
+                "observation": "",
+                "notes": ""
+              },
+              "path": "extensions/@amazon-share-a-cart_3.1.8/static/static_report.json",
+              "report_mtime": "2026-08-14T16:22:03.569Z"
+            },
+            "dynamic_detail": {
+              "outcome": "SINK_NOT_FIRED",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0.85,
+              "reproduced": false,
+              "basis": null,
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 3,
+              "reasoning": "A message reached the background (some instrumented sink fired), but the exact static sink did not execute under any contract candidate — a real rebuttal of the static routing.",
+              "evidence": "source-contract={\"surface\": \"WINDOW_MESSAGE\", \"sourcePath\": \"js/sac.js\", \"location\": \"L1:C526 -> L1:C551\", \"eventNames\": [], \"eventTarget\": \"window\", \"eventDetailKey\": \"data\", \"envelope\": {}, \"forwardField\": \"\", \"requirements\": {\"direction\": \"from-page-script\"}, \"selectors\": [], \"mediaTags\": [], \"snippet\": \"const getSACFlavor=()=>{const{name:e}=chrome.runtime.getManifest();return e.endsWith(\\\"Amazon\\\")?\\\"amazon\\\":e.endsWith(\\\"Walmart\\\")?\\\"walmart\\\":e.endsWith(\\\"AliExpress\\\")?\\\"aliexpress\\\":e.endsWith(\\\"Instacart\\\")?\\\"instacart\\\":\\\"sac\\\"},getSACVersion=()=>{const{version:e}=chrome.runtime.getManifest();return e},SAC_VERSION=getSACVersion(),SAC_FLAVOR=getSACFlavor();window.addEventListener(\\\"load\\\",()=>{const{pathname:e}=document.location;let t=\\\"\\\";try{t=chrome.runtime.id?chrome.runtime.id:\\\"\\\"}catch(e){}if(window.addEventListener(\\\"message\\\",e=>{if(e.source===window&&e.data&&\\\"from-page-script\\\"===e.data.direction){const{action:s}=e.data.message;if(\\\"load-cart-from-site\\\"===s){const{vendor:t,cartId:s,cartItems:r,sourceParam:o}=e.data.message;(t===SAC_FLAVOR||\\\"everything\\\"===t&&\\\"sac\\\"===SAC_FLAVOR)&&chrome.runtime.sendMessage({action:\\\"receive-cart\\\",id:s,cartItems:r,sourceParam:o})}else\\\"import-start-from-sac-plus-web\\\"===s?c\", \"notes\": [\"已从 source/sink 附近提取字面量分支。\", \"已从 sink 文件推导消息分发字段 `action` 及候选值。\", \"已从 sink 调用推导 URL 承载字段 `url`。\"], \"discriminatorField\": \"action\", \"discriminatorValues\": [\"fetch\", \"create-cart\", \"get-rater\", \"get-current-cart\", \"get-last-saved-cart\", \"get-vendor-for-tab\", \"get-vendor-map\", \"receive-cart\"], \"urlField\": \"url\", \"sinkTapKey\": \"fetch\", \"messageAlias\": \"n\", \"messageEventKey\": \"\", \"jsonMessageField\": \"\", \"sinkDataFields\": [\"direction\", \"message\"]}\nsink-tap={\"sink_type\": \"all\", \"result\": \"{\\\"keys\\\":[\\\"action.setIcon\\\"],\\\"data\\\":{\\\"__fetch__\\\":true,\\\"__xhr__\\\":true,\\\"__function__\\\":true,\\\"__eval__\\\":true,\\\"__storage_local_set__\\\":true,\\\"__storage_sync_set__\\\":true,\\\"__storage_onChanged__\\\":true,\\\"__cookies_set__\\\":true,\\\"__tabs_create__\\\":true,\\\"__tabs_update__\\\":true,\\\"__tabs_remove__\\\":true,\\\"__tabs_sendMessage__\\\":true,\\\"__windows_create__\\\":true,\\\"__windows_update__\\\":true,\\\"__windows_remove__\\\":true,\\\"__action_setBadgeText__\\\":true,\\\"__action_setTitle__\\\":true,\\\"__action_setIcon__\\\":true,\\\"__runtime_sendMessage__\\\":true,\\\"action.setIcon\\\":[{\\\"ts\\\":1786967090768,\\\"arg\\\":{\\\"redacted\\\":true,\\\"length\\\":37}},{\\\"ts\\\":1786967091221,\\\"arg\\\":{\\\"redacted\\\":true,\\\"length\\\":37}},{\\\"ts\\\":1786967091247,\\\"arg\\\":{\\\"redacted\\\":true,\\\"length\\\":37}},{\\\"ts\\\":1786967091663,\\\"arg\\\":{\\\"redacted\\\":true,\\\"length\\\":37}},{\\\"ts\\\":1786967091705,\\\"arg\\\":{\\\"redacted\\\nbeacon={\"token\": \"expa_8e8fb4f04d47\", \"hit\": false, \"count\": 0, \"hits\": []}",
+              "path": "extensions/@amazon-share-a-cart_3.1.8/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T11:45:06.427Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.55,
+              "reasoning": "Final ReAct did not provide verifiable source-code evidence: Final ReAct/extraction error: Request timed out.",
+              "evidence_summary": "Final ReAct did not provide verifiable source-code evidence: Final ReAct/extraction error: Request timed out.",
+              "conflict_resolution": "Strict final decision table applied.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "SINK_NOT_FIRED",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "fallback_insufficient_evidence",
+              "usable_for_label": true,
+              "path": "../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/firefox/extensions/@amazon-share-a-cart_3.1.8/final-verified-v2/final_report.json",
+              "report_mtime": "2026-08-20T13:22:20.139Z"
+            },
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user-provided manual validation",
+              "validated_at_utc": "2026-09-22T14:39:11.083860Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user as a manual validation result. No screenshot or HAR bytes were supplied with this conversation."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_report",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-22T14:39:11.083860Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "3.1.8",
+        "latest_version": "3.1.8",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

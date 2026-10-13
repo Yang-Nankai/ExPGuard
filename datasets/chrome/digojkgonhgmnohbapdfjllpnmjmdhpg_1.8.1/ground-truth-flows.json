@@ -1,0 +1,206 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "digojkgonhgmnohbapdfjllpnmjmdhpg",
+  "version": "1.8.1",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-6426b45222283fca",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_TABS_CREATE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:digojkgonhgmnohbapdfjllpnmjmdhpg:1.8.1:1e1307d2151c11cc:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:digojkgonhgmnohbapdfjllpnmjmdhpg:1.8.1:1e1307d2151c11cc:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "1e1307d2151c11cc3a2ada9d294c938b516e43a5093dc1c90d675a5581d20ef0",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "HIGH",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content-script",
+              "loc": "L61:C9 -> L61:C19",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.proctorexam.com/check_requirements/*",
+                      "https://*.proctorexam.com/student_sessions/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content-script",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_TABS_CREATE_OPTIONS",
+              "remark": "",
+              "file": "background-script",
+              "loc": "L72:C4 -> L72:C42",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content-script",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "confidence": 0.95,
+                  "detail": "dynamic_outcome=CONFIRMED; runtime prefix message reached port openTab; sinkTapKey=tabs.create"
+                },
+                {
+                  "tier": "expagent_final",
+                  "source": "ExPAgent",
+                  "kind": "final_report",
+                  "verdict": "TP",
+                  "confidence": 0.6,
+                  "detail": "Static phase is the strongest available completed review. Final ReAct/extraction error: Request timed out."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — WINDOW_MESSAGE_EVENT → chrome.tabs.create({url: payload.url}) ### (a) Who controls the source Untrusted **web page content**. The content script registers `window.addEventListener('message', messageHandler)` at `content-script.js:17`. It runs on `https://*.proctorexam.com/check_requirements/*` and `https://*.proctorexam.com/student_sessions/*` with `allFrames: true`. Any script executing in the page context on one of those origins (the exam page, a wildcard-m…",
+              "path": "extensions/digojkgonhgmnohbapdfjllpnmjmdhpg_1.8.1/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/digojkgonhgmnohbapdfjllpnmjmdhpg_1.8.1/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T17:12:05.593Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/chrome/digojkgonhgmnohbapdfjllpnmjmdhpg/1.8.1/dynamic-evidence/flow-0",
+              "files": [
+                "evidence-card.png",
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "source-contract.json",
+                "step-after-observation.png",
+                "step-after-trigger.png",
+                "step-source-open.png",
+                "storage-after-observation.json",
+                "storage-after-observation.png",
+                "storage-after-trigger.json",
+                "storage-after-trigger.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Request timed out.",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "aligned",
+              "usable_for_label": true,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/digojkgonhgmnohbapdfjllpnmjmdhpg_1.8.1/final/final_report.json",
+              "report_mtime": "2026-08-18T03:51:10.701Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-21T09:51:43Z",
+                "notes": "dynamic_outcome=CONFIRMED; runtime prefix message reached port openTab; sinkTapKey=tabs.create",
+                "report_path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/dynamic-audit-round3/after-final/proctor/dynamic_report.json",
+                "report_artifact": {
+                  "path": "D:/Ph0jav7/ExtensionSecurity/ExPGuard-Ablation/ExPAgent/runs/dynamic-audit-round3/after-final/proctor/dynamic_report.json",
+                  "kind": "dynamic_report.json",
+                  "mtime": "2026-09-21T09:48:52.57Z",
+                  "entry": {
+                    "outcome": "CONFIRMED",
+                    "final_verdict": "TRUE_POSITIVE",
+                    "verdict": null,
+                    "confidence": 0.95,
+                    "reproduced": true
+                  }
+                }
+              }
+            ],
+            "notes": [],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "1.8.1",
+        "latest_version": "1.8.1",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

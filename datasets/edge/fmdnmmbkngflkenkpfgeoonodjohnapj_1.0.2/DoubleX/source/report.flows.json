@@ -1,0 +1,311 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "content_scripts.js",
+      "sourceFrame": "CS_1",
+      "sourceLoc": "L106",
+      "sourceCode": "event",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkFrame": "CS_1",
+      "sinkLoc": "L125",
+      "sinkCode": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7fea4f4ff820>, <pdg_js.node.FunctionExpression object at 0x7fea4f4ff850>)",
+      "ctx": "content",
+      "messagePassing": false,
+      "channel": null,
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    },
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "content_scripts.js",
+      "sourceFrame": "CS_1",
+      "sourceLoc": "L106",
+      "sourceCode": "event",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkFrame": "CS_1",
+      "sinkLoc": "L145",
+      "sinkCode": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7fea4f51d640>, <pdg_js.node.FunctionExpression object at 0x7fea4f51d670>)",
+      "ctx": "content",
+      "messagePassing": false,
+      "channel": null,
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "content_scripts.js",
+      "sourceFrame": "CS_1",
+      "sourceLoc": "L106",
+      "sourceCode": "event",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L89",
+      "sinkCode": "fetch(https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=sanitizeLang(targetLang)&dt=t&q=encodeURIComponent(text), <pdg_js.node.ValueExpr object at 0x7fea4f32ab20>)",
+      "ctx": "background",
+      "messagePassing": true,
+      "channel": "doublex-edg",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "indirect_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "cs:direct_dangers:danger1",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L74",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x7fea4f5a5580>, 500)",
+        "sink-param1": "lastError) {\n\t\t\t// Service Worker 冷启动导致连接失败时，",
+        "sink-param2": 500,
+        "line": "74 - 74",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger2",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L125",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7fea4f4ff820>, <pdg_js.node.FunctionExpression object at 0x7fea4f4ff850>)",
+        "sink-param1": "ata.payload);\n\t\t\treturn;\n\t\t}\n\n\t\tif (event.data.t",
+        "sink-param2": "e === 'PROGRESS_UPDATE') {\n\t\t\tconst progressPayload = {\n\t\t\t\tpercent: Number(event.data.percent) || 0,\n\t\t\t\tmsg: event.data.msg || '',\n\t\t\t\tupdatedAt: new Date().toISOString()\n\t\t\t};\n\n\t\t\tchrome.sto",
+        "line": "125 - 136",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "event",
+            "line": "106 - 106",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+            "where": "event"
+          }
+        },
+        "param_id1": {
+          "received_from_wa_1": {
+            "wa": "event",
+            "line": "106 - 106",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+            "where": "event"
+          }
+        }
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger3",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L145",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7fea4f51d640>, <pdg_js.node.FunctionExpression object at 0x7fea4f51d670>)",
+        "sink-param1": "astError;\n\t\t\t\t\t});\n\t\t\t\t} catch (e) {}\n\t\t\t});\n\t\t}\n",
+        "sink-param2": "\tif (event.data.type === 'TRANSCRIPT_EXPORT_UPDATE' && event.data.payload) {\n\t\t\tconst exportPayload = {\n\t\t\t\t...event.data.payload,\n\t\t\t\tcapturedAt: new Date().toISOString()\n\t\t\t};\n\n\t\t\tchrome.storage.local.set({\n\t\t\t\techo360TranscriptExport: exportPayload\n\t\t\t}, () => {\n\t\t\t\ttry {\n\t\t\t\t\tchrome.runtime.sendMessage({\n\t\t\t\t\t\ttype: 'TRANSCRIPT_EXPORT_UPDATED',\n\t\t\t\t\t\tpayload: {\n\t\t\t\t\t\t\ttitle: exportPayload.title,\n\t\t\t\t\t\t\tcueCou",
+        "line": "145 - 161",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "event",
+            "line": "106 - 106",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+            "where": "event"
+          }
+        },
+        "param_id1": {
+          "received_from_wa_1": {
+            "wa": "event",
+            "line": "106 - 106",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+            "where": "event"
+          }
+        }
+      }
+    },
+    {
+      "id": "cs:indirect_dangers:danger1",
+      "component": "cs",
+      "category": "indirect_dangers",
+      "detected": false,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L27",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(chrome.runtime.getURL(defaults.json))",
+        "sink-param1": "chrome.runtime.getURL(defaults.json)",
+        "line": "27 - 27",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "cs:exfiltration_dangers:danger1",
+      "component": "cs",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L167",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(<pdg_js.node.ValueExpr object at 0x7fea4f8a8c40>, <pdg_js.node.FunctionExpression object at 0x7fea4f4ba550>)",
+        "sink-param1": "Chinese: true,\n\tccShowEnglish: ",
+        "sink-param2": "| 0,\n\t\t\t\t\t\t\tisTranslationComplete: !!exportPayload.isTranslationComplete\n\t\t\t\t\t\t}\n\t\t\t\t\t}, () => {\n\t\t\t\t\t\tvoid chrome.runtime.lastError;\n\t\t\t\t\t});\n\t\t\t\t} catch (e) {}\n\t\t\t});\n\t\t}\n\t}\n});\n\nloadDefaultConfig().finally(() => {\n\tchrome.storage.sync.get(DEFAULT_CONFIG, (items) => {\n\t\t// 1. 将配置作为全局变量打入主页面的 Window 环境中\n\t\tsync",
+        "line": "167 - 178",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:exfiltration_dangers:danger2",
+      "component": "cs",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L184",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(<pdg_js.node.ValueExpr object at 0x7fea4f8a8c40>, <pdg_js.node.FunctionExpression object at 0x7fea4f4db490>)",
+        "sink-param1": "Chinese: true,\n\tccShowEnglish: ",
+        "sink-param2": "ct.js');\n\t\tscript.onload = function() {\n\t\t\tthis.remove(); // 加载完后把标签移掉以保持 DOM 干净\n\t\t};",
+        "line": "184 - 187",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "background.js",
+      "sinkLoc": "L86",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x7fea4f32a7f0>, REQUEST_TIMEOUT_MS)",
+        "sink-param1": "dt=t&q=${encodeURICompon",
+        "sink-param2": "REQUEST_TIMEOUT_MS",
+        "line": "86 - 86",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger2",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "background.js",
+      "sinkLoc": "L29",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(resolve, ms)",
+        "sink-param1": "resolve",
+        "sink-param2": "ms",
+        "line": "29 - 29",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger1",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": true,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkLoc": "L89",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=sanitizeLang(targetLang)&dt=t&q=encodeURIComponent(text), <pdg_js.node.ValueExpr object at 0x7fea4f32ab20>)",
+        "sink-param1": "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=sanitizeLang(targetLang)&dt=t&q=encodeURIComponent(text)",
+        "sink-param2": "tId = setTimeout(() => controller.",
+        "line": "89 - 91",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/background.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "event",
+            "line": "106 - 106",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+            "where": "event",
+            "sent_to_wa_1": {
+              "wa": " && chrome.runtime.lastError.message?.includes('Receiving end does not exist')) {\n\t\t\t\tsetTimeout(() => forwardTranslateRequest(messageType, requestId, payload, true), 500);\n\t\t\t\treturn;\n\t\t\t}\n\n\t\t\tpostMessageToPage({\n\t\t\t\ttype: 'TRANSLATE_RESPONSE',\n\t\t\t\trequestId,\n\t\t\t\tsucce",
+              "line": "78 - 87",
+              "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+              "where": "event"
+            },
+            "sent_to_wa_2": {
+              "wa": "stError.message || 'Background translation request failed.',\n\t\t\t\terrorCode: 'TRANSLATE_RUNTIME_ERROR',\n\t\t\t\terrorCategory: 'runtime',\n\t\t\t\tretryable: false,\n\t\t\t\tstatus: 0\n\t\t\t});\n\t\t\treturn;\n\t\t}\n\n\t\tpostMessageToPage({\n\t\t\ttype: 'TRANSLATE_RESPONSE',\n\t\t\trequestId,\n\t\t\tsuccess: !!response?.success,\n\t\t\tpayload: res",
+              "line": "91 - 101",
+              "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+              "where": "event"
+            },
+            "sent_to_wa_3": {
+              "wa": " <script> 标签）\n\twindow.dispatchEvent(new Cu",
+              "line": "60 - 63",
+              "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_fmdnmmbkngflkenkpfgeoonodjohnapj_766b57edb459/dx_bm80qcug/unpacked/fmdnmmbkngflkenkpfgeoonodjohnapj.1.0.2/content_scripts.js",
+              "where": "event"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

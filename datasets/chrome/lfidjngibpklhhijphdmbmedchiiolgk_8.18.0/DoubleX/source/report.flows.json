@@ -1,0 +1,301 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L275",
+      "sourceCode": "t",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L276",
+      "sinkCode": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7fc5e1933bb0>)",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": null,
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "background.js",
+      "sinkLoc": "L263",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x7fc5e1978040>, 5000)",
+        "sink-param1": "() => {\n\t\tconsole.warn(\"No response from native hosts. Falling back to reading data.json.\"), loadConfigInForeground()\n\t}",
+        "sink-param2": 5000,
+        "line": "263 - 265",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger2",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L250",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7fc5e19d6610>)",
+        "sink-param1": "{\n\t\t\t\t\tdata: o\n\t\t\t\t}",
+        "line": "250 - 252",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger3",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_SESSION_STORAGE",
+      "sinkRemark": "chrome.storage.session.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L195",
+      "legacy": {
+        "danger": "chrome.storage.session.set",
+        "value": "chrome.storage.session.set(<pdg_js.node.ValueExpr object at 0x7fc5e1a3b0d0>)",
+        "sink-param1": "{\n\t\t\ttempConfigTabId: e.id\n\t\t}",
+        "line": "195 - 197",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger4",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "background.js",
+      "sinkLoc": "L198",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x7fc5e1a3b280>, 3000)",
+        "sink-param1": "() => {\n\t\t\tchrome.storage.session.get(\"tempConfigTabId\", e => {\n\t\t\t\te.tempConfigTabId && chrome.tabs.remove(e.tempConfigTabId, () => {\n\t\t\t\t\tchrome.storage.session.remove(\"tempConfigTabId\"), chrome.storage.local.get(\"data\", e => {\n\t\t\t\t\t\tif (e && e.data) try {\n\t\t\t\t\t\t\tvar o = JSON.parse(e.data),\n\t\t\t\t\t\t\t\tt = JSON.stringify(o);\n\t\t\t\t\t\t\tchrome.storage.local.set({\n\t\t\t\t\t\t\t\tdata: t\n\t\t\t\t\t\t\t}), console.log(\"Successfully read data from storage.\")\n\t\t\t\t\t\t} catch (e) {\n\t\t\t\t\t\t\tconsole.error(\"Invalid JSON in chrome.storage.local:\", e.message)\n\t\t\t\t\t\t} else console.warn(\"No data found in chrome.storage.local.\")\n\t\t\t\t\t})\n\t\t\t\t})\n\t\t\t})\n\t\t}",
+        "sink-param2": 3000,
+        "line": "198 - 214",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger5",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L205",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7fc5e1a56580>)",
+        "sink-param1": "{\n\t\t\t\t\t\t\t\tdata: t\n\t\t\t\t\t\t\t}",
+        "line": "205 - 207",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger6",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setInterval",
+      "sinkFile": "background.js",
+      "sinkLoc": "L153",
+      "legacy": {
+        "danger": "setInterval",
+        "value": "setInterval(<pdg_js.node.FunctionExpression object at 0x7fc5e1b216d0>, 1000)",
+        "sink-param1": "function() {\n\t\tchrome.tabs.get(e.tabId, function(e) {\n\t\t\te ? \"complete\" === e.status.toLowerCase() && (clearInterval(a), chrome.tabs.remove(e.id)) : clearInterval(a)\n\t\t})\n\t}",
+        "sink-param2": 1000,
+        "line": "153 - 157",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger7",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L276",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7fc5e1933bb0>)",
+        "sink-param1": "{\n\t\tdata: JSON.stringify(t.content)\n\t}",
+        "line": "276 - 278",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "t",
+            "line": "275 - 275",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+            "where": "t"
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.session.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L199",
+      "legacy": {
+        "danger": "chrome.storage.session.get",
+        "value": "chrome.storage.session.get(tempConfigTabId, <pdg_js.node.FunctionExpression object at 0x7fc5e1a3b520>)",
+        "sink-param1": "tempConfigTabId",
+        "sink-param2": "e => {\n\t\t\t\te.tempConfigTabId && chrome.tabs.remove(e.tempConfigTabId, () => {\n\t\t\t\t\tchrome.storage.session.remove(\"tempConfigTabId\"), chrome.storage.local.get(\"data\", e => {\n\t\t\t\t\t\tif (e && e.data) try {\n\t\t\t\t\t\t\tvar o = JSON.parse(e.data),\n\t\t\t\t\t\t\t\tt = JSON.stringify(o);\n\t\t\t\t\t\t\tchrome.storage.local.set({\n\t\t\t\t\t\t\t\tdata: t\n\t\t\t\t\t\t\t}), console.log(\"Successfully read data from storage.\")\n\t\t\t\t\t\t} catch (e) {\n\t\t\t\t\t\t\tconsole.error(\"Invalid JSON in chrome.storage.local:\", e.message)\n\t\t\t\t\t\t} else console.warn(\"No data found in chrome.storage.local.\")\n\t\t\t\t\t})\n\t\t\t\t})\n\t\t\t}",
+        "line": "199 - 213",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger2",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L201",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(data, <pdg_js.node.FunctionExpression object at 0x7fc5e1a3bd60>)",
+        "sink-param1": "data",
+        "sink-param2": "e => {\n\t\t\t\t\t\tif (e && e.data) try {\n\t\t\t\t\t\t\tvar o = JSON.parse(e.data),\n\t\t\t\t\t\t\t\tt = JSON.stringify(o);\n\t\t\t\t\t\t\tchrome.storage.local.set({\n\t\t\t\t\t\t\t\tdata: t\n\t\t\t\t\t\t\t}), console.log(\"Successfully read data from storage.\")\n\t\t\t\t\t\t} catch (e) {\n\t\t\t\t\t\t\tconsole.error(\"Invalid JSON in chrome.storage.local:\", e.message)\n\t\t\t\t\t\t} else console.warn(\"No data found in chrome.storage.local.\")\n\t\t\t\t\t}",
+        "line": "201 - 211",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger3",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "browser.storage.managed.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L38",
+      "legacy": {
+        "danger": "browser.storage.managed.get",
+        "value": "browser.storage.managed.get(host)",
+        "sink-param1": "host",
+        "line": "38 - 38",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger4",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "browser.storage.managed.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L39",
+      "legacy": {
+        "danger": "browser.storage.managed.get",
+        "value": "browser.storage.managed.get(origin)",
+        "sink-param1": "origin",
+        "line": "39 - 39",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger5",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "browser.storage.managed.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L40",
+      "legacy": {
+        "danger": "browser.storage.managed.get",
+        "value": "browser.storage.managed.get(enabled)",
+        "sink-param1": "enabled",
+        "line": "40 - 40",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger6",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "browser.storage.managed.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L41",
+      "legacy": {
+        "danger": "browser.storage.managed.get",
+        "value": "browser.storage.managed.get(protocols)",
+        "sink-param1": "protocols",
+        "line": "41 - 41",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger7",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L48",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(data, <pdg_js.node.FunctionExpression object at 0x7fc5e2256be0>)",
+        "sink-param1": "data",
+        "sink-param2": "e => {\n\t\t\t\t\tchrome.runtime.lastError ? t(new Error(chrome.runtime.lastError.message)) : o(e)\n\t\t\t\t}",
+        "line": "48 - 50",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_lfidjngibpklhhijphdmbmedchiiolgk_7963330de9aa/dx_y48nwj0d/unpacked/lfidjngibpklhhijphdmbmedchiiolgk.8.18.0/background.js",
+        "dataflow": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,254 @@
+{
+  "extension_id": "nkllpejimjknkljcbcmejbpnbcgpoecf",
+  "extension_version": "1.0.2",
+  "browser": "edge",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 4,
+  "verified_count": 3,
+  "verdicts": [
+    {
+      "flow_index": 3,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #3 — SyncFun `contentSettings.popups.set` via external message\n\n### (a) Who controls the source\nThe source is `chrome.runtime.onMessageExternal.addListener(ne)` in the background service worker (`assets/background.js-CPhEULRj.js`). Confirmed in source:\n\n```js\na.runtime.onMessage.addListener(ne);\na.runtime.onMessageExternal && a.runtime.onMessageExternal.addListener(ne);\n```\n\nThe manifest `externally_connectable.matches` is limited to `http://localhost:3000/*`, `http://bobobili.cn/*`, `https://bobobili.cn/*`. This is a browser-enforced origin restriction, not an unforgeable `sender.id` trust boundary (`authenticatedExtensionAllowlist` is `null`). Per the harness rules, restricted externally-connectable hosts reduce scope but remain exploitable via XSS/control of the companion origin, so the message body is attacker-influenceable runtime input, not trusted.\n\n### (b) Exact source-to-sink path\nThe propagation and source both confirm this chain (all in `background.js`):\n\n1. `ne(e, t, s)` receives the external message `e`; `pe(e)` is only `typeof e == \"object\" && typeof e.type == \"string\"`.\n2. `case \"syncfun-permissions-request\": { await Oe(e.payload); break }`.\n3",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "assets/background.js-CPhEULRj",
+          "reportedLoc": "L1:C15514 -> L1:C15515",
+          "resolvedFile": "assets/background.js-CPhEULRj.js",
+          "resolved": true,
+          "snippet": "L1 C15514-15515: …d,t.payload):v(o,s,t.payload)};async function ne(e,t,s){const{id:o}=t.tab;if(pe(e)){if(e.type===\"syncfun-init\"&&_(t.tab.url))return Ee(t.tab),!0;if(l.has(o)){swi…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "assets/background.js-CPhEULRj",
+          "reportedLoc": "L1:C14366 -> L1:C14441",
+          "resolvedFile": "assets/background.js-CPhEULRj.js",
+          "resolved": true,
+          "snippet": "L1 C14366-14441: …,B={async allowPopups(e){try{a.contentSettings&&a.contentSettings.popups&&await a.contentSettings.popups.set({primaryPattern:e.origins[0],setting:\"allow\"})}catch(t){console.warn(\"Failed to set popup permissions:\",t.message)}}},Oe=async…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "http://localhost:3000/*",
+            "http://bobobili.cn/*",
+            "https://bobobili.cn/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "NEEDS_SEMANTIC_CLASSIFICATION",
+          "rule": "Inspect the invoked API and the precise tainted argument before assigning a security label."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 0,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.0,
+      "reasoning": "Verification error: Connection error.",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "assets/background.js-CPhEULRj",
+          "reportedLoc": "L1:C15514 -> L1:C15515",
+          "resolvedFile": "assets/background.js-CPhEULRj.js",
+          "resolved": true,
+          "snippet": "L1 C15514-15515: …d,t.payload):v(o,s,t.payload)};async function ne(e,t,s){const{id:o}=t.tab;if(pe(e)){if(e.type===\"syncfun-init\"&&_(t.tab.url))return Ee(t.tab),!0;if(l.has(o)){swi…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "assets/background.js-CPhEULRj",
+          "reportedLoc": "L1:C15171 -> L1:C15181",
+          "resolvedFile": "assets/background.js-CPhEULRj.js",
+          "resolved": true,
+          "snippet": "L1 C15171-15181: …y{console.debug(`Requesting ${s}`);const P={...i,headers:b,signal:d};h=await fe(fetch(s,P),r)}catch(P){c.abort(),M=P.message}const ie={type:`syncfun-fetch-response${t}`,p…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "http://localhost:3000/*",
+            "http://bobobili.cn/*",
+            "https://bobobili.cn/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Verifier exception; no final semantic judgement was produced.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "UNCERTAIN",
+      "confidence": 0.0,
+      "reasoning": "Verification error: Connection error.",
+      "attacker_control": "",
+      "confirmed_path": "",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "assets/background.js-CPhEULRj",
+          "reportedLoc": "L1:C15514 -> L1:C15515",
+          "resolvedFile": "assets/background.js-CPhEULRj.js",
+          "resolved": true,
+          "snippet": "L1 C15514-15515: …d,t.payload):v(o,s,t.payload)};async function ne(e,t,s){const{id:o}=t.tab;if(pe(e)){if(e.type===\"syncfun-init\"&&_(t.tab.url))return Ee(t.tab),!0;if(l.has(o)){swi…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "assets/background.js-CPhEULRj",
+          "reportedLoc": "L1:C15171 -> L1:C15181",
+          "resolvedFile": "assets/background.js-CPhEULRj.js",
+          "resolved": true,
+          "snippet": "L1 C15171-15181: …y{console.debug(`Requesting ${s}`);const P={...i,headers:b,signal:d};h=await fe(fetch(s,P),r)}catch(P){c.abort(),M=P.message}const ie={type:`syncfun-fetch-response${t}`,p…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "http://localhost:3000/*",
+            "http://bobobili.cn/*",
+            "https://bobobili.cn/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Verifier exception; no final semantic judgement was produced.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 3 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 2 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

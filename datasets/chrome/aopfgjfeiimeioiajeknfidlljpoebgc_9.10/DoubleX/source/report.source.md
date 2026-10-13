@@ -1,0 +1,18 @@
+# DoubleX / ExPGuard aligned flow report
+
+- Extension: `aopfgjfeiimeioiajeknfidlljpoebgc.9.10`
+- Status: `success`
+- Duration: `90735.322ms`
+- Flows: `3`
+
+## Flow 1 — PRIVILEGE_ESCALATION
+
+`WINDOW_MESSAGE_EVENT` (L3237) → `CHROME_TABS_CREATE_OPTIONS` (L14)
+
+## Flow 2 — PRIVILEGE_ESCALATION
+
+`WINDOW_MESSAGE_EVENT` (L3237) → `CHROME_TABS_CREATE_OPTIONS` (L21)
+
+## Flow 3 — PRIVILEGE_ESCALATION
+
+`WINDOW_MESSAGE_EVENT` (L3237) → `CHROME_WINDOWS_UPDATE_OPTIONS` (L66)

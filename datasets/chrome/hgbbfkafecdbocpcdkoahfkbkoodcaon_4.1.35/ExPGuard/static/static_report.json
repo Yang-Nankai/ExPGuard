@@ -1,0 +1,109 @@
+{
+  "extension_id": "hgbbfkafecdbocpcdkoahfkbkoodcaon",
+  "extension_version": "4.1.35",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — `onMessageExternal` → `fetch(message.url)`\n\n### 1. Who controls the source?\n**Any webpage** (plus any extension). The source is `chrome.runtime.onMessageExternal.addListener` registered at `compiledBackgroundScript.js:1597` inside `listenToExternalMessages`. The manifest sets `externally_connectable.matches: [\"<all_urls>\"]`, so any page on any origin can send a message to the extension.\n\n### 2. Exact source-to-sink path\nFrom the propagation report and confirmed in raw source:\n\n- `L1539`: `const listenerFunction = async (message, sender, sendResponse) => {...}`\n- `L1549`: `if (message.action === \"get-image-data\") {` — **attacker-satisfiable** (the action string is supplied by the sender)\n- `L1551`: `const response = await fetch(message.url);` — the tainted `message.url` is the **full URL** consumed by `fetch`\n- `L1552-1554`: the response body is converted to base64 and returned via `sendResponse(base64)`\n\nThere is no sanitization, URL-scheme validation, allow-list, or constant replacement between `message.url` and the fetch argument.\n\n### 3. Which security-relevant argument is attacker-controlled?\nThe full fetch URL. This is not a constant, not browser-d",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "AUTHENTICATED_EXTENSION_IPC",
+          "browserFacts": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised)."
+        },
+        "sourceAnchor": {
+          "reportedFile": "compiledBackgroundScript",
+          "reportedLoc": "L1541:C12 -> L1541:C19",
+          "resolvedFile": "compiledBackgroundScript.js",
+          "resolved": true,
+          "snippet": "L1541 C12-19:         if (message.action === constants_1.MS_RESTART_ACTION) {"
+        },
+        "sinkAnchor": {
+          "reportedFile": "compiledBackgroundScript",
+          "reportedLoc": "L1551:C39 -> L1551:C57",
+          "resolvedFile": "compiledBackgroundScript.js",
+          "resolved": true,
+          "snippet": "L1551 C39-57:                 const response = await fetch(message.url);"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "<all_urls>"
+          ]
+        },
+        "authenticatedExtensionAllowlist": {
+          "class": "PA_PARTIAL_TRUSTED_IPC",
+          "reason": "The privileged path is reachable only from a fixed, browser-authenticated extension sender ID. It is not reachable by an ordinary webpage, but remains partially available to the trusted companion/peer extension (or if that peer is compromised).",
+          "sourceType": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+          "boundaryType": "FIXED_SENDER_ID_ALLOWLIST",
+          "codeEvidence": [
+            {
+              "file": "compiledBackgroundScript.js",
+              "fixedExtensionIds": [
+                "hgbbfkafecdbocpcdkoahfkbkoodcaon"
+              ],
+              "senderIdCheck": false,
+              "allowlistCue": true,
+              "fixedRecipient": false
+            }
+          ],
+          "manifestExtensionIds": [],
+          "manifestIdsOnly": false
+        },
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

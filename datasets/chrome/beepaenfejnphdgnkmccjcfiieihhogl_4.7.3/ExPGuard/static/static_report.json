@@ -1,0 +1,417 @@
+{
+  "extension_id": "beepaenfejnphdgnkmccjcfiieihhogl",
+  "extension_version": "4.7.3",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "flow_count": 5,
+  "verified_count": 5,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: # Verification — Flow #1 (STORAGE_POISONING, attacker-input → storage write)\n\n## Deterministic harness / anchor checks\n- Source anchor resolved to `js/sw.js`: `chrome.runtime.onMessageExternal.addListener((e,t,s)=>(e&&(e.message?\"version\"===e.message&&s({version:...}):e.apiKey&&chrome.storage.local.set({apiKey:e.apiKey})),!0))`.\n- Sink anchor resolved to `js/content.js`: inside `clearOldUserProfiles()` → `chrome.storage.local.set({extVersion:chrome.runtime.getManifest().version,apiKey:t},()=>{})` where `let t=e.apiKey;` comes from `chrome.storage.local.get([\"userProfiles\",\"extVersion\",\"apiKey\"])`.\n- Manifest: `externally_connectable.matches: [\"https://*.checkvisaslots.com/*\"]` (wildcard subdomain), no `sender.id` check anywhere (`search_code \"sender\\.id\"` → NO MATCHES).\n\n## Four-part decision ledger\n**(a) Who controls the source.** The external-message handler takes `e.apiKey` verbatim from any page origin matching `https://*.checkvisaslots.com/*`. There is *no* `sender.id`/origin guard inside the listener (the `t` sender arg is unused). The wildcard subdomain broadens the surface to any subdomain (takeover / XSS / any host under that registrable domain). Provenance `UNTRUSTED_STOR",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/sw",
+          "reportedLoc": "L1:C675 -> L1:C676",
+          "resolvedFile": "js/sw.js",
+          "resolved": true,
+          "snippet": "L1 C675-676: …}]).catch(console.log)}),chrome.runtime.onMessageExternal.addListener((e,t,s)=>(e&&(e.message?\"version\"===e.message&&s({version:chrome.runtime.getManifest().vers…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js/content",
+          "reportedLoc": "L1:C1005 -> L1:C1096",
+          "resolvedFile": "js/content.js",
+          "resolved": true,
+          "snippet": "L1 C1005-1096: …t(chrome.runtime.getManifest().version)&&chrome.storage.local.clear().then(()=>{chrome.storage.local.set({extVersion:chrome.runtime.getManifest().version,apiKey:t},()=>{})}),e.hasOwnProperty(\"userProfiles\")){let t=JSON.parse(e.userProfiles),n=new Date…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://*.checkvisaslots.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Analysis\n\n**Decision ledger**\n\n**(a) Who controls the source?**\n`chrome.runtime.onMessageExternal.addListener((e,t,s)=>…)` in `js/sw.js` receives messages from pages matching `externally_connectable.matches: [\"https://*.checkvisaslots.com/*\"]`. No `sender.id` check, no origin/url check inside the handler, and the harness confirms `authenticatedExtensionAllowlist: null` and `trustedWebOrigins: []`. The externally-connectable gate is an *origin allow-list*, not an unforgeable IPC boundary — it is satisfiable by any page/subdomain of `checkvisaslots.com` and is exploitable via XSS or a wildcard-subdomain takeover. The wildcard `*.checkvisaslots.com` broadens the surface to any subdomain. So `e.apiKey` is attacker-controllable.\n\n**(b) Source → sink path.**\nConfirmed directly in `js/sw.js` L1:\n```js\nchrome.runtime.onMessageExternal.addListener((e,t,s)=>(\n  e && ( e.message\n    ? \"version\"===e.message && s({version: chrome.runtime.getManifest().version})\n    : e.apiKey && chrome.storage.local.set({apiKey: e.apiKey})\n  ), !0))\n```\nAn attacker page sends `{apiKey: \"<attacker value>\"}`. Since `e.message` is undefined, the ternary falls to `e.apiKey && chrome.storage.local.set({apiKey: e.",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 3,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/sw",
+          "reportedLoc": "L1:C675 -> L1:C676",
+          "resolvedFile": "js/sw.js",
+          "resolved": true,
+          "snippet": "L1 C675-676: …}]).catch(console.log)}),chrome.runtime.onMessageExternal.addListener((e,t,s)=>(e&&(e.message?\"version\"===e.message&&s({version:chrome.runtime.getManifest().vers…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js/sw",
+          "reportedLoc": "L1:C772 -> L1:C815",
+          "resolvedFile": "js/sw.js",
+          "resolved": true,
+          "snippet": "L1 C772-815: …rsion\"===e.message&&s({version:chrome.runtime.getManifest().version}):e.apiKey&&chrome.storage.local.set({apiKey:e.apiKey})),!0)),chrome.action.onClicked.addListener(e=>{chrome.tabs.sendMessage(e.id,\"tog…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://*.checkvisaslots.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 2,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence from the report plus targeted source inspection. Let me finalize the four-part ledger.\n\n## Decision Ledger\n\n**(a) Who controls the source.** The source is a page-dispatchable custom event `vSCP`. In `js/content.js` (content script, ISOLATED world, matches `https://*.usvisascheduling.com/*/*` and `https://atlasauth.b2clogin.com/*`) I found:\n\n```js\naddEventListener(\"vSCP\",e=>{\"vD\"===e.detail.resource?setVisaDetails(e.detail.data):\n \"vSD\"===e.detail.resource?captureSlotDates(e.detail.data):\n \"vST\"===e.detail.resource&&captureSlotTimes(e.detail.data)})\n```\n\nA page script can `window.dispatchEvent(new CustomEvent('vSCP',{detail:{resource:'vSD',data:{…}}}))` and the isolated-world listener receives it (harness: `PAGE_TO_CONTENT_SCRIPT`, \"a page can forge …CustomEvent fields\"). `e.detail.data` is fully attacker-controlled — there is no origin/token guard (custom events can't be authenticated). ✅ attacker-controllable.\n\n**(b) Source→sink path.** `captureSlotDates(e)` → `fetchSlotDates(e)` reads `e.ScheduleDays…` into the `slotDetails` array; `captureSlotTimes(e)` → `fetchSlotTimes(e)` reads `e.ScheduleEntries…` into the times array. Both then call:\n\n```js\nsendToServe",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 4,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "CONTENT_SCRIPT",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/content",
+          "reportedLoc": "L1:C7042 -> L1:C7050",
+          "resolvedFile": "js/content.js",
+          "resolved": true,
+          "snippet": "L1 C7042-7050: …:r,slotLocationVal:fetched_location_val}})})}addEventListener(\"vSCP\",e=>{\"vD\"===e.detail.resource?setVisaDetails(e.detail.data):\"vSD\"===e.detail.resource?captureSlotDat…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js/sw",
+          "reportedLoc": "L1:C3133 -> L1:C3185",
+          "resolvedFile": "js/sw.js",
+          "resolved": true,
+          "snippet": "L1 C3133-3185: …m={headers:{\"x-api-key\":t.apiKey,extVersion:t.extVersion},method:\"POST\",body:h};fetch(\"https://app.checkvisaslots.com\"+e.resource,m).then().catch(e=>{})})}});const generateFilename=(e=5)=>Array.from({length:e},()…"
+        },
+        "sourceExpectedMarkers": [],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://*.usvisascheduling.com/*/*",
+              "https://atlasauth.b2clogin.com/*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "js/html2canvas.js",
+              "js/content.js"
+            ],
+            "runAt": "document_end",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": {
+          "matches": [
+            "https://*.checkvisaslots.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "DOM_INPUT",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    },
+    {
+      "flow_index": 3,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification — Flow #6 (REQUEST_FORGERY, source CHROME_ONMESSAGEEXTERNAL_MESSAGE → FETCH_HEADERS)\n\n### Deterministic harness facts\n- **Source anchor** confirmed at `js/sw.js` L1 C675: `chrome.runtime.onMessageExternal.addListener((e,t,s)=>(e&&(e.message?…:e.apiKey&&chrome.storage.local.set({apiKey:e.apiKey})),!0))`.\n- **Sink anchor** confirmed at L1 C3133: `const m={headers:{\"x-api-key\":t.apiKey,extVersion:t.extVersion},method:\"POST\",body:h};fetch(\"https://app.checkvisaslots.com\"+e.resource,m)`.\n- **externally_connectable**: `https://*.checkvisaslots.com/*` (wildcard subdomain), **no fixed `sender.id` allowlist**, no origin/action allow-list in the listener.\n- No content-script surface is required to poison the key — the external listener is the entry.\n\n### Four-part ledger\n**(a) Who controls the source.** An external web page whose origin matches `https://*.checkvisaslots.com/*` can invoke `sendMessage` against this extension. The harness confirms the only unforgeable trust anchor would be a fixed `sender.id` comparison; there is none. Origin-scoping reduces reach but, per the harness rules, does not make attacker input impossible — wildcard-subdomain reach is the reported seve",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 6,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/sw",
+          "reportedLoc": "L1:C675 -> L1:C676",
+          "resolvedFile": "js/sw.js",
+          "resolved": true,
+          "snippet": "L1 C675-676: …}]).catch(console.log)}),chrome.runtime.onMessageExternal.addListener((e,t,s)=>(e&&(e.message?\"version\"===e.message&&s({version:chrome.runtime.getManifest().vers…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js/sw",
+          "reportedLoc": "L1:C3133 -> L1:C3185",
+          "resolvedFile": "js/sw.js",
+          "resolved": true,
+          "snippet": "L1 C3133-3185: …m={headers:{\"x-api-key\":t.apiKey,extVersion:t.extVersion},method:\"POST\",body:h};fetch(\"https://app.checkvisaslots.com\"+e.resource,m).then().catch(e=>{})})}});const generateFilename=(e=5)=>Array.from({length:e},()…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://*.checkvisaslots.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 4,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I've verified the source-to-sink chain in the real source. Here's the ledger.\n\n## Four-part decision ledger\n\n**(a) Who controls the source — ATTACKER (web origin), no unforgeable guard**\n\n`js/sw.js` (C600-720):\n```js\nchrome.runtime.onMessageExternal.addListener((e,t,s)=>(\n  e && (e.message ? \"version\"===e.message && s({version:...})\n                 : e.apiKey && chrome.storage.local.set({apiKey:e.apiKey})),\n  !0))\n```\nThe listener accepts an external-message object and, if `e.apiKey` is truthy, writes it verbatim to `chrome.storage.local`. There is **no `sender.id` comparison** and **no origin/url check**. The manifest exposes this surface with `externally_connectable.matches = [\"https://*.checkvisaslots.com/*\"]` — a *wildcard subdomain* web-origin match. Per the harness rules, an origin restriction is not an unforgeable IPC boundary; any page under any `checkvisaslots.com` subdomain (XSS, subdomain takeover, or an intentionally-hosted page) can send `{apiKey: <anything>}`. The only \"guard\" is truthiness — no schema, no allow-list, no length/format validation.\n\n**(b) The exact source-to-sink path — UNBROKEN, single storage hop**\n\nConfirmed by the report's `STORAGE_FLOW[area: local",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 15,
+      "source_provenance": "UNTRUSTED_STORAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "js/sw",
+          "reportedLoc": "L1:C675 -> L1:C676",
+          "resolvedFile": "js/sw.js",
+          "resolved": true,
+          "snippet": "L1 C675-676: …}]).catch(console.log)}),chrome.runtime.onMessageExternal.addListener((e,t,s)=>(e&&(e.message?\"version\"===e.message&&s({version:chrome.runtime.getManifest().vers…"
+        },
+        "sinkAnchor": {
+          "reportedFile": "js/popup",
+          "reportedLoc": "L1:C10039 -> L1:C10089",
+          "resolvedFile": "js/popup.js",
+          "resolved": true,
+          "snippet": "L1 C10039-10089: …\"x-api-key\":o.apiKey,extVersion:chrome.runtime.getManifest().version}},n=await fetch(\"https://app.checkvisaslots.com/slots/v3\",e),a=await n.json();if(200!==n.status)document.getElementById(\"server_msg\").innerHT…"
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://*.checkvisaslots.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 5 flow(s): 5 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 1 flagged triggerable for dynamic testing."
+}

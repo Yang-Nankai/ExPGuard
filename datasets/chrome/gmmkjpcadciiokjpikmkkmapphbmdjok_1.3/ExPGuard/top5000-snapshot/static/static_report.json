@@ -1,0 +1,178 @@
+{
+  "extension_id": "gmmkjpcadciiokjpikmkkmapphbmdjok",
+  "extension_version": "1.3",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "flow_count": 2,
+  "verified_count": 2,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Analysis\n\n**Four-part ledger:**\n\n**(a) Who controls the source?** `chrome.runtime.onMessageExternal.addListener` (service-worker.js L32-51). The `req` argument and `req.data` are supplied by any page whose origin is in `externally_connectable.matches`: `https://reqbin.com/*`, `https://app.reqbin.com/*`, `https://beta.reqbin.com/*`. There is **no** fixed extension-ID allowlist (`authenticatedExtensionAllowlist: null`).\n\n**(b) Source→sink path.** Confirmed in raw source:\n- L34 `getSenderOrigin(sender)` → L36 `if (!TRUSTED_ORIGINS.has(origin)) return;` — a **web-origin equality** check (not a `sender.id` trust anchor).\n- L45-47 `case 'rbPostData': fetchRequest(req.data, sendResponse)` forwards the attacker payload.\n- fetchRequest.js L10 `const json = JSON.parse(data.json)` → L11 headers, L14 `method: json.method`, L19 `fetchData.body = json.content`, L57/`authHeader` → **L69 `fetch(json.idnUrl, fetchData)`**.\n\n**(c) Security-relevant argument controlled.** `json.idnUrl` (sink URL, report metadata `('FETCH_RESOURCE','FULL')`) plus `method`, `body`, and `Authorization` header are all parsed straight from the attacker-supplied JSON. The service worker fetches with the extension's `hos",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "service-worker",
+          "reportedLoc": "L41:C12 -> L41:C15",
+          "resolvedFile": "service-worker.js",
+          "resolved": true,
+          "snippet": "L41 C12-15:     switch (req && req.cmd) {"
+        },
+        "sinkAnchor": {
+          "reportedFile": "service-worker",
+          "reportedLoc": "L69:C8 -> L69:C37",
+          "resolvedFile": "service-worker.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://reqbin.com/*",
+            "https://app.reqbin.com/*",
+            "https://beta.reqbin.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    },
+    {
+      "flow_index": 1,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification Ledger — Flow #1 (REQUEST_FORGERY, `attacker-input-network-send`)\n\n**(a) Who controls the source.**\nThe source is `chrome.runtime.onMessageExternal.addListener` in `service-worker.js`. The listener's first argument `req` (source anchor L41 `switch (req && req.cmd)`) is fully attacker-supplied. Reachability is gated only by `externally_connectable.matches` = `reqbin.com/*`, `app.reqbin.com/*`, `beta.reqbin.com/*` (harness), i.e. a **web-page-origin** surface, not an extension-ID allowlist. Note the harness warning that the raw anchor text doesn't itself contain `onMessageExternal` — but the resolved file confirms the listener at L32–L51, so the anchor is correct.\n\n**(b) Exact source→sink path (confirmed in raw source).**\n- `service-worker.js` L41 `switch (req && req.cmd)` → `case 'rbPostData'` L45–46: `fetchRequest(req.data, sendResponse); return true;`\n- `fetchRequest.js` L3 `fetchRequest(data, …)`; L10 `const json = JSON.parse(data.json)` → attacker controls `json.idnUrl`, `json.method`, `json.headers`, `json.content`, `json.auth`.\n- Sink `fetchRequest.js` L69 `fetch(json.idnUrl, fetchData)` with `method: json.method` (L14), `body: json.content` (L19), arbitrary `h",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "EXTERNAL_MESSAGE",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "EXTERNAL_MESSAGE",
+          "browserFacts": "externally_connectable controls which page origins/extension IDs can call the listener. Only a browser-supplied sender.id comparison to a fixed extension ID is an unforgeable IPC boundary. Origin/url restrictions and manifest matches reduce scope but are not proof that attacker input is impossible."
+        },
+        "sourceAnchor": {
+          "reportedFile": "service-worker",
+          "reportedLoc": "L41:C12 -> L41:C15",
+          "resolvedFile": "service-worker.js",
+          "resolved": true,
+          "snippet": "L41 C12-15:     switch (req && req.cmd) {"
+        },
+        "sinkAnchor": {
+          "reportedFile": "service-worker",
+          "reportedLoc": "L69:C8 -> L69:C37",
+          "resolvedFile": "service-worker.js",
+          "resolved": true,
+          "snippet": ""
+        },
+        "sourceExpectedMarkers": [
+          "onMessageExternal"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": {
+          "matches": [
+            "https://reqbin.com/*",
+            "https://app.reqbin.com/*",
+            "https://beta.reqbin.com/*"
+          ]
+        },
+        "authenticatedExtensionAllowlist": null,
+        "trustedWebOrigins": [],
+        "configuredEndpointGate": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "RUNTIME_SENDMESSAGE",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": "Source type requires external conditions not available in sandbox."
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 2 flow(s): 2 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

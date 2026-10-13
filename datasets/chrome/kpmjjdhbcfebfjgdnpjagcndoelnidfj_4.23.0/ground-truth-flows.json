@@ -1,0 +1,682 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "kpmjjdhbcfebfjgdnpjagcndoelnidfj",
+  "version": "4.23.0",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-ef06c118894240e7",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard",
+        "CoCo",
+        "DoubleX"
+      ],
+      "match_region": "all three",
+      "match_basis": "explicit_reuse_and_normalized_signature",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:f5c991d5eeddaf77:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:f5c991d5eeddaf77:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "f5c991d5eeddaf774ff76b02917c9427a1e9ab6d86280d04b89992b1443ae84f",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content",
+              "loc": "L73:C6 -> L73:C21",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://twitter.com/*",
+                      "https://mobile.twitter.com/*",
+                      "https://x.com/*",
+                      "https://mobile.x.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "storage.fuzzy.settings",
+              "file": "content",
+              "loc": "L75:C4 -> L77:C6",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://twitter.com/*",
+                      "https://mobile.twitter.com/*",
+                      "https://x.com/*",
+                      "https://mobile.x.com/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "CONFIRMED",
+                  "basis": "runtime_sink_evidence",
+                  "confidence": 0.95,
+                  "detail": "Controlled cpftConfigChange message reached chrome.storage.local.set with the marker."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "dynamic_confirmed",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: The primary evidence is confirmed by the actual source. Let me lay out the ledger. **1. Who controls the source?** The page context on the matched host. `content.js` runs at `document_start` on `https://twitter.com/*`, `mobile.twitter.com`, `x.com`, `mobile.x.com`. Lines 71–72 register a `window.addEventListener('message', ...)` with only `event.source !== window` as a guard. A page script (or anything injected into the page context via XSS) can run: ```js window.postMessage({type:'cpftC…",
+              "path": "extensions/kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "inconclusive",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T17:38:15.152Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787025914864846a816464a9af9c0791e0f68a2ce03c4f575e', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary",
+                "coco",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0/final/final_report.json",
+              "report_mtime": "2026-08-18T04:05:13.6Z"
+            },
+            "manual_verification": null,
+            "notes": [],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        },
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:5bfe70de76b86cc8:01",
+          "flow": {
+            "flow_id": "coco:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:5bfe70de76b86cc8:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "5bfe70de76b86cc899ddfe9f50f30896978b616a904441c682a870d13b4f8d71",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "coco-storage_posoing",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "CoCo source evidence",
+              "file": "content.js",
+              "loc": "L71:C1 -> L71:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "content.js",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "CoCo sink evidence",
+              "file": "content.js",
+              "loc": "L73:C1 -> L73:C1",
+              "frame": "UNKNOWN",
+              "frames": [
+                {
+                  "id": "UNKNOWN",
+                  "family": "UNKNOWN"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content.js",
+              "message_sender_provenance": "UNKNOWN",
+              "privilege_reason": "CoCo reported cross-boundary flow; verify with source"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Reused/ExPGuard-Opti"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_reused_expguard-opti",
+                  "source": "Reused/ExPGuard-Opti",
+                  "kind": "coco_reused_expguard-opti",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "Reused ExPGuard-Opti F001 (flow_index=0) via source_type_normalized_sink_type_exact/all_candidates_agree.",
+                  "reused_flow_id": "expguard-opti:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:f5c991d5eeddaf77:01",
+                  "package_sha256": "e87ef9eda649bf502b08ddaa54c927e165fd085b44e8259f3b31a0829d57d427"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "reused_confirmation_match",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow Verification: content.js `window.postMessage` → `chrome.storage.local.set`\n\n### 1. Four-part decision ledger\n\n**(a) Who controls the source?**\n`content.js:71` registers `window.addEventListener('message', (event) => { ... })` in a content script (ISOLATED world) that runs at `document_start` on `https://twitter.com/*`, `mobile.twitter.com/*`, `x.com/*`, `mobile.x.com/*`. Any script executing in the page context (the page itself, or injected/XSS code) can dispatch a `message` event on the window via `window.postMessage(...)`. The `event.data` payload is fully attacker-chosen. ✅ Attacker-controllable.\n\n**(b) Exact source-to-sink path**\n```\nL71  window.addEventListener('message', (event) => {\nL72    if (event.source !== window) return\nL73    if (event.data.type === 'cpftConfigChange' && event.data.changes) {\nL75      chrome.storage.local.set(event.data.changes, () => { ... })\n```\nThe tainted field is `event.data.changes`. The report's sink anchor points at L73 (the boolean condition), but the actual `STORAGE_WRITE` operation is L75, where the *same tainted object* `event.data.changes` is passed directly as the first argument to `chrome.storage.local.set`. The path is unbroken ",
+              "path": "extensions/kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T03:59:09.740898Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": {
+              "source_dataset": "ExPGuard-Opti",
+              "extension_key": "kpmjjdhbcfebfjgdnpjagcndoelnidfj@4.23.0",
+              "flow_id": "expguard-opti:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:f5c991d5eeddaf77:01",
+              "flow_index": 0,
+              "flow_label": "F001",
+              "verification": "TP",
+              "verification_source": [
+                "ExPAgent"
+              ],
+              "match_mode": "source_type_normalized_sink_type_exact",
+              "match_reason": "all_candidates_agree",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_loc": "L73:C6 -> L73:C21",
+              "source_file": "content",
+              "sink_type": "CHROME_LOCAL_STORAGE",
+              "sink_loc": "L75:C4 -> L77:C6",
+              "sink_file": "content",
+              "package_evidence": {
+                "same_package": true,
+                "same_crx": true,
+                "same_manifest": true,
+                "same_source_manifest": true,
+                "coco_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0\\crx\\kpmjjdhbcfebfjgdnpjagcndoelnidfj.4.23.0.crx",
+                "external_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0\\crx\\kpmjjdhbcfebfjgdnpjagcndoelnidfj.4.23.0.crx",
+                "coco_package_sha256": "e87ef9eda649bf502b08ddaa54c927e165fd085b44e8259f3b31a0829d57d427",
+                "external_package_sha256": "e87ef9eda649bf502b08ddaa54c927e165fd085b44e8259f3b31a0829d57d427",
+                "coco_manifest_sha256": "ead3ccfb7e54bf9eed650d156e95b102410ce2653b7dbd64c6e63c6cc6a0d62a",
+                "external_manifest_sha256": "ead3ccfb7e54bf9eed650d156e95b102410ce2653b7dbd64c6e63c6cc6a0d62a",
+                "coco_source_manifest_sha256": "602fd78ecc99d7dacf847bfc61b86b79c9701ea28eaffcca36cb8607a19283e3",
+                "external_source_manifest_sha256": "602fd78ecc99d7dacf847bfc61b86b79c9701ea28eaffcca36cb8607a19283e3"
+              },
+              "supporting_matches": [
+                {
+                  "dataset": "DoubleX",
+                  "extension_key": "kpmjjdhbcfebfjgdnpjagcndoelnidfj@4.23.0",
+                  "extension_directory": "kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0",
+                  "flow_id": "doublex:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:0e0c1c4d2b5318c1:01",
+                  "flow_index": 0,
+                  "flow_label": "F001",
+                  "verification": "TP",
+                  "verification_source": [
+                    "Reused/ExPGuard-Opti"
+                  ],
+                  "match_mode": "source_type_normalized_sink_type_exact",
+                  "match_reason": "all_candidates_agree",
+                  "source_type": "WINDOW_MESSAGE_EVENT",
+                  "source_loc": "L76",
+                  "sink_type": "CHROME_LOCAL_STORAGE",
+                  "sink_loc": "L80",
+                  "source_file": "content_scripts.js",
+                  "sink_file": "content_scripts.js",
+                  "package_evidence": {
+                    "same_package": true,
+                    "same_crx": true,
+                    "same_manifest": true,
+                    "same_source_manifest": true,
+                    "coco_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\chrome\\extensions\\kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0\\crx\\kpmjjdhbcfebfjgdnpjagcndoelnidfj.4.23.0.crx",
+                    "external_package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0\\crx\\4.23.0\\kpmjjdhbcfebfjgdnpjagcndoelnidfj.4.23.0.crx",
+                    "coco_package_sha256": "e87ef9eda649bf502b08ddaa54c927e165fd085b44e8259f3b31a0829d57d427",
+                    "external_package_sha256": "e87ef9eda649bf502b08ddaa54c927e165fd085b44e8259f3b31a0829d57d427",
+                    "coco_manifest_sha256": "ead3ccfb7e54bf9eed650d156e95b102410ce2653b7dbd64c6e63c6cc6a0d62a",
+                    "external_manifest_sha256": "ead3ccfb7e54bf9eed650d156e95b102410ce2653b7dbd64c6e63c6cc6a0d62a",
+                    "coco_source_manifest_sha256": "602fd78ecc99d7dacf847bfc61b86b79c9701ea28eaffcca36cb8607a19283e3",
+                    "external_source_manifest_sha256": "602fd78ecc99d7dacf847bfc61b86b79c9701ea28eaffcca36cb8607a19283e3"
+                  }
+                }
+              ]
+            },
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        },
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:0e0c1c4d2b5318c1:01",
+          "flow": {
+            "flow_id": "doublex:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:0e0c1c4d2b5318c1:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "0e0c1c4d2b5318c126298a0e0d960ed49e8783e47d9070399e11ed6af55ee816",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L76",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://twitter.com/*",
+                      "https://mobile.twitter.com/*",
+                      "https://x.com/*",
+                      "https://mobile.x.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "chrome.storage.local.set",
+              "file": "content_scripts.js",
+              "loc": "L80",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": false,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Reused/ExPGuard-Opti"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "doublex_reused_expguard",
+                  "source": "Reused/ExPGuard-Opti",
+                  "kind": "doublex_reused_expguard",
+                  "verdict": "TP",
+                  "confidence": 0.9,
+                  "detail": "Reused ExPGuard-Opti F001 (flow_index=0) via source_sink_type_exact/all_candidates_agree.",
+                  "reused_flow_id": "expguard-opti:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:f5c991d5eeddaf77:01",
+                  "package_sha256": "e87ef9eda649bf502b08ddaa54c927e165fd085b44e8259f3b31a0829d57d427"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "reused_expguard_match",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow 0: WINDOW_MESSAGE_EVENT → chrome.storage.local.set (STORAGE_POSOING)\n\n### Evidence resolution\n\nThe report names `content_scripts.js`, but that file does not exist in the unpacked extension; the manifest content-script entry is `content.js`. The sink context in the report (`chrome.storage.local.set(event.data.changes, ...)`) matches `content.js:75` exactly, and the source (`window.addEventListener('message', ...)`) matches `content.js:71`. The line numbers are offset by 5 (report L76/L80 → actual L71/L75), but the code is identical, so this is the same flow.\n\nRelevant actual source (`content.js:70-79`):\n\n```js\n// Store config changes sent from the injected script\nwindow.addEventListener('message', (event) => {\n  if (event.source !== window) return\n  if (event.data.type === 'cpftConfigChange' && event.data.changes) {\n    chrome.storage.onChanged.removeListener(onConfigChange)\n    chrome.storage.local.set(event.data.changes, () => {\n      chrome.storage.onChanged.addListener(onConfigChange)\n    })\n  }\n}, false)\n```\n\n### Four-part decision ledger\n\n**(a) Who controls the source?** The page (main world) on `twitter.com` / `x.com` (the content-script `matches`). A ",
+              "path": "extensions/kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T17:11:23.578107Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": {
+              "source_dataset": "ExPGuard-Opti",
+              "extension_key": "kpmjjdhbcfebfjgdnpjagcndoelnidfj@4.23.0",
+              "flow_id": "expguard-opti:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:f5c991d5eeddaf77:01",
+              "flow_index": 0,
+              "flow_label": "F001",
+              "verification": "TP",
+              "verification_source": [
+                "ExPAgent"
+              ],
+              "match_mode": "source_sink_type_exact",
+              "match_reason": "all_candidates_agree",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_loc": "L73:C6 -> L73:C21",
+              "sink_type": "CHROME_LOCAL_STORAGE",
+              "sink_loc": "L75:C4 -> L77:C6",
+              "package_evidence": {
+                "same_crx": true,
+                "same_manifest": true,
+                "same_package": true,
+                "doublex_crx_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0\\crx\\kpmjjdhbcfebfjgdnpjagcndoelnidfj.4.23.0.crx",
+                "expaguard_crx_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.23.0\\crx\\kpmjjdhbcfebfjgdnpjagcndoelnidfj.4.23.0.crx",
+                "doublex_crx_sha256": "e87ef9eda649bf502b08ddaa54c927e165fd085b44e8259f3b31a0829d57d427",
+                "expaguard_crx_sha256": "e87ef9eda649bf502b08ddaa54c927e165fd085b44e8259f3b31a0829d57d427",
+                "doublex_manifest_sha256": "ead3ccfb7e54bf9eed650d156e95b102410ce2653b7dbd64c6e63c6cc6a0d62a",
+                "expaguard_manifest_sha256": "ead3ccfb7e54bf9eed650d156e95b102410ce2653b7dbd64c6e63c6cc6a0d62a"
+              }
+            },
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "mixed_tool_outcome",
+        "dataset_version": "4.23.0",
+        "latest_version": "4.25.0",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.25.0\\kpmjjdhbcfebfjgdnpjagcndoelnidfj.4.25.0.crx",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:f5c991d5eeddaf77:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "chrome__kpmjjdhbcfebfjgdnpjagcndoelnidfj__4.25.0__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.25.0\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.25.0\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 32.312,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "WINDOW_MESSAGE_EVENT",
+                  "remark": "window.addEventListener(message)",
+                  "file": "content",
+                  "loc": "L73:C6 -> L73:C21",
+                  "code": "if (»event.data.type« === 'cpftConfigChange' && event.data.changes) {"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "storage.fuzzy.settings",
+                  "file": "content",
+                  "loc": "L75:C4 -> L77:C6",
+                  "code": "»chrome.storage.local.set(event.data.changes, () => {«"
+                },
+                "propagation_step_count": 2
+              }
+            ],
+            "tool_report_flow_count": 3,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          },
+          {
+            "tool": "CoCo",
+            "original_source_flow_id": "coco:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:5bfe70de76b86cc8:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "chrome__kpmjjdhbcfebfjgdnpjagcndoelnidfj__4.25.0__CoCo",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.25.0\\revalidation\\CoCo\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.25.0\\revalidation\\CoCo\\attempt-01\\report.flows.json",
+            "duration_seconds": 1.844,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "disappeared",
+            "comparison": "no_exact_source_and_sink_api_pair",
+            "candidate_match_count": 0,
+            "same_source_candidates": [],
+            "same_sink_candidates": [],
+            "tool_report_flow_count": 0,
+            "source_review_required": true,
+            "interpretation": "The original source/sink pair was not reported in the successful rerun; this alone does not prove a security fix."
+          },
+          {
+            "tool": "DoubleX",
+            "original_source_flow_id": "doublex:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:0e0c1c4d2b5318c1:01",
+            "original_source_type": "WINDOW_MESSAGE_EVENT",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "chrome__kpmjjdhbcfebfjgdnpjagcndoelnidfj__4.25.0__DoubleX",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.25.0\\revalidation\\DoubleX\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\chrome\\kpmjjdhbcfebfjgdnpjagcndoelnidfj_4.25.0\\revalidation\\DoubleX\\attempt-01\\report.flows.json",
+            "duration_seconds": 1.672,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": "STORAGE_POSOING",
+                "source_type": "WINDOW_MESSAGE_EVENT",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "type": "WINDOW_MESSAGE_EVENT",
+                  "remark": "DoubleX web-accessible message input",
+                  "file": "content_scripts.js",
+                  "loc": "L145",
+                  "code": "event"
+                },
+                "sink": {
+                  "type": "CHROME_LOCAL_STORAGE",
+                  "remark": "chrome.storage.local.set",
+                  "file": "content_scripts.js",
+                  "loc": "L153",
+                  "code": "chrome.storage.local.set(event.data.changes, <pdg_js.node.FunctionExpression object at 0x000002286F51C940>)"
+                },
+                "propagation_step_count": null
+              }
+            ],
+            "tool_report_flow_count": 1,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "mixed_or_inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 1,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 1.0,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": false,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.9,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:f5c991d5eeddaf77:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          },
+          {
+            "status": "inconclusive_no_matching_candidate",
+            "basis": "No same-source/sink candidate was available in the successful new report; source absence is not proof of a fix.",
+            "candidate_count": 0,
+            "tool": "CoCo",
+            "original_flow_id": "coco:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:5bfe70de76b86cc8:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          },
+          {
+            "status": "inconclusive_ambiguous_candidates",
+            "basis": "Same API categories occur in multiple paths or source context similarity is insufficient for a unique identity decision.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 1,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 0.0,
+              "actual_sink_context_similarity": 0.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 0.5,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "DoubleX",
+            "original_flow_id": "doublex:chrome:kpmjjdhbcfebfjgdnpjagcndoelnidfj:4.23.0:0e0c1c4d2b5318c1:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

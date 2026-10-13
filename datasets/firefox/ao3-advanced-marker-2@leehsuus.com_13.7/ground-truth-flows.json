@@ -1,0 +1,977 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "firefox",
+  "extension_id": "ao3-advanced-marker-2@leehsuus.com",
+  "version": "13.7",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-20c706efed9416a6",
+      "verification": "TP",
+      "source_family": "ELEMENT_TEXT_CONTENT",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:ao3-advanced-marker-2@leehsuus.com:13.7:ed84d07010838789:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:ao3-advanced-marker-2@leehsuus.com:13.7:ed84d07010838789:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "ed84d070108387896cb54d047d8c65f2f0721944699b4a8bc5399d869e4838ae",
+            "semantic_key": {
+              "rule_id": "web-content-storage-write",
+              "flow_type": "STORAGE_POSOING",
+              "source_type": "ELEMENT_TEXT_CONTENT",
+              "source_file": "content",
+              "source_loc": "228959228989",
+              "source_frame": "CS_1",
+              "sink_type": "CHROME_LOCAL_STORAGE",
+              "sink_file": "content",
+              "sink_loc": "253216253270",
+              "sink_frame": "CS_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 2,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "web-content-storage-write",
+            "rule_description": "Page-derived content written into chrome.storage. Suppressed by the privilege-delta gate when no other code reads the key back.",
+            "severity": "HIGH",
+            "severity_reason": "Wildcard subdomain matching is allowed.",
+            "severity_evidence": [
+              "*://*.archiveofourown.org/tags/*"
+            ],
+            "source": {
+              "type": "ELEMENT_TEXT_CONTENT",
+              "remark": "From storage.local.set('ao3_hl_null') in content",
+              "file": "content",
+              "loc": "L2289:C59 -> L2289:C89",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://*.archiveofourown.org/tags/*",
+                      "*://*.archiveofourown.org/users/*",
+                      "*://*.archiveofourown.org/series/*",
+                      "*://*.archiveofourown.org/bookmarks*",
+                      "*://*.archiveofourown.org/works*",
+                      "*://*.archiveofourown.org/collections/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "UNTRUSTED_STORAGE",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "*://*.archiveofourown.org/tags/*",
+                  "*://*.archiveofourown.org/users/*",
+                  "*://*.archiveofourown.org/series/*",
+                  "*://*.archiveofourown.org/bookmarks*",
+                  "*://*.archiveofourown.org/works*",
+                  "*://*.archiveofourown.org/collections/*"
+                ]
+              },
+              "code_preview": "r = authorElement ? >>>authorElement.textContent.trim<<<() : 'Unknown Author"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "ao3_hl_null",
+              "file": "content",
+              "loc": "L2532:C16 -> L2532:C70",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://*.archiveofourown.org/tags/*",
+                      "*://*.archiveofourown.org/users/*",
+                      "*://*.archiveofourown.org/series/*",
+                      "*://*.archiveofourown.org/bookmarks*",
+                      "*://*.archiveofourown.org/works*",
+                      "*://*.archiveofourown.org/collections/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": " {\r\n                >>>storage.local.set({ [storageKey]: workData }, resolve)<<<;\r\n            });\r\n"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": true,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": "STORAGE_FLOW[area: local, key: ao3_hl_null, sender: content, receiver: content]"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。 F002 未被用户单独点名；由于与 F001/F003 同属 ELEMENT_TEXT_CONTENT -> chrome.storage.local 路径，按同一人工结论记为 TP，以确保该扩展所有唯一 Flow 均可判定。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 18,
+              "source_provenance": "UNTRUSTED_STORAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow verification\n\n### (a) Who controls the source\n`authorElement = document.querySelector('a[rel=\"author\"]')`, then the tainted span is `authorElement.textContent.trim()`.\n\nThis is shared page DOM read from an ISOLATED-world content script. The AO3 page (or script running in the page world, e.g. after an XSS on `archiveofourown.org`) can mutate that element’s text before the content script reads it. The source is therefore genuine WEB_CONTENT/DOM taint, not extension-user input. The harness explicitly notes that page scripts can mutate shared DOM values; there is no browser-authenticated IPC boundary here.\n\n### (b) Source-to-sink path\nThe report propagation is corroborated by the raw source:\n\n- `content.js:2289` — `workAuthor = authorElement.textContent.trim()` (tainted)\n- `content.js:2325` — passed as `{ workTitle, workAuthor }` to `saveHighlightToStorage(...)`\n- `content.js:2479-2480` — `if (metadata.workAuthor) workData.workAuthor = metadata.workAuthor;`\n- `content.js:2489-2490` — `storage.local.set({ [storageKey]: workData }, resolve);` where `storageKey = \\`ao3_hl_${workId}\\``\n\nThe later `removeHighlightFromStorage` set at `content.js:2532` is a downstream storage read/mod",
+              "dynamic_guidance": {
+                "triggerable": false,
+                "trigger_mechanism": "OTHER",
+                "injection_context": "",
+                "origin_requirement": "",
+                "trigger_surface": "",
+                "target_urls": [],
+                "payload_sketch": "",
+                "dom_forgery": "",
+                "beacon_pointable": false,
+                "beacon_param": "",
+                "observation": "",
+                "notes": ""
+              },
+              "path": "extensions/ao3-advanced-marker-2@leehsuus.com_13.7/static/static_report.json",
+              "report_mtime": "2026-08-14T16:23:57.589Z"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": null,
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "evidence": "deep-trace=source-contract={\"surface\": \"CUSTOM_EVENT\", \"sourcePath\": \"content.js\", \"location\": \"L2289:C59 -> L2289:C89\", \"eventNames\": [\"mouseup\", \"online\", \"resize\", \"mousedown\", \"touchstart\", \"touchend\", \"error\", \"selectionchange\"], \"eventTarget\": \"document\", \"eventDetailKey\": \"detail\", \"envelope\": {}, \"forwardField\": \"\", \"requirements\": {}, \"selectors\": [], \"mediaTags\": [], \"snippet\": \"         const range = selection.getRangeAt(0);\\n            const selectedText = range.toString().trim();\\n            if (!selectedText || selectedText.length === 0) return;\\n\\n            // Ensure selection is within the story content\\n            if (!container.contains(range.startContainer) || !container.contains(range.endContainer)) return;\\n\\n            // Safe closest check\\n            const getMark = (node) => {\\n                if (!node) return null;\\n                if (node.nodeType === Node.ELEMEN",
+              "path": "extensions/ao3-advanced-marker-2@leehsuus.com_13.7/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T12:31:58.338Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "evidence_summary": "Completed static source-level TP evidence is retained; dynamic result is not a rebuttal.",
+              "conflict_resolution": "Strict final decision table applied.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "INCONCLUSIVE_AFTER_DEBUG",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "static_supported",
+              "usable_for_label": true,
+              "path": "../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/firefox/extensions/ao3-advanced-marker-2@leehsuus.com_13.7/final-verified-v2/final_report.json",
+              "report_mtime": "2026-08-20T13:24:24.817Z"
+            },
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user-provided manual validation",
+              "validated_at_utc": "2026-09-22T14:39:11.083860Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。 F002 未被用户单独点名；由于与 F001/F003 同属 ELEMENT_TEXT_CONTENT -> chrome.storage.local 路径，按同一人工结论记为 TP，以确保该扩展所有唯一 Flow 均可判定。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user as a manual validation result. No screenshot or HAR bytes were supplied with this conversation."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_report",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-22T14:39:11.083860Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。 F002 未被用户单独点名；由于与 F001/F003 同属 ELEMENT_TEXT_CONTENT -> chrome.storage.local 路径，按同一人工结论记为 TP，以确保该扩展所有唯一 Flow 均可判定。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "13.7",
+        "latest_version": "14.2",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\ao3-advanced-marker-2@leehsuus.com_14.2\\ao3-advanced-marker-2@leehsuus.com.14.2.xpi",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:firefox:ao3-advanced-marker-2@leehsuus.com:13.7:ed84d07010838789:01",
+            "original_source_type": "ELEMENT_TEXT_CONTENT",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "firefox__ao3-advanced-marker-2@leehsuus.com__14.2__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\ao3-advanced-marker-2@leehsuus.com_14.2\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\ao3-advanced-marker-2@leehsuus.com_14.2\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 3.922,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 3,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 9,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "ELEMENT_TEXT_CONTENT",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "ELEMENT_TEXT_CONTENT",
+                  "remark": "a[rel=\"author\"]",
+                  "file": "content",
+                  "loc": "L2556:C59 -> L2556:C89",
+                  "code": "const workAuthor = authorElement ? »authorElement.textContent.trim«() : 'Unknown Author';"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "ao3_hl_null",
+                  "file": "content",
+                  "loc": "L2757:C12 -> L2757:C66",
+                  "code": "»storage.local.set({ [storageKey]: workData }, resolve)«;"
+                },
+                "propagation_step_count": 4
+              },
+              {
+                "tool_flow_index": 17,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "ELEMENT_TEXT_CONTENT",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "ELEMENT_TEXT_CONTENT",
+                  "remark": "From storage.local.set('ao3_hl_null') in content",
+                  "file": "content",
+                  "loc": "L2556:C59 -> L2556:C89",
+                  "code": "const workAuthor = authorElement ? »authorElement.textContent.trim«() : 'Unknown Author';"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "ao3_hl_null",
+                  "file": "content",
+                  "loc": "L2799:C16 -> L2799:C70",
+                  "code": "»storage.local.set({ [storageKey]: workData }, resolve)«;"
+                },
+                "propagation_step_count": 53
+              },
+              {
+                "tool_flow_index": 17,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "ELEMENT_TEXT_CONTENT",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "ELEMENT_TEXT_CONTENT",
+                  "remark": "From storage.local.set('ao3_hl_null') in content",
+                  "file": "content",
+                  "loc": "L2556:C59 -> L2556:C89",
+                  "code": "const workAuthor = authorElement ? »authorElement.textContent.trim«() : 'Unknown Author';"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "ao3_hl_null",
+                  "file": "content",
+                  "loc": "L2718:C16 -> L2718:C70",
+                  "code": "»storage.local.set({ [storageKey]: workData }, resolve)«;"
+                },
+                "propagation_step_count": 53
+              }
+            ],
+            "tool_report_flow_count": 40,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "likely_unchanged",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 3,
+            "top_candidate": {
+              "tool_flow_index": 17,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 1.0,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 1.0,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:firefox:ao3-advanced-marker-2@leehsuus.com:13.7:ed84d07010838789:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-62dcfb1f65a20669",
+      "verification": "TP",
+      "source_family": "ELEMENT_TEXT_CONTENT",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:ao3-advanced-marker-2@leehsuus.com:13.7:0099f0f6092388c0:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:ao3-advanced-marker-2@leehsuus.com:13.7:0099f0f6092388c0:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "0099f0f6092388c0e3d909a0b4e94a26d9b9cab41df79221310d3d8b753c8cc0",
+            "semantic_key": {
+              "rule_id": "web-content-storage-write",
+              "flow_type": "STORAGE_POSOING",
+              "source_type": "ELEMENT_TEXT_CONTENT",
+              "source_file": "content",
+              "source_loc": "228959228989",
+              "source_frame": "CS_1",
+              "sink_type": "CHROME_LOCAL_STORAGE",
+              "sink_file": "content",
+              "sink_loc": "249012249066",
+              "sink_frame": "CS_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "web-content-storage-write",
+            "rule_description": "Page-derived content written into chrome.storage. Suppressed by the privilege-delta gate when no other code reads the key back.",
+            "severity": "HIGH",
+            "severity_reason": "Wildcard subdomain matching is allowed.",
+            "severity_evidence": [
+              "*://*.archiveofourown.org/tags/*"
+            ],
+            "source": {
+              "type": "ELEMENT_TEXT_CONTENT",
+              "remark": "a[rel=\"author\"]",
+              "file": "content",
+              "loc": "L2289:C59 -> L2289:C89",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://*.archiveofourown.org/tags/*",
+                      "*://*.archiveofourown.org/users/*",
+                      "*://*.archiveofourown.org/series/*",
+                      "*://*.archiveofourown.org/bookmarks*",
+                      "*://*.archiveofourown.org/works*",
+                      "*://*.archiveofourown.org/collections/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "*://*.archiveofourown.org/tags/*",
+                  "*://*.archiveofourown.org/users/*",
+                  "*://*.archiveofourown.org/series/*",
+                  "*://*.archiveofourown.org/bookmarks*",
+                  "*://*.archiveofourown.org/works*",
+                  "*://*.archiveofourown.org/collections/*"
+                ]
+              },
+              "code_preview": "r = authorElement ? >>>authorElement.textContent.trim<<<() : 'Unknown Author"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "ao3_hl_null",
+              "file": "content",
+              "loc": "L2490:C12 -> L2490:C66",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://*.archiveofourown.org/tags/*",
+                      "*://*.archiveofourown.org/users/*",
+                      "*://*.archiveofourown.org/series/*",
+                      "*://*.archiveofourown.org/bookmarks*",
+                      "*://*.archiveofourown.org/works*",
+                      "*://*.archiveofourown.org/collections/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "e => {\r\n            >>>storage.local.set({ [storageKey]: workData }, resolve)<<<;\r\n        });\r\n\r\n  "
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification": "TP",
+            "dynamic": false,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": null,
+            "dynamic_detail": null,
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user-provided manual validation",
+              "validated_at_utc": "2026-09-22T14:39:11.083860Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user as a manual validation result. No screenshot or HAR bytes were supplied with this conversation."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_report",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-22T14:39:11.083860Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "13.7",
+        "latest_version": "14.2",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\ao3-advanced-marker-2@leehsuus.com_14.2\\ao3-advanced-marker-2@leehsuus.com.14.2.xpi",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:firefox:ao3-advanced-marker-2@leehsuus.com:13.7:0099f0f6092388c0:01",
+            "original_source_type": "ELEMENT_TEXT_CONTENT",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "firefox__ao3-advanced-marker-2@leehsuus.com__14.2__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\ao3-advanced-marker-2@leehsuus.com_14.2\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\ao3-advanced-marker-2@leehsuus.com_14.2\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 3.922,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 3,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 9,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "ELEMENT_TEXT_CONTENT",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "ELEMENT_TEXT_CONTENT",
+                  "remark": "a[rel=\"author\"]",
+                  "file": "content",
+                  "loc": "L2556:C59 -> L2556:C89",
+                  "code": "const workAuthor = authorElement ? »authorElement.textContent.trim«() : 'Unknown Author';"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "ao3_hl_null",
+                  "file": "content",
+                  "loc": "L2757:C12 -> L2757:C66",
+                  "code": "»storage.local.set({ [storageKey]: workData }, resolve)«;"
+                },
+                "propagation_step_count": 4
+              },
+              {
+                "tool_flow_index": 17,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "ELEMENT_TEXT_CONTENT",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "ELEMENT_TEXT_CONTENT",
+                  "remark": "From storage.local.set('ao3_hl_null') in content",
+                  "file": "content",
+                  "loc": "L2556:C59 -> L2556:C89",
+                  "code": "const workAuthor = authorElement ? »authorElement.textContent.trim«() : 'Unknown Author';"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "ao3_hl_null",
+                  "file": "content",
+                  "loc": "L2799:C16 -> L2799:C70",
+                  "code": "»storage.local.set({ [storageKey]: workData }, resolve)«;"
+                },
+                "propagation_step_count": 53
+              },
+              {
+                "tool_flow_index": 17,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "ELEMENT_TEXT_CONTENT",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "ELEMENT_TEXT_CONTENT",
+                  "remark": "From storage.local.set('ao3_hl_null') in content",
+                  "file": "content",
+                  "loc": "L2556:C59 -> L2556:C89",
+                  "code": "const workAuthor = authorElement ? »authorElement.textContent.trim«() : 'Unknown Author';"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "ao3_hl_null",
+                  "file": "content",
+                  "loc": "L2718:C16 -> L2718:C70",
+                  "code": "»storage.local.set({ [storageKey]: workData }, resolve)«;"
+                },
+                "propagation_step_count": 53
+              }
+            ],
+            "tool_report_flow_count": 40,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "likely_unchanged",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 3,
+            "top_candidate": {
+              "tool_flow_index": 9,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 1.0,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 1.0,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:firefox:ao3-advanced-marker-2@leehsuus.com:13.7:0099f0f6092388c0:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-7c5c1fde4a68c78e",
+      "verification": "TP",
+      "source_family": "ELEMENT_TEXT_CONTENT",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:firefox:ao3-advanced-marker-2@leehsuus.com:13.7:75d989ca39023eb9:01",
+          "flow": {
+            "flow_id": "expguard-opti:firefox:ao3-advanced-marker-2@leehsuus.com:13.7:75d989ca39023eb9:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "semantic_sha256": "75d989ca39023eb98aa65dd1adcb9972aebc8c02a22f6964ea5ad72bccf6bfea",
+            "semantic_key": {
+              "rule_id": "web-content-storage-write",
+              "flow_type": "STORAGE_POSOING",
+              "source_type": "ELEMENT_TEXT_CONTENT",
+              "source_file": "content",
+              "source_loc": "228959228989",
+              "source_frame": "CS_1",
+              "sink_type": "CHROME_LOCAL_STORAGE",
+              "sink_file": "content",
+              "sink_loc": "245116245170",
+              "sink_frame": "CS_1"
+            },
+            "identity_occurrence": 1,
+            "source_report_id": 3,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "web-content-storage-write",
+            "rule_description": "Page-derived content written into chrome.storage. Suppressed by the privilege-delta gate when no other code reads the key back.",
+            "severity": "HIGH",
+            "severity_reason": "Wildcard subdomain matching is allowed.",
+            "severity_evidence": [
+              "*://*.archiveofourown.org/tags/*"
+            ],
+            "source": {
+              "type": "ELEMENT_TEXT_CONTENT",
+              "remark": "From storage.local.set('ao3_hl_null') in content",
+              "file": "content",
+              "loc": "L2289:C59 -> L2289:C89",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://*.archiveofourown.org/tags/*",
+                      "*://*.archiveofourown.org/users/*",
+                      "*://*.archiveofourown.org/series/*",
+                      "*://*.archiveofourown.org/bookmarks*",
+                      "*://*.archiveofourown.org/works*",
+                      "*://*.archiveofourown.org/collections/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "UNTRUSTED_STORAGE",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "*://*.archiveofourown.org/tags/*",
+                  "*://*.archiveofourown.org/users/*",
+                  "*://*.archiveofourown.org/series/*",
+                  "*://*.archiveofourown.org/bookmarks*",
+                  "*://*.archiveofourown.org/works*",
+                  "*://*.archiveofourown.org/collections/*"
+                ]
+              },
+              "code_preview": "r = authorElement ? >>>authorElement.textContent.trim<<<() : 'Unknown Author"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "ao3_hl_null",
+              "file": "content",
+              "loc": "L2451:C16 -> L2451:C70",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://*.archiveofourown.org/tags/*",
+                      "*://*.archiveofourown.org/users/*",
+                      "*://*.archiveofourown.org/series/*",
+                      "*://*.archiveofourown.org/bookmarks*",
+                      "*://*.archiveofourown.org/works*",
+                      "*://*.archiveofourown.org/collections/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": " {\r\n                >>>storage.local.set({ [storageKey]: workData }, resolve)<<<;\r\n            });\r\n"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": true,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": "STORAGE_FLOW[area: local, key: ao3_hl_null, sender: content, receiver: content]"
+            },
+            "verification": "TP",
+            "dynamic": false,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_kind": null,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "user_manual_validation",
+                  "source": "Manual",
+                  "kind": "user_manual_validation",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": null,
+            "dynamic_detail": null,
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_validation": {
+              "selected": true,
+              "status": "confirmed_tp",
+              "verdict": "TP",
+              "confidence": 0.95,
+              "operator": "user-provided manual validation",
+              "validated_at_utc": "2026-09-22T14:39:11.083860Z",
+              "result": {
+                "reproduced": true,
+                "observed_effect": "用户人工验证确认该 Flow 可达并产生对应特权效果。",
+                "evidence_paths": [],
+                "limitations": "The verdict was supplied by the user as a manual validation result. No screenshot or HAR bytes were supplied with this conversation."
+              }
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "user_manual_validation",
+                "verification_origin": "manual_user_report",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at_utc": "2026-09-22T14:39:11.083860Z",
+                "notes": "用户人工验证确认该 Flow 可达并产生对应特权效果。"
+              }
+            ],
+            "notes": [
+              "Manual verdict applied: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "13.7",
+        "latest_version": "14.2",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\ao3-advanced-marker-2@leehsuus.com_14.2\\ao3-advanced-marker-2@leehsuus.com.14.2.xpi",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:firefox:ao3-advanced-marker-2@leehsuus.com:13.7:75d989ca39023eb9:01",
+            "original_source_type": "ELEMENT_TEXT_CONTENT",
+            "original_sink_type": "CHROME_LOCAL_STORAGE",
+            "revalidation_job_key": "firefox__ao3-advanced-marker-2@leehsuus.com__14.2__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\ao3-advanced-marker-2@leehsuus.com_14.2\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\firefox\\ao3-advanced-marker-2@leehsuus.com_14.2\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 3.922,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 3,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 9,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "ELEMENT_TEXT_CONTENT",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "ELEMENT_TEXT_CONTENT",
+                  "remark": "a[rel=\"author\"]",
+                  "file": "content",
+                  "loc": "L2556:C59 -> L2556:C89",
+                  "code": "const workAuthor = authorElement ? »authorElement.textContent.trim«() : 'Unknown Author';"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "ao3_hl_null",
+                  "file": "content",
+                  "loc": "L2757:C12 -> L2757:C66",
+                  "code": "»storage.local.set({ [storageKey]: workData }, resolve)«;"
+                },
+                "propagation_step_count": 4
+              },
+              {
+                "tool_flow_index": 17,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "ELEMENT_TEXT_CONTENT",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "ELEMENT_TEXT_CONTENT",
+                  "remark": "From storage.local.set('ao3_hl_null') in content",
+                  "file": "content",
+                  "loc": "L2556:C59 -> L2556:C89",
+                  "code": "const workAuthor = authorElement ? »authorElement.textContent.trim«() : 'Unknown Author';"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "ao3_hl_null",
+                  "file": "content",
+                  "loc": "L2799:C16 -> L2799:C70",
+                  "code": "»storage.local.set({ [storageKey]: workData }, resolve)«;"
+                },
+                "propagation_step_count": 53
+              },
+              {
+                "tool_flow_index": 17,
+                "sink_index": 2,
+                "flow_type": null,
+                "source_type": "ELEMENT_TEXT_CONTENT",
+                "sink_type": "CHROME_LOCAL_STORAGE",
+                "source": {
+                  "kind": "ELEMENT_TEXT_CONTENT",
+                  "remark": "From storage.local.set('ao3_hl_null') in content",
+                  "file": "content",
+                  "loc": "L2556:C59 -> L2556:C89",
+                  "code": "const workAuthor = authorElement ? »authorElement.textContent.trim«() : 'Unknown Author';"
+                },
+                "sink": {
+                  "kind": "CHROME_LOCAL_STORAGE",
+                  "remark": "ao3_hl_null",
+                  "file": "content",
+                  "loc": "L2718:C16 -> L2718:C70",
+                  "code": "»storage.local.set({ [storageKey]: workData }, resolve)«;"
+                },
+                "propagation_step_count": 53
+              }
+            ],
+            "tool_report_flow_count": 40,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "likely_unchanged",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "likely_unchanged",
+            "basis": "The original source/sink context is present in the updated source or has a unique high-scoring same-path candidate.",
+            "candidate_count": 3,
+            "top_candidate": {
+              "tool_flow_index": 17,
+              "sink_index": 2
+            },
+            "identity_evidence": {
+              "source_context_similarity": 1.0,
+              "sink_expression_similarity": 1.0,
+              "actual_source_context_similarity": 1.0,
+              "actual_sink_context_similarity": 1.0,
+              "source_remark_match": true,
+              "specific_sink_remark_match": true,
+              "sink_expression_same_after_short_identifier_normalization": true,
+              "ranking_score": 1.0,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:firefox:ao3-advanced-marker-2@leehsuus.com:13.7:75d989ca39023eb9:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

@@ -1,0 +1,177 @@
+{
+  "extensionId": "apcnhnfabpjbhehcnlebhdpidhmdhlon",
+  "extensionVersion": "2.0.4",
+  "sourceType": "CRX",
+  "status": "success",
+  "duration": 59.841,
+  "files": [
+    {
+      "file": "background.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 118007,
+      "durationMs": 18829.246688
+    },
+    {
+      "file": "contentScript.js",
+      "frame": "CS_1",
+      "frameTags": [
+        "CS_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ]
+          }
+        }
+      ],
+      "size": 186554,
+      "durationMs": 22851.107775
+    },
+    {
+      "file": "popup.js",
+      "frame": "POPUP_1",
+      "frameTags": [
+        "POPUP_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "POPUP_1",
+          "family": "EX"
+        }
+      ],
+      "size": 93563,
+      "durationMs": 15041.652425
+    }
+  ],
+  "totalFiles": 3,
+  "totalSize": 398124,
+  "cacheStats": {
+    "totalCalls": 0,
+    "hits": 0,
+    "misses": 0,
+    "evictions": 0,
+    "hitRate": 0,
+    "cacheSize": 0,
+    "maxEntries": 4096
+  },
+  "coverage": {
+    "totalNodes": 6786,
+    "coveredNodes": 4852,
+    "nodeCoverage": 0.7150014736221633,
+    "totalScopes": 1860,
+    "coveredScopes": 1272,
+    "scopeCoverage": 0.6838709677419355,
+    "analyzedScripts": 3,
+    "scripts": [
+      {
+        "file": "background",
+        "frame": "BG_1",
+        "totalNodes": 2438,
+        "coveredNodes": 1630,
+        "nodeCoverage": 0.6685808039376538,
+        "totalScopes": 629,
+        "coveredScopes": 408,
+        "scopeCoverage": 0.6486486486486487
+      },
+      {
+        "file": "contentScript",
+        "frame": "CS_1",
+        "totalNodes": 2073,
+        "coveredNodes": 1527,
+        "nodeCoverage": 0.7366136034732272,
+        "totalScopes": 595,
+        "coveredScopes": 413,
+        "scopeCoverage": 0.6941176470588235
+      },
+      {
+        "file": "popup",
+        "frame": "POPUP_1",
+        "totalNodes": 2275,
+        "coveredNodes": 1695,
+        "nodeCoverage": 0.7450549450549451,
+        "totalScopes": 636,
+        "coveredScopes": 451,
+        "scopeCoverage": 0.7091194968553459
+      }
+    ]
+  },
+  "hasFlows": true,
+  "flows": [
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "TARGET_CUSTOM_EVENT",
+      "sourceRemark": "target.addEventListener(emailActivation)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "contentScript",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "contentScript",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "http://*/*",
+          "https://*/*"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L1:C68872 -> L1:C68880",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "[Unknown URL]",
+      "sinkUrlTaintControl": "FULL",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L1:C115897 -> L1:C115905",
+      "ctx": "background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[contentScript->background]",
+      "messageSender": "contentScript",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "Wildcard host `*` allows coverage of arbitrary domains.",
+      "severityEvidence": [
+        "http://*/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "2,priority:1,action:>>>{type:\"b<<<lock\"},condition:{ur",
+      "sinkCode": "{e.source}`,i=await >>>fetch(r)<<<,o=await i.json();o."
+    }
+  ],
+  "privilegeSuppressedCount": 0,
+  "privilegeSuppressed": []
+}

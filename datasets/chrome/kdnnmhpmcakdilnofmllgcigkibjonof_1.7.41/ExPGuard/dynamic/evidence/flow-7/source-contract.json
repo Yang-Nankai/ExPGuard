@@ -1,0 +1,45 @@
+{
+  "surface": "CUSTOM_EVENT",
+  "sourcePath": "storage.js",
+  "location": "L209:C5 -> L209:C13",
+  "eventNames": [
+    "lemon",
+    "paddle"
+  ],
+  "eventTarget": "window",
+  "eventDetailKey": "detail",
+  "envelope": {},
+  "forwardField": "",
+  "scalarMessageValue": "",
+  "requirements": {
+    "attributes": "true"
+  },
+  "preconditionActions": [],
+  "selectors": [],
+  "mediaTags": [],
+  "snippet": "tail));\n\t\tvar product_id = e.detail.order.product_id || e.detail.lockers[0].product_id || \"\"; // Version 1.4.2g\n\t\tif (products_array.indexOf(product_id) > -1) { // Version 1.4.2g - Changed e.detail.order[\"product_id\"] to product_id\n\t\t\tvar obj = {};\n\t\t\t// obj[\"order_id\"] = e.detail.order.subscription_id || e.detail.order.order_id;\n\t\t\tobj[\"order_id\"] = e.detail.order.order_id; // It appears that the order_id should always be used with paddle\n\t\t\tobj[\"license\"] = \"FULL\";\n\t\t\tobj[\"kind\"] = \"paddle\";\n\t\t\tobj[\"is_subscription\"] = e.detail.order.is_subscription || \"\";\t// Version 1.6.7 - Added || \"\"\n\t\t\tvar cd2 = new Date(); cd2.setDate(cd2.getDate()-10); // Version 1.6.5 - Subtract 10 days from cd2 so next time they restart it will check for license\n\t\t\tobj[\"cd2\"] = cd2.getTime(); // Version 1.6.12 - Added .getTime() because it was object instead of number\n\t\t\t//save_to_sync(obj); // Save to sync in ",
+  "notes": [
+    "已从 source/sink 附近提取字面量分支。",
+    "已从 sink 文件推导消息分发字段 `command` 及候选值。",
+    "已从 sink 调用推导 URL 承载字段 `url`。",
+    "已提取页面可达事件名。"
+  ],
+  "discriminatorField": "command",
+  "discriminatorValues": [
+    "switch_fields"
+  ],
+  "urlField": "url",
+  "sinkTapKey": "storage.local.set",
+  "messageAlias": "",
+  "messageEventKey": "",
+  "jsonMessageField": "",
+  "eventDetailIsJson": false,
+  "sinkDataFields": [
+    "attributes",
+    "id",
+    "match"
+  ],
+  "runtimeMessageKeyPrefix": "",
+  "contractConfidence": "HIGH",
+  "contractWarnings": []
+}

@@ -1,0 +1,239 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "edge",
+  "extension_id": "fcblfpbeglkdleeegdjjomkaffglabic",
+  "version": "2.0.37",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-104bd3cfb731dabe",
+      "verification": "TP",
+      "source_family": "external",
+      "sink_family": "CHROME_TABS_CREATE_OPTIONS",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/edge/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:edge:fcblfpbeglkdleeegdjjomkaffglabic:2.0.37:12c41dc08a695f7e:01",
+          "flow": {
+            "flow_id": "expguard-opti:edge:fcblfpbeglkdleeegdjjomkaffglabic:2.0.37:12c41dc08a695f7e:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "12c41dc08a695f7e205228b97e6c354b47cd7c02c642ec141ba1903cf21dbb34",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "service_worker_utils/track_tabs",
+              "loc": "L157:C6 -> L157:C13",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "service_worker_utils/track_tabs",
+              "origin_frame_family": "UNKNOWN"
+            },
+            "sink": {
+              "type": "CHROME_TABS_CREATE_OPTIONS",
+              "remark": "",
+              "file": "service_worker_utils/track_tabs",
+              "loc": "L164:C10 -> L167:C12",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "expagent_dynamic",
+                  "source": "ExPAgent",
+                  "kind": "dynamic_report",
+                  "outcome": "EXTERNAL_CONDITION_REQUIRED",
+                  "basis": "external_condition_required",
+                  "confidence": 0.9,
+                  "detail": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。"
+                },
+                {
+                  "tier": "expagent_final",
+                  "source": "ExPAgent",
+                  "kind": "final_report",
+                  "verdict": "TP",
+                  "confidence": 0.6,
+                  "detail": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787026159313add9fca5277b8939d33af9a0f1789d6ca2a512', 'param': '', 'type': 'TooManyRequests'}}"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "single_source",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "EXTERNAL_MESSAGE",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: I have enough evidence to verify this flow. Let me reason through the four-part ledger. **(a) Who controls the source?** `chrome.runtime.onMessageExternal.addListener(function (request) {...})` at L156. The `request` object is fully controlled by any page allowed by `externally_connectable.matches` — `https://stg.matador.ai/*` and `https://app.matador.ai/*`. There is no `sender.id` allowlist; the only gate is `request.action === 'openTab'`, which is an attacker-chosen message *field*, no…",
+              "path": "extensions/fcblfpbeglkdleeegdjjomkaffglabic_2.0.37/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "EXTERNAL_CONDITION_REQUIRED",
+              "final_verdict": "TRUE_POSITIVE",
+              "recorded_label": "TP",
+              "confidence": 0.9,
+              "reproduced": false,
+              "basis": "external_condition_required",
+              "usable_for_label": true,
+              "evidence_stage": null,
+              "evidence_artifact_count": 2,
+              "reasoning": "源是 chrome.runtime.onMessageExternal / onConnectExternal（来自 externally_connectable 声明的外部网站/扩展消息）；需要匹配的受控发送方页面/扩展，属于外部消息发送方前置条件。",
+              "path": "extensions/fcblfpbeglkdleeegdjjomkaffglabic_2.0.37/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-16T19:06:56.708Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": {
+              "verdict": "TP",
+              "label": "TP",
+              "confidence": 0.6,
+              "reasoning": "Static phase is the strongest available completed review. Final ReAct/extraction error: Error code: 429 - {'error': {'code': 'AccountQuotaExceeded', 'message': 'You have exceeded the 5-hour usage quota. It will reset at 2026-08-18 15:42:49 +0800 CST. We recommend upgrading your plan for more quota, or waiting for the reset. Request id: 021787026159313add9fca5277b8939d33af9a0f1789d6ca2a512', 'param': '', 'type': 'TooManyRequests'}}",
+              "evidence_summary": "Static phase is the strongest available completed review.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "TRUE_POSITIVE",
+              "dynamic_outcome_snapshot": "EXTERNAL_CONDITION_REQUIRED",
+              "tool_reports_consulted": [
+                "primary"
+              ],
+              "trust": "aligned",
+              "usable_for_label": true,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/edge/extensions/fcblfpbeglkdleeegdjjomkaffglabic_2.0.37/final/final_report.json",
+              "report_mtime": "2026-08-18T04:09:18.040Z"
+            },
+            "manual_verification": null,
+            "notes": [
+              "Label rests on a recorded ExPAgent verdict reached with an unmet external precondition (no runtime reproduction)."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "still_detected",
+        "dataset_version": "2.0.37",
+        "latest_version": "2.0.58",
+        "package_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\edge\\fcblfpbeglkdleeegdjjomkaffglabic_2.0.58\\fcblfpbeglkdleeegdjjomkaffglabic.2.0.58.crx",
+        "tool_assessments": [
+          {
+            "tool": "ExPGuard",
+            "original_source_flow_id": "expguard-opti:edge:fcblfpbeglkdleeegdjjomkaffglabic:2.0.37:12c41dc08a695f7e:01",
+            "original_source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+            "original_sink_type": "CHROME_TABS_CREATE_OPTIONS",
+            "revalidation_job_key": "edge__fcblfpbeglkdleeegdjjomkaffglabic__2.0.58__ExPGuard",
+            "run_status": "completed",
+            "result_dir": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\edge\\fcblfpbeglkdleeegdjjomkaffglabic_2.0.58\\revalidation\\ExPGuard\\attempt-01",
+            "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard\\datasets\\updates\\edge\\fcblfpbeglkdleeegdjjomkaffglabic_2.0.58\\revalidation\\ExPGuard\\attempt-01\\report.flows.json",
+            "duration_seconds": 51.141,
+            "error": null,
+            "tool_summary_status": "success",
+            "outcome": "still_detected",
+            "comparison": "exact_source_and_sink_api_types",
+            "candidate_match_count": 1,
+            "candidate_matches": [
+              {
+                "tool_flow_index": 1,
+                "sink_index": 1,
+                "flow_type": null,
+                "source_type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "sink_type": "CHROME_TABS_CREATE_OPTIONS",
+                "source": {
+                  "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                  "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+                  "file": "background",
+                  "loc": "L1:C323738 -> L1:C323739",
+                  "code": "…e[e.id]={popup:null})},{windowTypes:[\"popup\"]}),chrome.runtime.onMessageExternal.addListener(function(e){if(\"openTab\"===»e«.action)return chrome.tabs.query({active:!0,currentWindow:!0},a=>{if(a.length>0){const c=a[0].index+1;chrome.tabs.create…"
+                },
+                "sink": {
+                  "kind": "CHROME_TABS_CREATE_OPTIONS",
+                  "file": "background",
+                  "loc": "L1:C323841 -> L1:C323880",
+                  "code": "…){if(\"openTab\"===e.action)return chrome.tabs.query({active:!0,currentWindow:!0},a=>{if(a.length>0){const c=a[0].index+1;»chrome.tabs.create({url:e.url,index:c})«}}),!0}),chrome.windows.onRemoved.addListener(async function(e){const a=Fe[e];a?(a.popup?await chrome.windows.remove(a.p…"
+                },
+                "propagation_step_count": 1
+              }
+            ],
+            "tool_report_flow_count": 1,
+            "source_review_required": true,
+            "interpretation": "Tool detection only. Endpoint API categories do not establish the identity or exploitability of the original Flow."
+          }
+        ]
+      },
+      "source_review": {
+        "status": "inconclusive",
+        "scope": "Only this original Ground Truth Flow; newly discovered Flows are ignored.",
+        "tool_reviews": [
+          {
+            "status": "inconclusive_ambiguous_candidates",
+            "basis": "Same API categories occur in multiple paths or source context similarity is insufficient for a unique identity decision.",
+            "candidate_count": 1,
+            "top_candidate": {
+              "tool_flow_index": 1,
+              "sink_index": 1
+            },
+            "identity_evidence": {
+              "source_context_similarity": 0.159,
+              "sink_expression_similarity": 0.56,
+              "actual_source_context_similarity": 0.343,
+              "actual_sink_context_similarity": 0.468,
+              "source_remark_match": true,
+              "specific_sink_remark_match": false,
+              "sink_expression_same_after_short_identifier_normalization": false,
+              "ranking_score": 0.471,
+              "meaning": "Similarity is candidate-ranking evidence only, not a proof of Flow identity or exploitability."
+            },
+            "tool": "ExPGuard",
+            "original_flow_id": "expguard-opti:edge:fcblfpbeglkdleeegdjjomkaffglabic:2.0.37:12c41dc08a695f7e:01",
+            "reviewed_at_utc": "2026-10-12T14:16:06Z",
+            "reviewer": "Codex evidence-assisted static source review"
+          }
+        ],
+        "limitations": "Static source evidence review; no claim of dynamic exploit reproduction or independent human laboratory reproduction."
+      }
+    }
+  ]
+}

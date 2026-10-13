@@ -1,0 +1,99 @@
+{
+    "benchmarks": {
+        "crashes": [],
+        "cs: got AST": 0.10330349206924438,
+        "cs: AST": 8.320808410644531e-05,
+        "cs: CFG": 9.80030745267868e-06,
+        "cs: PDG": 0.00013674050569534302,
+        "bp: got AST": 0.3339079301804304,
+        "bp: AST": 0.09456599317491055,
+        "bp: CFG": 0.02132693398743868,
+        "bp: PDG": 0.0656579714268446,
+        "collected messages": 0.02030390128493309,
+        "linked messages": 0.0042006392031908035,
+        "cs: dangers & from WA": 1.6069971024990082e-05,
+        "bp: dangers & from WA": 0.043210236355662346,
+        "cs: got vulnerabilities": 1.597125083208084e-05,
+        "bp: got vulnerabilities": 0.0004994664341211319,
+        "totalAnalysisSeconds": 0.712464558891952
+    },
+    "extension": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_felflkndljbjehhgadcfmijcoamhhngl_9432c9b84fde/dx_flo64b3u/unpacked/felflkndljbjehhgadcfmijcoamhhngl.2.1.0",
+    "cs": {
+        "direct_dangers": {},
+        "indirect_dangers": {},
+        "exfiltration_dangers": {}
+    },
+    "bp": {
+        "direct_dangers": {
+            "danger1": {
+                "danger": "chrome.notifications.create",
+                "value": "chrome.notifications.create(<pdg_js.node.ValueExpr object at 0x7f0f3d15b280>, <pdg_js.node.FunctionExpression object at 0x7f0f3d15b2b0>)",
+                "sink-param1": "e({\n\t\t\t\ttype: \"basic\",\n\t\t\t\ttitle: item.notifications.title,\n\t\t\t\tmessage: item.notifications.message,\n\t\t\t\ticonUrl: item.notifications.iconUrl\n\t\t",
+                "sink-param2": ", function(callback) {\n\n\t\t",
+                "line": "1285 - 1292",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_felflkndljbjehhgadcfmijcoamhhngl_9432c9b84fde/dx_flo64b3u/unpacked/felflkndljbjehhgadcfmijcoamhhngl.2.1.0/background.js",
+                "dataflow": false,
+                "param_id0": {},
+                "param_id1": {}
+            },
+            "danger2": {
+                "danger": "chrome.storage.local.set",
+                "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7f0f3d15bdf0>)",
+                "sink-param1": "t({\n\t\t\t\tnotifications: {}\n\t\t",
+                "line": "1298 - 1300",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_felflkndljbjehhgadcfmijcoamhhngl_9432c9b84fde/dx_flo64b3u/unpacked/felflkndljbjehhgadcfmijcoamhhngl.2.1.0/background.js",
+                "dataflow": false,
+                "param_id0": {}
+            },
+            "danger3": {
+                "danger": "chrome.storage.local.set",
+                "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7f0f3d1a03a0>)",
+                "sink-param1": "t({\n\t\t\tsettings: conf,\n\t\t\tuid: uid\n\t",
+                "line": "1243 - 1246",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_felflkndljbjehhgadcfmijcoamhhngl_9432c9b84fde/dx_flo64b3u/unpacked/felflkndljbjehhgadcfmijcoamhhngl.2.1.0/background.js",
+                "dataflow": false,
+                "param_id0": {}
+            },
+            "danger4": {
+                "danger": "chrome.storage.local.set",
+                "value": "chrome.storage.local.set({'request': {'key': 'request.value'}}, <pdg_js.node.FunctionExpression object at 0x7f0f3d1be400>)",
+                "sink-param1": {
+                    "request": {
+                        "key": "request.value"
+                    }
+                },
+                "sink-param2": ", () => {\n\t\t\t\tresponse({\n\t\t\t\t\tstatus: 'success'\n\t\t\t\t});\n\t\t",
+                "line": "1263 - 1267",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_felflkndljbjehhgadcfmijcoamhhngl_9432c9b84fde/dx_flo64b3u/unpacked/felflkndljbjehhgadcfmijcoamhhngl.2.1.0/background.js",
+                "dataflow": false,
+                "param_id0": {},
+                "param_id1": {}
+            }
+        },
+        "indirect_dangers": {},
+        "exfiltration_dangers": {
+            "danger1": {
+                "danger": "chrome.storage.local.get",
+                "value": "chrome.storage.local.get(<pdg_js.node.FunctionExpression object at 0x7f0f3d1bec70>)",
+                "sink-param1": "t(function(item) {\n\t\tif (item.notifications && Object.prototype.hasOwnProperty.call(item.notifications, 'message')) {\n\t\t\tchrome.notifications.create({\n\t\t\t\ttype: \"basic\",\n\t\t\t\ttitle: item.notifications.title,\n\t\t\t\tmessage: item.notifications.message,\n\t\t\t\ticonUrl: item.notifications.iconUrl\n\t\t\t}, function(callback) {\n\n\t\t\t});\n\t\t\tchrome.notifications.onClicked.addListener(function() {\n\t\t\t\tchrome.tabs.create({\n\t\t\t\t\turl: item.url\n\t\t\t\t});\n\t\t\t})\n\t\t\tchrome.storage.local.set({\n\t\t\t\tnotifications: {}\n\t\t\t});\n\t\t}\n",
+                "line": "1283 - 1302",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_felflkndljbjehhgadcfmijcoamhhngl_9432c9b84fde/dx_flo64b3u/unpacked/felflkndljbjehhgadcfmijcoamhhngl.2.1.0/background.js",
+                "dataflow": false
+            },
+            "danger2": {
+                "danger": "chrome.storage.local.get",
+                "value": "chrome.storage.local.get(<pdg_js.node.FunctionExpression object at 0x7f0f3d1be850>)",
+                "sink-param1": "t((data) => {\n\t\t\t\tresponse(data);\n\t\t",
+                "line": "1271 - 1273",
+                "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_felflkndljbjehhgadcfmijcoamhhngl_9432c9b84fde/dx_flo64b3u/unpacked/felflkndljbjehhgadcfmijcoamhhngl.2.1.0/background.js",
+                "dataflow": true,
+                "sent_to_wa_1": {
+                    "wa": "data",
+                    "line": "1272 - 1272",
+                    "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_felflkndljbjehhgadcfmijcoamhhngl_9432c9b84fde/dx_flo64b3u/unpacked/felflkndljbjehhgadcfmijcoamhhngl.2.1.0/background.js",
+                    "where": "data"
+                }
+            }
+        }
+    }
+}

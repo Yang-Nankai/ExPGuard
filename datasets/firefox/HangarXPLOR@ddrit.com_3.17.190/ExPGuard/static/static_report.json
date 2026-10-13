@@ -1,0 +1,104 @@
+{
+  "extension_id": "HangarXPLOR@ddrit.com",
+  "extension_version": "3.17.190",
+  "browser": "firefox",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 2,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 1,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — STORAGE_POSOING (page → content script → chrome.storage)\n\n### 1. Source control (who controls the tainted data)\n- **Source anchor confirmed**: `content_scripts/loader.js` L76 registers `window.addEventListener('message', ...)`; L78 reads `event.data.type`.\n- The page on `https://robertsspaceindustries.com/*/account/pledges*` (and `www.` variant) can call `window.postMessage(...)` to itself, and the content script (ISOLATED world) receives it on the same `window` object.\n- The only source-side guards are:\n  - L77 `if (event.source != window) return;` — trivially satisfied by the page posting to its own window.\n  - L78 `if ((event.data.type || false) == false) return;` — attacker-chosen `type` field.\n- No `sender.id`, no origin allowlist, no fixed action allowlist. The \"type\" field is attacker-controlled and drives the `switch`.\n\n**Conclusion:** source is genuinely page-controllable. The `event.source === window` and `type` checks are attacker-satisfiable, not authentication.\n\n### 2. Source-to-sink data path (unbroken)\nReported propagation is direct and verified in raw source:\n\n```\nL76 window.addEventListener('message', function(event) {\nL77   if (event.s",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {},
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "content_scripts/loader",
+          "reportedLoc": "L78:C9 -> L78:C24",
+          "resolvedFile": "content_scripts/loader.js",
+          "resolved": true,
+          "snippet": "L78 C9-24:     if ((event.data.type || false) == false) return;"
+        },
+        "sinkAnchor": {
+          "reportedFile": "content_scripts/loader",
+          "reportedLoc": "L88:C40 -> L88:C199",
+          "resolvedFile": "content_scripts/loader.js",
+          "resolved": true,
+          "snippet": "L88 C40-199:       case 'storage.local.set.request': chrome.storage.local.set(event.data.payload, function() { window.postMessage({ type: \"storage.set.response\", callbackIndex: event.data.callbackIndex }, \"*\") }); break;"
+        },
+        "sourceExpectedMarkers": [
+          "message",
+          "addEventListener",
+          "onmessage"
+        ],
+        "contentScriptSurface": [
+          {
+            "matches": [
+              "https://robertsspaceindustries.com/*/account/pledges*",
+              "https://www.robertsspaceindustries.com/*/account/pledges*"
+            ],
+            "excludeMatches": [],
+            "js": [
+              "content_scripts/loader.js"
+            ],
+            "runAt": "document_end",
+            "allFrames": false,
+            "world": "ISOLATED"
+          }
+        ],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": [
+          "The exact source anchor does not contain the expected source API/token; inspect surrounding code before trusting a minified-text match."
+        ]
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": false,
+        "trigger_mechanism": "OTHER",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 0 flagged triggerable for dynamic testing."
+}

@@ -1,0 +1,94 @@
+{
+  "extension_id": "mmioliijnhnoblpgimnlajmefafdfilb",
+  "extension_version": "2.5.0",
+  "browser": "chrome",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "flow_count": 1,
+  "verified_count": 1,
+  "verdicts": [
+    {
+      "flow_index": 0,
+      "verdict": "TRUE_POSITIVE",
+      "confidence": 0.6,
+      "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 \u2014 `TARGET_CUSTOM_EVENT` \u2192 `chrome.storage.sync.set`\n\n### (a) Who controls the source\nThe source is the `detail` of a `CustomEvent` named **`contentscript_host:storageChange`**, listened for on `document` inside the content script running on `*://www.shazam.com/*` and `*://amp.shazam.com/*`.\n\nI read the actual code around the reported columns:\n\n```js\ndocument.addEventListener(\"contentscript_host:storageChange\",(e=>{\n  let{eventType:t,key:n,data:o}=e.detail;\n  \"amconnect\"===n && (\"removed\"===t ? chrome.storage.sync.remove(n) : chrome.storage.sync.set(o,(()=>{})))\n}));\n```\n\nThe content script shares the DOM with the host page. A script running on `www.shazam.com` (or `amp.shazam.com`) can dispatch a custom event with any name on `document`, so the page controls `e.detail` and therefore `data`. The deterministic harness corroborates this (`PAGE_TO_CONTENT_SCRIPT`, \"a page can forge \u2026 CustomEvent fields\"). This is untrusted web content reaching a content-script API.\n\n### (b) Exact source-to-sink path\n`e.detail` \u2192 destructuring `{eventType:t, key:n, data:o}` \u2192 `\"amconnect\" === n` gate \u2192 `\"removed\" !== t` branch \u2192 **`chrome.storage.sync.set(o)`**.\n\nThere is no s",
+      "attacker_control": "See preserved static analyst transcript.",
+      "confirmed_path": "See preserved static analyst transcript.",
+      "false_positive_reason": "",
+      "partial_reason": "",
+      "pa_category": "",
+      "representative_index": null,
+      "report_disposition": "SUMMARY",
+      "source_report_id": 1,
+      "source_provenance": "CONTENT_SCRIPT",
+      "message_sender_provenance": "",
+      "privilege_reason": "sink grants capability beyond the source origin",
+      "report_evidence": {
+        "sanitized": false,
+        "duplicatePaths": 1,
+        "rawSteps": 13,
+        "distinctLines": 1,
+        "crossContextHops": [],
+        "sinkUrlControl": []
+      },
+      "harness_evidence": {
+        "version": "browser-extension-static-harness/v1",
+        "sourceReachability": {
+          "kind": "PAGE_TO_CONTENT_SCRIPT",
+          "browserFacts": "A page can forge window.postMessage/CustomEvent fields and mutate shared DOM values. event.source === window, same-page origin checks, and message action/type fields are not authentication."
+        },
+        "sourceAnchor": {
+          "reportedFile": "contentScript.bundle",
+          "reportedLoc": "L1:C497 -> L1:C505",
+          "resolvedFile": "contentScript.bundle.js",
+          "resolved": true,
+          "snippet": "L1 C497-505: \u2026tListener(\"contentscript_host:storageChange\",(e=>{let{eventType:t,key:n,data:o}=e.detail;\"amconnect\"===n&&(\"removed\"===t?chrome.storage.sync.remove(n):chrome.storage.sy\u2026"
+        },
+        "sinkAnchor": {
+          "reportedFile": "contentScript.bundle",
+          "reportedLoc": "L1:C568 -> L1:C603",
+          "resolvedFile": "contentScript.bundle.js",
+          "resolved": true,
+          "snippet": "L1 C568-603: \u2026,data:o}=e.detail;\"amconnect\"===n&&(\"removed\"===t?chrome.storage.sync.remove(n):chrome.storage.sync.set(o,(()=>{})))}));"
+        },
+        "sourceExpectedMarkers": [
+          "addEventListener",
+          "detail"
+        ],
+        "contentScriptSurface": [],
+        "externallyConnectable": null,
+        "authenticatedExtensionAllowlist": null,
+        "sinkClassification": {
+          "class": "SECURITY_RELEVANT",
+          "rule": "Confirm that attacker data reaches the actual URL/config/body/code/storage argument and is not replaced by a literal or browser-derived value."
+        },
+        "browserTrustRules": [
+          "sender.id is browser-populated and only a fixed-ID allowlist is an unforgeable inter-extension trust boundary.",
+          "event.origin/window.location.origin and message action/type fields are attacker-satisfiable in a page-to-content-script bridge.",
+          "chrome.action/browserAction badge, title, icon, and chrome.notifications UI state are extension/browser authority; attacker-controlled operative fields are TP, not harmless presentation. Verify the value reaches the API argument.",
+          "A source/sink match in an import statement, comment, dead code, or an unrelated action branch is not a data-flow proof.",
+          "For chrome.tabs.create/windows.create/downloads/fetch/WebSocket, verify that the tainted value controls the URL/body/options actually consumed by the API."
+        ],
+        "warnings": []
+      },
+      "verdict_basis": "Explicit labelled verdict recovered from the final static transcript after structured-output fallback.",
+      "dynamic_guidance": {
+        "triggerable": true,
+        "trigger_mechanism": "DOM_INPUT",
+        "injection_context": "",
+        "origin_requirement": "",
+        "trigger_surface": "",
+        "target_urls": [],
+        "payload_sketch": "",
+        "dom_forgery": "",
+        "beacon_pointable": false,
+        "beacon_param": "",
+        "observation": "",
+        "notes": ""
+      }
+    }
+  ],
+  "unreviewed_flow_indices": [],
+  "reused_flow_indices": [],
+  "summary": "Verified 1 flow(s): 1 true-positive, 0 false-positive, 0 partial-available (PA), 0 uncertain, 0 duplicate; 1 flagged triggerable for dynamic testing."
+}

@@ -1,0 +1,401 @@
+{
+  "extensionId": "offaffijfcafoohdmbhllfmcbijgfkoi",
+  "extensionVersion": "1.2",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 3,
+    "totalFiles": 4,
+    "distinctFlows": 3,
+    "rawIssueEntries": 3,
+    "sinklessSourcesSkipped": 2
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "contentScript",
+      "frame": "CS_1",
+      "constraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "contentScript",
+        "loc": "L8:C8 -> L8:C23",
+        "line": 8,
+        "col": [
+          8,
+          23
+        ],
+        "spansTo": null,
+        "code": "if (»event.data.type« && (event.data.type == \"ESMART_WEB_EXTENSION_REQUEST\")) {"
+      },
+      "sinks": [
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "*",
+          "file": "contentScript",
+          "loc": "L14:C12 -> L14:C131",
+          "line": 14,
+          "col": [
+            12,
+            131
+          ],
+          "spansTo": null,
+          "code": "»window.postMessage({ type: \"ESMART_WEB_EXTENSION_RESPONSE\", requestId: event.data.requestId, response: response }, \"*\")«;",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 14,
+        "distinctLines": 6,
+        "steps": [
+          {
+            "n": 1,
+            "file": "contentScript",
+            "line": 8,
+            "ops": [
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»event.data.type && (event.data.type == \"ESMART_WEB_EXTENSION_REQUEST\")«) {"
+          },
+          {
+            "n": 2,
+            "file": "contentScript",
+            "line": 10,
+            "ops": [
+              "ELEMENT:member-element"
+            ],
+            "code": "operation: »event.data.operation«,"
+          },
+          {
+            "n": 3,
+            "file": "contentScript",
+            "line": 9,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        browser.runtime.sendMessage({«",
+            "spansTo": 15
+          },
+          {
+            "n": 4,
+            "file": "contentScript",
+            "line": 11,
+            "ops": [
+              "ELEMENT:member-element"
+            ],
+            "code": "data: »event.data.data«,"
+          },
+          {
+            "n": 5,
+            "file": "contentScript",
+            "line": 12,
+            "ops": [
+              "ELEMENT:member-element"
+            ],
+            "code": "method: »event.data.method«"
+          },
+          {
+            "n": 6,
+            "file": "contentScript",
+            "line": 14,
+            "ops": [
+              "ELEMENT:member-element",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»window.postMessage({ type: \"ESMART_WEB_EXTENSION_RESPONSE\", requestId: event.data.requestId, response: response }, \"*\")«;"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "background",
+        "loc": "L3:C0 -> L60:C2",
+        "line": 3,
+        "col": [
+          0,
+          2
+        ],
+        "spansTo": 60,
+        "code": "»browser.runtime.onMessage.addListener(async (request, sender) => {«"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L48:C15 -> L48:C42",
+          "line": 48,
+          "col": [
+            15,
+            42
+          ],
+          "spansTo": null,
+          "code": "return »fetch(url, fetchParameters)«.then(function (response) {",
+          "urlControl": "FULL",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_BODY",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L48:C15 -> L48:C42",
+          "line": 48,
+          "col": [
+            15,
+            42
+          ],
+          "spansTo": null,
+          "code": "return »fetch(url, fetchParameters)«.then(function (response) {",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 322,
+        "distinctLines": 15,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 3,
+            "ops": [
+              "MESSAGE",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»browser.runtime.onMessage.addListener(async (request, sender) => {«",
+            "spansTo": 60,
+            "crossContextHop": "runtime.single.sender.message[contentScript->background]"
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 29,
+            "ops": [
+              "ASSIGN:binary-right"
+            ],
+            "code": "var url = url + »request.operation«;"
+          },
+          {
+            "n": 3,
+            "file": "background",
+            "line": 31,
+            "ops": [
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "request.method = request.method ? »request.method« : \"GET\";"
+          },
+          {
+            "n": 4,
+            "file": "background",
+            "line": 32,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        let fetchParameters = {«",
+            "spansTo": 37
+          },
+          {
+            "n": 5,
+            "file": "background",
+            "line": 40,
+            "ops": [
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request.method.toLowerCase()« == \"get\") {"
+          },
+          {
+            "n": 6,
+            "file": "background",
+            "line": 48,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "return fetch(»url«, fetchParameters).then(function (response) {"
+          },
+          {
+            "n": 7,
+            "file": "background",
+            "line": 41,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "url = buildUrl(»url«, request.data);"
+          },
+          {
+            "n": 8,
+            "file": "background",
+            "line": 73,
+            "ops": [
+              "ASSIGN:identifier",
+              "ITERATE:loop.iteration"
+            ],
+            "code": "for (»var key in parameters«) {"
+          },
+          {
+            "n": 9,
+            "file": "background",
+            "line": 74,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "var value = »parameters[key]«;"
+          },
+          {
+            "n": 10,
+            "file": "background",
+            "line": 75,
+            "ops": [
+              "ASSIGN:identifier",
+              "RETURN:encodeURIComponent",
+              "ASSIGN:binary-left",
+              "ASSIGN:binary-right"
+            ],
+            "code": "qs += »encodeURIComponent(key) + \"=\" + encodeURIComponent(value)« + \"&\";"
+          },
+          {
+            "n": 11,
+            "file": "background",
+            "line": 78,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member.length",
+              "ASSIGN:binary-left",
+              "RETURN:fallback-return"
+            ],
+            "code": "qs = »qs.substring(0, qs.length - 1)«; //chop off last \"&\""
+          },
+          {
+            "n": 12,
+            "file": "background",
+            "line": 81,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "return »url«;"
+          },
+          {
+            "n": 13,
+            "file": "background",
+            "line": 79,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ASSIGN:binary-right"
+            ],
+            "code": "url = »url + \"?\" + qs«;"
+          },
+          {
+            "n": 14,
+            "file": "background",
+            "line": 77,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member.length",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»qs.length« > 0) {"
+          },
+          {
+            "n": 15,
+            "file": "background",
+            "line": 44,
+            "ops": [
+              "RETURN:json.stringify"
+            ],
+            "code": "fetchParameters.body = »JSON.stringify(request.data)«;"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "file": "options",
+      "frame": "OPTIONS_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "serviceUrl",
+        "file": "options",
+        "loc": "L24:C38 -> L24:C48",
+        "line": 24,
+        "col": [
+          38,
+          48
+        ],
+        "spansTo": null,
+        "code": "findStorage().set({ 'serviceUrl': »serviceUrl« }, function () {"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "serviceUrl",
+          "file": "options",
+          "loc": "L24:C4 -> L26:C6",
+          "line": 24,
+          "col": [
+            4,
+            6
+          ],
+          "spansTo": 26,
+          "code": "»findStorage().set({ 'serviceUrl': serviceUrl }, function () {«",
+          "frame": "OPTIONS_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 4,
+        "distinctLines": 2,
+        "steps": [
+          {
+            "n": 1,
+            "file": "options",
+            "line": 24,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "findStorage().set({ 'serviceUrl': »serviceUrl }, function () {«",
+            "spansTo": 26
+          },
+          {
+            "n": 2,
+            "file": "options",
+            "line": 25,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "console.log('Value is set to ' + »serviceUrl«);"
+          }
+        ]
+      }
+    }
+  ]
+}

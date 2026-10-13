@@ -1,0 +1,3720 @@
+{
+  "extensionId": "ookgnahfklmejhicejjbfjifppjbfnlk",
+  "extensionVersion": "5.3.3",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 5,
+    "totalFiles": 8,
+    "distinctFlows": 11,
+    "rawIssueEntries": 125,
+    "sinklessSourcesSkipped": 21
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "content",
+      "frame": "CS_2",
+      "constraint": {
+        "matches": [
+          "https://www.facebook.com/*",
+          "https://business.facebook.com/*",
+          "https://adsmanager.facebook.com/*"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "content",
+        "loc": "L162:C6 -> L162:C13",
+        "line": 162,
+        "col": [
+          6,
+          13
+        ],
+        "spansTo": null,
+        "code": "if (»!e.data« || !e.data.__adsmeta) return;"
+      },
+      "sinks": [
+        {
+          "kind": "WEB_SESSION_STORAGE_SET_VALUE",
+          "remark": null,
+          "file": "content",
+          "loc": "L168:C10 -> L168:C60",
+          "line": 168,
+          "col": [
+            10,
+            60
+          ],
+          "spansTo": null,
+          "code": "try { »sessionStorage.setItem('_adsmeta_fb_token', token)«; sessionStorage.setItem('_adsmeta_fb_token_time', String(Date.now())) } catch {}",
+          "frame": "CS_2",
+          "constraint": {
+            "matches": [
+              "https://www.facebook.com/*",
+              "https://business.facebook.com/*",
+              "https://adsmanager.facebook.com/*"
+            ]
+          }
+        },
+        {
+          "kind": "CHROME_SESSION_STORAGE",
+          "remark": "fb_token",
+          "file": "content",
+          "loc": "L154:C14 -> L154:C46",
+          "line": 154,
+          "col": [
+            14,
+            46
+          ],
+          "spansTo": null,
+          "code": "const p = »chrome.storage.session.set(data)«",
+          "frame": "CS_2",
+          "constraint": {
+            "matches": [
+              "https://www.facebook.com/*",
+              "https://business.facebook.com/*",
+              "https://adsmanager.facebook.com/*"
+            ]
+          }
+        },
+        {
+          "kind": "CHROME_SESSION_STORAGE",
+          "remark": "fb_fbdt",
+          "file": "content",
+          "loc": "L154:C14 -> L154:C46",
+          "line": 154,
+          "col": [
+            14,
+            46
+          ],
+          "spansTo": null,
+          "code": "const p = »chrome.storage.session.set(data)«",
+          "frame": "CS_2",
+          "constraint": {
+            "matches": [
+              "https://www.facebook.com/*",
+              "https://business.facebook.com/*",
+              "https://adsmanager.facebook.com/*"
+            ]
+          }
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "fb_token",
+          "file": "content",
+          "loc": "L171:C10 -> L171:C82",
+          "line": 171,
+          "col": [
+            10,
+            82
+          ],
+          "spansTo": null,
+          "code": "try { »chrome.storage.local.set({ fb_token: token, fb_token_time: Date.now() })« } catch {}",
+          "frame": "CS_2",
+          "constraint": {
+            "matches": [
+              "https://www.facebook.com/*",
+              "https://business.facebook.com/*",
+              "https://adsmanager.facebook.com/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 33,
+        "distinctLines": 9,
+        "steps": [
+          {
+            "n": 1,
+            "file": "content",
+            "line": 162,
+            "ops": [
+              "ASSIGN:unary",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»!e.data || !e.data.__adsmeta«) return;"
+          },
+          {
+            "n": 2,
+            "file": "content",
+            "line": 163,
+            "ops": [
+              "ELEMENT:destructure-property[token]",
+              "ELEMENT:destructure-property[fbdt]"
+            ],
+            "code": "const { »token, fbdt« } = e.data;"
+          },
+          {
+            "n": 3,
+            "file": "content",
+            "line": 164,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»token && token.startsWith('EAA')«) {"
+          },
+          {
+            "n": 4,
+            "file": "content",
+            "line": 165,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "_cachedToken = »token«;"
+          },
+          {
+            "n": 5,
+            "file": "content",
+            "line": 166,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (»fbdt) _cachedFbdt = fbdt«;"
+          },
+          {
+            "n": 6,
+            "file": "content",
+            "line": 168,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "try { sessionStorage.setItem('_adsmeta_fb_token', »token«); sessionStorage.setItem('_adsmeta_fb_token_time', String(Date.now())) } catch {}"
+          },
+          {
+            "n": 7,
+            "file": "content",
+            "line": 169,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread"
+            ],
+            "code": "»safeSessionSet({ fb_token: token, fb_token_time: Date.now(), ...(fbdt ? { fb_fbdt: fbdt } : {}) })«;"
+          },
+          {
+            "n": 8,
+            "file": "content",
+            "line": 171,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "try { »chrome.storage.local.set({ fb_token: token, fb_token_time: Date.now() })« } catch {}"
+          },
+          {
+            "n": 9,
+            "file": "content",
+            "line": 37,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (»_cachedToken) return { token: _cachedToken, fbdt: _cachedFbdt, eaag: _cachedEaag };«"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "sidebar",
+      "frame": "CS_5",
+      "constraint": {
+        "matches": [
+          "https://adsmanager.facebook.com/adsmanager/manage/campaigns*",
+          "https://adsmanager.facebook.com/adsmanager/manage/adsets*",
+          "https://adsmanager.facebook.com/adsmanager/manage/ads*",
+          "https://adsmanager.facebook.com/adsmanager/billing_hub/accounts/details*",
+          "https://adsmanager.facebook.com/adsmanager/billing_hub/payment_settings*",
+          "https://adsmanager.facebook.com/*/billing_hub/accounts/details*",
+          "https://adsmanager.facebook.com/*/billing_hub/payment_settings*",
+          "https://business.facebook.com/billing_hub/accounts/details*",
+          "https://business.facebook.com/latest/billing_hub/accounts/details*",
+          "https://business.facebook.com/*/billing_hub/accounts/details*",
+          "https://business.facebook.com/billing_hub/payment_settings*",
+          "https://business.facebook.com/latest/billing_hub/payment_settings*",
+          "https://business.facebook.com/*/billing_hub/payment_settings*"
+        ]
+      },
+      "source": {
+        "kind": "DOCUMENT_LOCATION",
+        "remark": "location.href",
+        "file": "sidebar",
+        "loc": "L197:C14 -> L197:C33",
+        "line": 197,
+        "col": [
+          14,
+          33
+        ],
+        "spansTo": null,
+        "code": "const m = »location.href.match«(/act[=_](\\d+)/)"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "sidebar",
+          "loc": "L318:C11 -> L321:C6",
+          "line": 318,
+          "col": [
+            11,
+            6
+          ],
+          "spansTo": 321,
+          "code": "return »fetch(url, {«",
+          "urlControl": "FULL",
+          "frame": "CS_5",
+          "constraint": {
+            "matches": [
+              "https://adsmanager.facebook.com/adsmanager/manage/campaigns*",
+              "https://adsmanager.facebook.com/adsmanager/manage/adsets*",
+              "https://adsmanager.facebook.com/adsmanager/manage/ads*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/payment_settings*",
+              "https://adsmanager.facebook.com/*/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/*/billing_hub/payment_settings*",
+              "https://business.facebook.com/billing_hub/accounts/details*",
+              "https://business.facebook.com/latest/billing_hub/accounts/details*",
+              "https://business.facebook.com/*/billing_hub/accounts/details*",
+              "https://business.facebook.com/billing_hub/payment_settings*",
+              "https://business.facebook.com/latest/billing_hub/payment_settings*",
+              "https://business.facebook.com/*/billing_hub/payment_settings*"
+            ]
+          }
+        },
+        {
+          "kind": "FETCH_BODY",
+          "remark": "location.origin/api/graphql",
+          "file": "sidebar",
+          "loc": "L272:C24 -> L274:C8",
+          "line": 272,
+          "col": [
+            24,
+            8
+          ],
+          "spansTo": 274,
+          "code": "const res = await »fetch(`${window.location.origin}/api/graphql`, {«",
+          "frame": "CS_5",
+          "constraint": {
+            "matches": [
+              "https://adsmanager.facebook.com/adsmanager/manage/campaigns*",
+              "https://adsmanager.facebook.com/adsmanager/manage/adsets*",
+              "https://adsmanager.facebook.com/adsmanager/manage/ads*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/payment_settings*",
+              "https://adsmanager.facebook.com/*/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/*/billing_hub/payment_settings*",
+              "https://business.facebook.com/billing_hub/accounts/details*",
+              "https://business.facebook.com/latest/billing_hub/accounts/details*",
+              "https://business.facebook.com/*/billing_hub/accounts/details*",
+              "https://business.facebook.com/billing_hub/payment_settings*",
+              "https://business.facebook.com/latest/billing_hub/payment_settings*",
+              "https://business.facebook.com/*/billing_hub/payment_settings*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 4595,
+        "distinctLines": 44,
+        "steps": [
+          {
+            "n": 1,
+            "file": "sidebar",
+            "line": 197,
+            "ops": [
+              "ELEMENT:member-element",
+              "RETURN:fallback-return"
+            ],
+            "code": "const m = »location.href.match(/act[=_](\\d+)/)«"
+          },
+          {
+            "n": 2,
+            "file": "sidebar",
+            "line": 198,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "return m ? »m[1]« : null"
+          },
+          {
+            "n": 3,
+            "file": "sidebar",
+            "line": 2193,
+            "ops": [
+              "ELEMENT:implicit.add"
+            ],
+            "code": "const »actId = actFromUrl()«"
+          },
+          {
+            "n": 4,
+            "file": "sidebar",
+            "line": 2194,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!actId«) {"
+          },
+          {
+            "n": 5,
+            "file": "sidebar",
+            "line": 2201,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right",
+              "ASSIGN:logical-left"
+            ],
+            "code": "if (»!force && S.actId === actId && S.info«) { renderBody(); return }"
+          },
+          {
+            "n": 6,
+            "file": "sidebar",
+            "line": 2203,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-left"
+            ],
+            "code": "if (»S.actId !== actId || force«) { S.newLimit = null; S.spendMax = null; S.bmAcct = null }  // đổi TK HOẶC bấm 🔄 làm mới → bỏ cache Limit/Chi-tiêu-max/BM để tải lại HẾT"
+          },
+          {
+            "n": 7,
+            "file": "sidebar",
+            "line": 2204,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "S.actId = »actId«"
+          },
+          {
+            "n": 8,
+            "file": "sidebar",
+            "line": 147,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»  let S = {«",
+            "spansTo": 178
+          },
+          {
+            "n": 9,
+            "file": "sidebar",
+            "line": 2205,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "actidEl.textContent = »actId«"
+          },
+          {
+            "n": 10,
+            "file": "sidebar",
+            "line": 1024,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »actidEl = document.getElementById('__amsb-actid')«"
+          },
+          {
+            "n": 11,
+            "file": "sidebar",
+            "line": 2240,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:template-literal"
+            ],
+            "code": "directFetch(»`${GRAPH}/act_${actId}?fields=${encodeURIComponent(fields)}&access_token=${token}`«),"
+          },
+          {
+            "n": 12,
+            "file": "sidebar",
+            "line": 318,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "return fetch(»url«, {"
+          },
+          {
+            "n": 13,
+            "file": "sidebar",
+            "line": 2247,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "fetchNewLimit(»actId«)"
+          },
+          {
+            "n": 14,
+            "file": "sidebar",
+            "line": 262,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right",
+              "ASSIGN:logical-left",
+              "ASSIGN:binary-left",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "if (»S.newLimit && S.newLimit.actId === actId && S.newLimit.done«) return"
+          },
+          {
+            "n": 15,
+            "file": "sidebar",
+            "line": 264,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ASSIGN:binary-right"
+            ],
+            "code": "const retry = () => { if (attempt < 3) setTimeout(() => { if (»S.actId === actId) fetchNewLimit(actId«, attempt + 1) }, 1200 * (attempt + 1)); else finalize(null) }"
+          },
+          {
+            "n": 16,
+            "file": "sidebar",
+            "line": 263,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "ASSIGN:binary-left",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right"
+            ],
+            "code": "const finalize = raw => { »S.newLimit = { actId, raw, done: true }; if (S.open && S.info && S.actId === actId«) renderBody() }"
+          },
+          {
+            "n": 17,
+            "file": "sidebar",
+            "line": 271,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:template-literal"
+            ],
+            "code": "fd.append('variables', »`{\"assetID\":${actId}}`«)"
+          },
+          {
+            "n": 18,
+            "file": "sidebar",
+            "line": 268,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »fd = new FormData()«"
+          },
+          {
+            "n": 19,
+            "file": "sidebar",
+            "line": 272,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»      const res = await fetch(`${window.location.origin}/api/graphql`, {«",
+            "spansTo": 274
+          },
+          {
+            "n": 20,
+            "file": "sidebar",
+            "line": 2249,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "fetchSpendMax(»actId«, token)"
+          },
+          {
+            "n": 21,
+            "file": "sidebar",
+            "line": 289,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right",
+              "ASSIGN:binary-left",
+              "ASSIGN:logical-left",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "if (»S.spendMax && S.spendMax.actId === actId«) return  // cache theo account"
+          },
+          {
+            "n": 22,
+            "file": "sidebar",
+            "line": 292,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:template-literal"
+            ],
+            "code": "const r = await directFetch(»`${GRAPH}/act_${actId}/insights?date_preset=maximum&fields=spend&access_token=${token}`«)"
+          },
+          {
+            "n": 23,
+            "file": "sidebar",
+            "line": 294,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»S.spendMax = { actId, raw: spend == null ? null : Number(spend) }«"
+          },
+          {
+            "n": 24,
+            "file": "sidebar",
+            "line": 295,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»S.open && S.info && S.actId === actId«) renderBody()"
+          },
+          {
+            "n": 25,
+            "file": "sidebar",
+            "line": 2264,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (info.owner_business?.id) fetchBmAcctCount(»actId«, info.owner_business.id, token)"
+          },
+          {
+            "n": 26,
+            "file": "sidebar",
+            "line": 304,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right",
+              "ASSIGN:binary-left",
+              "ASSIGN:logical-left",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "if (»S.bmAcct && S.bmAcct.actId === actId«) return  // cache theo account"
+          },
+          {
+            "n": 27,
+            "file": "sidebar",
+            "line": 309,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»S.bmAcct = { actId, raw: total == null ? null : Number(total) }«"
+          },
+          {
+            "n": 28,
+            "file": "sidebar",
+            "line": 310,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»S.open && S.info && S.actId === actId«) renderBody()"
+          },
+          {
+            "n": 29,
+            "file": "sidebar",
+            "line": 2266,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right"
+            ],
+            "code": "acnEl.textContent = »info.name || ('act_' + actId)«"
+          },
+          {
+            "n": 30,
+            "file": "sidebar",
+            "line": 1023,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »acnEl   = document.getElementById('__amsb-acname')«"
+          },
+          {
+            "n": 31,
+            "file": "sidebar",
+            "line": 1931,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "if (»!S.newLimit || S.newLimit.actId !== S.actId«) limitHtml = '<span class=\"__amsb-ispin\"></span>'"
+          },
+          {
+            "n": 32,
+            "file": "sidebar",
+            "line": 1932,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-left"
+            ],
+            "code": "else if (»S.newLimit.raw« == null) limitHtml = '—'"
+          },
+          {
+            "n": 33,
+            "file": "sidebar",
+            "line": 1937,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "if (»!S.spendMax || S.spendMax.actId !== S.actId«) spentHtml = '<span class=\"__amsb-ispin\"></span>'"
+          },
+          {
+            "n": 34,
+            "file": "sidebar",
+            "line": 1938,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-left"
+            ],
+            "code": "else if (»S.spendMax.raw« == null) spentHtml = '—'"
+          },
+          {
+            "n": 35,
+            "file": "sidebar",
+            "line": 1967,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "else if (»!S.bmAcct || S.bmAcct.actId !== S.actId«) bmHtml = '<span class=\"__amsb-ispin\"></span>'"
+          },
+          {
+            "n": 36,
+            "file": "sidebar",
+            "line": 1968,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-left"
+            ],
+            "code": "else if (»S.bmAcct.raw« == null) bmHtml = escH(info.owner_business.name || '—')  // lấy count lỗi → hiện tên BM"
+          },
+          {
+            "n": 37,
+            "file": "sidebar",
+            "line": 2013,
+            "ops": [
+              "ASSIGN:logical-right",
+              "ASSIGN:logical-left"
+            ],
+            "code": "${isBillingPage ? row(ic.person, 'ID', »info.id || S.actId || '—'«) : ''}"
+          },
+          {
+            "n": 38,
+            "file": "sidebar",
+            "line": 2054,
+            "ops": [
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»S._prevCur !== cur || S._prevAct !== S.actId«) { S._prevVals = {}; S._prevCur = cur; S._prevAct = S.actId }"
+          },
+          {
+            "n": 39,
+            "file": "sidebar",
+            "line": 1449,
+            "ops": [
+              "ASSIGN:logical-left"
+            ],
+            "code": "function curName() { return (S.info && S.info.name) ? S.info.name : (»acnEl.textContent || ''«) }"
+          },
+          {
+            "n": 40,
+            "file": "sidebar",
+            "line": 1441,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »renameInput = document.getElementById('__amsb-rename-input')«"
+          },
+          {
+            "n": 41,
+            "file": "sidebar",
+            "line": 1458,
+            "ops": [
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»!trimmedName || trimmedName === curName()«) { closeRename(); return }"
+          },
+          {
+            "n": 42,
+            "file": "sidebar",
+            "line": 1461,
+            "ops": [
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!S.actId«) { showRenameMsg('Chưa nhận diện TKQC — mở Ads Manager rồi thử lại.', false); return }"
+          },
+          {
+            "n": 43,
+            "file": "sidebar",
+            "line": 1616,
+            "ops": [
+              "ASSIGN:logical-left"
+            ],
+            "code": "navigator.clipboard.writeText(»actidEl.textContent || ''«).catch(() => {})"
+          },
+          {
+            "n": 44,
+            "file": "sidebar",
+            "line": 2409,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ASSIGN:binary-right"
+            ],
+            "code": "if (»location.href !== _url«) {"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "file": "sidebar",
+      "frame": "CS_5",
+      "constraint": {
+        "matches": [
+          "https://adsmanager.facebook.com/adsmanager/manage/campaigns*",
+          "https://adsmanager.facebook.com/adsmanager/manage/adsets*",
+          "https://adsmanager.facebook.com/adsmanager/manage/ads*",
+          "https://adsmanager.facebook.com/adsmanager/billing_hub/accounts/details*",
+          "https://adsmanager.facebook.com/adsmanager/billing_hub/payment_settings*",
+          "https://adsmanager.facebook.com/*/billing_hub/accounts/details*",
+          "https://adsmanager.facebook.com/*/billing_hub/payment_settings*",
+          "https://business.facebook.com/billing_hub/accounts/details*",
+          "https://business.facebook.com/latest/billing_hub/accounts/details*",
+          "https://business.facebook.com/*/billing_hub/accounts/details*",
+          "https://business.facebook.com/billing_hub/payment_settings*",
+          "https://business.facebook.com/latest/billing_hub/payment_settings*",
+          "https://business.facebook.com/*/billing_hub/payment_settings*"
+        ]
+      },
+      "source": {
+        "kind": "DOCUMENT_LOCATION",
+        "remark": "location.origin",
+        "file": "sidebar",
+        "loc": "L272:C30 -> L272:C69",
+        "line": 272,
+        "col": [
+          30,
+          69
+        ],
+        "spansTo": null,
+        "code": "const res = await fetch(»`${window.location.origin}/api/graphql`«, {"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "location.origin/api/graphql",
+          "file": "sidebar",
+          "loc": "L272:C24 -> L274:C8",
+          "line": 272,
+          "col": [
+            24,
+            8
+          ],
+          "spansTo": 274,
+          "code": "const res = await »fetch(`${window.location.origin}/api/graphql`, {«",
+          "urlControl": "PARTIAL",
+          "frame": "CS_5",
+          "constraint": {
+            "matches": [
+              "https://adsmanager.facebook.com/adsmanager/manage/campaigns*",
+              "https://adsmanager.facebook.com/adsmanager/manage/adsets*",
+              "https://adsmanager.facebook.com/adsmanager/manage/ads*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/payment_settings*",
+              "https://adsmanager.facebook.com/*/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/*/billing_hub/payment_settings*",
+              "https://business.facebook.com/billing_hub/accounts/details*",
+              "https://business.facebook.com/latest/billing_hub/accounts/details*",
+              "https://business.facebook.com/*/billing_hub/accounts/details*",
+              "https://business.facebook.com/billing_hub/payment_settings*",
+              "https://business.facebook.com/latest/billing_hub/payment_settings*",
+              "https://business.facebook.com/*/billing_hub/payment_settings*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 30,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "sidebar",
+            "line": 272,
+            "ops": [
+              "ASSIGN:template-literal"
+            ],
+            "code": "const res = await fetch(»`${window.location.origin}/api/graphql`«, {"
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "file": "sidebar",
+      "frame": "CS_5",
+      "constraint": {
+        "matches": [
+          "https://adsmanager.facebook.com/adsmanager/manage/campaigns*",
+          "https://adsmanager.facebook.com/adsmanager/manage/adsets*",
+          "https://adsmanager.facebook.com/adsmanager/manage/ads*",
+          "https://adsmanager.facebook.com/adsmanager/billing_hub/accounts/details*",
+          "https://adsmanager.facebook.com/adsmanager/billing_hub/payment_settings*",
+          "https://adsmanager.facebook.com/*/billing_hub/accounts/details*",
+          "https://adsmanager.facebook.com/*/billing_hub/payment_settings*",
+          "https://business.facebook.com/billing_hub/accounts/details*",
+          "https://business.facebook.com/latest/billing_hub/accounts/details*",
+          "https://business.facebook.com/*/billing_hub/accounts/details*",
+          "https://business.facebook.com/billing_hub/payment_settings*",
+          "https://business.facebook.com/latest/billing_hub/payment_settings*",
+          "https://business.facebook.com/*/billing_hub/payment_settings*"
+        ]
+      },
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "__amsb-uid-input",
+        "file": "sidebar",
+        "loc": "L413:C20 -> L413:C35",
+        "line": 413,
+        "col": [
+          20,
+          35
+        ],
+        "spansTo": null,
+        "code": "const lines = »inp.value.split«('\\n').map(s => s.trim()).filter(Boolean)"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "sidebar",
+          "loc": "L318:C11 -> L321:C6",
+          "line": 318,
+          "col": [
+            11,
+            6
+          ],
+          "spansTo": 321,
+          "code": "return »fetch(url, {«",
+          "urlControl": "FULL",
+          "frame": "CS_5",
+          "constraint": {
+            "matches": [
+              "https://adsmanager.facebook.com/adsmanager/manage/campaigns*",
+              "https://adsmanager.facebook.com/adsmanager/manage/adsets*",
+              "https://adsmanager.facebook.com/adsmanager/manage/ads*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/payment_settings*",
+              "https://adsmanager.facebook.com/*/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/*/billing_hub/payment_settings*",
+              "https://business.facebook.com/billing_hub/accounts/details*",
+              "https://business.facebook.com/latest/billing_hub/accounts/details*",
+              "https://business.facebook.com/*/billing_hub/accounts/details*",
+              "https://business.facebook.com/billing_hub/payment_settings*",
+              "https://business.facebook.com/latest/billing_hub/payment_settings*",
+              "https://business.facebook.com/*/billing_hub/payment_settings*"
+            ]
+          }
+        },
+        {
+          "kind": "DOM_INNER_HTML",
+          "remark": "innerHTML",
+          "file": "sidebar",
+          "loc": "L450:C8 -> L450:C17",
+          "line": 450,
+          "col": [
+            8,
+            17
+          ],
+          "spansTo": null,
+          "code": "out.»innerHTML« = `",
+          "frame": "CS_5",
+          "constraint": {
+            "matches": [
+              "https://adsmanager.facebook.com/adsmanager/manage/campaigns*",
+              "https://adsmanager.facebook.com/adsmanager/manage/adsets*",
+              "https://adsmanager.facebook.com/adsmanager/manage/ads*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/payment_settings*",
+              "https://adsmanager.facebook.com/*/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/*/billing_hub/payment_settings*",
+              "https://business.facebook.com/billing_hub/accounts/details*",
+              "https://business.facebook.com/latest/billing_hub/accounts/details*",
+              "https://business.facebook.com/*/billing_hub/accounts/details*",
+              "https://business.facebook.com/billing_hub/payment_settings*",
+              "https://business.facebook.com/latest/billing_hub/payment_settings*",
+              "https://business.facebook.com/*/billing_hub/payment_settings*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 2089,
+        "distinctLines": 29,
+        "steps": [
+          {
+            "n": 1,
+            "file": "sidebar",
+            "line": 413,
+            "ops": [
+              "ELEMENT:member-element",
+              "RETURN:fallback-return"
+            ],
+            "code": "const lines = »inp.value.split('\\n').map(s => s.trim()).filter(Boolean)«"
+          },
+          {
+            "n": 2,
+            "file": "sidebar",
+            "line": 414,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member.length",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!lines.length«) return"
+          },
+          {
+            "n": 3,
+            "file": "sidebar",
+            "line": 423,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const results = await lookupUids(»lines«, token)"
+          },
+          {
+            "n": 4,
+            "file": "sidebar",
+            "line": 359,
+            "ops": [
+              "ASSIGN:identifier",
+              "ITERATE:loop.iteration"
+            ],
+            "code": "for (»const raw of inputs«) {"
+          },
+          {
+            "n": 5,
+            "file": "sidebar",
+            "line": 360,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return"
+            ],
+            "code": "const inp = »raw.trim()«"
+          },
+          {
+            "n": 6,
+            "file": "sidebar",
+            "line": 361,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!inp«) continue"
+          },
+          {
+            "n": 7,
+            "file": "sidebar",
+            "line": 362,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return"
+            ],
+            "code": "const profMatch = »inp.match(/profile\\.php[?&]id=(\\d+)/)«"
+          },
+          {
+            "n": 8,
+            "file": "sidebar",
+            "line": 363,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (»profMatch«) {"
+          },
+          {
+            "n": 9,
+            "file": "sidebar",
+            "line": 365,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:template-literal"
+            ],
+            "code": "const d = await directFetch(»`${GAPI}/${profMatch[1]}?fields=id,name&access_token=${token}`«)"
+          },
+          {
+            "n": 10,
+            "file": "sidebar",
+            "line": 318,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "return fetch(»url«, {"
+          },
+          {
+            "n": 11,
+            "file": "sidebar",
+            "line": 370,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const isGroup = /facebook\\.com\\/groups\\//i.test(»inp«)"
+          },
+          {
+            "n": 12,
+            "file": "sidebar",
+            "line": 366,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-right"
+            ],
+            "code": "»results.push({ input: inp, uid: d.id || profMatch[1], name: d.name || '', type: 'Profile' })«"
+          },
+          {
+            "n": 13,
+            "file": "sidebar",
+            "line": 358,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "ELEMENT:implicit.add"
+            ],
+            "code": "const »results = []«"
+          },
+          {
+            "n": 14,
+            "file": "sidebar",
+            "line": 371,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return"
+            ],
+            "code": "let slug = »inp.replace(/https?:\\/\\/[^/]*facebook\\.com\\//i, '').replace(/\\/$/, '').split(/[?&#]/)[0]«"
+          },
+          {
+            "n": 15,
+            "file": "sidebar",
+            "line": 372,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return"
+            ],
+            "code": "slug = »slug.replace(/^(?:groups|pages)\\/[^/]+\\//, '').replace(/^(?:groups|pages)\\//, '')«"
+          },
+          {
+            "n": 16,
+            "file": "sidebar",
+            "line": 373,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary",
+              "ASSIGN:binary-left",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (»!slug || slug === 'home' || slug === 'feed') { results.push({ input: inp, uid: '—', name: 'URL không hợp lệ', type: '—', error: true })«; continue }"
+          },
+          {
+            "n": 17,
+            "file": "sidebar",
+            "line": 375,
+            "ops": [
+              "ASSIGN:identifier",
+              "RETURN:encodeURIComponent",
+              "ASSIGN:template-literal"
+            ],
+            "code": "const d = await directFetch(»`${GAPI}/${encodeURIComponent(slug)}?fields=id,name,fan_count,category&access_token=${token}`«)"
+          },
+          {
+            "n": 18,
+            "file": "sidebar",
+            "line": 380,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»results.push({ input: inp, uid: '—', name: 'Không tìm thấy', type: '—', error: true })«"
+          },
+          {
+            "n": 19,
+            "file": "sidebar",
+            "line": 378,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»results.push({ input: inp, uid: d.id, name: d.name || '', type })«"
+          },
+          {
+            "n": 20,
+            "file": "sidebar",
+            "line": 147,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»  let S = {«",
+            "spansTo": 178
+          },
+          {
+            "n": 21,
+            "file": "sidebar",
+            "line": 431,
+            "ops": [
+              "ELEMENT:member.length",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!results.length«) return"
+          },
+          {
+            "n": 22,
+            "file": "sidebar",
+            "line": 432,
+            "ops": [
+              "RETURN:array.join"
+            ],
+            "code": "const allUids = »results.filter(r => !r.error).map(r => r.uid).join('\\n')«"
+          },
+          {
+            "n": 23,
+            "file": "sidebar",
+            "line": 433,
+            "ops": [
+              "RETURN:array.join"
+            ],
+            "code": "»    const rows = results.map(r => `«",
+            "spansTo": 448
+          },
+          {
+            "n": 24,
+            "file": "sidebar",
+            "line": 452,
+            "ops": [
+              "ELEMENT:member.length"
+            ],
+            "code": "<span style=\"font-size:10px;color:${dark?'#9ca3af':'#6b7280'}\">${»results.length«} kết quả</span>"
+          },
+          {
+            "n": 25,
+            "file": "sidebar",
+            "line": 455,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "${»rows«}"
+          },
+          {
+            "n": 26,
+            "file": "sidebar",
+            "line": 450,
+            "ops": [
+              "ASSIGN:template-literal"
+            ],
+            "code": "»    out.innerHTML = `«",
+            "spansTo": 456
+          },
+          {
+            "n": 27,
+            "file": "sidebar",
+            "line": 408,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »out = document.getElementById('__amsb-uid-out')«"
+          },
+          {
+            "n": 28,
+            "file": "sidebar",
+            "line": 464,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "navigator.clipboard.writeText(»allUids«).catch(() => {})"
+          },
+          {
+            "n": 29,
+            "file": "sidebar",
+            "line": 410,
+            "ops": [
+              "ELEMENT:member.length"
+            ],
+            "code": "if (»S.uidResults?.length«) renderUidResults(S.uidResults, out, dark)"
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "file": "sidebar",
+      "frame": "CS_5",
+      "constraint": {
+        "matches": [
+          "https://adsmanager.facebook.com/adsmanager/manage/campaigns*",
+          "https://adsmanager.facebook.com/adsmanager/manage/adsets*",
+          "https://adsmanager.facebook.com/adsmanager/manage/ads*",
+          "https://adsmanager.facebook.com/adsmanager/billing_hub/accounts/details*",
+          "https://adsmanager.facebook.com/adsmanager/billing_hub/payment_settings*",
+          "https://adsmanager.facebook.com/*/billing_hub/accounts/details*",
+          "https://adsmanager.facebook.com/*/billing_hub/payment_settings*",
+          "https://business.facebook.com/billing_hub/accounts/details*",
+          "https://business.facebook.com/latest/billing_hub/accounts/details*",
+          "https://business.facebook.com/*/billing_hub/accounts/details*",
+          "https://business.facebook.com/billing_hub/payment_settings*",
+          "https://business.facebook.com/latest/billing_hub/payment_settings*",
+          "https://business.facebook.com/*/billing_hub/payment_settings*"
+        ]
+      },
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "__amsb-rating-comment",
+        "file": "sidebar",
+        "loc": "L1785:C24 -> L1785:C85",
+        "line": 1785,
+        "col": [
+          24,
+          85
+        ],
+        "spansTo": null,
+        "code": "const comment = »document.getElementById('__amsb-rating-comment')?.value?.trim«() || ''"
+      },
+      "sinks": [
+        {
+          "kind": "DOM_INNER_HTML",
+          "remark": "innerHTML",
+          "file": "sidebar",
+          "loc": "L1640:C11 -> L1640:C20",
+          "line": 1640,
+          "col": [
+            11,
+            20
+          ],
+          "spansTo": null,
+          "code": "bodyEl.»innerHTML« = `",
+          "frame": "CS_5",
+          "constraint": {
+            "matches": [
+              "https://adsmanager.facebook.com/adsmanager/manage/campaigns*",
+              "https://adsmanager.facebook.com/adsmanager/manage/adsets*",
+              "https://adsmanager.facebook.com/adsmanager/manage/ads*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/payment_settings*",
+              "https://adsmanager.facebook.com/*/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/*/billing_hub/payment_settings*",
+              "https://business.facebook.com/billing_hub/accounts/details*",
+              "https://business.facebook.com/latest/billing_hub/accounts/details*",
+              "https://business.facebook.com/*/billing_hub/accounts/details*",
+              "https://business.facebook.com/billing_hub/payment_settings*",
+              "https://business.facebook.com/latest/billing_hub/payment_settings*",
+              "https://business.facebook.com/*/billing_hub/payment_settings*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 74,
+        "distinctLines": 8,
+        "steps": [
+          {
+            "n": 1,
+            "file": "sidebar",
+            "line": 1785,
+            "ops": [
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ASSIGN:logical-left"
+            ],
+            "code": "const comment = »document.getElementById('__amsb-rating-comment')?.value?.trim() || ''«"
+          },
+          {
+            "n": 2,
+            "file": "sidebar",
+            "line": 1788,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "chrome.runtime.sendMessage({ type: 'SMETA_SUBMIT_RATING', stars: S.ratingStars, »comment }, r => {«",
+            "spansTo": 1823
+          },
+          {
+            "n": 3,
+            "file": "sidebar",
+            "line": 1793,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»S.ratingExisting = { stars: S.ratingStars, comment, rewarded: true }«"
+          },
+          {
+            "n": 4,
+            "file": "sidebar",
+            "line": 147,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»  let S = {«",
+            "spansTo": 178
+          },
+          {
+            "n": 5,
+            "file": "sidebar",
+            "line": 1671,
+            "ops": [
+              "ASSIGN:logical-left"
+            ],
+            "code": ">${»existing?.comment || ''«}</textarea>"
+          },
+          {
+            "n": 6,
+            "file": "sidebar",
+            "line": 1666,
+            "ops": [
+              "ASSIGN:template-literal",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "»        ${stars > 0 && stars < 4 ? `«",
+            "spansTo": 1677
+          },
+          {
+            "n": 7,
+            "file": "sidebar",
+            "line": 1640,
+            "ops": [
+              "ASSIGN:template-literal"
+            ],
+            "code": "»    bodyEl.innerHTML = `«",
+            "spansTo": 1723
+          },
+          {
+            "n": 8,
+            "file": "sidebar",
+            "line": 1021,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »bodyEl  = document.getElementById('__amsb-body')«"
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "file": "sidebar",
+      "frame": "CS_5",
+      "constraint": {
+        "matches": [
+          "https://adsmanager.facebook.com/adsmanager/manage/campaigns*",
+          "https://adsmanager.facebook.com/adsmanager/manage/adsets*",
+          "https://adsmanager.facebook.com/adsmanager/manage/ads*",
+          "https://adsmanager.facebook.com/adsmanager/billing_hub/accounts/details*",
+          "https://adsmanager.facebook.com/adsmanager/billing_hub/payment_settings*",
+          "https://adsmanager.facebook.com/*/billing_hub/accounts/details*",
+          "https://adsmanager.facebook.com/*/billing_hub/payment_settings*",
+          "https://business.facebook.com/billing_hub/accounts/details*",
+          "https://business.facebook.com/latest/billing_hub/accounts/details*",
+          "https://business.facebook.com/*/billing_hub/accounts/details*",
+          "https://business.facebook.com/billing_hub/payment_settings*",
+          "https://business.facebook.com/latest/billing_hub/payment_settings*",
+          "https://business.facebook.com/*/billing_hub/payment_settings*"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "From storage.local.set('fb_token') in content",
+        "file": "sidebar",
+        "loc": "L162:C6 -> L162:C13",
+        "line": 162,
+        "col": [
+          6,
+          13
+        ],
+        "spansTo": null,
+        "code": "cu»rrOpen:« false,"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "sidebar",
+          "loc": "L318:C11 -> L321:C6",
+          "line": 318,
+          "col": [
+            11,
+            6
+          ],
+          "spansTo": 321,
+          "code": "return »fetch(url, {«",
+          "urlControl": "FULL",
+          "frame": "CS_5",
+          "constraint": {
+            "matches": [
+              "https://adsmanager.facebook.com/adsmanager/manage/campaigns*",
+              "https://adsmanager.facebook.com/adsmanager/manage/adsets*",
+              "https://adsmanager.facebook.com/adsmanager/manage/ads*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/adsmanager/billing_hub/payment_settings*",
+              "https://adsmanager.facebook.com/*/billing_hub/accounts/details*",
+              "https://adsmanager.facebook.com/*/billing_hub/payment_settings*",
+              "https://business.facebook.com/billing_hub/accounts/details*",
+              "https://business.facebook.com/latest/billing_hub/accounts/details*",
+              "https://business.facebook.com/*/billing_hub/accounts/details*",
+              "https://business.facebook.com/billing_hub/payment_settings*",
+              "https://business.facebook.com/latest/billing_hub/payment_settings*",
+              "https://business.facebook.com/*/billing_hub/payment_settings*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 30,
+      "propagation": {
+        "rawSteps": 808,
+        "distinctLines": 26,
+        "steps": [
+          {
+            "n": 1,
+            "file": "overlay",
+            "line": 162,
+            "ops": [
+              "ASSIGN:unary",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "co»nst nativeMajor = toMajor(na«tiveV, nativeCur, useRound);"
+          },
+          {
+            "n": 2,
+            "file": "sidebar",
+            "line": 163,
+            "ops": [
+              "ELEMENT:destructure-property[token]",
+              "ELEMENT:destructure-property[fbdt]"
+            ],
+            "code": "usdRat»es: null, u«sdRatesTime: 0,"
+          },
+          {
+            "n": 3,
+            "file": "sidebar",
+            "line": 164,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "bi»ll: null,  // tỷ giá BÁN + %biên« (báo khách) — bridge amsbridge.js đẩy vào chrome.storage"
+          },
+          {
+            "n": 4,
+            "file": "sidebar",
+            "line": 165,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "newLimit: null,»  // «{ actId, raw } — \"Limit\" (formatted_dsl) fetched via billing GraphQL"
+          },
+          {
+            "n": 5,
+            "file": "overlay",
+            "line": 166,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (»noBill && dispCur === 'B«ILL') return html;  // Ngưỡng: chế độ VND* hiện NATIVE, không cộng biên (giống \"Ngưỡng còn lại\")"
+          },
+          {
+            "n": 6,
+            "file": "sidebar",
+            "line": 168,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "visRows: (() => { const DEF = { name:false, nextBi»ll:fa«lse }; try { const v = JSON.parse(localStorage.getItem('_amsb_vis') || 'null'); return v || DEF } catch { return { name:false, nextBill:false } } })()"
+          },
+          {
+            "n": 7,
+            "file": "content",
+            "line": 169,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread"
+            ],
+            "code": "»safeSessionSet({ fb_token: token, fb_token_time: Date.now(), ...(fbdt ? { fb_fbdt: fbdt } : {}) })«;"
+          },
+          {
+            "n": 8,
+            "file": "content",
+            "line": 171,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "try { »chrome.storage.local.set({ fb_token: token, fb_token_time: Date.now() })« } catch {}"
+          },
+          {
+            "n": 9,
+            "file": "content",
+            "line": 37,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (»_cachedToken) return { token: _cachedToken, fbdt: _cachedFbdt, eaag: _cachedEaag };«"
+          },
+          {
+            "n": 10,
+            "file": "sidebar",
+            "line": 218,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: local, key: fb_token, sender: content, receiver: sidebar]"
+            ],
+            "code": "»      chrome.storage.local.get(['fb_token','fb_token_time'], items => {«",
+            "spansTo": 236
+          },
+          {
+            "n": 11,
+            "file": "sidebar",
+            "line": 221,
+            "ops": [
+              "ASSIGN:logical-left"
+            ],
+            "code": "if (»items.fb_token && items.fb_token_time && Date.now() - items.fb_token_time < 43200000«)"
+          },
+          {
+            "n": 12,
+            "file": "sidebar",
+            "line": 2220,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!token«) {"
+          },
+          {
+            "n": 13,
+            "file": "sidebar",
+            "line": 2240,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:template-literal"
+            ],
+            "code": "directFetch(»`${GRAPH}/act_${actId}?fields=${encodeURIComponent(fields)}&access_token=${token}`«),"
+          },
+          {
+            "n": 14,
+            "file": "sidebar",
+            "line": 318,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "return fetch(»url«, {"
+          },
+          {
+            "n": 15,
+            "file": "sidebar",
+            "line": 2242,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:template-literal"
+            ],
+            "code": "if (!S.myId)          promises.push(directFetch(»`${GRAPH}/me?fields=id&access_token=${token}`«))"
+          },
+          {
+            "n": 16,
+            "file": "sidebar",
+            "line": 2249,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "fetchSpendMax(actId, »token«)"
+          },
+          {
+            "n": 17,
+            "file": "sidebar",
+            "line": 292,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:template-literal"
+            ],
+            "code": "const r = await directFetch(»`${GRAPH}/act_${actId}/insights?date_preset=maximum&fields=spend&access_token=${token}`«)"
+          },
+          {
+            "n": 18,
+            "file": "sidebar",
+            "line": 2264,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (info.owner_business?.id) fetchBmAcctCount(actId, info.owner_business.id, »token«)"
+          },
+          {
+            "n": 19,
+            "file": "sidebar",
+            "line": 307,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:template-literal"
+            ],
+            "code": "const r = await directFetch(»`${GRAPH}/${ownerBizId}/owned_ad_accounts?fields=id&limit=1&summary=true&access_token=${token}`«)"
+          },
+          {
+            "n": 20,
+            "file": "sidebar",
+            "line": 1460,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!token«)   { showRenameMsg('Không lấy được token FB — hãy đăng nhập Facebook.', false); return }"
+          },
+          {
+            "n": 21,
+            "file": "sidebar",
+            "line": 1469,
+            "ops": [
+              "ASSIGN:identifier",
+              "RETURN:encodeURIComponent",
+              "ASSIGN:binary-right"
+            ],
+            "code": "const body = 'name=' + encodeURIComponent(trimmedName) + '&access_token=' + »encodeURIComponent(token)«"
+          },
+          {
+            "n": 22,
+            "file": "sidebar",
+            "line": 1475,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "chrome.runtime.sendMessage({ type: 'FB_FETCH', method: 'POST', url: `https://graph.facebook.com/v21.0/act_${bare}`, »body }, (r) => {«",
+            "spansTo": 1478
+          },
+          {
+            "n": 23,
+            "file": "sidebar",
+            "line": 419,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!token«) {"
+          },
+          {
+            "n": 24,
+            "file": "sidebar",
+            "line": 423,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const results = await lookupUids(lines, »token«)"
+          },
+          {
+            "n": 25,
+            "file": "sidebar",
+            "line": 365,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:template-literal"
+            ],
+            "code": "const d = await directFetch(»`${GAPI}/${profMatch[1]}?fields=id,name&access_token=${token}`«)"
+          },
+          {
+            "n": 26,
+            "file": "sidebar",
+            "line": 375,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:template-literal"
+            ],
+            "code": "const d = await directFetch(»`${GAPI}/${encodeURIComponent(slug)}?fields=id,name,fan_count,category&access_token=${token}`«)"
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+        "file": "background",
+        "loc": "L413:C6 -> L413:C13",
+        "line": 413,
+        "col": [
+          6,
+          13
+        ],
+        "spansTo": null,
+        "code": "if (»request«?.type === 'PING') {"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_SESSION_STORAGE",
+          "remark": "smeta_jwt",
+          "file": "background",
+          "loc": "L7:C39 -> L7:C94",
+          "line": 7,
+          "col": [
+            39,
+            94
+          ],
+          "spansTo": null,
+          "code": "set: (jwt) => new Promise(resolve => »chrome.storage.session.set({ smeta_jwt: jwt }, resolve)«),",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_HEADERS",
+          "remark": "https://adsmeta.io/api/auth/me",
+          "file": "background",
+          "loc": "L58:C20 -> L65:C6",
+          "line": 58,
+          "col": [
+            20,
+            6
+          ],
+          "spansTo": 65,
+          "code": "const r = await »fetch(`${SMETA_API}${path}`, {«",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L515:C24 -> L515:C88",
+          "line": 515,
+          "col": [
+            24,
+            88
+          ],
+          "spansTo": null,
+          "code": "const r = await »fetch(url, { method: 'POST', credentials: 'include', body: fd })«;",
+          "urlControl": "FULL",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_BODY",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L515:C24 -> L515:C88",
+          "line": 515,
+          "col": [
+            24,
+            88
+          ],
+          "spansTo": null,
+          "code": "const r = await »fetch(url, { method: 'POST', credentials: 'include', body: fd })«;",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L446:C30 -> L446:C124",
+          "line": 446,
+          "col": [
+            30,
+            124
+          ],
+          "spansTo": null,
+          "code": "const r = await »fetch(u, { method: m, credentials: 'include', headers: h, body: m !== 'GET' ? b : undefined })«;",
+          "urlControl": "FULL",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_HEADERS",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L446:C30 -> L446:C124",
+          "line": 446,
+          "col": [
+            30,
+            124
+          ],
+          "spansTo": null,
+          "code": "const r = await »fetch(u, { method: m, credentials: 'include', headers: h, body: m !== 'GET' ? b : undefined })«;",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_BODY",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L446:C30 -> L446:C124",
+          "line": 446,
+          "col": [
+            30,
+            124
+          ],
+          "spansTo": null,
+          "code": "const r = await »fetch(u, { method: m, credentials: 'include', headers: h, body: m !== 'GET' ? b : undefined })«;",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L587:C6 -> L587:C30",
+          "line": 587,
+          "col": [
+            6,
+            30
+          ],
+          "spansTo": null,
+          "code": "»fetch(request.url, opts)«",
+          "urlControl": "FULL",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_HEADERS",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L587:C6 -> L587:C30",
+          "line": 587,
+          "col": [
+            6,
+            30
+          ],
+          "spansTo": null,
+          "code": "»fetch(request.url, opts)«",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_BODY",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L587:C6 -> L587:C30",
+          "line": 587,
+          "col": [
+            6,
+            30
+          ],
+          "spansTo": null,
+          "code": "»fetch(request.url, opts)«",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 1066,
+        "distinctLines": 56,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 413,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'PING') {"
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 419,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'GET_EXT_CONFIG') {"
+          },
+          {
+            "n": 3,
+            "file": "background",
+            "line": 432,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'GQL_IN_TAB') {"
+          },
+          {
+            "n": 4,
+            "file": "background",
+            "line": 433,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:destructure-property[url]",
+              "ELEMENT:destructure-property[method]",
+              "ELEMENT:destructure-property[body]",
+              "ELEMENT:destructure-property[headers]"
+            ],
+            "code": "const { »url, method = 'POST', body, headers } = request«;"
+          },
+          {
+            "n": 5,
+            "file": "background",
+            "line": 462,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'GET_FB_TOKEN') {"
+          },
+          {
+            "n": 6,
+            "file": "background",
+            "line": 484,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'CLEAR_FB_TOKEN') {"
+          },
+          {
+            "n": 7,
+            "file": "background",
+            "line": 495,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type === 'FB_FETCH') return handleFbFetch(request«, sendResponse);"
+          },
+          {
+            "n": 8,
+            "file": "background",
+            "line": 381,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:destructure-property[url]",
+              "ELEMENT:destructure-property[method]",
+              "ELEMENT:destructure-property[body]",
+              "ELEMENT:destructure-property[headers]",
+              "ELEMENT:destructure-property[credentials]"
+            ],
+            "code": "const { »url, method = 'GET', body, headers: extraHeaders, credentials: credOverride } = request«;"
+          },
+          {
+            "n": 9,
+            "file": "background",
+            "line": 382,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!url«) { sendResponse(JSON.stringify({ error: 'no_url' })); return true; }"
+          },
+          {
+            "n": 10,
+            "file": "background",
+            "line": 385,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "INITIAL:URL.constructor",
+              "ELEMENT:member-element"
+            ],
+            "code": "const »h = new URL(url).hostname«;"
+          },
+          {
+            "n": 11,
+            "file": "background",
+            "line": 390,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "ASSIGN:logical-left"
+            ],
+            "code": "const »opts = { method, credentials: credOverride || 'include' }«;"
+          },
+          {
+            "n": 12,
+            "file": "background",
+            "line": 391,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»body && method !== 'GET'«) {"
+          },
+          {
+            "n": 13,
+            "file": "background",
+            "line": 395,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left",
+              "COPY:object-spread"
+            ],
+            "code": "if (»extraHeaders && typeof extraHeaders === 'object') { opts.headers = { ...(opts.headers || {}), ...extraHeaders« }; }"
+          },
+          {
+            "n": 14,
+            "file": "background",
+            "line": 392,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (typeof body === 'string') { opts.body = »body«; opts.headers = { 'Content-Type': 'application/x-www-form-urlencoded' }; }"
+          },
+          {
+            "n": 15,
+            "file": "background",
+            "line": 393,
+            "ops": [
+              "ASSIGN:identifier",
+              "RETURN:json.stringify"
+            ],
+            "code": "else { opts.body = »JSON.stringify(body)«; }"
+          },
+          {
+            "n": 16,
+            "file": "background",
+            "line": 498,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'FB_UPLOAD_PHOTO') {"
+          },
+          {
+            "n": 17,
+            "file": "background",
+            "line": 499,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:destructure-property[url]",
+              "ELEMENT:destructure-property[fields]",
+              "ELEMENT:destructure-property[file]"
+            ],
+            "code": "const { »url, fields, file } = request«;"
+          },
+          {
+            "n": 18,
+            "file": "background",
+            "line": 525,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'SMETA_JWT') {"
+          },
+          {
+            "n": 19,
+            "file": "background",
+            "line": 500,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»!url || !file?.base64«) { sendResponse(JSON.stringify({ error: 'bad_upload_args' })); return true; }"
+          },
+          {
+            "n": 20,
+            "file": "background",
+            "line": 526,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "const jwt = »request.jwt«;"
+          },
+          {
+            "n": 21,
+            "file": "background",
+            "line": 548,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'SMETA_LOGOUT') {"
+          },
+          {
+            "n": 22,
+            "file": "background",
+            "line": 527,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left",
+              "ELEMENT:member.length",
+              "ASSIGN:binary-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»jwt && typeof jwt === 'string' && jwt.length < 2048«) {"
+          },
+          {
+            "n": 23,
+            "file": "background",
+            "line": 560,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "if (»request?.url«) {"
+          },
+          {
+            "n": 24,
+            "file": "background",
+            "line": 502,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "INITIAL:URL.constructor",
+              "ELEMENT:member-element"
+            ],
+            "code": "try { »h = new URL(url).hostname«; } catch {}"
+          },
+          {
+            "n": 25,
+            "file": "background",
+            "line": 528,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "jwtStore.set(»jwt«).then(async () => {"
+          },
+          {
+            "n": 26,
+            "file": "background",
+            "line": 7,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "set: (jwt) => new Promise(resolve => chrome.storage.session.set({ smeta_jwt: »jwt« }, resolve)),"
+          },
+          {
+            "n": 27,
+            "file": "background",
+            "line": 533,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const me = await smetaFetch('/auth/me', »jwt«);"
+          },
+          {
+            "n": 28,
+            "file": "background",
+            "line": 61,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:template-literal"
+            ],
+            "code": "'Authorization': »`Bearer ${jwt}`«,"
+          },
+          {
+            "n": 29,
+            "file": "background",
+            "line": 58,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    const r = await fetch(`${SMETA_API}${path}`, {«",
+            "spansTo": 65
+          },
+          {
+            "n": 30,
+            "file": "background",
+            "line": 569,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:object.setProperty",
+              "INITIAL:URL.constructor",
+              "ELEMENT:destructure-property[hostname]"
+            ],
+            "code": "const »{ hostname } = new URL(request.url)«;"
+          },
+          {
+            "n": 31,
+            "file": "background",
+            "line": 503,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»h« !== 'upload.facebook.com') { sendResponse(JSON.stringify({ error: 'url_not_allowed' })); return true; }"
+          },
+          {
+            "n": 32,
+            "file": "background",
+            "line": 508,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "RETURN:atob"
+            ],
+            "code": "const bin = »atob(file.base64)«;"
+          },
+          {
+            "n": 33,
+            "file": "background",
+            "line": 509,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member.length",
+              "INITIAL:Uint8Array.constructor",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »bytes = new Uint8Array(bin.length)«;"
+          },
+          {
+            "n": 34,
+            "file": "background",
+            "line": 510,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member.length",
+              "ASSIGN:binary-right",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return"
+            ],
+            "code": "for (let i = 0; i < »bin.length; i++) bytes[i] = bin.charCodeAt(i)«;"
+          },
+          {
+            "n": 35,
+            "file": "background",
+            "line": 511,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left"
+            ],
+            "code": "const »blob = new Blob([bytes], { type: file.mime || 'image/jpeg' })«;"
+          },
+          {
+            "n": 36,
+            "file": "background",
+            "line": 513,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left",
+              "ITERATE:loop.iteration",
+              "ELEMENT:member-element"
+            ],
+            "code": "for (»const k in (fields || {})) fd.append(k, fields[k]«);"
+          },
+          {
+            "n": 37,
+            "file": "background",
+            "line": 512,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »fd = new FormData()«;"
+          },
+          {
+            "n": 38,
+            "file": "background",
+            "line": 514,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left"
+            ],
+            "code": "fd.append('farr', blob, »file.name || 'photo.jpg'«);"
+          },
+          {
+            "n": 39,
+            "file": "background",
+            "line": 515,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »r = await fetch(url, { method: 'POST', credentials: 'include', body: fd })«;"
+          },
+          {
+            "n": 40,
+            "file": "background",
+            "line": 577,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const opts = buildFetchOptions(»request«);"
+          },
+          {
+            "n": 41,
+            "file": "background",
+            "line": 34,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:destructure-property[method]",
+              "ELEMENT:destructure-property[header]",
+              "ELEMENT:destructure-property[body]",
+              "ELEMENT:destructure-property[form]"
+            ],
+            "code": "const { »method = 'GET', header = {}, body, form } = request«;"
+          },
+          {
+            "n": 42,
+            "file": "background",
+            "line": 35,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "const isForm = »!!form«;"
+          },
+          {
+            "n": 43,
+            "file": "background",
+            "line": 36,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left"
+            ],
+            "code": "const isFbOrSmeta = /facebook\\.com|fbcdn\\.net|adsmeta\\.io/.test(»request.url || ''«);"
+          },
+          {
+            "n": 44,
+            "file": "background",
+            "line": 38,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»method«,"
+          },
+          {
+            "n": 45,
+            "file": "background",
+            "line": 37,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»  const opts = {«",
+            "spansTo": 44
+          },
+          {
+            "n": 46,
+            "file": "background",
+            "line": 42,
+            "ops": [
+              "ASSIGN:identifier",
+              "COPY:object-spread"
+            ],
+            "code": "»...header«,"
+          },
+          {
+            "n": 47,
+            "file": "background",
+            "line": 45,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»method« !== 'GET') {"
+          },
+          {
+            "n": 48,
+            "file": "background",
+            "line": 46,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (»isForm) opts.body = form«;"
+          },
+          {
+            "n": 49,
+            "file": "background",
+            "line": 47,
+            "ops": [
+              "ASSIGN:identifier",
+              "RETURN:json.stringify",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "else if (»body) opts.body = typeof body === 'string' ? body : JSON.stringify(body)«;"
+          },
+          {
+            "n": 50,
+            "file": "background",
+            "line": 580,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:object.setProperty",
+              "INITIAL:URL.constructor",
+              "ELEMENT:destructure-property[hostname]"
+            ],
+            "code": "const »{ hostname } = new URL(request.url)«;"
+          },
+          {
+            "n": 51,
+            "file": "background",
+            "line": 581,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»hostname === 'graph.facebook.com' || hostname.endsWith('.graph.facebook.com')«) {"
+          },
+          {
+            "n": 52,
+            "file": "background",
+            "line": 443,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left"
+            ],
+            "code": "args: [»url, method, body || '', headers || {}«],"
+          },
+          {
+            "n": 53,
+            "file": "background",
+            "line": 440,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "ELEMENT:implicit.add"
+            ],
+            "code": "»        const inj = await chrome.scripting.executeScript({«",
+            "spansTo": 450
+          },
+          {
+            "n": 54,
+            "file": "background",
+            "line": 446,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "const »r = await fetch(u, { method: m, credentials: 'include', headers: h, body: m !== 'GET' ? b : undefined })«;"
+          },
+          {
+            "n": 55,
+            "file": "background",
+            "line": 570,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "urlHostOk = EXTERNAL_ALLOWED.some(h => »hostname === h || hostname.endsWith('.' + h)«);"
+          },
+          {
+            "n": 56,
+            "file": "background",
+            "line": 587,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "fetch(»request.url«, opts)"
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "__amsb-rename-input",
+        "file": "background",
+        "loc": "L599:C0 -> L791:C2",
+        "line": 599,
+        "col": [
+          0,
+          2
+        ],
+        "spansTo": 791,
+        "code": "»chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {«"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_BODY",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L398:C4 -> L398:C20",
+          "line": 398,
+          "col": [
+            4,
+            20
+          ],
+          "spansTo": null,
+          "code": "»fetch(url, opts)«.then(r => r.text()).then(text => sendResponse(text)).catch(err => sendResponse(JSON.stringify({ error: err.message })));",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 1602,
+        "distinctLines": 5,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 599,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {«",
+            "spansTo": 791,
+            "crossContextHop": "runtime.single.sender.message[sidebar->background]"
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 391,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left"
+            ],
+            "code": "if (»body && method !== 'GET'«) {"
+          },
+          {
+            "n": 3,
+            "file": "background",
+            "line": 392,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (typeof body === 'string') { opts.body = »body«; opts.headers = { 'Content-Type': 'application/x-www-form-urlencoded' }; }"
+          },
+          {
+            "n": 4,
+            "file": "background",
+            "line": 390,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »opts = { method, credentials: credOverride || 'include' }«;"
+          },
+          {
+            "n": 5,
+            "file": "background",
+            "line": 393,
+            "ops": [
+              "ASSIGN:identifier",
+              "RETURN:json.stringify"
+            ],
+            "code": "else { opts.body = »JSON.stringify(body)«; }"
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "__amsb-rating-comment",
+        "file": "background",
+        "loc": "L599:C0 -> L791:C2",
+        "line": 599,
+        "col": [
+          0,
+          2
+        ],
+        "spansTo": 791,
+        "code": "»chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {«"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_BODY",
+          "remark": "https://adsmeta.io/api/rating",
+          "file": "background",
+          "loc": "L58:C20 -> L65:C6",
+          "line": 58,
+          "col": [
+            20,
+            6
+          ],
+          "spansTo": 65,
+          "code": "const r = await »fetch(`${SMETA_API}${path}`, {«",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 156,
+        "distinctLines": 5,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 599,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {«",
+            "spansTo": 791,
+            "crossContextHop": "runtime.single.sender.message[sidebar->background]"
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 765,
+            "ops": [
+              "ASSIGN:logical-left",
+              "RETURN:json.stringify"
+            ],
+            "code": "body: »JSON.stringify({ stars: request.stars, comment: request.comment || '', source: 'extension' })«,"
+          },
+          {
+            "n": 3,
+            "file": "background",
+            "line": 763,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const data = await smetaFetch('/rating', smeta_jwt, {«",
+            "spansTo": 766
+          },
+          {
+            "n": 4,
+            "file": "background",
+            "line": 58,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    const r = await fetch(`${SMETA_API}${path}`, {«",
+            "spansTo": 65
+          },
+          {
+            "n": 5,
+            "file": "background",
+            "line": 59,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...opts«,"
+          }
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "From storage.local.set('fb_token') in content",
+        "file": "background",
+        "loc": "L162:C6 -> L162:C13",
+        "line": 162,
+        "col": [
+          6,
+          13
+        ],
+        "spansTo": null,
+        "code": "for »(const «n of newNotifs.slice(0, 3)) {"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+          "remark": "chrome.runtime.onMessageExternal.addListener[sendResponse]",
+          "file": "background",
+          "loc": "L471:C8 -> L471:C101",
+          "line": 471,
+          "col": [
+            8,
+            101
+          ],
+          "spansTo": null,
+          "code": "»sendResponse({ token: items.fb_token, fbdt: items.fb_fbdt || '', time: items.fb_token_time })«;",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 3,
+      "propagation": {
+        "rawSteps": 43,
+        "distinctLines": 12,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 162,
+            "ops": [
+              "ASSIGN:unary",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "for »(const n of newNotifs.slice(«0, 3)) {"
+          },
+          {
+            "n": 2,
+            "file": "sidebar",
+            "line": 163,
+            "ops": [
+              "ELEMENT:destructure-property[token]",
+              "ELEMENT:destructure-property[fbdt]"
+            ],
+            "code": "usdRat»es: null, u«sdRatesTime: 0,"
+          },
+          {
+            "n": 3,
+            "file": "background",
+            "line": 164,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "»await chrome.notifications.creat«e(`smeta-${n.id}`, {"
+          },
+          {
+            "n": 4,
+            "file": "sidebar",
+            "line": 165,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "newLimit: null,»  // «{ actId, raw } — \"Limit\" (formatted_dsl) fetched via billing GraphQL"
+          },
+          {
+            "n": 5,
+            "file": "background",
+            "line": 166,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»iconUrl: 'icons/icon48.p«ng',"
+          },
+          {
+            "n": 6,
+            "file": "sidebar",
+            "line": 168,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "visRows: (() => { const DEF = { name:false, nextBi»ll:fa«lse }; try { const v = JSON.parse(localStorage.getItem('_amsb_vis') || 'null'); return v || DEF } catch { return { name:false, nextBill:false } } })()"
+          },
+          {
+            "n": 7,
+            "file": "content",
+            "line": 169,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread"
+            ],
+            "code": "»safeSessionSet({ fb_token: token, fb_token_time: Date.now(), ...(fbdt ? { fb_fbdt: fbdt } : {}) })«;"
+          },
+          {
+            "n": 8,
+            "file": "content",
+            "line": 171,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "try { »chrome.storage.local.set({ fb_token: token, fb_token_time: Date.now() })« } catch {}"
+          },
+          {
+            "n": 9,
+            "file": "content",
+            "line": 37,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (»_cachedToken) return { token: _cachedToken, fbdt: _cachedFbdt, eaag: _cachedEaag };«"
+          },
+          {
+            "n": 10,
+            "file": "background",
+            "line": 464,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: local, key: fb_token, sender: content, receiver: background]"
+            ],
+            "code": "»    chrome.storage.local.get(['fb_token', 'fb_token_time', 'fb_fbdt', 'fb_cuser'], async (items) => {«",
+            "spansTo": 480
+          },
+          {
+            "n": 11,
+            "file": "background",
+            "line": 470,
+            "ops": [
+              "ASSIGN:logical-left"
+            ],
+            "code": "if (»items.fb_token && age < TOKEN_MAX_AGE && !switched«) {"
+          },
+          {
+            "n": 12,
+            "file": "background",
+            "line": 471,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»sendResponse({ token: items.fb_token, fbdt: items.fb_fbdt || '', time: items.fb_token_time })«;"
+          }
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "remark": "From storage.session.set('smeta_jwt') in background",
+        "file": "background",
+        "loc": "L413:C6 -> L413:C13",
+        "line": 413,
+        "col": [
+          6,
+          13
+        ],
+        "spansTo": null,
+        "code": "if (»request«?.type === 'PING') {"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_HEADERS",
+          "remark": "https://adsmeta.io/api/ext/fetch-command",
+          "file": "background",
+          "loc": "L58:C20 -> L65:C6",
+          "line": 58,
+          "col": [
+            20,
+            6
+          ],
+          "spansTo": 65,
+          "code": "const r = await »fetch(`${SMETA_API}${path}`, {«",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 84,
+      "propagation": {
+        "rawSteps": 1474,
+        "distinctLines": 72,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 413,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'PING') {"
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 419,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'GET_EXT_CONFIG') {"
+          },
+          {
+            "n": 3,
+            "file": "background",
+            "line": 432,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'GQL_IN_TAB') {"
+          },
+          {
+            "n": 4,
+            "file": "background",
+            "line": 433,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:destructure-property[url]",
+              "ELEMENT:destructure-property[method]",
+              "ELEMENT:destructure-property[body]",
+              "ELEMENT:destructure-property[headers]"
+            ],
+            "code": "const { »url, method = 'POST', body, headers } = request«;"
+          },
+          {
+            "n": 5,
+            "file": "background",
+            "line": 462,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'GET_FB_TOKEN') {"
+          },
+          {
+            "n": 6,
+            "file": "background",
+            "line": 484,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'CLEAR_FB_TOKEN') {"
+          },
+          {
+            "n": 7,
+            "file": "background",
+            "line": 495,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type === 'FB_FETCH') return handleFbFetch(request«, sendResponse);"
+          },
+          {
+            "n": 8,
+            "file": "background",
+            "line": 381,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:destructure-property[url]",
+              "ELEMENT:destructure-property[method]",
+              "ELEMENT:destructure-property[body]",
+              "ELEMENT:destructure-property[headers]",
+              "ELEMENT:destructure-property[credentials]"
+            ],
+            "code": "const { »url, method = 'GET', body, headers: extraHeaders, credentials: credOverride } = request«;"
+          },
+          {
+            "n": 9,
+            "file": "background",
+            "line": 382,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!url«) { sendResponse(JSON.stringify({ error: 'no_url' })); return true; }"
+          },
+          {
+            "n": 10,
+            "file": "background",
+            "line": 385,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "INITIAL:URL.constructor",
+              "ELEMENT:member-element"
+            ],
+            "code": "const »h = new URL(url).hostname«;"
+          },
+          {
+            "n": 11,
+            "file": "background",
+            "line": 390,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "ASSIGN:logical-left"
+            ],
+            "code": "const »opts = { method, credentials: credOverride || 'include' }«;"
+          },
+          {
+            "n": 12,
+            "file": "background",
+            "line": 391,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»body && method !== 'GET'«) {"
+          },
+          {
+            "n": 13,
+            "file": "background",
+            "line": 395,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left",
+              "COPY:object-spread"
+            ],
+            "code": "if (»extraHeaders && typeof extraHeaders === 'object') { opts.headers = { ...(opts.headers || {}), ...extraHeaders« }; }"
+          },
+          {
+            "n": 14,
+            "file": "background",
+            "line": 392,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (typeof body === 'string') { opts.body = »body«; opts.headers = { 'Content-Type': 'application/x-www-form-urlencoded' }; }"
+          },
+          {
+            "n": 15,
+            "file": "background",
+            "line": 393,
+            "ops": [
+              "ASSIGN:identifier",
+              "RETURN:json.stringify"
+            ],
+            "code": "else { opts.body = »JSON.stringify(body)«; }"
+          },
+          {
+            "n": 16,
+            "file": "background",
+            "line": 498,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'FB_UPLOAD_PHOTO') {"
+          },
+          {
+            "n": 17,
+            "file": "background",
+            "line": 499,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:destructure-property[url]",
+              "ELEMENT:destructure-property[fields]",
+              "ELEMENT:destructure-property[file]"
+            ],
+            "code": "const { »url, fields, file } = request«;"
+          },
+          {
+            "n": 18,
+            "file": "background",
+            "line": 525,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'SMETA_JWT') {"
+          },
+          {
+            "n": 19,
+            "file": "background",
+            "line": 500,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»!url || !file?.base64«) { sendResponse(JSON.stringify({ error: 'bad_upload_args' })); return true; }"
+          },
+          {
+            "n": 20,
+            "file": "background",
+            "line": 526,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "const jwt = »request.jwt«;"
+          },
+          {
+            "n": 21,
+            "file": "background",
+            "line": 548,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request?.type« === 'SMETA_LOGOUT') {"
+          },
+          {
+            "n": 22,
+            "file": "background",
+            "line": 527,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left",
+              "ELEMENT:member.length",
+              "ASSIGN:binary-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»jwt && typeof jwt === 'string' && jwt.length < 2048«) {"
+          },
+          {
+            "n": 23,
+            "file": "background",
+            "line": 560,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "if (»request?.url«) {"
+          },
+          {
+            "n": 24,
+            "file": "background",
+            "line": 502,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "INITIAL:URL.constructor",
+              "ELEMENT:member-element"
+            ],
+            "code": "try { »h = new URL(url).hostname«; } catch {}"
+          },
+          {
+            "n": 25,
+            "file": "background",
+            "line": 528,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "jwtStore.set(»jwt«).then(async () => {"
+          },
+          {
+            "n": 26,
+            "file": "background",
+            "line": 7,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "set: (jwt) => new Promise(resolve => chrome.storage.session.set({ smeta_jwt: »jwt« }, resolve)),"
+          },
+          {
+            "n": 27,
+            "file": "background",
+            "line": 533,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const me = await smetaFetch('/auth/me', »jwt«);"
+          },
+          {
+            "n": 28,
+            "file": "background",
+            "line": 61,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:template-literal"
+            ],
+            "code": "'Authorization': »`Bearer ${jwt}`«,"
+          },
+          {
+            "n": 29,
+            "file": "background",
+            "line": 58,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    const r = await fetch(`${SMETA_API}${path}`, {«",
+            "spansTo": 65
+          },
+          {
+            "n": 30,
+            "file": "background",
+            "line": 569,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:object.setProperty",
+              "INITIAL:URL.constructor",
+              "ELEMENT:destructure-property[hostname]"
+            ],
+            "code": "const »{ hostname } = new URL(request.url)«;"
+          },
+          {
+            "n": 31,
+            "file": "background",
+            "line": 503,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»h« !== 'upload.facebook.com') { sendResponse(JSON.stringify({ error: 'url_not_allowed' })); return true; }"
+          },
+          {
+            "n": 32,
+            "file": "background",
+            "line": 508,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "RETURN:atob"
+            ],
+            "code": "const bin = »atob(file.base64)«;"
+          },
+          {
+            "n": 33,
+            "file": "background",
+            "line": 509,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member.length",
+              "INITIAL:Uint8Array.constructor",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »bytes = new Uint8Array(bin.length)«;"
+          },
+          {
+            "n": 34,
+            "file": "background",
+            "line": 510,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member.length",
+              "ASSIGN:binary-right",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return"
+            ],
+            "code": "for (let i = 0; i < »bin.length; i++) bytes[i] = bin.charCodeAt(i)«;"
+          },
+          {
+            "n": 35,
+            "file": "background",
+            "line": 511,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left"
+            ],
+            "code": "const »blob = new Blob([bytes], { type: file.mime || 'image/jpeg' })«;"
+          },
+          {
+            "n": 36,
+            "file": "background",
+            "line": 513,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left",
+              "ITERATE:loop.iteration",
+              "ELEMENT:member-element"
+            ],
+            "code": "for (»const k in (fields || {})) fd.append(k, fields[k]«);"
+          },
+          {
+            "n": 37,
+            "file": "background",
+            "line": 512,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »fd = new FormData()«;"
+          },
+          {
+            "n": 38,
+            "file": "background",
+            "line": 514,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left"
+            ],
+            "code": "fd.append('farr', blob, »file.name || 'photo.jpg'«);"
+          },
+          {
+            "n": 39,
+            "file": "background",
+            "line": 515,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »r = await fetch(url, { method: 'POST', credentials: 'include', body: fd })«;"
+          },
+          {
+            "n": 40,
+            "file": "background",
+            "line": 577,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const opts = buildFetchOptions(»request«);"
+          },
+          {
+            "n": 41,
+            "file": "background",
+            "line": 34,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:destructure-property[method]",
+              "ELEMENT:destructure-property[header]",
+              "ELEMENT:destructure-property[body]",
+              "ELEMENT:destructure-property[form]"
+            ],
+            "code": "const { »method = 'GET', header = {}, body, form } = request«;"
+          },
+          {
+            "n": 42,
+            "file": "background",
+            "line": 35,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "const isForm = »!!form«;"
+          },
+          {
+            "n": 43,
+            "file": "background",
+            "line": 36,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left"
+            ],
+            "code": "const isFbOrSmeta = /facebook\\.com|fbcdn\\.net|adsmeta\\.io/.test(»request.url || ''«);"
+          },
+          {
+            "n": 44,
+            "file": "background",
+            "line": 38,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»method«,"
+          },
+          {
+            "n": 45,
+            "file": "background",
+            "line": 37,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»  const opts = {«",
+            "spansTo": 44
+          },
+          {
+            "n": 46,
+            "file": "background",
+            "line": 42,
+            "ops": [
+              "ASSIGN:identifier",
+              "COPY:object-spread"
+            ],
+            "code": "»...header«,"
+          },
+          {
+            "n": 47,
+            "file": "background",
+            "line": 45,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»method« !== 'GET') {"
+          },
+          {
+            "n": 48,
+            "file": "background",
+            "line": 46,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (»isForm) opts.body = form«;"
+          },
+          {
+            "n": 49,
+            "file": "background",
+            "line": 47,
+            "ops": [
+              "ASSIGN:identifier",
+              "RETURN:json.stringify",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "else if (»body) opts.body = typeof body === 'string' ? body : JSON.stringify(body)«;"
+          },
+          {
+            "n": 50,
+            "file": "background",
+            "line": 580,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:object.setProperty",
+              "INITIAL:URL.constructor",
+              "ELEMENT:destructure-property[hostname]"
+            ],
+            "code": "const »{ hostname } = new URL(request.url)«;"
+          },
+          {
+            "n": 51,
+            "file": "background",
+            "line": 581,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»hostname === 'graph.facebook.com' || hostname.endsWith('.graph.facebook.com')«) {"
+          },
+          {
+            "n": 52,
+            "file": "background",
+            "line": 443,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left"
+            ],
+            "code": "args: [»url, method, body || '', headers || {}«],"
+          },
+          {
+            "n": 53,
+            "file": "background",
+            "line": 440,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "ELEMENT:implicit.add"
+            ],
+            "code": "»        const inj = await chrome.scripting.executeScript({«",
+            "spansTo": 450
+          },
+          {
+            "n": 54,
+            "file": "background",
+            "line": 446,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "const »r = await fetch(u, { method: m, credentials: 'include', headers: h, body: m !== 'GET' ? b : undefined })«;"
+          },
+          {
+            "n": 55,
+            "file": "background",
+            "line": 570,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "urlHostOk = EXTERNAL_ALLOWED.some(h => »hostname === h || hostname.endsWith('.' + h)«);"
+          },
+          {
+            "n": 56,
+            "file": "background",
+            "line": 587,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "fetch(»request.url«, opts)"
+          },
+          {
+            "n": 57,
+            "file": "background",
+            "line": 6,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: session, key: smeta_jwt, sender: background, receiver: background]",
+              "ASSIGN:logical-left"
+            ],
+            "code": "get: () => new Promise(resolve => »chrome.storage.session.get('smeta_jwt', d => resolve(d.smeta_jwt || null))«),"
+          },
+          {
+            "n": 58,
+            "file": "background",
+            "line": 151,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!smeta_jwt«) return;"
+          },
+          {
+            "n": 59,
+            "file": "background",
+            "line": 153,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "checkFetchCommand(»smeta_jwt«);   // LỚP 1: kiểm lệnh lấy số tươi (on-demand, không chạm FB)"
+          },
+          {
+            "n": 60,
+            "file": "background",
+            "line": 134,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const cmd = await smetaFetch('/ext/fetch-command', »smeta_jwt«);"
+          },
+          {
+            "n": 61,
+            "file": "background",
+            "line": 141,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "await smetaFetch('/ext/fetch-done', »smeta_jwt«, { method: 'POST', body: JSON.stringify({ reqId: cmd.reqId, ok: false, reason: 'no_dashboard_tab' }) });"
+          },
+          {
+            "n": 62,
+            "file": "background",
+            "line": 155,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const notifs = await smetaFetch('/notifications', »smeta_jwt«);"
+          },
+          {
+            "n": 63,
+            "file": "background",
+            "line": 761,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!smeta_jwt«) { sendResponse({ ok: false, error: 'Chưa đăng nhập' }); return; }"
+          },
+          {
+            "n": 64,
+            "file": "background",
+            "line": 763,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const data = await smetaFetch('/rating', »smeta_jwt«, {"
+          },
+          {
+            "n": 65,
+            "file": "background",
+            "line": 196,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (»smeta_jwt«) chrome.alarms.create(POLL_ALARM, { periodInMinutes: 5 });"
+          },
+          {
+            "n": 66,
+            "file": "background",
+            "line": 256,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (»smeta_jwt«) chrome.alarms.create(POLL_ALARM, { periodInMinutes: 5 });"
+          },
+          {
+            "n": 67,
+            "file": "background",
+            "line": 620,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left"
+            ],
+            "code": "if (»jwt && request.account«) {"
+          },
+          {
+            "n": 68,
+            "file": "background",
+            "line": 621,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "await smetaFetch('/sync/fb-data', »jwt«, { method: 'POST', body: JSON.stringify({ accounts: [request.account] }) });"
+          },
+          {
+            "n": 69,
+            "file": "background",
+            "line": 666,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!jwt«) { sendResponse({ ok: false }); return; }"
+          },
+          {
+            "n": 70,
+            "file": "background",
+            "line": 668,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const data = await smetaFetch('/auth/me', »jwt«);"
+          },
+          {
+            "n": 71,
+            "file": "background",
+            "line": 683,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!jwt«) { sendResponse({ ok: false }); return; }"
+          },
+          {
+            "n": 72,
+            "file": "background",
+            "line": 684,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const data = await smetaFetch('/ext/promo-context', »jwt«);"
+          }
+        ]
+      }
+    }
+  ]
+}

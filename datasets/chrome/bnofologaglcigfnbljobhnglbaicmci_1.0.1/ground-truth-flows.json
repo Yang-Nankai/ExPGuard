@@ -1,0 +1,389 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "chrome",
+  "extension_id": "bnofologaglcigfnbljobhnglbaicmci",
+  "version": "1.0.1",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-3a6ce1414aee312b",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "DoubleX"
+      ],
+      "match_region": "DoubleX only",
+      "match_basis": "reviewed_non_match_exception",
+      "reports": [
+        {
+          "tool": "DoubleX",
+          "tool_label": "DoubleX",
+          "source_report": "DoubleX/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "doublex:chrome:bnofologaglcigfnbljobhnglbaicmci:1.0.1:eb404b57044b6760:01",
+          "flow": {
+            "flow_id": "doublex:chrome:bnofologaglcigfnbljobhnglbaicmci:1.0.1:eb404b57044b6760:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "eb404b57044b67601821e7f68dff774e55122e7e6d847d6b23f18bc49ae1f673",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L72",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "<all_urls>"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "chrome.storage.local.set",
+              "file": "content_scripts.js",
+              "loc": "L95",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": false,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Reused/ExPGuard-Opti"
+            ],
+            "verification_evidence": {
+              "true_positive": [],
+              "false_positive": [
+                {
+                  "tier": "doublex_reused_expguard",
+                  "source": "Reused/ExPGuard-Opti",
+                  "kind": "doublex_reused_expguard",
+                  "verdict": "FP",
+                  "confidence": 0.9,
+                  "detail": "Reused ExPGuard-Opti F001 (flow_index=0) via source_sink_type_exact/nearest_sink_line.",
+                  "reused_flow_id": "expguard-opti:chrome:bnofologaglcigfnbljobhnglbaicmci:1.0.1:12680bdebbded85e:01",
+                  "package_sha256": "97af46991002e8ead98f5f03819911d5baea3864f3d0b7b771f90cd0c7e56e6e"
+                }
+              ]
+            },
+            "verification_conflict": false,
+            "verification_resolution": "duplicate_tp_promoted_representative",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": null,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Flow Verification: STORAGE_POSOING (page message → `chrome.storage.local.set`)\n\n### 1. Who controls the source\n**Attacker (any webpage).** The manifest injects `js/content-script.js` into `http://*/*` and `https://*/*` at `document_start`, all frames. The content script registers:\n\n```js\nwindow.addEventListener('message', event => {\n  if (event && event.data.textSpeecher) {\n    switch (event.data.message) {\n      ...\n      case 'setNewBaseSpeed':\n        chrome.storage.local.set({ defaultSpeed: event.data.speed });\n```\n\nA page on any matched origin can call `window.postMessage(...)`; the listener runs in the same window, so the page's own postMessage reaches it. There is **no** `event.source === window` check, no `event.origin`/`sender.origin` validation, and no allow-list. The only gates are `event.data.textSpeecher` (truthy) and `event.data.message === 'setNewBaseSpeed'`, both of which are attacker-chosen message fields and trivially satisfiable.\n\n### 2. Source-to-sink path\n- Source: `window.addEventListener('message', ...)` — `js/content-script.js:70` (report cites `content_scripts.js:72`; the actual file is `js/content-script.js`, but the code matches).\n- `event.data.message",
+              "path": "extensions/bnofologaglcigfnbljobhnglbaicmci_1.0.1/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/bnofologaglcigfnbljobhnglbaicmci_1.0.1/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-21T05:01:56.474024Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": null,
+            "reused_from": {
+              "source_dataset": "ExPGuard-Opti",
+              "extension_key": "bnofologaglcigfnbljobhnglbaicmci@1.0.1",
+              "flow_id": "expguard-opti:chrome:bnofologaglcigfnbljobhnglbaicmci:1.0.1:12680bdebbded85e:01",
+              "flow_index": 0,
+              "flow_label": "F001",
+              "verification": "FP",
+              "verification_source": [
+                "ExPAgent"
+              ],
+              "match_mode": "source_sink_type_exact",
+              "match_reason": "nearest_sink_line",
+              "source_type": "WINDOW_MESSAGE_EVENT",
+              "source_loc": "L71:C17 -> L71:C40",
+              "sink_type": "CHROME_LOCAL_STORAGE",
+              "sink_loc": "L93:C10 -> L95:C12",
+              "package_evidence": {
+                "same_crx": true,
+                "same_manifest": false,
+                "same_package": true,
+                "doublex_crx_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\DoubleX\\chrome\\extensions\\bnofologaglcigfnbljobhnglbaicmci_1.0.1\\crx\\bnofologaglcigfnbljobhnglbaicmci.1.0.1.crx",
+                "expaguard_crx_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\bnofologaglcigfnbljobhnglbaicmci_1.0.1\\crx\\bnofologaglcigfnbljobhnglbaicmci.1.0.1.crx",
+                "doublex_crx_sha256": "97af46991002e8ead98f5f03819911d5baea3864f3d0b7b771f90cd0c7e56e6e",
+                "expaguard_crx_sha256": "97af46991002e8ead98f5f03819911d5baea3864f3d0b7b771f90cd0c7e56e6e",
+                "doublex_manifest_sha256": "42ab3ba0f344276085ff24d20f51c18c568f65183987130877ca81e9044cf966",
+                "expaguard_manifest_sha256": "c668e58bae102da8a2908a7f49ae1910fed9bfba0ec3bfefb2f29ae7c778aec6"
+              }
+            },
+            "notes": [
+              "DoubleX static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "DoubleX dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "Representative promoted from FP to TP because a duplicate Flow was verified TP; duplicate status is normalized separately."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+doublex-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "extension_delisted",
+        "dataset_version": "1.0.1",
+        "latest_version": null,
+        "reason": "Chrome Web Store has no public details for this ID",
+        "tool_assessments": []
+      }
+    },
+    {
+      "ground_truth_flow_id": "gtf-e9c1da2ed1018c6c",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_LOCAL_STORAGE",
+      "matched_tools": [
+        "ExPGuard"
+      ],
+      "match_region": "ExPGuard only",
+      "match_basis": "reviewed_non_match_exception",
+      "reports": [
+        {
+          "tool": "ExPGuard-Opti",
+          "tool_label": "ExPGuard",
+          "source_report": "ExPGuard-Opti/chrome/flow-verification-results-no-duplicate.json",
+          "flow_id": "expguard-opti:chrome:bnofologaglcigfnbljobhnglbaicmci:1.0.1:9b0288aa6966e730:01",
+          "flow": {
+            "flow_id": "expguard-opti:chrome:bnofologaglcigfnbljobhnglbaicmci:1.0.1:9b0288aa6966e730:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "semantic_sha256": "9b0288aa6966e730620f25df164ea1dbfab39804b10b039a7d5d1e878977c087",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POSOING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "js/content-script",
+              "loc": "L71:C17 -> L71:C40",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "http://*/*",
+                      "https://*/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/content-script",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "voiceParams",
+              "file": "js/content-script",
+              "loc": "L108:C10 -> L113:C12",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "http://*/*",
+                      "https://*/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "ExPAgent",
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "confirmed_inventory_manual_audit",
+                  "source": "Manual",
+                  "kind": "confirmed_inventory_manual_audit",
+                  "flow_index": 1,
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "User manually confirmed the page message writes voiceParams into local storage."
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "CONTENT_SCRIPT",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification **Four-part ledger** **(a) Who controls the source** — `WINDOW_MESSAGE_EVENT` on a content script declared with `matches: [\"http://*/*\",\"https://*/*\"]`, `allFrames: true`, `runAt: document_start`. The listener at `js/content-script.js:70` is registered unconditionally at script load (it is not nested in an `initWidget` branch — L50–L72 sit at the same top-level scope, while `initWidget` closes at L38). Since content scripts share the page's `window` message channel, **any…",
+              "path": "extensions/bnofologaglcigfnbljobhnglbaicmci_1.0.1/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "PARTIAL",
+              "final_verdict": "FALSE_POSITIVE",
+              "recorded_label": null,
+              "confidence": 0.78,
+              "reproduced": false,
+              "basis": "non_decisive",
+              "usable_for_label": false,
+              "evidence_stage": "SINK_REACHED",
+              "evidence_artifact_count": 5,
+              "reasoning": "The exact content-script source breakpoint fired for the controlled page event, but the privileged sink did not. The remaining failure is isolated to message routing or a background-side payload precondition.",
+              "notes": "sourceBreakpointHits=1 sinkBreakpointHits=1 react=skippedDeterministicResolved",
+              "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\bnofologaglcigfnbljobhnglbaicmci_1.0.1\\dynamic\\dynamic_report.json",
+              "report_mtime": "2026-09-23T02:49:05.902Z"
+            },
+            "dynamic_run_evidence": {
+              "directory": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\bnofologaglcigfnbljobhnglbaicmci_1.0.1\\dynamic\\evidence\\flow-1",
+              "files": [
+                "extension-debug.json",
+                "flow-result.json",
+                "screenshot-evidence.json",
+                "source-contract.json",
+                "step-after-observation.png",
+                "step-after-trigger.png",
+                "step-final-state.png",
+                "step-source-open.png",
+                "storage-after-observation.json",
+                "storage-after-observation.png",
+                "storage-after-trigger.json",
+                "storage-after-trigger.png",
+                "trajectory.txt"
+              ]
+            },
+            "expagent_final": {
+              "verdict": "FP",
+              "label": "FP",
+              "confidence": 0.5,
+              "reasoning": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path. Final ReAct/extraction error: Request timed out.",
+              "evidence_summary": "Forced-binary conservative tie-break: no decisive evidence established an exploitable path.",
+              "conflict_resolution": "Fallback applied the documented TP/FP-only tie-break.",
+              "static_verdict_snapshot": "DUPLICATE",
+              "dynamic_outcome_snapshot": "NOT_AVAILABLE",
+              "tool_reports_consulted": [
+                "primary",
+                "coco",
+                "DoubleX"
+              ],
+              "trust": "count_mismatch",
+              "usable_for_label": false,
+              "path": "../../../../ExPGuard-Ablation/Consolidated-Extension-Security-Analysis/tools/ExPGuard-Opti/chrome/extensions/bnofologaglcigfnbljobhnglbaicmci_1.0.1/final/final_report.json",
+              "report_mtime": "2026-08-18T03:42:18.052Z"
+            },
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "confirmed_inventory_manual_audit",
+                "verification_origin": "manual_audit",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "confirmed_at": "2026-09-23T02:49:05.902Z",
+                "notes": "User manually confirmed the page message writes voiceParams into local storage.",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\bnofologaglcigfnbljobhnglbaicmci_1.0.1\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\ExPGuard-Opti\\chrome\\extensions\\bnofologaglcigfnbljobhnglbaicmci_1.0.1\\dynamic\\evidence\\flow-1\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-23T02:49:05.902Z",
+                  "sha256": "c12c60b00df50ca332b88e9ad0279c281f47089356e9fc90c5efba3b46d0a253"
+                }
+              }
+            ],
+            "notes": [
+              "Latest manual attestation overrides the aggregate label while preserving the automated outcome for audit."
+            ],
+            "snapshot_drift": {
+              "static_verdict": {
+                "flow_summary": "DUPLICATE",
+                "current_report": "TRUE_POSITIVE"
+              },
+              "dynamic_outcome": {
+                "flow_summary": "",
+                "current_report": "INCONCLUSIVE_AFTER_DEBUG"
+              },
+              "dynamic_final_verdict": {
+                "flow_summary": "",
+                "current_report": "UNCERTAIN"
+              }
+            },
+            "data_availability": "extensions-dir+flow-summary"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "extension_delisted",
+        "dataset_version": "1.0.1",
+        "latest_version": null,
+        "reason": "Chrome Web Store has no public details for this ID",
+        "tool_assessments": []
+      }
+    }
+  ]
+}

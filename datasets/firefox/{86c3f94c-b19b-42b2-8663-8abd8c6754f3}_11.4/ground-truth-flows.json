@@ -1,0 +1,161 @@
+{
+  "schema_version": "expguard-ground-truth-flows/v1",
+  "platform": "firefox",
+  "extension_id": "{86c3f94c-b19b-42b2-8663-8abd8c6754f3}",
+  "version": "11.4",
+  "flows": [
+    {
+      "ground_truth_flow_id": "gtf-a2e8ae6d35ff0b21",
+      "verification": "TP",
+      "source_family": "page",
+      "sink_family": "CHROME_SYNC_STORAGE",
+      "matched_tools": [
+        "CoCo"
+      ],
+      "match_region": "CoCo only",
+      "match_basis": "single_tool_report",
+      "reports": [
+        {
+          "tool": "CoCo",
+          "tool_label": "CoCo",
+          "source_report": "CoCo/firefox/flow-verification-results-no-duplicate.json",
+          "flow_id": "coco:firefox:{86c3f94c-b19b-42b2-8663-8abd8c6754f3}:11.4:b43b7e31f27374c0:01",
+          "flow": {
+            "flow_id": "coco:firefox:{86c3f94c-b19b-42b2-8663-8abd8c6754f3}:11.4:b43b7e31f27374c0:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "semantic_sha256": "b43b7e31f27374c087eeb14d933b1a3e82bd4eb316e737844b417a5598e7b3de",
+            "identity_occurrence": 1,
+            "source_report_id": 1,
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "",
+              "file": "",
+              "loc": "",
+              "frame": "",
+              "frames": [
+                {
+                  "id": "",
+                  "family": ""
+                }
+              ],
+              "provenance": "UNKNOWN",
+              "origin_context": "",
+              "origin_frame_family": ""
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "",
+              "file": "",
+              "loc": "",
+              "frame": "",
+              "frames": [
+                {
+                  "id": "",
+                  "family": ""
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": null,
+              "privilege_crossing": false,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": ""
+            },
+            "verification": "TP",
+            "dynamic": true,
+            "duplicate_of": null,
+            "is_duplicate": false,
+            "duplicate_reason": null,
+            "verification_source": [
+              "Manual"
+            ],
+            "verification_evidence": {
+              "true_positive": [
+                {
+                  "tier": "coco_firefox_user_manual",
+                  "source": "Manual",
+                  "kind": "coco_firefox_user_manual",
+                  "verdict": "TP",
+                  "confidence": 0.95,
+                  "detail": "人工验证为 TP：*.dvo.com 页面可伪造 loginWithThirdParty，并覆盖扩展保存的 session id 和 email。",
+                  "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\firefox\\extensions\\{86c3f94c-b19b-42b2-8663-8abd8c6754f3}_11.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "report_sha256": "30508fc28e04f1961d50e838f64d44be214081c34738aed9e5e7354b1cb3f456"
+                }
+              ],
+              "false_positive": []
+            },
+            "verification_conflict": false,
+            "verification_resolution": "manual_override",
+            "static": {
+              "verdict": "TRUE_POSITIVE",
+              "confidence": 0.6,
+              "report_disposition": "SUMMARY",
+              "representative_index": null,
+              "source_report_id": 1,
+              "source_provenance": "",
+              "reasoning": "Structured extraction unavailable; explicit analyst conclusion preserved from the final static transcript: ## Verification of Flow #1 — `STORAGE_POSOING` (WINDOW_MESSAGE_EVENT → CHROME_SYNC_STORAGE)\n\n### (a) Who controls the source\n`js/dvo_msg_listeners.js` registers `window.addEventListener(\"message\", function(event) {...})` in a content script that the manifest injects on `https://*.dvo.com/*` (ISOLATED world). The `event.data` payload is fully controlled by any script running in the page (`window.postMessage`). There is **no `event.origin` check and no `event.source` check**, so the page itself can trivially forge the message. The `action === \"loginWithThirdParty\"` gate is an attacker-chosen message field, not a trust anchor.\n\n### (b) Source-to-sink path (confirmed by raw source)\n1. `L3: const data = event.data;` — attacker object.\n2. `L5: const action = data.action;`\n3. `L8: if (action === \"loginWithThirdParty\")` — attacker-satisfiable branch.\n4. `L9: const sid = data.sessionId;` (reported sink line; actually an intermediate assignment)\n5. `L10: const eml = data.email;`\n6. `L11: saveSession(sid, eml);`\n7. `js/helper/session.js L27-28`: `setInStorage(KEY_SESSION_ID, sid); setInStorage(KEY_EMAIL, eml);`\n8. `js/helper/storage.js L7`: `storage.set(obj);` where `storage = browser.storage",
+              "path": "extensions/{86c3f94c-b19b-42b2-8663-8abd8c6754f3}_11.4/static/static_report.json"
+            },
+            "dynamic_detail": {
+              "outcome": "INCONCLUSIVE_AFTER_DEBUG",
+              "final_verdict": "UNCERTAIN",
+              "recorded_label": null,
+              "confidence": 0,
+              "reproduced": false,
+              "basis": "runtime_or_static_dynamic_evidence",
+              "usable_for_label": false,
+              "evidence_stage": null,
+              "evidence_artifact_count": 0,
+              "reasoning": "ReAct LLM phase exceeded its 30s budget (thinking-mode latency); deterministic evidence retained and graded inconclusive rather than guessed.",
+              "path": "extensions/{86c3f94c-b19b-42b2-8663-8abd8c6754f3}_11.4/dynamic/dynamic_report.json",
+              "report_mtime": "2026-08-17T14:30:40.464004Z"
+            },
+            "dynamic_run_evidence": null,
+            "expagent_final": null,
+            "manual_verification": [
+              {
+                "source": "Manual",
+                "kind": "coco_firefox_user_manual",
+                "verification_origin": "user_manual_validation",
+                "verdict": "TP",
+                "confidence": 0.95,
+                "validated_at": "2026-09-24T10:01:50.217158Z",
+                "notes": "人工验证为 TP：*.dvo.com 页面可伪造 loginWithThirdParty，并覆盖扩展保存的 session id 和 email。",
+                "report_path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\firefox\\extensions\\{86c3f94c-b19b-42b2-8663-8abd8c6754f3}_11.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                "report_artifact": {
+                  "path": "D:\\Ph0jav7\\ExtensionSecurity\\ExPGuard-Data\\Top5000\\CoCo\\firefox\\extensions\\{86c3f94c-b19b-42b2-8663-8abd8c6754f3}_11.4\\dynamic\\evidence\\flow-0\\manual\\manual_validation.json",
+                  "kind": "manual_validation.json",
+                  "mtime": "2026-09-24T10:01:50.217158Z",
+                  "sha256": "30508fc28e04f1961d50e838f64d44be214081c34738aed9e5e7354b1cb3f456"
+                }
+              }
+            ],
+            "reused_from": null,
+            "notes": [
+              "CoCo static verdict snapshot: TRUE_POSITIVE (informational; not promoted to TP/FP).",
+              "CoCo dynamic outcome: INCONCLUSIVE_AFTER_DEBUG; final_verdict=UNCERTAIN.",
+              "CoCo Firefox manual verdict: TP."
+            ],
+            "snapshot_drift": null,
+            "data_availability": "extensions-dir+coco-source+static+dynamic"
+          }
+        }
+      ],
+      "version_update_assessment": {
+        "status": "version_unchanged",
+        "dataset_version": "11.4",
+        "latest_version": "11.4",
+        "tool_assessments": []
+      }
+    }
+  ]
+}
