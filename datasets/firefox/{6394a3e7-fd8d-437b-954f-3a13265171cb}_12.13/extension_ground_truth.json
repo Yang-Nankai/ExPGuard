@@ -1,0 +1,557 @@
+{
+  "schema_version": "expguard-extension-dataset/v1",
+  "extension": {
+    "platform": "firefox",
+    "extension_id": "{6394a3e7-fd8d-437b-954f-3a13265171cb}",
+    "version": "12.13",
+    "name": "Netflix Bilingual Subtitles",
+    "rank": 2326,
+    "manifest_version": 3,
+    "catalog_manifest_version": 3,
+    "catalog_metadata": {
+      "rank": 2326,
+      "manifest_version": 3,
+      "user_count": 1527,
+      "rating_count": 35,
+      "rating_average": 3.2286,
+      "name": "Netflix Bilingual Subtitles"
+    },
+    "source": {
+      "directory": "Source",
+      "manifest_sha256": "e8ec28d4920ea8c19d8b1346edf5e4f0978bc980b53a5efa9623fd57e05c793c"
+    }
+  },
+  "tools": {
+    "ExPGuard": {
+      "scan_status": "not_available",
+      "report_files": {
+        "scan_reports": [
+          "ExPGuard/analysis.log"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    },
+    "CoCo": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "CoCo/report.flows.json",
+          "CoCo/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    },
+    "DoubleX": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "DoubleX/report.flows.json",
+          "DoubleX/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 3,
+        "reported_no_duplicate": 2,
+        "tp_no_duplicate": 2,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [
+          {
+            "flow_id": "doublex:firefox:{6394a3e7-fd8d-437b-954f-3a13265171cb}:12.13:bdcc634c18e12ff9:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L325",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.netflix.com/*",
+                      "https://*.netflixsubs.app/login*",
+                      "https://*.netflixsubs.app/v2/auth/patreon/callback*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "chrome.storage.sync.set",
+              "file": "content_scripts.js",
+              "loc": "L2540",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": false,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "doublex:firefox:{6394a3e7-fd8d-437b-954f-3a13265171cb}:12.13:07af40110accd08d:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "DATA_LEAK",
+            "rule_id": "doublex-sensitive-api-egress",
+            "severity": "HIGH",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "chrome.storage.sync.get",
+              "file": "content_scripts.js",
+              "loc": "L2438",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.netflix.com/*",
+                      "https://*.netflixsubs.app/login*",
+                      "https://*.netflixsubs.app/v2/auth/patreon/callback*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "age\":\n\t\t\t\t\t\tchrome.storage.sync.get(m, e => {\n\t\t\t\t\t\t\twindow.postMessage({\n\t\t\t\t\t\t\t\tdirection: ",
+              "file": "content_scripts.js",
+              "loc": "L2439",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "Sensitive extension data is returned to a web-accessible channel."
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "doublex:firefox:{6394a3e7-fd8d-437b-954f-3a13265171cb}:12.13:299180e41000bac0:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "flow_type": "DATA_LEAK",
+            "rule_id": "doublex-sensitive-api-egress",
+            "severity": "HIGH",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "chrome.storage.sync.get",
+              "file": "content_scripts.js",
+              "loc": "L2519",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.netflix.com/*",
+                      "https://*.netflixsubs.app/login*",
+                      "https://*.netflixsubs.app/v2/auth/patreon/callback*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "tion.reload() : chrome.storage.sync.get(m, e => {\n\t\t\twindow.postMessage({\n\t\t\t",
+              "file": "content_scripts.js",
+              "loc": "L2520",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "Sensitive extension data is returned to a web-accessible channel."
+            },
+            "verification_evidence": "Duplicate",
+            "deduplication": {
+              "is_duplicate": true,
+              "duplicate_of": "doublex:firefox:{6394a3e7-fd8d-437b-954f-3a13265171cb}:12.13:07af40110accd08d:01",
+              "duplicate_reason": "static_report_representative_index"
+            }
+          }
+        ],
+        "no_duplicate": [
+          {
+            "flow_id": "doublex:firefox:{6394a3e7-fd8d-437b-954f-3a13265171cb}:12.13:bdcc634c18e12ff9:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "CRITICAL",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L325",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.netflix.com/*",
+                      "https://*.netflixsubs.app/login*",
+                      "https://*.netflixsubs.app/v2/auth/patreon/callback*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "chrome.storage.sync.set",
+              "file": "content_scripts.js",
+              "loc": "L2540",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": false,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "doublex:firefox:{6394a3e7-fd8d-437b-954f-3a13265171cb}:12.13:07af40110accd08d:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "DATA_LEAK",
+            "rule_id": "doublex-sensitive-api-egress",
+            "severity": "HIGH",
+            "source": {
+              "type": "STORAGE_ALL_ITEMS",
+              "remark": "chrome.storage.sync.get",
+              "file": "content_scripts.js",
+              "loc": "L2438",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.netflix.com/*",
+                      "https://*.netflixsubs.app/login*",
+                      "https://*.netflixsubs.app/v2/auth/patreon/callback*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "age\":\n\t\t\t\t\t\tchrome.storage.sync.get(m, e => {\n\t\t\t\t\t\t\twindow.postMessage({\n\t\t\t\t\t\t\t\tdirection: ",
+              "file": "content_scripts.js",
+              "loc": "L2439",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "Sensitive extension data is returned to a web-accessible channel."
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ground_truth": {
+    "verdict": "TP",
+    "flow_count": 2,
+    "flow_ids": [
+      "gtf-baa79cacd048c056",
+      "gtf-bd1bcfbea381232e"
+    ],
+    "flows": [
+      {
+        "ground_truth_flow_id": "gtf-baa79cacd048c056",
+        "verification": "TP",
+        "source_family": "page",
+        "sink_family": "CHROME_SYNC_STORAGE",
+        "matched_tools": [
+          "DoubleX"
+        ],
+        "match_region": "DoubleX only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "DoubleX",
+            "flow_id": "doublex:firefox:{6394a3e7-fd8d-437b-954f-3a13265171cb}:12.13:bdcc634c18e12ff9:01",
+            "source_report": "DoubleX/report.flows.json",
+            "flow": {
+              "flow_id": "doublex:firefox:{6394a3e7-fd8d-437b-954f-3a13265171cb}:12.13:bdcc634c18e12ff9:01",
+              "flow_index": 0,
+              "flow_order": 1,
+              "flow_label": "F001",
+              "flow_type": "STORAGE_POISONING",
+              "rule_id": "doublex-edg-provenance",
+              "severity": "CRITICAL",
+              "source": {
+                "type": "WINDOW_MESSAGE_EVENT",
+                "remark": "DoubleX web-accessible message input",
+                "file": "content_scripts.js",
+                "loc": "L325",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "https://*.netflix.com/*",
+                        "https://*.netflixsubs.app/login*",
+                        "https://*.netflixsubs.app/v2/auth/patreon/callback*"
+                      ]
+                    }
+                  }
+                ],
+                "provenance": "CONTENT_SCRIPT",
+                "origin_context": "content_scripts.js",
+                "origin_frame_family": "CS"
+              },
+              "sink": {
+                "type": "CHROME_SYNC_STORAGE",
+                "remark": "chrome.storage.sync.set",
+                "file": "content_scripts.js",
+                "loc": "L2540",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS"
+                  }
+                ],
+                "url_taint_control": null
+              },
+              "structural": {
+                "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+                "privilege_crossing": false,
+                "message_passing": false,
+                "storage_passing": false,
+                "message_sender": null,
+                "message_sender_provenance": null,
+                "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      },
+      {
+        "ground_truth_flow_id": "gtf-bd1bcfbea381232e",
+        "verification": "TP",
+        "source_family": "storage",
+        "sink_family": "WINDOW_POSTMESSAGE",
+        "matched_tools": [
+          "DoubleX"
+        ],
+        "match_region": "DoubleX only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "DoubleX",
+            "flow_id": "doublex:firefox:{6394a3e7-fd8d-437b-954f-3a13265171cb}:12.13:07af40110accd08d:01",
+            "source_report": "DoubleX/report.flows.json",
+            "flow": {
+              "flow_id": "doublex:firefox:{6394a3e7-fd8d-437b-954f-3a13265171cb}:12.13:07af40110accd08d:01",
+              "flow_index": 1,
+              "flow_order": 2,
+              "flow_label": "F002",
+              "flow_type": "DATA_LEAK",
+              "rule_id": "doublex-sensitive-api-egress",
+              "severity": "HIGH",
+              "source": {
+                "type": "STORAGE_ALL_ITEMS",
+                "remark": "chrome.storage.sync.get",
+                "file": "content_scripts.js",
+                "loc": "L2438",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "https://*.netflix.com/*",
+                        "https://*.netflixsubs.app/login*",
+                        "https://*.netflixsubs.app/v2/auth/patreon/callback*"
+                      ]
+                    }
+                  }
+                ],
+                "provenance": "CONTENT_SCRIPT",
+                "origin_context": "content_scripts.js",
+                "origin_frame_family": "CS"
+              },
+              "sink": {
+                "type": "WINDOW_POSTMESSAGE",
+                "remark": "age\":\n\t\t\t\t\t\tchrome.storage.sync.get(m, e => {\n\t\t\t\t\t\t\twindow.postMessage({\n\t\t\t\t\t\t\t\tdirection: ",
+                "file": "content_scripts.js",
+                "loc": "L2439",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS"
+                  }
+                ],
+                "url_taint_control": null
+              },
+              "structural": {
+                "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+                "privilege_crossing": true,
+                "message_passing": false,
+                "storage_passing": false,
+                "message_sender": null,
+                "message_sender_provenance": null,
+                "privilege_reason": "Sensitive extension data is returned to a web-accessible channel."
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

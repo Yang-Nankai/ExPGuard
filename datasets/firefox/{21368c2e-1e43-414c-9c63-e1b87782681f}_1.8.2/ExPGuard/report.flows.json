@@ -1,0 +1,1476 @@
+{
+  "extensionId": "{21368c2e-1e43-414c-9c63-e1b87782681f}",
+  "extensionVersion": "1.8.2",
+  "sourceType": "XPI",
+  "stats": {
+    "filesWithIssues": 2,
+    "totalFiles": 4,
+    "distinctFlows": 2,
+    "rawIssueEntries": 2,
+    "sinklessSourcesSkipped": 4
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "content",
+      "frame": "CS_1",
+      "constraint": {
+        "matches": [
+          "https://www.locoloader.com/*",
+          "https://www.locoloader.test/*"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "content",
+        "loc": "L30:C12 -> L30:C31",
+        "line": 30,
+        "col": [
+          12,
+          31
+        ],
+        "spansTo": null,
+        "code": "if (»message.data.target« !== 'ext') {"
+      },
+      "sinks": [
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "location.origin",
+          "file": "content",
+          "loc": "L59:C8 -> L59:C59",
+          "line": 59,
+          "col": [
+            8,
+            59
+          ],
+          "spansTo": null,
+          "code": "»window.postMessage(message, window.location.origin)«;",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "https://www.locoloader.com/*",
+              "https://www.locoloader.test/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 16,
+        "distinctLines": 3,
+        "steps": [
+          {
+            "n": 1,
+            "file": "content",
+            "line": 30,
+            "ops": [
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.data.target« !== 'ext') {"
+          },
+          {
+            "n": 2,
+            "file": "content",
+            "line": 43,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {«",
+            "spansTo": 60,
+            "crossContextHop": "runtime.single.sender.message[background->content]"
+          },
+          {
+            "n": 3,
+            "file": "content",
+            "line": 54,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.target« !== 'app') {"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "background",
+        "loc": "L704:C0 -> L956:C2",
+        "line": 704,
+        "col": [
+          0,
+          2
+        ],
+        "spansTo": 956,
+        "code": "»chrome.runtime.onMessage.addListener(async (message, sender) => {«"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_SESSION_STORAGE",
+          "remark": "unknown",
+          "file": "background",
+          "loc": "L796:C12 -> L796:C75",
+          "line": 796,
+          "col": [
+            12,
+            75
+          ],
+          "spansTo": null,
+          "code": "»chrome.storage.session.set({ [previewId]: message.previewURL })«;",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_DECLARATIVENETREQUEST_RULES",
+          "remark": null,
+          "file": "background",
+          "loc": "L1032:C10 -> L1042:C6",
+          "line": 1032,
+          "col": [
+            10,
+            6
+          ],
+          "spansTo": 1042,
+          "code": "await »chrome.declarativeNetRequest.updateSessionRules({«",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L608:C35 -> L608:C51",
+          "line": 608,
+          "col": [
+            35,
+            51
+          ],
+          "spansTo": null,
+          "code": "const response = await »fetch(scriptUrl)«;",
+          "urlControl": "FULL",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L918:C34 -> L918:C102",
+          "line": 918,
+          "col": [
+            34,
+            102
+          ],
+          "spansTo": null,
+          "code": "fetchResponse = await »fetch(message.url, message.fetchOptions ? message.fetchOptions : {})«;",
+          "urlControl": "FULL",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 9103,
+        "distinctLines": 124,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 704,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»chrome.runtime.onMessage.addListener(async (message, sender) => {«",
+            "spansTo": 956,
+            "crossContextHop": "runtime.single.sender.message[content->background]"
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 705,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "log('Background.js received message from content script:', »message«);"
+          },
+          {
+            "n": 3,
+            "file": "background",
+            "line": 719,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.target« !== 'ext') {"
+          },
+          {
+            "n": 4,
+            "file": "background",
+            "line": 723,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.event« === 'UPDATE_OPTIONS') {"
+          },
+          {
+            "n": 5,
+            "file": "background",
+            "line": 724,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "extensionOptions[»message.optionName] = message.optionVal«;"
+          },
+          {
+            "n": 6,
+            "file": "background",
+            "line": 22,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const extensionOptions = {«",
+            "spansTo": 25
+          },
+          {
+            "n": 7,
+            "file": "background",
+            "line": 728,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.event« === 'START_DOWNLOAD') {"
+          },
+          {
+            "n": 8,
+            "file": "background",
+            "line": 742,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.event« === 'START_BATCH_DOWNLOAD') {"
+          },
+          {
+            "n": 9,
+            "file": "background",
+            "line": 738,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "downloadLinks(»message«);"
+          },
+          {
+            "n": 10,
+            "file": "background",
+            "line": 226,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "const links = »message.links«;"
+          },
+          {
+            "n": 11,
+            "file": "background",
+            "line": 228,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!links«) {"
+          },
+          {
+            "n": 12,
+            "file": "background",
+            "line": 233,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member.length",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!links.length«) {"
+          },
+          {
+            "n": 13,
+            "file": "background",
+            "line": 238,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member.length",
+              "ASSIGN:binary-left",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "if (»links[links.length - 1].url« === 'exceeded') {"
+          },
+          {
+            "n": 14,
+            "file": "background",
+            "line": 244,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "const isSingle = »message.event« === 'START_DOWNLOAD';"
+          },
+          {
+            "n": 15,
+            "file": "background",
+            "line": 247,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left",
+              "ASSIGN:unary",
+              "ASSIGN:logical-right"
+            ],
+            "code": "const createFolder = »(isSingle && extensionOptions.btDlFolder) || (!isSingle && extensionOptions.btDlAllFolder)«;"
+          },
+          {
+            "n": 16,
+            "file": "background",
+            "line": 253,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»message.extActions && message.extActions.headers«) {"
+          },
+          {
+            "n": 17,
+            "file": "background",
+            "line": 254,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member.length",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»message.extActions.headers.download && message.extActions.headers.download.length«) {"
+          },
+          {
+            "n": 18,
+            "file": "background",
+            "line": 260,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member.length",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "} else if (»message.extActions.headers.both && message.extActions.headers.both.length«) {"
+          },
+          {
+            "n": 19,
+            "file": "background",
+            "line": 256,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ITERATE:loop.iteration"
+            ],
+            "code": "for (»const index in message.extActions.headers.download«) {"
+          },
+          {
+            "n": 20,
+            "file": "background",
+            "line": 257,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "decodeCookies(»message.extActions.headers.download[index]«);"
+          },
+          {
+            "n": 21,
+            "file": "background",
+            "line": 963,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»headersObj.action && headersObj.action.requestHeaders«) {"
+          },
+          {
+            "n": 22,
+            "file": "background",
+            "line": 964,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ITERATE:loop.iteration"
+            ],
+            "code": "for (»const key in headersObj.action.requestHeaders«) {"
+          },
+          {
+            "n": 23,
+            "file": "background",
+            "line": 965,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»headersObj.action.requestHeaders[key].header« === 'cookie') {"
+          },
+          {
+            "n": 24,
+            "file": "background",
+            "line": 967,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "»headersObj.action.requestHeaders[key].value«,"
+          },
+          {
+            "n": 25,
+            "file": "background",
+            "line": 966,
+            "ops": [
+              "RETURN:decodeURIComponent",
+              "ASSIGN:identifier"
+            ],
+            "code": "»headersObj.action.requestHeaders[key].value = decodeURIComponent(«",
+            "spansTo": 968
+          },
+          {
+            "n": 26,
+            "file": "background",
+            "line": 262,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ITERATE:loop.iteration"
+            ],
+            "code": "for (»const index in message.extActions.headers.both«) {"
+          },
+          {
+            "n": 27,
+            "file": "background",
+            "line": 258,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "headerObjArr.push(»message.extActions.headers.download[index]«);"
+          },
+          {
+            "n": 28,
+            "file": "background",
+            "line": 252,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »headerObjArr = []«;"
+          },
+          {
+            "n": 29,
+            "file": "background",
+            "line": 263,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "decodeCookies(»message.extActions.headers.both[index]«);"
+          },
+          {
+            "n": 30,
+            "file": "background",
+            "line": 264,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "headerObjArr.push(»message.extActions.headers.both[index]«);"
+          },
+          {
+            "n": 31,
+            "file": "background",
+            "line": 764,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.event« === 'STOP_BATCH_DOWNLOAD') {"
+          },
+          {
+            "n": 32,
+            "file": "background",
+            "line": 784,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.event« === 'PREVIEW') {"
+          },
+          {
+            "n": 33,
+            "file": "background",
+            "line": 753,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "activeBatchTabUUID = »message.tabUUID«;"
+          },
+          {
+            "n": 34,
+            "file": "background",
+            "line": 768,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (»activeBatchTabUUID«) {"
+          },
+          {
+            "n": 35,
+            "file": "background",
+            "line": 786,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "let tabUrl = »message.previewURL«;"
+          },
+          {
+            "n": 36,
+            "file": "background",
+            "line": 743,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (»activeBatchTabUUID«) {"
+          },
+          {
+            "n": 37,
+            "file": "background",
+            "line": 754,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member.length"
+            ],
+            "code": "remainingLinksUI = »message.links.length«;"
+          },
+          {
+            "n": 38,
+            "file": "background",
+            "line": 772,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "tabUUID: »activeBatchTabUUID«,"
+          },
+          {
+            "n": 39,
+            "file": "background",
+            "line": 769,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            chrome.tabs.sendMessage(sender.tab.id, {«",
+            "spansTo": 775
+          },
+          {
+            "n": 40,
+            "file": "background",
+            "line": 773,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "remainingLinks: »remainingLinksUI«,"
+          },
+          {
+            "n": 41,
+            "file": "background",
+            "line": 789,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "»message.player === 'true' ||«",
+            "spansTo": 791
+          },
+          {
+            "n": 42,
+            "file": "background",
+            "line": 790,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "(»message.extActions && message.extActions.playerPreview«) ||"
+          },
+          {
+            "n": 43,
+            "file": "background",
+            "line": 791,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "»message.linkType« === 'raw'"
+          },
+          {
+            "n": 44,
+            "file": "background",
+            "line": 850,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»isPrivate && message.type === 'ext-fetch'«) {"
+          },
+          {
+            "n": 45,
+            "file": "background",
+            "line": 747,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "tabUUID: »activeBatchTabUUID«,"
+          },
+          {
+            "n": 46,
+            "file": "background",
+            "line": 744,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            chrome.tabs.sendMessage(sender.tab.id, {«",
+            "spansTo": 748
+          },
+          {
+            "n": 47,
+            "file": "background",
+            "line": 755,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "activeMessage = »message«;"
+          },
+          {
+            "n": 48,
+            "file": "background",
+            "line": 851,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»message«.type = 'ext-tab';"
+          },
+          {
+            "n": 49,
+            "file": "background",
+            "line": 857,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.type« === 'ext-fetch') {"
+          },
+          {
+            "n": 50,
+            "file": "background",
+            "line": 757,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "log('Active tabUUID:', »activeBatchTabUUID«);"
+          },
+          {
+            "n": 51,
+            "file": "background",
+            "line": 795,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:template-literal"
+            ],
+            "code": "tabUrl = chrome.runtime.getURL(»`player.html?data=${message.linkType}&previewId=${previewId}`«);"
+          },
+          {
+            "n": 52,
+            "file": "background",
+            "line": 801,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»message.extActions && message.extActions.headers«) {"
+          },
+          {
+            "n": 53,
+            "file": "background",
+            "line": 852,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»message«['headers'] = {};"
+          },
+          {
+            "n": 54,
+            "file": "background",
+            "line": 862,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "tabUUID: »message.tabUUID«,"
+          },
+          {
+            "n": 55,
+            "file": "background",
+            "line": 859,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const pageObj = {«",
+            "spansTo": 866
+          },
+          {
+            "n": 56,
+            "file": "background",
+            "line": 863,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "url: »message.url«,"
+          },
+          {
+            "n": 57,
+            "file": "background",
+            "line": 941,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.type« === 'ext-tab') {"
+          },
+          {
+            "n": 58,
+            "file": "background",
+            "line": 796,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.storage.session.set({ [previewId]: message.previewURL })«;"
+          },
+          {
+            "n": 59,
+            "file": "background",
+            "line": 802,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member.length",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»message.extActions.headers.preview && message.extActions.headers.preview.length«) {"
+          },
+          {
+            "n": 60,
+            "file": "background",
+            "line": 853,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»message«['actions'] = [];"
+          },
+          {
+            "n": 61,
+            "file": "background",
+            "line": 942,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const pageObj = await openTab(»message«);"
+          },
+          {
+            "n": 62,
+            "file": "background",
+            "line": 466,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "tabUUID: »message.tabUUID«,"
+          },
+          {
+            "n": 63,
+            "file": "background",
+            "line": 461,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const defaultResponse = [«",
+            "spansTo": 479
+          },
+          {
+            "n": 64,
+            "file": "background",
+            "line": 467,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "url: »message.url«,"
+          },
+          {
+            "n": 65,
+            "file": "background",
+            "line": 476,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "windowURL: »message.windowURL«,"
+          },
+          {
+            "n": 66,
+            "file": "background",
+            "line": 485,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "log('Received headers:', »message.headers«);"
+          },
+          {
+            "n": 67,
+            "file": "background",
+            "line": 487,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ITERATE:loop.iteration"
+            ],
+            "code": "for (»const headerObj of message.headers«) {"
+          },
+          {
+            "n": 68,
+            "file": "background",
+            "line": 488,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»headerObj«.condition['tabIds'] = [tab.id];"
+          },
+          {
+            "n": 69,
+            "file": "background",
+            "line": 504,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»await chrome.tabs.update(tab.id, { url: message.url, active: false })«;"
+          },
+          {
+            "n": 70,
+            "file": "background",
+            "line": 490,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "const headerInfo = await setHeaders(»headerObj.action, headerObj.condition«);"
+          },
+          {
+            "n": 71,
+            "file": "background",
+            "line": 996,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»!action || !condition«) {"
+          },
+          {
+            "n": 72,
+            "file": "background",
+            "line": 1002,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "sanitizeHeaders(»action.requestHeaders«);"
+          },
+          {
+            "n": 73,
+            "file": "background",
+            "line": 1077,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (Array.isArray(»headerArr«)) {"
+          },
+          {
+            "n": 74,
+            "file": "background",
+            "line": 1078,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member.length",
+              "ASSIGN:binary-left",
+              "ASSIGN:update"
+            ],
+            "code": "for (let i = »headerArr.length - 1; i >= 0; i--«) {"
+          },
+          {
+            "n": 75,
+            "file": "background",
+            "line": 1079,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element-container",
+              "ELEMENT:implicit.add"
+            ],
+            "code": "const »item = headerArr[i]«;"
+          },
+          {
+            "n": 76,
+            "file": "background",
+            "line": 1080,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "if (typeof item?.header === 'string' && DISALLOWED_HEADERS.has(»item.header.toLowerCase()«)) {"
+          },
+          {
+            "n": 77,
+            "file": "background",
+            "line": 1081,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "»headerArr.splice(i, 1)«;"
+          },
+          {
+            "n": 78,
+            "file": "background",
+            "line": 1003,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "sanitizeHeaders(»action.responseHeaders«);"
+          },
+          {
+            "n": 79,
+            "file": "background",
+            "line": 1006,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "RETURN:json.stringify"
+            ],
+            "code": "const »jsonString = JSON.stringify({ action, condition })«;"
+          },
+          {
+            "n": 80,
+            "file": "background",
+            "line": 1007,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const headerUUID = hash(»jsonString«);"
+          },
+          {
+            "n": 81,
+            "file": "background",
+            "line": 1028,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "log('Set headers (action):', »action«);"
+          },
+          {
+            "n": 82,
+            "file": "background",
+            "line": 1029,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "log('Set headers (condition):', »condition«);"
+          },
+          {
+            "n": 83,
+            "file": "background",
+            "line": 1037,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»action«,"
+          },
+          {
+            "n": 84,
+            "file": "background",
+            "line": 1032,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    await chrome.declarativeNetRequest.updateSessionRules({«",
+            "spansTo": 1042
+          },
+          {
+            "n": 85,
+            "file": "background",
+            "line": 1038,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»condition«,"
+          },
+          {
+            "n": 86,
+            "file": "background",
+            "line": 592,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "args: [»message«],"
+          },
+          {
+            "n": 87,
+            "file": "background",
+            "line": 586,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        injectionResult = await ensureExecuteScript({«",
+            "spansTo": 593
+          },
+          {
+            "n": 88,
+            "file": "background",
+            "line": 590,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "document.LLPage = »message«;"
+          },
+          {
+            "n": 89,
+            "file": "background",
+            "line": 601,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "if (»message.actions.script«) {"
+          },
+          {
+            "n": 90,
+            "file": "background",
+            "line": 604,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:template-literal",
+              "ELEMENT:object.setProperty",
+              "INITIAL:URL.constructor",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "const »scriptUrl = new URL(`${message.actions.script}.js`, baseFolderUrl).href«;"
+          },
+          {
+            "n": 91,
+            "file": "background",
+            "line": 605,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "log('Script to fetch:', »scriptUrl«);"
+          },
+          {
+            "n": 92,
+            "file": "background",
+            "line": 608,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const response = await fetch(»scriptUrl«);"
+          },
+          {
+            "n": 93,
+            "file": "background",
+            "line": 760,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "downloadLinks(»activeMessage«);"
+          },
+          {
+            "n": 94,
+            "file": "background",
+            "line": 803,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ITERATE:loop.iteration"
+            ],
+            "code": "for (»const index in message.extActions.headers.preview«) {"
+          },
+          {
+            "n": 95,
+            "file": "background",
+            "line": 807,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member.length",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "} else if (»message.extActions.headers.both && message.extActions.headers.both.length«) {"
+          },
+          {
+            "n": 96,
+            "file": "background",
+            "line": 854,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»message«['xhr'] = [];"
+          },
+          {
+            "n": 97,
+            "file": "background",
+            "line": 872,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left"
+            ],
+            "code": "if (»message.fetchOptions.headers && Object.keys(message.fetchOptions.headers)«) {"
+          },
+          {
+            "n": 98,
+            "file": "background",
+            "line": 804,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "decodeCookies(»message.extActions.headers.preview[index]«);"
+          },
+          {
+            "n": 99,
+            "file": "background",
+            "line": 808,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ITERATE:loop.iteration"
+            ],
+            "code": "for (»const index in message.extActions.headers.both«) {"
+          },
+          {
+            "n": 100,
+            "file": "background",
+            "line": 873,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "for (const [key, val] of Object.entries(»message.fetchOptions.headers«)) {"
+          },
+          {
+            "n": 101,
+            "file": "background",
+            "line": 949,
+            "ops": [
+              "ELEMENT:member-element-container"
+            ],
+            "code": "? »pageObj[0]?.result«"
+          },
+          {
+            "n": 102,
+            "file": "background",
+            "line": 950,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:conditional-alternate"
+            ],
+            "code": ": »{ event: 'PRE_EXTRACTION', target: 'app', tabUUID: message.tabUUID, html: '' }«,"
+          },
+          {
+            "n": 103,
+            "file": "background",
+            "line": 946,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.tabs.sendMessage(«",
+            "spansTo": 951
+          },
+          {
+            "n": 104,
+            "file": "background",
+            "line": 805,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "headerObjArr.push(»message.extActions.headers.preview[index]«);"
+          },
+          {
+            "n": 105,
+            "file": "background",
+            "line": 800,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »headerObjArr = []«;"
+          },
+          {
+            "n": 106,
+            "file": "background",
+            "line": 809,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "decodeCookies(»message.extActions.headers.both[index]«);"
+          },
+          {
+            "n": 107,
+            "file": "background",
+            "line": 883,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "if (»message.fetchOptions.referrer«) {"
+          },
+          {
+            "n": 108,
+            "file": "background",
+            "line": 810,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "headerObjArr.push(»message.extActions.headers.both[index]«);"
+          },
+          {
+            "n": 109,
+            "file": "background",
+            "line": 887,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "value: »message.fetchOptions.referrer«,"
+          },
+          {
+            "n": 110,
+            "file": "background",
+            "line": 884,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            requestHeaders.push({«",
+            "spansTo": 888
+          },
+          {
+            "n": 111,
+            "file": "background",
+            "line": 869,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "ELEMENT:implicit.add"
+            ],
+            "code": "let »requestHeaders = []«;"
+          },
+          {
+            "n": 112,
+            "file": "background",
+            "line": 892,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "if (»message.fetchOptions.referrerPolicy«) {"
+          },
+          {
+            "n": 113,
+            "file": "background",
+            "line": 896,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "value: »message.fetchOptions.referrerPolicy«,"
+          },
+          {
+            "n": 114,
+            "file": "background",
+            "line": 893,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "»requestHeaders.push({«",
+            "spansTo": 897
+          },
+          {
+            "n": 115,
+            "file": "background",
+            "line": 820,
+            "ops": [
+              "ITERATE:loop.iteration"
+            ],
+            "code": "for (»const headerObj« of headerObjArr) {"
+          },
+          {
+            "n": 116,
+            "file": "background",
+            "line": 902,
+            "ops": [
+              "ELEMENT:member.length"
+            ],
+            "code": "if (»requestHeaders.length«) {"
+          },
+          {
+            "n": 117,
+            "file": "background",
+            "line": 821,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»headerObj«.condition['tabIds'] = [tab.id];"
+          },
+          {
+            "n": 118,
+            "file": "background",
+            "line": 903,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            headerInfo = await setHeaders(«",
+            "spansTo": 912
+          },
+          {
+            "n": 119,
+            "file": "background",
+            "line": 910,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:template-literal"
+            ],
+            "code": "urlFilter: »`|${message.url}|`«,"
+          },
+          {
+            "n": 120,
+            "file": "background",
+            "line": 823,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "const headerInfo = await setHeaders(»headerObj.action, headerObj.condition«);"
+          },
+          {
+            "n": 121,
+            "file": "background",
+            "line": 918,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "fetchResponse = await fetch(»message.url, message.fetchOptions ? message.fetchOptions« : {});"
+          },
+          {
+            "n": 122,
+            "file": "background",
+            "line": 107,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:update"
+            ],
+            "code": "»remainingLinksUI--«;"
+          },
+          {
+            "n": 123,
+            "file": "background",
+            "line": 654,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»message«['doNotReFetch'] = true;"
+          },
+          {
+            "n": 124,
+            "file": "background",
+            "line": 657,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "resolve(await openTab(»message«));"
+          }
+        ]
+      }
+    }
+  ]
+}

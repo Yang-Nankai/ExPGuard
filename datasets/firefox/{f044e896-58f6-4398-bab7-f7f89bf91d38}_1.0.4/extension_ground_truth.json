@@ -1,0 +1,922 @@
+{
+  "schema_version": "expguard-extension-dataset/v1",
+  "extension": {
+    "platform": "firefox",
+    "extension_id": "{f044e896-58f6-4398-bab7-f7f89bf91d38}",
+    "version": "1.0.4",
+    "name": "Seedr",
+    "rank": 2967,
+    "manifest_version": 3,
+    "catalog_manifest_version": 3,
+    "catalog_metadata": {
+      "rank": 2967,
+      "manifest_version": 3,
+      "user_count": 976,
+      "rating_count": 36,
+      "rating_average": 4.0,
+      "name": "Seedr"
+    },
+    "source": {
+      "directory": "Source",
+      "manifest_sha256": "643c01cdea8ebb75d9b5e1aa1e706ad8e1bf436c8dd94f5b58959a26aa0b5cc9"
+    }
+  },
+  "tools": {
+    "ExPGuard": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "ExPGuard/analysis.log",
+          "ExPGuard/report.flows.json",
+          "ExPGuard/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 7,
+        "reported_no_duplicate": 3,
+        "tp_no_duplicate": 2,
+        "fp_no_duplicate": 1
+      },
+      "flows": {
+        "reported": [
+          {
+            "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:137679e43d374a71:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "rule_description": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+            "severity": "CRITICAL",
+            "severity_reason": "Wildcard host `*` allows coverage of arbitrary domains.",
+            "severity_evidence": [
+              "http://*/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content",
+              "loc": "L215:C9 -> L215:C23",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "http://*/*",
+                      "https://*/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "http://*/*",
+                  "https://*/*"
+                ]
+              },
+              "code_preview": "     }\n            ]>>>;\n            <<<rcb({ result: false "
+            },
+            "sink": {
+              "type": "FETCH_BODY",
+              "remark": "https://www.seedr.cc/api/token",
+              "file": "background",
+              "loc": "L116:C29 -> L119:C8",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "i.exec(contentDispos>>>ition);\n    if (filenameMatch && filenameMatch[1]) {\n        const filename = filename<<<Match[1];\n        co"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[content->background]",
+              "storage_area": null
+            },
+            "verification_evidence": "FP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:269b698e53473a37:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "CRITICAL",
+            "severity_reason": "`externally_connectable` is not declared; any external extension can connect by default (MV2 and MV3 behave identically here).",
+            "severity_evidence": [
+              "externally_connectable: <missing>"
+            ],
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L593:C26 -> L593:C33",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG",
+              "constraint": null,
+              "code_preview": "  external_listener(>>>request<<<, sender, sendRespon"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "access_token",
+              "file": "background",
+              "loc": "L21:C5 -> L28:C7",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "Interval(() => {\n   >>>     chrome.runtime.sendMessage({type: 'keep_alive'});\n        keepAlive()\n    }, 1000 * 25);\n}\nfunction stopKeepAlive() {\n    clearInterval(keepAliveInstance);\n}\n\n// Listener for download events\nconst download_listener = async (ite<<<m, suggest) => {\n   "
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:269b698e53473a37:02",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "CRITICAL",
+            "severity_reason": "`externally_connectable` is not declared; any external extension can connect by default (MV2 and MV3 behave identically here).",
+            "severity_evidence": [
+              "externally_connectable: <missing>"
+            ],
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L593:C26 -> L593:C33",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG",
+              "constraint": null,
+              "code_preview": "  external_listener(>>>request<<<, sender, sendRespon"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "refresh_token",
+              "file": "background",
+              "loc": "L21:C5 -> L28:C7",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "Interval(() => {\n   >>>     chrome.runtime.sendMessage({type: 'keep_alive'});\n        keepAlive()\n    }, 1000 * 25);\n}\nfunction stopKeepAlive() {\n    clearInterval(keepAliveInstance);\n}\n\n// Listener for download events\nconst download_listener = async (ite<<<m, suggest) => {\n   "
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification_evidence": "Duplicate",
+            "deduplication": {
+              "is_duplicate": true,
+              "duplicate_of": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:269b698e53473a37:01",
+              "duplicate_reason": "semantic_identity"
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:269b698e53473a37:03",
+            "flow_index": 3,
+            "flow_order": 4,
+            "flow_label": "F004",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "CRITICAL",
+            "severity_reason": "`externally_connectable` is not declared; any external extension can connect by default (MV2 and MV3 behave identically here).",
+            "severity_evidence": [
+              "externally_connectable: <missing>"
+            ],
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L593:C26 -> L593:C33",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG",
+              "constraint": null,
+              "code_preview": "  external_listener(>>>request<<<, sender, sendRespon"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "username",
+              "file": "background",
+              "loc": "L21:C5 -> L28:C7",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "Interval(() => {\n   >>>     chrome.runtime.sendMessage({type: 'keep_alive'});\n        keepAlive()\n    }, 1000 * 25);\n}\nfunction stopKeepAlive() {\n    clearInterval(keepAliveInstance);\n}\n\n// Listener for download events\nconst download_listener = async (ite<<<m, suggest) => {\n   "
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification_evidence": "Duplicate",
+            "deduplication": {
+              "is_duplicate": true,
+              "duplicate_of": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:269b698e53473a37:01",
+              "duplicate_reason": "semantic_identity"
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:8b3b41511e1ae48c:01",
+            "flow_index": 4,
+            "flow_order": 5,
+            "flow_label": "F005",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "CRITICAL",
+            "severity_reason": "`externally_connectable` is not declared; any external extension can connect by default (MV2 and MV3 behave identically here).",
+            "severity_evidence": [
+              "externally_connectable: <missing>"
+            ],
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L598:C26 -> L598:C33",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG",
+              "constraint": null,
+              "code_preview": "  external_listener(>>>request<<<, sender, sendRespon"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "access_token",
+              "file": "background",
+              "loc": "L21:C5 -> L28:C7",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "Interval(() => {\n   >>>     chrome.runtime.sendMessage({type: 'keep_alive'});\n        keepAlive()\n    }, 1000 * 25);\n}\nfunction stopKeepAlive() {\n    clearInterval(keepAliveInstance);\n}\n\n// Listener for download events\nconst download_listener = async (ite<<<m, suggest) => {\n   "
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:8b3b41511e1ae48c:02",
+            "flow_index": 5,
+            "flow_order": 6,
+            "flow_label": "F006",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "CRITICAL",
+            "severity_reason": "`externally_connectable` is not declared; any external extension can connect by default (MV2 and MV3 behave identically here).",
+            "severity_evidence": [
+              "externally_connectable: <missing>"
+            ],
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L598:C26 -> L598:C33",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG",
+              "constraint": null,
+              "code_preview": "  external_listener(>>>request<<<, sender, sendRespon"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "refresh_token",
+              "file": "background",
+              "loc": "L21:C5 -> L28:C7",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "Interval(() => {\n   >>>     chrome.runtime.sendMessage({type: 'keep_alive'});\n        keepAlive()\n    }, 1000 * 25);\n}\nfunction stopKeepAlive() {\n    clearInterval(keepAliveInstance);\n}\n\n// Listener for download events\nconst download_listener = async (ite<<<m, suggest) => {\n   "
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification_evidence": "Duplicate",
+            "deduplication": {
+              "is_duplicate": true,
+              "duplicate_of": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:8b3b41511e1ae48c:01",
+              "duplicate_reason": "semantic_identity"
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:8b3b41511e1ae48c:03",
+            "flow_index": 6,
+            "flow_order": 7,
+            "flow_label": "F007",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "CRITICAL",
+            "severity_reason": "`externally_connectable` is not declared; any external extension can connect by default (MV2 and MV3 behave identically here).",
+            "severity_evidence": [
+              "externally_connectable: <missing>"
+            ],
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L598:C26 -> L598:C33",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG",
+              "constraint": null,
+              "code_preview": "  external_listener(>>>request<<<, sender, sendRespon"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "username",
+              "file": "background",
+              "loc": "L21:C5 -> L28:C7",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "Interval(() => {\n   >>>     chrome.runtime.sendMessage({type: 'keep_alive'});\n        keepAlive()\n    }, 1000 * 25);\n}\nfunction stopKeepAlive() {\n    clearInterval(keepAliveInstance);\n}\n\n// Listener for download events\nconst download_listener = async (ite<<<m, suggest) => {\n   "
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification_evidence": "Duplicate",
+            "deduplication": {
+              "is_duplicate": true,
+              "duplicate_of": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:8b3b41511e1ae48c:01",
+              "duplicate_reason": "semantic_identity"
+            }
+          }
+        ],
+        "no_duplicate": [
+          {
+            "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:137679e43d374a71:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "rule_description": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+            "severity": "CRITICAL",
+            "severity_reason": "Wildcard host `*` allows coverage of arbitrary domains.",
+            "severity_evidence": [
+              "http://*/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "content",
+              "loc": "L215:C9 -> L215:C23",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "http://*/*",
+                      "https://*/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "http://*/*",
+                  "https://*/*"
+                ]
+              },
+              "code_preview": "     }\n            ]>>>;\n            <<<rcb({ result: false "
+            },
+            "sink": {
+              "type": "FETCH_BODY",
+              "remark": "https://www.seedr.cc/api/token",
+              "file": "background",
+              "loc": "L116:C29 -> L119:C8",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "i.exec(contentDispos>>>ition);\n    if (filenameMatch && filenameMatch[1]) {\n        const filename = filename<<<Match[1];\n        co"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[content->background]",
+              "storage_area": null
+            },
+            "verification_evidence": "FP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:269b698e53473a37:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "CRITICAL",
+            "severity_reason": "`externally_connectable` is not declared; any external extension can connect by default (MV2 and MV3 behave identically here).",
+            "severity_evidence": [
+              "externally_connectable: <missing>"
+            ],
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L593:C26 -> L593:C33",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG",
+              "constraint": null,
+              "code_preview": "  external_listener(>>>request<<<, sender, sendRespon"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "access_token",
+              "file": "background",
+              "loc": "L21:C5 -> L28:C7",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "Interval(() => {\n   >>>     chrome.runtime.sendMessage({type: 'keep_alive'});\n        keepAlive()\n    }, 1000 * 25);\n}\nfunction stopKeepAlive() {\n    clearInterval(keepAliveInstance);\n}\n\n// Listener for download events\nconst download_listener = async (ite<<<m, suggest) => {\n   "
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:8b3b41511e1ae48c:01",
+            "flow_index": 4,
+            "flow_order": 5,
+            "flow_label": "F005",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "CRITICAL",
+            "severity_reason": "`externally_connectable` is not declared; any external extension can connect by default (MV2 and MV3 behave identically here).",
+            "severity_evidence": [
+              "externally_connectable: <missing>"
+            ],
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "background",
+              "loc": "L598:C26 -> L598:C33",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "background",
+              "origin_frame_family": "BG",
+              "constraint": null,
+              "code_preview": "  external_listener(>>>request<<<, sender, sendRespon"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "access_token",
+              "file": "background",
+              "loc": "L21:C5 -> L28:C7",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "Interval(() => {\n   >>>     chrome.runtime.sendMessage({type: 'keep_alive'});\n        keepAlive()\n    }, 1000 * 25);\n}\nfunction stopKeepAlive() {\n    clearInterval(keepAliveInstance);\n}\n\n// Listener for download events\nconst download_listener = async (ite<<<m, suggest) => {\n   "
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ]
+      }
+    },
+    "CoCo": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "CoCo/report.flows.json",
+          "CoCo/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    },
+    "DoubleX": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "DoubleX/report.flows.json",
+          "DoubleX/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    }
+  },
+  "ground_truth": {
+    "verdict": "TP",
+    "flow_count": 2,
+    "flow_ids": [
+      "gtf-bccc0ffd32f0a680",
+      "gtf-fd6a307c094b0487"
+    ],
+    "flows": [
+      {
+        "ground_truth_flow_id": "gtf-bccc0ffd32f0a680",
+        "verification": "TP",
+        "source_family": "external",
+        "sink_family": "CHROME_LOCAL_STORAGE",
+        "matched_tools": [
+          "ExPGuard"
+        ],
+        "match_region": "ExPGuard only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "ExPGuard",
+            "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:269b698e53473a37:01",
+            "source_report": "ExPGuard/report.flows.json",
+            "flow": {
+              "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:269b698e53473a37:01",
+              "flow_index": 1,
+              "flow_order": 2,
+              "flow_label": "F002",
+              "flow_type": "STORAGE_POISONING",
+              "rule_id": "attacker-input-storage-write",
+              "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+              "severity": "CRITICAL",
+              "severity_reason": "`externally_connectable` is not declared; any external extension can connect by default (MV2 and MV3 behave identically here).",
+              "severity_evidence": [
+                "externally_connectable: <missing>"
+              ],
+              "source": {
+                "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+                "file": "background",
+                "loc": "L593:C26 -> L593:C33",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "provenance": "EXTERNAL_MESSAGE",
+                "origin_context": "background",
+                "origin_frame_family": "BG",
+                "constraint": null,
+                "code_preview": "  external_listener(>>>request<<<, sender, sendRespon"
+              },
+              "sink": {
+                "type": "CHROME_LOCAL_STORAGE",
+                "remark": "access_token",
+                "file": "background",
+                "loc": "L21:C5 -> L28:C7",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "url_taint_control": null,
+                "code_preview": "Interval(() => {\n   >>>     chrome.runtime.sendMessage({type: 'keep_alive'});\n        keepAlive()\n    }, 1000 * 25);\n}\nfunction stopKeepAlive() {\n    clearInterval(keepAliveInstance);\n}\n\n// Listener for download events\nconst download_listener = async (ite<<<m, suggest) => {\n   "
+              },
+              "structural": {
+                "constraint_kind": "EXTERNALLY_CONNECTABLE",
+                "privilege_crossing": true,
+                "privilege_reason": "sink grants capability beyond the source origin",
+                "message_passing": false,
+                "storage_passing": false,
+                "message_sender": null,
+                "message_sender_provenance": null,
+                "channel": null,
+                "storage_area": null
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      },
+      {
+        "ground_truth_flow_id": "gtf-fd6a307c094b0487",
+        "verification": "TP",
+        "source_family": "external",
+        "sink_family": "CHROME_LOCAL_STORAGE",
+        "matched_tools": [
+          "ExPGuard"
+        ],
+        "match_region": "ExPGuard only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "ExPGuard",
+            "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:8b3b41511e1ae48c:01",
+            "source_report": "ExPGuard/report.flows.json",
+            "flow": {
+              "flow_id": "expguard-opti:firefox:{f044e896-58f6-4398-bab7-f7f89bf91d38}:1.0.4:8b3b41511e1ae48c:01",
+              "flow_index": 4,
+              "flow_order": 5,
+              "flow_label": "F005",
+              "flow_type": "STORAGE_POISONING",
+              "rule_id": "attacker-input-storage-write",
+              "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+              "severity": "CRITICAL",
+              "severity_reason": "`externally_connectable` is not declared; any external extension can connect by default (MV2 and MV3 behave identically here).",
+              "severity_evidence": [
+                "externally_connectable: <missing>"
+              ],
+              "source": {
+                "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+                "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+                "file": "background",
+                "loc": "L598:C26 -> L598:C33",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "provenance": "EXTERNAL_MESSAGE",
+                "origin_context": "background",
+                "origin_frame_family": "BG",
+                "constraint": null,
+                "code_preview": "  external_listener(>>>request<<<, sender, sendRespon"
+              },
+              "sink": {
+                "type": "CHROME_LOCAL_STORAGE",
+                "remark": "access_token",
+                "file": "background",
+                "loc": "L21:C5 -> L28:C7",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "url_taint_control": null,
+                "code_preview": "Interval(() => {\n   >>>     chrome.runtime.sendMessage({type: 'keep_alive'});\n        keepAlive()\n    }, 1000 * 25);\n}\nfunction stopKeepAlive() {\n    clearInterval(keepAliveInstance);\n}\n\n// Listener for download events\nconst download_listener = async (ite<<<m, suggest) => {\n   "
+              },
+              "structural": {
+                "constraint_kind": "EXTERNALLY_CONNECTABLE",
+                "privilege_crossing": true,
+                "privilege_reason": "sink grants capability beyond the source origin",
+                "message_passing": false,
+                "storage_passing": false,
+                "message_sender": null,
+                "message_sender_provenance": null,
+                "channel": null,
+                "storage_area": null
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

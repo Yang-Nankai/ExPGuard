@@ -1,0 +1,1 @@
+const routeApp="gpx-studio",isPathSupported=()=>location.pathname.includes("/app"),reloadOnUrlChange=!0,findMap=()=>{if(window._map)return appendLog("map found"),squadrats.mapbox=window._map,window._map;appendLog("map not found")};

@@ -1,0 +1,1 @@
+import{$ as t}from"./affiliate-BtdEvLxA.js";const r=r=>t.post(`https://minion.alihunter.io/promotion-generate?productId=${r}&subid=AR`,{productId:r,subid:"AR"},{"Content-From":"*.aliexpress"}),o=async t=>{try{const{status:r,url:o}=await fetch(t);return r&&o?o:null}catch{return null}};export{r as g,o as p};

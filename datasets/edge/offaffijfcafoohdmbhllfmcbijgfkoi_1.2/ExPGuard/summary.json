@@ -1,0 +1,266 @@
+{
+  "extensionId": "offaffijfcafoohdmbhllfmcbijgfkoi",
+  "extensionVersion": "1.2",
+  "sourceType": "CRX",
+  "status": "success",
+  "duration": 0.854,
+  "files": [
+    {
+      "file": "background.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 2788,
+      "durationMs": 91.24060699999995
+    },
+    {
+      "file": "browser-polyfill.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "CS_1",
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        },
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 39716,
+      "durationMs": 328.19891100000007
+    },
+    {
+      "file": "contentScript.js",
+      "frame": "CS_1",
+      "frameTags": [
+        "CS_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "size": 736,
+      "durationMs": 32.12636999999995
+    },
+    {
+      "file": "options.js",
+      "frame": "OPTIONS_1",
+      "frameTags": [
+        "OPTIONS_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "OPTIONS_1",
+          "family": "EX"
+        }
+      ],
+      "size": 861,
+      "durationMs": 19.128836000000092
+    }
+  ],
+  "totalFiles": 4,
+  "totalSize": 44101,
+  "cacheStats": {
+    "totalCalls": 0,
+    "hits": 0,
+    "misses": 0,
+    "evictions": 0,
+    "hitRate": 0,
+    "cacheSize": 0,
+    "maxEntries": 4096
+  },
+  "coverage": {
+    "totalNodes": 210,
+    "coveredNodes": 70,
+    "nodeCoverage": 0.3333333333333333,
+    "totalScopes": 60,
+    "coveredScopes": 60,
+    "scopeCoverage": 1,
+    "analyzedScripts": 4,
+    "scripts": [
+      {
+        "file": "browser-polyfill",
+        "frame": "BG_1",
+        "totalNodes": 147,
+        "coveredNodes": 8,
+        "nodeCoverage": 0.05442176870748299,
+        "totalScopes": 40,
+        "coveredScopes": 40,
+        "scopeCoverage": 1
+      },
+      {
+        "file": "background",
+        "frame": "BG_1",
+        "totalNodes": 42,
+        "coveredNodes": 41,
+        "nodeCoverage": 0.9761904761904762,
+        "totalScopes": 11,
+        "coveredScopes": 11,
+        "scopeCoverage": 1
+      },
+      {
+        "file": "contentScript",
+        "frame": "CS_1",
+        "totalNodes": 8,
+        "coveredNodes": 8,
+        "nodeCoverage": 1,
+        "totalScopes": 3,
+        "coveredScopes": 3,
+        "scopeCoverage": 1
+      },
+      {
+        "file": "options",
+        "frame": "OPTIONS_1",
+        "totalNodes": 13,
+        "coveredNodes": 13,
+        "nodeCoverage": 1,
+        "totalScopes": 6,
+        "coveredScopes": 6,
+        "scopeCoverage": 1
+      }
+    ]
+  },
+  "hasFlows": true,
+  "flows": [
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "window.addEventListener(message)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "contentScript",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "contentScript",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L8:C8 -> L8:C23",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "[Unknown URL]",
+      "sinkUrlTaintControl": "FULL",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L48:C15 -> L48:C42",
+      "ctx": "background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[contentScript->background]",
+      "messageSender": "contentScript",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "url = items.serviceU>>>rl;\r\n          <<<  if (!servurl) {\r\n ",
+      "sinkCode": "}\r\n\r\n        return >>>fetch(url, fetchParameters)<<<.then(function (resp"
+    },
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "attacker-input-network-send",
+      "ruleDescription": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "window.addEventListener(message)",
+      "sourceProvenance": "CONTENT_SCRIPT",
+      "sourceOriginContext": "contentScript",
+      "sourceOriginFrameFamily": "CS",
+      "sourceFile": "contentScript",
+      "sourceFrame": "CS_1",
+      "sourceFrameConstraint": {
+        "matches": [
+          "<all_urls>"
+        ]
+      },
+      "sourceFrames": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "sourceLoc": "L8:C8 -> L8:C23",
+      "sinkType": "FETCH_BODY",
+      "sinkRemark": "[Unknown URL]",
+      "sinkFile": "background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L48:C15 -> L48:C42",
+      "ctx": "background",
+      "messagePassing": true,
+      "channel": "runtime.single.sender.message[contentScript->background]",
+      "messageSender": "contentScript",
+      "messageSenderFrameFamily": "CS",
+      "messageSenderProvenance": "CONTENT_SCRIPT",
+      "storagePassing": false,
+      "constraintKind": "CONTENT_SCRIPT_MATCHES",
+      "severity": "CRITICAL",
+      "severityReason": "`<all_urls>` allows any webpage to trigger the extension.",
+      "severityEvidence": [
+        "<all_urls>"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "url = items.serviceU>>>rl;\r\n          <<<  if (!servurl) {\r\n ",
+      "sinkCode": "}\r\n\r\n        return >>>fetch(url, fetchParameters)<<<.then(function (resp"
+    }
+  ],
+  "privilegeSuppressedCount": 0,
+  "privilegeSuppressed": []
+}

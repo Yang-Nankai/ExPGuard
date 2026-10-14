@@ -1,0 +1,2 @@
+$(document).ready(function(){-1<window.location.href.indexOf("coupon.jd.com/ilink/couponActiveFront/front_index.action")&&setInterval(()=>{if(0<$("body").html().indexOf("\u6d3b\u52a8\u94fe\u63a5\u8fc7\u671f\uff0c\u8bf7\u770b\u4e00\u4e0b\u5176\u4ed6\u6d3b\u52a8\u5427~")){var a=new URLSearchParams(window.location.search),b=a.get("key")||"",c=a.get("roleId")||"";a=a.get("to")||"";b&&c&&a&&""!=b&&""!=c&&""!=a&&(window.location.href="https://coupon.jd.com/ilink/couponSendFront/send_index.action?key="+
+b+"&roleId="+c+"&to="+a)}},300)});

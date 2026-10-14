@@ -1,0 +1,104 @@
+<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="referrer" content="origin"/><style>* { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; background: transparent; }
+      body {
+        font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+        color: #111827;
+        -webkit-font-smoothing: antialiased;
+      }
+      #card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        box-shadow: 0 14px 36px rgba(17,24,39,0.10), 0 2px 6px rgba(17,24,39,0.05);
+        overflow: hidden;
+      }
+      #head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        border-bottom: 1px solid #f3f4f6;
+      }
+      #logo-link { display: inline-flex; align-items: center; line-height: 0; }
+      #logo { height: 20px; display: block; }
+      #head-right { display: flex; align-items: center; gap: 12px; }
+      #why {
+        display: inline-flex; align-items: center; gap: 5px;
+        font: inherit; font-size: 12.5px; font-weight: 500;
+        color: #2563eb; background: none; border: 0; cursor: pointer; padding: 0;
+      }
+      /* Settings gear + its dropdown menu (Adobe parity, replacing the old X). */
+      #settings { position: relative; display: inline-flex; line-height: 0; }
+      #gear {
+        display: inline-flex; color: #9ca3af; background: none; border: 0;
+        cursor: pointer; padding: 4px; border-radius: 6px;
+        transition: color .15s, background .15s;
+      }
+      #gear:hover, #gear:focus-visible { color: #4b5563; background: #f3f4f6; outline: none; }
+      #menu {
+        position: absolute; top: calc(100% + 6px); right: 0;
+        min-width: 190px;
+        background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
+        box-shadow: 0 12px 30px rgba(17,24,39,0.16), 0 3px 8px rgba(17,24,39,0.07);
+        padding: 6px; z-index: 30;
+      }
+      #menu[hidden] { display: none; }
+      #menu button {
+        display: block; width: 100%; text-align: left;
+        font: inherit; font-size: 13px; font-weight: 500; color: #111827;
+        background: none; border: 0; border-radius: 8px;
+        padding: 13px 14px; cursor: pointer; white-space: nowrap;
+      }
+      #menu button:hover, #menu button:focus-visible { background: #f3f4f6; outline: none; }
+      #note {
+        display: none;
+        font-size: 11.5px; color: #4b5563; line-height: 1.5;
+        padding: 12px 18px 14px;
+      }
+      /* Tinted "stage" so the white dropzone reads as a raised layer
+         (the depth Adobe + Smallpdf get from their wrapping panels). */
+      #body { padding: 14px 16px; background: #eef2fb; }
+      #drop {
+        border: 1.5px dashed #c3cde4;
+        border-radius: 12px;
+        min-height: 74px;
+        padding: 14px 16px;
+        display: flex; align-items: center; gap: 14px;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(17,24,39,0.05);
+        cursor: pointer;
+        transition: border-color .15s, background .15s, box-shadow .15s;
+      }
+      #conv-icons { display: flex; align-items: center; gap: 7px; flex: none; }
+      #drop-text { flex: 1; min-width: 0; text-align: left; }
+      #headline { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; color: #111827; }
+      #sub { margin-top: 3px; font-size: 12.5px; color: #4b5563; }
+      #cta {
+        flex: none;
+        display: inline-flex; align-items: center; gap: 7px;
+        background: #ffd803; color: #111827;
+        font: inherit; font-size: 14px; font-weight: 700;
+        border: 0; border-radius: 22px; padding: 10px 20px; cursor: pointer;
+      }
+      #cta:hover { background: #e6c200; }
+      /* drag-over state */
+      #drop.over {
+        border: 2px solid #2563eb;
+        background: rgba(37,99,235,0.05);
+        box-shadow: 0 0 0 4px rgba(37,99,235,0.14);
+        justify-content: center;
+      }
+      #over-text { display: none; align-items: center; gap: 11px; }
+      #drop.over #conv-icons, #drop.over #drop-text, #drop.over #cta { display: none; }
+      #drop.over #over-text { display: flex; }
+      #over-title { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; color: #111827; }
+      #over-sub { margin-top: 2px; font-size: 12.5px; color: #4b5563; }
+      #foot {
+        display: flex; align-items: flex-start; gap: 8px;
+        padding: 11px 20px; background: #eef2fb; border-top: 1px solid #e2e8f0;
+      }
+      #foot svg { flex: none; margin-top: 2px; }
+      #foot span { font-size: 12.5px; color: #6b7280; line-height: 1.45; }
+      #foot a { color: #2563eb; text-decoration: underline; }
+      #foot a:hover { color: #1d4ed8; }
+      #file { display: none; }</style><script defer="defer" src="/searchWidgetPage.js"></script></head><body><div id="card"><div id="head"><a id="logo-link" href="https://www.printfriendly.com/" target="_blank" rel="noopener noreferrer"><img id="logo" alt="PrintFriendly"/></a><div id="head-right"><button id="why" type="button"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.2v4M8 4.6h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> Why this?</button><div id="settings"><button id="gear" type="button" aria-label="Settings" aria-haspopup="menu" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.4023 13.58C20.76 13.77 21.036 14.07 21.2301 14.37C21.6083 14.99 21.5776 15.75 21.2097 16.42L20.4943 17.62C20.1162 18.26 19.411 18.66 18.6855 18.66C18.3278 18.66 17.9292 18.56 17.6022 18.36C17.3365 18.19 17.0299 18.13 16.7029 18.13C15.6911 18.13 14.8429 18.96 14.8122 19.95C14.8122 21.1 13.872 22 12.6968 22H11.3069C10.1215 22 9.18125 21.1 9.18125 19.95C9.16081 18.96 8.31259 18.13 7.30085 18.13C6.96361 18.13 6.65702 18.19 6.40153 18.36C6.0745 18.56 5.66572 18.66 5.31825 18.66C4.58245 18.66 3.87729 18.26 3.49917 17.62L2.79402 16.42C2.4159 15.77 2.39546 14.99 2.77358 14.37C2.93709 14.07 3.24368 13.77 3.59115 13.58C3.87729 13.44 4.06125 13.21 4.23498 12.94C4.74596 12.08 4.43937 10.95 3.57071 10.44C2.55897 9.87 2.23194 8.6 2.81446 7.61L3.49917 6.43C4.09191 5.44 5.35913 5.09 6.38109 5.67C7.27019 6.15 8.425 5.83 8.9462 4.98C9.10972 4.7 9.20169 4.4 9.18125 4.1C9.16081 3.71 9.27323 3.34 9.4674 3.04C9.84553 2.42 10.5302 2.02 11.2763 2H12.7172C13.4735 2 14.1582 2.42 14.5363 3.04C14.7203 3.34 14.8429 3.71 14.8122 4.1C14.7918 4.4 14.8838 4.7 15.0473 4.98C15.5685 5.83 16.7233 6.15 17.6226 5.67C18.6344 5.09 19.9118 5.44 20.4943 6.43L21.179 7.61C21.7718 8.6 21.4447 9.87 20.4228 10.44C19.5541 10.95 19.2475 12.08 19.7687 12.94C19.9322 13.21 20.1162 13.44 20.4023 13.58ZM9.10971 12.0097C9.10971 13.5797 10.4076 14.8297 12.0121 14.8297C13.6165 14.8297 14.8838 13.5797 14.8838 12.0097C14.8838 10.4397 13.6165 9.17969 12.0121 9.17969C10.4076 9.17969 9.10971 10.4397 9.10971 12.0097Z" fill="currentColor"/></svg></button><div id="menu" role="menu" hidden><button id="hide-now" type="button" role="menuitem">Hide for now</button> <button id="prefs" type="button" role="menuitem">Preferences</button></div></div></div></div><div id="note">You searched for a PDF task, so PrintFriendly is offering the matching tool. The match happened on your device; your query never left the browser.</div><div id="body"><label id="drop" for="file"><div id="conv-icons" aria-hidden="true"></div><div id="drop-text"><div id="headline">Convert PDF to Word</div><div id="sub">Free, no watermark, keeps your formatting.</div></div><button id="cta" type="button"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 13V3.5M3.5 8L8 3.5 12.5 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Select file</button><div id="over-text"><svg width="22" height="22" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 13V3.5M3.5 8L8 3.5 12.5 8" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div><div id="over-title">Drop your file to start</div><div id="over-sub">Uploads securely, then auto-deletes.</div></div></div></label></div><div id="foot"><svg width="14" height="14" viewBox="0 0 16 16" fill="#16a34a" aria-hidden="true"><path d="M8 1l5 2v4c0 3.5-2.3 6.3-5 7-2.7-.7-5-3.5-5-7V3l5-2z"/></svg> <span>Your file is uploaded securely to PrintFriendly and automatically deleted shortly thereafter. By using this service, you agree to the <a id="terms-link" target="_blank" rel="noopener noreferrer">Terms of Service</a> and <a id="privacy-link" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span></div><input id="file" type="file"/></div></body></html>

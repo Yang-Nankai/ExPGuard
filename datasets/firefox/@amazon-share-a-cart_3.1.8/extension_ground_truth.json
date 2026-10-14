@@ -1,0 +1,570 @@
+{
+  "schema_version": "expguard-extension-dataset/v1",
+  "extension": {
+    "platform": "firefox",
+    "extension_id": "@amazon-share-a-cart",
+    "version": "3.1.8",
+    "name": "Share-A-Cart for Amazon",
+    "rank": 4692,
+    "manifest_version": 3,
+    "catalog_manifest_version": 3,
+    "catalog_metadata": {
+      "rank": 4692,
+      "manifest_version": 3,
+      "user_count": 439,
+      "rating_count": 1,
+      "rating_average": 5.0,
+      "name": "Share-A-Cart for Amazon"
+    },
+    "source": {
+      "directory": "Source",
+      "manifest_sha256": "f5a733416dd8da78f76701033e5f22ab636aff4f73ec3ecb07bde003b76b5610"
+    }
+  },
+  "tools": {
+    "ExPGuard": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "ExPGuard/analysis.log",
+          "ExPGuard/report.flows.json",
+          "ExPGuard/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 2,
+        "reported_no_duplicate": 2,
+        "tp_no_duplicate": 2,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [
+          {
+            "flow_id": "expguard-opti:firefox:@amazon-share-a-cart:3.1.8:fcd1a03c096d23e5:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "rule_description": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+            "severity": "HIGH",
+            "severity_reason": "Wildcard subdomain matching is allowed.",
+            "severity_evidence": [
+              "https://*.share-a-cart.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "js/sac",
+              "loc": "L1:C526 -> L1:C551",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.share-a-cart.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/sac",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://*.share-a-cart.com/*"
+                ]
+              },
+              "code_preview": "unction i(e,t,n){ret>>>urn t&&r(e.prototype,t),n<<<&&r(e,n),Object.defi"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "js/background",
+              "loc": "L2:C1406971 -> L2:C1407012",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "FULL",
+              "code_preview": "/(GET|SHARE)\\//,\"\"),>>>fetch(r.A.data.get+encodeURIComponent(t))<<<.then(e=>e.json()).t"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "js/sac",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[js/sac->js/background]",
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:@amazon-share-a-cart:3.1.8:8564cfeb9252a74c:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "rule_description": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+            "severity": "HIGH",
+            "severity_reason": "Wildcard subdomain matching is allowed.",
+            "severity_evidence": [
+              "https://*.share-a-cart.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "js/sac",
+              "loc": "L1:C526 -> L1:C551",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.share-a-cart.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/sac",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://*.share-a-cart.com/*"
+                ]
+              },
+              "code_preview": "unction i(e,t,n){ret>>>urn t&&r(e.prototype,t),n<<<&&r(e,n),Object.defi"
+            },
+            "sink": {
+              "type": "CHROME_TABS_CREATE_OPTIONS",
+              "remark": null,
+              "file": "js/background",
+              "loc": "L2:C1407500 -> L2:C1407566",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "\",vendor:y.id}})})):>>>chrome.tabs.create({url:`${u.site}/receive/${t}?source=${p||\"\"}`})<<<.then(async e=>{awai"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "js/sac",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[js/sac->js/background]",
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ],
+        "no_duplicate": [
+          {
+            "flow_id": "expguard-opti:firefox:@amazon-share-a-cart:3.1.8:fcd1a03c096d23e5:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "rule_description": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+            "severity": "HIGH",
+            "severity_reason": "Wildcard subdomain matching is allowed.",
+            "severity_evidence": [
+              "https://*.share-a-cart.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "js/sac",
+              "loc": "L1:C526 -> L1:C551",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.share-a-cart.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/sac",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://*.share-a-cart.com/*"
+                ]
+              },
+              "code_preview": "unction i(e,t,n){ret>>>urn t&&r(e.prototype,t),n<<<&&r(e,n),Object.defi"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "js/background",
+              "loc": "L2:C1406971 -> L2:C1407012",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "FULL",
+              "code_preview": "/(GET|SHARE)\\//,\"\"),>>>fetch(r.A.data.get+encodeURIComponent(t))<<<.then(e=>e.json()).t"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "js/sac",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[js/sac->js/background]",
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:@amazon-share-a-cart:3.1.8:8564cfeb9252a74c:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "rule_description": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+            "severity": "HIGH",
+            "severity_reason": "Wildcard subdomain matching is allowed.",
+            "severity_evidence": [
+              "https://*.share-a-cart.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "js/sac",
+              "loc": "L1:C526 -> L1:C551",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://*.share-a-cart.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "js/sac",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://*.share-a-cart.com/*"
+                ]
+              },
+              "code_preview": "unction i(e,t,n){ret>>>urn t&&r(e.prototype,t),n<<<&&r(e,n),Object.defi"
+            },
+            "sink": {
+              "type": "CHROME_TABS_CREATE_OPTIONS",
+              "remark": null,
+              "file": "js/background",
+              "loc": "L2:C1407500 -> L2:C1407566",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "\",vendor:y.id}})})):>>>chrome.tabs.create({url:`${u.site}/receive/${t}?source=${p||\"\"}`})<<<.then(async e=>{awai"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "js/sac",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[js/sac->js/background]",
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ]
+      }
+    },
+    "CoCo": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "CoCo/report.flows.json",
+          "CoCo/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    },
+    "DoubleX": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "DoubleX/report.flows.json",
+          "DoubleX/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    }
+  },
+  "ground_truth": {
+    "verdict": "TP",
+    "flow_count": 2,
+    "flow_ids": [
+      "gtf-2c5beb5dd4431367",
+      "gtf-b90b1290eb3af111"
+    ],
+    "flows": [
+      {
+        "ground_truth_flow_id": "gtf-2c5beb5dd4431367",
+        "verification": "TP",
+        "source_family": "page",
+        "sink_family": "CHROME_TABS_CREATE_OPTIONS",
+        "matched_tools": [
+          "ExPGuard"
+        ],
+        "match_region": "ExPGuard only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "ExPGuard",
+            "flow_id": "expguard-opti:firefox:@amazon-share-a-cart:3.1.8:8564cfeb9252a74c:01",
+            "source_report": "ExPGuard/report.flows.json",
+            "flow": {
+              "flow_id": "expguard-opti:firefox:@amazon-share-a-cart:3.1.8:8564cfeb9252a74c:01",
+              "flow_index": 1,
+              "flow_order": 2,
+              "flow_label": "F002",
+              "flow_type": "PRIVILEGE_ESCALATION",
+              "rule_id": "attacker-input-privileged-operation",
+              "rule_description": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+              "severity": "HIGH",
+              "severity_reason": "Wildcard subdomain matching is allowed.",
+              "severity_evidence": [
+                "https://*.share-a-cart.com/*"
+              ],
+              "source": {
+                "type": "WINDOW_MESSAGE_EVENT",
+                "remark": "window.addEventListener(message)",
+                "file": "js/sac",
+                "loc": "L1:C526 -> L1:C551",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "https://*.share-a-cart.com/*"
+                      ]
+                    }
+                  }
+                ],
+                "provenance": "CONTENT_SCRIPT",
+                "origin_context": "js/sac",
+                "origin_frame_family": "CS",
+                "constraint": {
+                  "matches": [
+                    "https://*.share-a-cart.com/*"
+                  ]
+                },
+                "code_preview": "unction i(e,t,n){ret>>>urn t&&r(e.prototype,t),n<<<&&r(e,n),Object.defi"
+              },
+              "sink": {
+                "type": "CHROME_TABS_CREATE_OPTIONS",
+                "remark": null,
+                "file": "js/background",
+                "loc": "L2:C1407500 -> L2:C1407566",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "url_taint_control": null,
+                "code_preview": "\",vendor:y.id}})})):>>>chrome.tabs.create({url:`${u.site}/receive/${t}?source=${p||\"\"}`})<<<.then(async e=>{awai"
+              },
+              "structural": {
+                "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+                "privilege_crossing": true,
+                "privilege_reason": "sink grants capability beyond the source origin",
+                "message_passing": true,
+                "storage_passing": false,
+                "message_sender": "js/sac",
+                "message_sender_provenance": "CONTENT_SCRIPT",
+                "channel": "runtime.single.sender.message[js/sac->js/background]",
+                "storage_area": null
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      },
+      {
+        "ground_truth_flow_id": "gtf-b90b1290eb3af111",
+        "verification": "TP",
+        "source_family": "page",
+        "sink_family": "FETCH_RESOURCE",
+        "matched_tools": [
+          "ExPGuard"
+        ],
+        "match_region": "ExPGuard only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "ExPGuard",
+            "flow_id": "expguard-opti:firefox:@amazon-share-a-cart:3.1.8:fcd1a03c096d23e5:01",
+            "source_report": "ExPGuard/report.flows.json",
+            "flow": {
+              "flow_id": "expguard-opti:firefox:@amazon-share-a-cart:3.1.8:fcd1a03c096d23e5:01",
+              "flow_index": 0,
+              "flow_order": 1,
+              "flow_label": "F001",
+              "flow_type": "REQUEST_FORGERY",
+              "rule_id": "attacker-input-network-send",
+              "rule_description": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+              "severity": "HIGH",
+              "severity_reason": "Wildcard subdomain matching is allowed.",
+              "severity_evidence": [
+                "https://*.share-a-cart.com/*"
+              ],
+              "source": {
+                "type": "WINDOW_MESSAGE_EVENT",
+                "remark": "window.addEventListener(message)",
+                "file": "js/sac",
+                "loc": "L1:C526 -> L1:C551",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "https://*.share-a-cart.com/*"
+                      ]
+                    }
+                  }
+                ],
+                "provenance": "CONTENT_SCRIPT",
+                "origin_context": "js/sac",
+                "origin_frame_family": "CS",
+                "constraint": {
+                  "matches": [
+                    "https://*.share-a-cart.com/*"
+                  ]
+                },
+                "code_preview": "unction i(e,t,n){ret>>>urn t&&r(e.prototype,t),n<<<&&r(e,n),Object.defi"
+              },
+              "sink": {
+                "type": "FETCH_RESOURCE",
+                "remark": "[Unknown URL]",
+                "file": "js/background",
+                "loc": "L2:C1406971 -> L2:C1407012",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "url_taint_control": "FULL",
+                "code_preview": "/(GET|SHARE)\\//,\"\"),>>>fetch(r.A.data.get+encodeURIComponent(t))<<<.then(e=>e.json()).t"
+              },
+              "structural": {
+                "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+                "privilege_crossing": true,
+                "privilege_reason": "sink grants capability beyond the source origin",
+                "message_passing": true,
+                "storage_passing": false,
+                "message_sender": "js/sac",
+                "message_sender_provenance": "CONTENT_SCRIPT",
+                "channel": "runtime.single.sender.message[js/sac->js/background]",
+                "storage_area": null
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

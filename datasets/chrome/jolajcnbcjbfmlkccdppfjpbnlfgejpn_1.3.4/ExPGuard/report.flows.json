@@ -1,0 +1,4780 @@
+{
+  "extensionId": "jolajcnbcjbfmlkccdppfjpbnlfgejpn",
+  "extensionVersion": "1.3.4",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 3,
+    "totalFiles": 7,
+    "distinctFlows": 16,
+    "rawIssueEntries": 31,
+    "sinklessSourcesSkipped": 18
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+        "file": "background",
+        "loc": "L99:C8 -> L99:C15",
+        "line": 99,
+        "col": [
+          8,
+          15
+        ],
+        "spansTo": null,
+        "code": "if (»message«.source === 'supabase-auth-adapter') {"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_RUNTIME_ONCONNECTEXTERNAL_POSTMESSAGE",
+          "remark": "chrome.runtime.onConnectExternal.addListener[postMessage]",
+          "file": "background",
+          "loc": "L53:C6 -> L53:C36",
+          "line": 53,
+          "col": [
+            6,
+            36
+          ],
+          "spansTo": null,
+          "code": "»port.postMessage(notification)«;",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "unknown",
+          "file": "background",
+          "loc": "L129:C12 -> L129:C54",
+          "line": 129,
+          "col": [
+            12,
+            54
+          ],
+          "spansTo": null,
+          "code": "»chrome.storage.local.set({ [key]: value })«;",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "CHROME_SYNC_STORAGE",
+          "remark": "unknown",
+          "file": "background",
+          "loc": "L79:C8 -> L86:C10",
+          "line": 79,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 86,
+          "code": "»chrome.storage.sync.set(syncQueue, () => {«",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 67,
+        "distinctLines": 22,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 99,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»message.source« === 'supabase-auth-adapter') {"
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 100,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "switch (»message.action«) {"
+          },
+          {
+            "n": 3,
+            "file": "background",
+            "line": 172,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "} else if (»message.type« === 'broadcast') {"
+          },
+          {
+            "n": 4,
+            "file": "background",
+            "line": 173,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "notifyConnectedClients(»message.data || message«);"
+          },
+          {
+            "n": 5,
+            "file": "background",
+            "line": 53,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "port.postMessage(»notification«);"
+          },
+          {
+            "n": 6,
+            "file": "background",
+            "line": 107,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:destructure-property[key]"
+            ],
+            "code": "const { »key } = message.data«;"
+          },
+          {
+            "n": 7,
+            "file": "background",
+            "line": 108,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "if (syncQueue[»key«] !== undefined) {"
+          },
+          {
+            "n": 8,
+            "file": "background",
+            "line": 127,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:destructure-property[key]",
+              "ELEMENT:destructure-property[value]"
+            ],
+            "code": "const { »key, value } = message.data«;"
+          },
+          {
+            "n": 9,
+            "file": "background",
+            "line": 109,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "sendResponse({ status: 'success', value: syncQueue[»key«] });"
+          },
+          {
+            "n": 10,
+            "file": "background",
+            "line": 111,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "chrome.storage.sync.get(»key«, result => {"
+          },
+          {
+            "n": 11,
+            "file": "background",
+            "line": 115,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "sendResponse({ status: 'success', value: result[»key«] || null });"
+          },
+          {
+            "n": 12,
+            "file": "background",
+            "line": 128,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "syncQueue[»key] = value«;"
+          },
+          {
+            "n": 13,
+            "file": "background",
+            "line": 74,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "let »syncQueue = {}«;"
+          },
+          {
+            "n": 14,
+            "file": "background",
+            "line": 147,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:destructure-property[key]"
+            ],
+            "code": "const { »key } = message.data«;"
+          },
+          {
+            "n": 15,
+            "file": "background",
+            "line": 129,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.storage.local.set({ [key]: value })«;"
+          },
+          {
+            "n": 16,
+            "file": "background",
+            "line": 148,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "chrome.storage.sync.remove(»key«, () => {"
+          },
+          {
+            "n": 17,
+            "file": "background",
+            "line": 168,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "console.warn('Unknown action:', »message.action«);"
+          },
+          {
+            "n": 18,
+            "file": "background",
+            "line": 136,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»key«,"
+          },
+          {
+            "n": 19,
+            "file": "background",
+            "line": 133,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            notifyConnectedClients({«",
+            "spansTo": 139
+          },
+          {
+            "n": 20,
+            "file": "background",
+            "line": 137,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»value«,"
+          },
+          {
+            "n": 21,
+            "file": "background",
+            "line": 155,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "»key«,"
+          },
+          {
+            "n": 22,
+            "file": "background",
+            "line": 152,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»                notifyConnectedClients({«",
+            "spansTo": 157
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "brightness",
+        "file": "popup",
+        "loc": "L152:C20 -> L152:C73",
+        "line": 152,
+        "col": [
+          20,
+          73
+        ],
+        "spansTo": null,
+        "code": "brightness: »parseInt(document.getElementById('brightness').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "customPreset",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 29,
+        "distinctLines": 9,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 152,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "brightness: »parseInt(document.getElementById('brightness').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:template-literal"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "contrast",
+        "file": "popup",
+        "loc": "L153:C18 -> L153:C69",
+        "line": 153,
+        "col": [
+          18,
+          69
+        ],
+        "spansTo": null,
+        "code": "contrast: »parseInt(document.getElementById('contrast').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "customPreset",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 29,
+        "distinctLines": 9,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 153,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "contrast: »parseInt(document.getElementById('contrast').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:template-literal"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "sepia",
+        "file": "popup",
+        "loc": "L154:C15 -> L154:C63",
+        "line": 154,
+        "col": [
+          15,
+          63
+        ],
+        "spansTo": null,
+        "code": "sepia: »parseInt(document.getElementById('sepia').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "customPreset",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 29,
+        "distinctLines": 9,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 154,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "sepia: »parseInt(document.getElementById('sepia').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:template-literal"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "grayscale",
+        "file": "popup",
+        "loc": "L155:C19 -> L155:C71",
+        "line": 155,
+        "col": [
+          19,
+          71
+        ],
+        "spansTo": null,
+        "code": "grayscale: »parseInt(document.getElementById('grayscale').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "customPreset",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 29,
+        "distinctLines": 9,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 155,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "grayscale: »parseInt(document.getElementById('grayscale').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:template-literal"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "hueRotate",
+        "file": "popup",
+        "loc": "L156:C19 -> L156:C71",
+        "line": 156,
+        "col": [
+          19,
+          71
+        ],
+        "spansTo": null,
+        "code": "hueRotate: »parseInt(document.getElementById('hueRotate').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "customPreset",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 26,
+        "distinctLines": 9,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 156,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "hueRotate: »parseInt(document.getElementById('hueRotate').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:template-literal"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "From storage.local.set('themeSettings') in popup",
+        "file": "popup",
+        "loc": "L152:C20 -> L152:C73",
+        "line": 152,
+        "col": [
+          20,
+          73
+        ],
+        "spansTo": null,
+        "code": "brightness: »parseInt(document.getElementById('brightness').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L270:C20 -> L272:C22",
+          "line": 270,
+          "col": [
+            20,
+            22
+          ],
+          "spansTo": 272,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L326:C12 -> L328:C14",
+          "line": 326,
+          "col": [
+            12,
+            14
+          ],
+          "spansTo": 328,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 4,
+      "propagation": {
+        "rawSteps": 151,
+        "distinctLines": 40,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 152,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "brightness: »parseInt(document.getElementById('brightness').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:template-literal"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          },
+          {
+            "n": 10,
+            "file": "popup",
+            "line": 233,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: local, key: themeSettings, sender: popup, receiver: popup]"
+            ],
+            "code": "»chrome.storage.local.get(['themeSettings', 'customPreset'], async (res) => {«",
+            "spansTo": 281
+          },
+          {
+            "n": 11,
+            "file": "popup",
+            "line": 235,
+            "ops": [
+              "ASSIGN:logical-left"
+            ],
+            "code": "const s = »res.themeSettings || CONFIG.DEFAULT_SETTINGS«;"
+          },
+          {
+            "n": 12,
+            "file": "popup",
+            "line": 240,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:logical-right"
+            ],
+            "code": "const shouldBeEnabled = »hasAccess && (s.enabled !== undefined ? s.enabled : false)«;"
+          },
+          {
+            "n": 13,
+            "file": "popup",
+            "line": 242,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "master.checked = »shouldBeEnabled«;"
+          },
+          {
+            "n": 14,
+            "file": "popup",
+            "line": 237,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »master = document.getElementById('master-switch')«;"
+          },
+          {
+            "n": 15,
+            "file": "popup",
+            "line": 243,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateToggleIcons(»shouldBeEnabled«);"
+          },
+          {
+            "n": 16,
+            "file": "popup",
+            "line": 245,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»!hasAccess && s.enabled«) {"
+          },
+          {
+            "n": 17,
+            "file": "popup",
+            "line": 280,
+            "ops": [
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left"
+            ],
+            "code": "refreshUI(s, »s.activePreset || 'dark'«);"
+          },
+          {
+            "n": 18,
+            "file": "popup",
+            "line": 214,
+            "ops": [
+              "ELEMENT:member-element-container"
+            ],
+            "code": "const val = settings[id] !== undefined ? »settings[id]« : (id === 'hueRotate' ? 0 : 100);"
+          },
+          {
+            "n": 19,
+            "file": "popup",
+            "line": 163,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »el = document.getElementById(id)«;"
+          },
+          {
+            "n": 20,
+            "file": "popup",
+            "line": 167,
+            "ops": [
+              "ASSIGN:binary-left"
+            ],
+            "code": "const percent = (»(el.value - el.min) / (el.max - el.min)«) * 100;"
+          },
+          {
+            "n": 21,
+            "file": "popup",
+            "line": 169,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (fill) »fill.style.width = percent + '%'«;"
+          },
+          {
+            "n": 22,
+            "file": "popup",
+            "line": 173,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:identifier"
+            ],
+            "code": "const offset = »val« - 100;"
+          },
+          {
+            "n": 23,
+            "file": "popup",
+            "line": 174,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "label.textContent = (offset >= 0 ? '+' : '') + »offset«;"
+          },
+          {
+            "n": 24,
+            "file": "popup",
+            "line": 162,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »label = document.getElementById(id + '-val')«;"
+          },
+          {
+            "n": 25,
+            "file": "popup",
+            "line": 176,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val« + '°';"
+          },
+          {
+            "n": 26,
+            "file": "popup",
+            "line": 217,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»document.getElementById('invert').checked = !!settings.invert«;"
+          },
+          {
+            "n": 27,
+            "file": "popup",
+            "line": 219,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const index = presetIds.indexOf(»activePresetId«);"
+          },
+          {
+            "n": 28,
+            "file": "popup",
+            "line": 252,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "master.checked = »!wantedState«;"
+          },
+          {
+            "n": 29,
+            "file": "popup",
+            "line": 263,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "master.checked = »wantedState«;"
+          },
+          {
+            "n": 30,
+            "file": "popup",
+            "line": 264,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateToggleIcons(»wantedState«);"
+          },
+          {
+            "n": 31,
+            "file": "popup",
+            "line": 268,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »newSettings = { ...current, enabled: wantedState }«;"
+          },
+          {
+            "n": 32,
+            "file": "popup",
+            "line": 270,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»                    chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 272
+          },
+          {
+            "n": 33,
+            "file": "popup",
+            "line": 271,
+            "ops": [
+              "ELEMENT:member-element"
+            ],
+            "code": "if (typeof refreshUI === 'function') refreshUI(newSettings, »newSettings.activePreset«);"
+          },
+          {
+            "n": 34,
+            "file": "popup",
+            "line": 319,
+            "ops": [
+              "ASSIGN:logical-right"
+            ],
+            "code": "const current = »res.themeSettings || CONFIG.DEFAULT_SETTINGS«;"
+          },
+          {
+            "n": 35,
+            "file": "popup",
+            "line": 321,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...current«,"
+          },
+          {
+            "n": 36,
+            "file": "popup",
+            "line": 326,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 328
+          },
+          {
+            "n": 37,
+            "file": "popup",
+            "line": 215,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateLabel(id, »val«);"
+          },
+          {
+            "n": 38,
+            "file": "popup",
+            "line": 166,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "el.value = »val«;"
+          },
+          {
+            "n": 39,
+            "file": "popup",
+            "line": 178,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val«;"
+          },
+          {
+            "n": 40,
+            "file": "popup",
+            "line": 346,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...current«,"
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "From storage.local.set('themeSettings') in popup",
+        "file": "popup",
+        "loc": "L153:C18 -> L153:C69",
+        "line": 153,
+        "col": [
+          18,
+          69
+        ],
+        "spansTo": null,
+        "code": "contrast: »parseInt(document.getElementById('contrast').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L270:C20 -> L272:C22",
+          "line": 270,
+          "col": [
+            20,
+            22
+          ],
+          "spansTo": 272,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L326:C12 -> L328:C14",
+          "line": 326,
+          "col": [
+            12,
+            14
+          ],
+          "spansTo": 328,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 4,
+      "propagation": {
+        "rawSteps": 151,
+        "distinctLines": 40,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 153,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "contrast: »parseInt(document.getElementById('contrast').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:template-literal"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          },
+          {
+            "n": 10,
+            "file": "popup",
+            "line": 233,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: local, key: themeSettings, sender: popup, receiver: popup]"
+            ],
+            "code": "»chrome.storage.local.get(['themeSettings', 'customPreset'], async (res) => {«",
+            "spansTo": 281
+          },
+          {
+            "n": 11,
+            "file": "popup",
+            "line": 235,
+            "ops": [
+              "ASSIGN:logical-left"
+            ],
+            "code": "const s = »res.themeSettings || CONFIG.DEFAULT_SETTINGS«;"
+          },
+          {
+            "n": 12,
+            "file": "popup",
+            "line": 240,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:logical-right"
+            ],
+            "code": "const shouldBeEnabled = »hasAccess && (s.enabled !== undefined ? s.enabled : false)«;"
+          },
+          {
+            "n": 13,
+            "file": "popup",
+            "line": 242,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "master.checked = »shouldBeEnabled«;"
+          },
+          {
+            "n": 14,
+            "file": "popup",
+            "line": 237,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »master = document.getElementById('master-switch')«;"
+          },
+          {
+            "n": 15,
+            "file": "popup",
+            "line": 243,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateToggleIcons(»shouldBeEnabled«);"
+          },
+          {
+            "n": 16,
+            "file": "popup",
+            "line": 245,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»!hasAccess && s.enabled«) {"
+          },
+          {
+            "n": 17,
+            "file": "popup",
+            "line": 280,
+            "ops": [
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left"
+            ],
+            "code": "refreshUI(s, »s.activePreset || 'dark'«);"
+          },
+          {
+            "n": 18,
+            "file": "popup",
+            "line": 214,
+            "ops": [
+              "ELEMENT:member-element-container"
+            ],
+            "code": "const val = settings[id] !== undefined ? »settings[id]« : (id === 'hueRotate' ? 0 : 100);"
+          },
+          {
+            "n": 19,
+            "file": "popup",
+            "line": 163,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »el = document.getElementById(id)«;"
+          },
+          {
+            "n": 20,
+            "file": "popup",
+            "line": 167,
+            "ops": [
+              "ASSIGN:binary-left"
+            ],
+            "code": "const percent = (»(el.value - el.min) / (el.max - el.min)«) * 100;"
+          },
+          {
+            "n": 21,
+            "file": "popup",
+            "line": 169,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (fill) »fill.style.width = percent + '%'«;"
+          },
+          {
+            "n": 22,
+            "file": "popup",
+            "line": 173,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:identifier"
+            ],
+            "code": "const offset = »val« - 100;"
+          },
+          {
+            "n": 23,
+            "file": "popup",
+            "line": 174,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "label.textContent = (offset >= 0 ? '+' : '') + »offset«;"
+          },
+          {
+            "n": 24,
+            "file": "popup",
+            "line": 162,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »label = document.getElementById(id + '-val')«;"
+          },
+          {
+            "n": 25,
+            "file": "popup",
+            "line": 176,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val« + '°';"
+          },
+          {
+            "n": 26,
+            "file": "popup",
+            "line": 217,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»document.getElementById('invert').checked = !!settings.invert«;"
+          },
+          {
+            "n": 27,
+            "file": "popup",
+            "line": 219,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const index = presetIds.indexOf(»activePresetId«);"
+          },
+          {
+            "n": 28,
+            "file": "popup",
+            "line": 252,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "master.checked = »!wantedState«;"
+          },
+          {
+            "n": 29,
+            "file": "popup",
+            "line": 263,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "master.checked = »wantedState«;"
+          },
+          {
+            "n": 30,
+            "file": "popup",
+            "line": 264,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateToggleIcons(»wantedState«);"
+          },
+          {
+            "n": 31,
+            "file": "popup",
+            "line": 268,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »newSettings = { ...current, enabled: wantedState }«;"
+          },
+          {
+            "n": 32,
+            "file": "popup",
+            "line": 270,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»                    chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 272
+          },
+          {
+            "n": 33,
+            "file": "popup",
+            "line": 271,
+            "ops": [
+              "ELEMENT:member-element"
+            ],
+            "code": "if (typeof refreshUI === 'function') refreshUI(newSettings, »newSettings.activePreset«);"
+          },
+          {
+            "n": 34,
+            "file": "popup",
+            "line": 319,
+            "ops": [
+              "ASSIGN:logical-right"
+            ],
+            "code": "const current = »res.themeSettings || CONFIG.DEFAULT_SETTINGS«;"
+          },
+          {
+            "n": 35,
+            "file": "popup",
+            "line": 321,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...current«,"
+          },
+          {
+            "n": 36,
+            "file": "popup",
+            "line": 326,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 328
+          },
+          {
+            "n": 37,
+            "file": "popup",
+            "line": 215,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateLabel(id, »val«);"
+          },
+          {
+            "n": 38,
+            "file": "popup",
+            "line": 166,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "el.value = »val«;"
+          },
+          {
+            "n": 39,
+            "file": "popup",
+            "line": 178,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val«;"
+          },
+          {
+            "n": 40,
+            "file": "popup",
+            "line": 346,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...current«,"
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "From storage.local.set('themeSettings') in popup",
+        "file": "popup",
+        "loc": "L154:C15 -> L154:C63",
+        "line": 154,
+        "col": [
+          15,
+          63
+        ],
+        "spansTo": null,
+        "code": "sepia: »parseInt(document.getElementById('sepia').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L270:C20 -> L272:C22",
+          "line": 270,
+          "col": [
+            20,
+            22
+          ],
+          "spansTo": 272,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L326:C12 -> L328:C14",
+          "line": 326,
+          "col": [
+            12,
+            14
+          ],
+          "spansTo": 328,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 4,
+      "propagation": {
+        "rawSteps": 151,
+        "distinctLines": 40,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 154,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "sepia: »parseInt(document.getElementById('sepia').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:template-literal"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          },
+          {
+            "n": 10,
+            "file": "popup",
+            "line": 233,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: local, key: themeSettings, sender: popup, receiver: popup]"
+            ],
+            "code": "»chrome.storage.local.get(['themeSettings', 'customPreset'], async (res) => {«",
+            "spansTo": 281
+          },
+          {
+            "n": 11,
+            "file": "popup",
+            "line": 235,
+            "ops": [
+              "ASSIGN:logical-left"
+            ],
+            "code": "const s = »res.themeSettings || CONFIG.DEFAULT_SETTINGS«;"
+          },
+          {
+            "n": 12,
+            "file": "popup",
+            "line": 240,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:logical-right"
+            ],
+            "code": "const shouldBeEnabled = »hasAccess && (s.enabled !== undefined ? s.enabled : false)«;"
+          },
+          {
+            "n": 13,
+            "file": "popup",
+            "line": 242,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "master.checked = »shouldBeEnabled«;"
+          },
+          {
+            "n": 14,
+            "file": "popup",
+            "line": 237,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »master = document.getElementById('master-switch')«;"
+          },
+          {
+            "n": 15,
+            "file": "popup",
+            "line": 243,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateToggleIcons(»shouldBeEnabled«);"
+          },
+          {
+            "n": 16,
+            "file": "popup",
+            "line": 245,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»!hasAccess && s.enabled«) {"
+          },
+          {
+            "n": 17,
+            "file": "popup",
+            "line": 280,
+            "ops": [
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left"
+            ],
+            "code": "refreshUI(s, »s.activePreset || 'dark'«);"
+          },
+          {
+            "n": 18,
+            "file": "popup",
+            "line": 214,
+            "ops": [
+              "ELEMENT:member-element-container"
+            ],
+            "code": "const val = settings[id] !== undefined ? »settings[id]« : (id === 'hueRotate' ? 0 : 100);"
+          },
+          {
+            "n": 19,
+            "file": "popup",
+            "line": 163,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »el = document.getElementById(id)«;"
+          },
+          {
+            "n": 20,
+            "file": "popup",
+            "line": 167,
+            "ops": [
+              "ASSIGN:binary-left"
+            ],
+            "code": "const percent = (»(el.value - el.min) / (el.max - el.min)«) * 100;"
+          },
+          {
+            "n": 21,
+            "file": "popup",
+            "line": 169,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (fill) »fill.style.width = percent + '%'«;"
+          },
+          {
+            "n": 22,
+            "file": "popup",
+            "line": 173,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:identifier"
+            ],
+            "code": "const offset = »val« - 100;"
+          },
+          {
+            "n": 23,
+            "file": "popup",
+            "line": 174,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "label.textContent = (offset >= 0 ? '+' : '') + »offset«;"
+          },
+          {
+            "n": 24,
+            "file": "popup",
+            "line": 162,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »label = document.getElementById(id + '-val')«;"
+          },
+          {
+            "n": 25,
+            "file": "popup",
+            "line": 176,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val« + '°';"
+          },
+          {
+            "n": 26,
+            "file": "popup",
+            "line": 217,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»document.getElementById('invert').checked = !!settings.invert«;"
+          },
+          {
+            "n": 27,
+            "file": "popup",
+            "line": 219,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const index = presetIds.indexOf(»activePresetId«);"
+          },
+          {
+            "n": 28,
+            "file": "popup",
+            "line": 252,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "master.checked = »!wantedState«;"
+          },
+          {
+            "n": 29,
+            "file": "popup",
+            "line": 263,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "master.checked = »wantedState«;"
+          },
+          {
+            "n": 30,
+            "file": "popup",
+            "line": 264,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateToggleIcons(»wantedState«);"
+          },
+          {
+            "n": 31,
+            "file": "popup",
+            "line": 268,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »newSettings = { ...current, enabled: wantedState }«;"
+          },
+          {
+            "n": 32,
+            "file": "popup",
+            "line": 270,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»                    chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 272
+          },
+          {
+            "n": 33,
+            "file": "popup",
+            "line": 271,
+            "ops": [
+              "ELEMENT:member-element"
+            ],
+            "code": "if (typeof refreshUI === 'function') refreshUI(newSettings, »newSettings.activePreset«);"
+          },
+          {
+            "n": 34,
+            "file": "popup",
+            "line": 319,
+            "ops": [
+              "ASSIGN:logical-right"
+            ],
+            "code": "const current = »res.themeSettings || CONFIG.DEFAULT_SETTINGS«;"
+          },
+          {
+            "n": 35,
+            "file": "popup",
+            "line": 321,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...current«,"
+          },
+          {
+            "n": 36,
+            "file": "popup",
+            "line": 326,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 328
+          },
+          {
+            "n": 37,
+            "file": "popup",
+            "line": 215,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateLabel(id, »val«);"
+          },
+          {
+            "n": 38,
+            "file": "popup",
+            "line": 166,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "el.value = »val«;"
+          },
+          {
+            "n": 39,
+            "file": "popup",
+            "line": 178,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val«;"
+          },
+          {
+            "n": 40,
+            "file": "popup",
+            "line": 346,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...current«,"
+          }
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "From storage.local.set('themeSettings') in popup",
+        "file": "popup",
+        "loc": "L155:C19 -> L155:C71",
+        "line": 155,
+        "col": [
+          19,
+          71
+        ],
+        "spansTo": null,
+        "code": "grayscale: »parseInt(document.getElementById('grayscale').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L270:C20 -> L272:C22",
+          "line": 270,
+          "col": [
+            20,
+            22
+          ],
+          "spansTo": 272,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L326:C12 -> L328:C14",
+          "line": 326,
+          "col": [
+            12,
+            14
+          ],
+          "spansTo": 328,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 4,
+      "propagation": {
+        "rawSteps": 151,
+        "distinctLines": 40,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 155,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "grayscale: »parseInt(document.getElementById('grayscale').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:template-literal"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          },
+          {
+            "n": 10,
+            "file": "popup",
+            "line": 233,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: local, key: themeSettings, sender: popup, receiver: popup]"
+            ],
+            "code": "»chrome.storage.local.get(['themeSettings', 'customPreset'], async (res) => {«",
+            "spansTo": 281
+          },
+          {
+            "n": 11,
+            "file": "popup",
+            "line": 235,
+            "ops": [
+              "ASSIGN:logical-left"
+            ],
+            "code": "const s = »res.themeSettings || CONFIG.DEFAULT_SETTINGS«;"
+          },
+          {
+            "n": 12,
+            "file": "popup",
+            "line": 240,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:logical-right"
+            ],
+            "code": "const shouldBeEnabled = »hasAccess && (s.enabled !== undefined ? s.enabled : false)«;"
+          },
+          {
+            "n": 13,
+            "file": "popup",
+            "line": 242,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "master.checked = »shouldBeEnabled«;"
+          },
+          {
+            "n": 14,
+            "file": "popup",
+            "line": 237,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »master = document.getElementById('master-switch')«;"
+          },
+          {
+            "n": 15,
+            "file": "popup",
+            "line": 243,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateToggleIcons(»shouldBeEnabled«);"
+          },
+          {
+            "n": 16,
+            "file": "popup",
+            "line": 245,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»!hasAccess && s.enabled«) {"
+          },
+          {
+            "n": 17,
+            "file": "popup",
+            "line": 280,
+            "ops": [
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left"
+            ],
+            "code": "refreshUI(s, »s.activePreset || 'dark'«);"
+          },
+          {
+            "n": 18,
+            "file": "popup",
+            "line": 214,
+            "ops": [
+              "ELEMENT:member-element-container"
+            ],
+            "code": "const val = settings[id] !== undefined ? »settings[id]« : (id === 'hueRotate' ? 0 : 100);"
+          },
+          {
+            "n": 19,
+            "file": "popup",
+            "line": 163,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »el = document.getElementById(id)«;"
+          },
+          {
+            "n": 20,
+            "file": "popup",
+            "line": 167,
+            "ops": [
+              "ASSIGN:binary-left"
+            ],
+            "code": "const percent = (»(el.value - el.min) / (el.max - el.min)«) * 100;"
+          },
+          {
+            "n": 21,
+            "file": "popup",
+            "line": 169,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (fill) »fill.style.width = percent + '%'«;"
+          },
+          {
+            "n": 22,
+            "file": "popup",
+            "line": 173,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:identifier"
+            ],
+            "code": "const offset = »val« - 100;"
+          },
+          {
+            "n": 23,
+            "file": "popup",
+            "line": 174,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "label.textContent = (offset >= 0 ? '+' : '') + »offset«;"
+          },
+          {
+            "n": 24,
+            "file": "popup",
+            "line": 162,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »label = document.getElementById(id + '-val')«;"
+          },
+          {
+            "n": 25,
+            "file": "popup",
+            "line": 176,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val« + '°';"
+          },
+          {
+            "n": 26,
+            "file": "popup",
+            "line": 217,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»document.getElementById('invert').checked = !!settings.invert«;"
+          },
+          {
+            "n": 27,
+            "file": "popup",
+            "line": 219,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const index = presetIds.indexOf(»activePresetId«);"
+          },
+          {
+            "n": 28,
+            "file": "popup",
+            "line": 252,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "master.checked = »!wantedState«;"
+          },
+          {
+            "n": 29,
+            "file": "popup",
+            "line": 263,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "master.checked = »wantedState«;"
+          },
+          {
+            "n": 30,
+            "file": "popup",
+            "line": 264,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateToggleIcons(»wantedState«);"
+          },
+          {
+            "n": 31,
+            "file": "popup",
+            "line": 268,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »newSettings = { ...current, enabled: wantedState }«;"
+          },
+          {
+            "n": 32,
+            "file": "popup",
+            "line": 270,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»                    chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 272
+          },
+          {
+            "n": 33,
+            "file": "popup",
+            "line": 271,
+            "ops": [
+              "ELEMENT:member-element"
+            ],
+            "code": "if (typeof refreshUI === 'function') refreshUI(newSettings, »newSettings.activePreset«);"
+          },
+          {
+            "n": 34,
+            "file": "popup",
+            "line": 319,
+            "ops": [
+              "ASSIGN:logical-right"
+            ],
+            "code": "const current = »res.themeSettings || CONFIG.DEFAULT_SETTINGS«;"
+          },
+          {
+            "n": 35,
+            "file": "popup",
+            "line": 321,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...current«,"
+          },
+          {
+            "n": 36,
+            "file": "popup",
+            "line": 326,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 328
+          },
+          {
+            "n": 37,
+            "file": "popup",
+            "line": 215,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateLabel(id, »val«);"
+          },
+          {
+            "n": 38,
+            "file": "popup",
+            "line": 166,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "el.value = »val«;"
+          },
+          {
+            "n": 39,
+            "file": "popup",
+            "line": 178,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val«;"
+          },
+          {
+            "n": 40,
+            "file": "popup",
+            "line": 346,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...current«,"
+          }
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "From storage.local.set('themeSettings') in popup",
+        "file": "popup",
+        "loc": "L156:C19 -> L156:C71",
+        "line": 156,
+        "col": [
+          19,
+          71
+        ],
+        "spansTo": null,
+        "code": "hueRotate: »parseInt(document.getElementById('hueRotate').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L270:C20 -> L272:C22",
+          "line": 270,
+          "col": [
+            20,
+            22
+          ],
+          "spansTo": 272,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L326:C12 -> L328:C14",
+          "line": 326,
+          "col": [
+            12,
+            14
+          ],
+          "spansTo": 328,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        },
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L352:C8 -> L359:C10",
+          "line": 352,
+          "col": [
+            8,
+            10
+          ],
+          "spansTo": 359,
+          "code": "»chrome.storage.local.set({ «",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 4,
+      "propagation": {
+        "rawSteps": 148,
+        "distinctLines": 40,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 156,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "hueRotate: »parseInt(document.getElementById('hueRotate').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:template-literal"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          },
+          {
+            "n": 10,
+            "file": "popup",
+            "line": 233,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: local, key: themeSettings, sender: popup, receiver: popup]"
+            ],
+            "code": "»chrome.storage.local.get(['themeSettings', 'customPreset'], async (res) => {«",
+            "spansTo": 281
+          },
+          {
+            "n": 11,
+            "file": "popup",
+            "line": 235,
+            "ops": [
+              "ASSIGN:logical-left"
+            ],
+            "code": "const s = »res.themeSettings || CONFIG.DEFAULT_SETTINGS«;"
+          },
+          {
+            "n": 12,
+            "file": "popup",
+            "line": 240,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:logical-right"
+            ],
+            "code": "const shouldBeEnabled = »hasAccess && (s.enabled !== undefined ? s.enabled : false)«;"
+          },
+          {
+            "n": 13,
+            "file": "popup",
+            "line": 242,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "master.checked = »shouldBeEnabled«;"
+          },
+          {
+            "n": 14,
+            "file": "popup",
+            "line": 237,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »master = document.getElementById('master-switch')«;"
+          },
+          {
+            "n": 15,
+            "file": "popup",
+            "line": 243,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateToggleIcons(»shouldBeEnabled«);"
+          },
+          {
+            "n": 16,
+            "file": "popup",
+            "line": 245,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»!hasAccess && s.enabled«) {"
+          },
+          {
+            "n": 17,
+            "file": "popup",
+            "line": 280,
+            "ops": [
+              "ELEMENT:member-element",
+              "ASSIGN:logical-left"
+            ],
+            "code": "refreshUI(s, »s.activePreset || 'dark'«);"
+          },
+          {
+            "n": 18,
+            "file": "popup",
+            "line": 214,
+            "ops": [
+              "ELEMENT:member-element-container"
+            ],
+            "code": "const val = settings[id] !== undefined ? »settings[id]« : (id === 'hueRotate' ? 0 : 100);"
+          },
+          {
+            "n": 19,
+            "file": "popup",
+            "line": 163,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »el = document.getElementById(id)«;"
+          },
+          {
+            "n": 20,
+            "file": "popup",
+            "line": 167,
+            "ops": [
+              "ASSIGN:binary-left"
+            ],
+            "code": "const percent = (»(el.value - el.min) / (el.max - el.min)«) * 100;"
+          },
+          {
+            "n": 21,
+            "file": "popup",
+            "line": 169,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (fill) »fill.style.width = percent + '%'«;"
+          },
+          {
+            "n": 22,
+            "file": "popup",
+            "line": 173,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:identifier"
+            ],
+            "code": "const offset = »val« - 100;"
+          },
+          {
+            "n": 23,
+            "file": "popup",
+            "line": 174,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "label.textContent = (offset >= 0 ? '+' : '') + »offset«;"
+          },
+          {
+            "n": 24,
+            "file": "popup",
+            "line": 162,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »label = document.getElementById(id + '-val')«;"
+          },
+          {
+            "n": 25,
+            "file": "popup",
+            "line": 176,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val« + '°';"
+          },
+          {
+            "n": 26,
+            "file": "popup",
+            "line": 217,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»document.getElementById('invert').checked = !!settings.invert«;"
+          },
+          {
+            "n": 27,
+            "file": "popup",
+            "line": 219,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "const index = presetIds.indexOf(»activePresetId«);"
+          },
+          {
+            "n": 28,
+            "file": "popup",
+            "line": 252,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "master.checked = »!wantedState«;"
+          },
+          {
+            "n": 29,
+            "file": "popup",
+            "line": 263,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "master.checked = »wantedState«;"
+          },
+          {
+            "n": 30,
+            "file": "popup",
+            "line": 264,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateToggleIcons(»wantedState«);"
+          },
+          {
+            "n": 31,
+            "file": "popup",
+            "line": 268,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »newSettings = { ...current, enabled: wantedState }«;"
+          },
+          {
+            "n": 32,
+            "file": "popup",
+            "line": 270,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»                    chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 272
+          },
+          {
+            "n": 33,
+            "file": "popup",
+            "line": 271,
+            "ops": [
+              "ELEMENT:member-element"
+            ],
+            "code": "if (typeof refreshUI === 'function') refreshUI(newSettings, »newSettings.activePreset«);"
+          },
+          {
+            "n": 34,
+            "file": "popup",
+            "line": 319,
+            "ops": [
+              "ASSIGN:logical-right"
+            ],
+            "code": "const current = »res.themeSettings || CONFIG.DEFAULT_SETTINGS«;"
+          },
+          {
+            "n": 35,
+            "file": "popup",
+            "line": 321,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...current«,"
+          },
+          {
+            "n": 36,
+            "file": "popup",
+            "line": 326,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 328
+          },
+          {
+            "n": 37,
+            "file": "popup",
+            "line": 215,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateLabel(id, »val«);"
+          },
+          {
+            "n": 38,
+            "file": "popup",
+            "line": 166,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "el.value = »val«;"
+          },
+          {
+            "n": 39,
+            "file": "popup",
+            "line": 178,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val«;"
+          },
+          {
+            "n": 40,
+            "file": "popup",
+            "line": 346,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...current«,"
+          }
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "From storage.local.set('customPreset') in popup",
+        "file": "popup",
+        "loc": "L152:C20 -> L152:C73",
+        "line": 152,
+        "col": [
+          20,
+          73
+        ],
+        "spansTo": null,
+        "code": "brightness: »parseInt(document.getElementById('brightness').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L326:C12 -> L328:C14",
+          "line": 326,
+          "col": [
+            12,
+            14
+          ],
+          "spansTo": 328,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 85,
+        "distinctLines": 26,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 152,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "brightness: »parseInt(document.getElementById('brightness').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:template-literal",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          },
+          {
+            "n": 10,
+            "file": "popup",
+            "line": 233,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: local, key: customPreset, sender: popup, receiver: popup]"
+            ],
+            "code": "»chrome.storage.local.get(['themeSettings', 'customPreset'], async (res) => {«",
+            "spansTo": 281
+          },
+          {
+            "n": 11,
+            "file": "popup",
+            "line": 314,
+            "ops": [
+              "ELEMENT:implicit.add",
+              "ELEMENT:member-element-container",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "const »data = (presetId === 'custom') ? presets.custom : CONFIG.PRESETS[presetId]«;"
+          },
+          {
+            "n": 12,
+            "file": "popup",
+            "line": 322,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...data«,"
+          },
+          {
+            "n": 13,
+            "file": "popup",
+            "line": 320,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            const newSettings = {«",
+            "spansTo": 325
+          },
+          {
+            "n": 14,
+            "file": "popup",
+            "line": 326,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 328
+          },
+          {
+            "n": 15,
+            "file": "popup",
+            "line": 214,
+            "ops": [
+              "ELEMENT:member-element-container"
+            ],
+            "code": "const val = settings[id] !== undefined ? »settings[id]« : (id === 'hueRotate' ? 0 : 100);"
+          },
+          {
+            "n": 16,
+            "file": "popup",
+            "line": 215,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateLabel(id, »val«);"
+          },
+          {
+            "n": 17,
+            "file": "popup",
+            "line": 166,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "el.value = »val«;"
+          },
+          {
+            "n": 18,
+            "file": "popup",
+            "line": 163,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »el = document.getElementById(id)«;"
+          },
+          {
+            "n": 19,
+            "file": "popup",
+            "line": 167,
+            "ops": [
+              "ASSIGN:binary-left"
+            ],
+            "code": "const percent = (»(el.value - el.min) / (el.max - el.min)«) * 100;"
+          },
+          {
+            "n": 20,
+            "file": "popup",
+            "line": 169,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (fill) »fill.style.width = percent + '%'«;"
+          },
+          {
+            "n": 21,
+            "file": "popup",
+            "line": 173,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "const offset = »val« - 100;"
+          },
+          {
+            "n": 22,
+            "file": "popup",
+            "line": 174,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "label.textContent = (offset >= 0 ? '+' : '') + »offset«;"
+          },
+          {
+            "n": 23,
+            "file": "popup",
+            "line": 162,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »label = document.getElementById(id + '-val')«;"
+          },
+          {
+            "n": 24,
+            "file": "popup",
+            "line": 176,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "label.textContent = »val« + '°';"
+          },
+          {
+            "n": 25,
+            "file": "popup",
+            "line": 178,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val«;"
+          },
+          {
+            "n": 26,
+            "file": "popup",
+            "line": 217,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»document.getElementById('invert').checked = !!settings.invert«;"
+          }
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "From storage.local.set('customPreset') in popup",
+        "file": "popup",
+        "loc": "L153:C18 -> L153:C69",
+        "line": 153,
+        "col": [
+          18,
+          69
+        ],
+        "spansTo": null,
+        "code": "contrast: »parseInt(document.getElementById('contrast').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L326:C12 -> L328:C14",
+          "line": 326,
+          "col": [
+            12,
+            14
+          ],
+          "spansTo": 328,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 85,
+        "distinctLines": 26,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 153,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "contrast: »parseInt(document.getElementById('contrast').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:template-literal",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          },
+          {
+            "n": 10,
+            "file": "popup",
+            "line": 233,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: local, key: customPreset, sender: popup, receiver: popup]"
+            ],
+            "code": "»chrome.storage.local.get(['themeSettings', 'customPreset'], async (res) => {«",
+            "spansTo": 281
+          },
+          {
+            "n": 11,
+            "file": "popup",
+            "line": 314,
+            "ops": [
+              "ELEMENT:implicit.add",
+              "ELEMENT:member-element-container",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "const »data = (presetId === 'custom') ? presets.custom : CONFIG.PRESETS[presetId]«;"
+          },
+          {
+            "n": 12,
+            "file": "popup",
+            "line": 322,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...data«,"
+          },
+          {
+            "n": 13,
+            "file": "popup",
+            "line": 320,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            const newSettings = {«",
+            "spansTo": 325
+          },
+          {
+            "n": 14,
+            "file": "popup",
+            "line": 326,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 328
+          },
+          {
+            "n": 15,
+            "file": "popup",
+            "line": 214,
+            "ops": [
+              "ELEMENT:member-element-container"
+            ],
+            "code": "const val = settings[id] !== undefined ? »settings[id]« : (id === 'hueRotate' ? 0 : 100);"
+          },
+          {
+            "n": 16,
+            "file": "popup",
+            "line": 215,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateLabel(id, »val«);"
+          },
+          {
+            "n": 17,
+            "file": "popup",
+            "line": 166,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "el.value = »val«;"
+          },
+          {
+            "n": 18,
+            "file": "popup",
+            "line": 163,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »el = document.getElementById(id)«;"
+          },
+          {
+            "n": 19,
+            "file": "popup",
+            "line": 167,
+            "ops": [
+              "ASSIGN:binary-left"
+            ],
+            "code": "const percent = (»(el.value - el.min) / (el.max - el.min)«) * 100;"
+          },
+          {
+            "n": 20,
+            "file": "popup",
+            "line": 169,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (fill) »fill.style.width = percent + '%'«;"
+          },
+          {
+            "n": 21,
+            "file": "popup",
+            "line": 173,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "const offset = »val« - 100;"
+          },
+          {
+            "n": 22,
+            "file": "popup",
+            "line": 174,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "label.textContent = (offset >= 0 ? '+' : '') + »offset«;"
+          },
+          {
+            "n": 23,
+            "file": "popup",
+            "line": 162,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »label = document.getElementById(id + '-val')«;"
+          },
+          {
+            "n": 24,
+            "file": "popup",
+            "line": 176,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "label.textContent = »val« + '°';"
+          },
+          {
+            "n": 25,
+            "file": "popup",
+            "line": 178,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val«;"
+          },
+          {
+            "n": 26,
+            "file": "popup",
+            "line": 217,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»document.getElementById('invert').checked = !!settings.invert«;"
+          }
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "From storage.local.set('customPreset') in popup",
+        "file": "popup",
+        "loc": "L154:C15 -> L154:C63",
+        "line": 154,
+        "col": [
+          15,
+          63
+        ],
+        "spansTo": null,
+        "code": "sepia: »parseInt(document.getElementById('sepia').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L326:C12 -> L328:C14",
+          "line": 326,
+          "col": [
+            12,
+            14
+          ],
+          "spansTo": 328,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 85,
+        "distinctLines": 26,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 154,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "sepia: »parseInt(document.getElementById('sepia').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:template-literal",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          },
+          {
+            "n": 10,
+            "file": "popup",
+            "line": 233,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: local, key: customPreset, sender: popup, receiver: popup]"
+            ],
+            "code": "»chrome.storage.local.get(['themeSettings', 'customPreset'], async (res) => {«",
+            "spansTo": 281
+          },
+          {
+            "n": 11,
+            "file": "popup",
+            "line": 314,
+            "ops": [
+              "ELEMENT:implicit.add",
+              "ELEMENT:member-element-container",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "const »data = (presetId === 'custom') ? presets.custom : CONFIG.PRESETS[presetId]«;"
+          },
+          {
+            "n": 12,
+            "file": "popup",
+            "line": 322,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...data«,"
+          },
+          {
+            "n": 13,
+            "file": "popup",
+            "line": 320,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            const newSettings = {«",
+            "spansTo": 325
+          },
+          {
+            "n": 14,
+            "file": "popup",
+            "line": 326,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 328
+          },
+          {
+            "n": 15,
+            "file": "popup",
+            "line": 214,
+            "ops": [
+              "ELEMENT:member-element-container"
+            ],
+            "code": "const val = settings[id] !== undefined ? »settings[id]« : (id === 'hueRotate' ? 0 : 100);"
+          },
+          {
+            "n": 16,
+            "file": "popup",
+            "line": 215,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateLabel(id, »val«);"
+          },
+          {
+            "n": 17,
+            "file": "popup",
+            "line": 166,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "el.value = »val«;"
+          },
+          {
+            "n": 18,
+            "file": "popup",
+            "line": 163,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »el = document.getElementById(id)«;"
+          },
+          {
+            "n": 19,
+            "file": "popup",
+            "line": 167,
+            "ops": [
+              "ASSIGN:binary-left"
+            ],
+            "code": "const percent = (»(el.value - el.min) / (el.max - el.min)«) * 100;"
+          },
+          {
+            "n": 20,
+            "file": "popup",
+            "line": 169,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (fill) »fill.style.width = percent + '%'«;"
+          },
+          {
+            "n": 21,
+            "file": "popup",
+            "line": 173,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "const offset = »val« - 100;"
+          },
+          {
+            "n": 22,
+            "file": "popup",
+            "line": 174,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "label.textContent = (offset >= 0 ? '+' : '') + »offset«;"
+          },
+          {
+            "n": 23,
+            "file": "popup",
+            "line": 162,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »label = document.getElementById(id + '-val')«;"
+          },
+          {
+            "n": 24,
+            "file": "popup",
+            "line": 176,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "label.textContent = »val« + '°';"
+          },
+          {
+            "n": 25,
+            "file": "popup",
+            "line": 178,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val«;"
+          },
+          {
+            "n": 26,
+            "file": "popup",
+            "line": 217,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»document.getElementById('invert').checked = !!settings.invert«;"
+          }
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "From storage.local.set('customPreset') in popup",
+        "file": "popup",
+        "loc": "L155:C19 -> L155:C71",
+        "line": 155,
+        "col": [
+          19,
+          71
+        ],
+        "spansTo": null,
+        "code": "grayscale: »parseInt(document.getElementById('grayscale').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L326:C12 -> L328:C14",
+          "line": 326,
+          "col": [
+            12,
+            14
+          ],
+          "spansTo": 328,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 85,
+        "distinctLines": 26,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 155,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "grayscale: »parseInt(document.getElementById('grayscale').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:binary-left",
+              "ASSIGN:template-literal",
+              "ELEMENT:member-element-container"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          },
+          {
+            "n": 10,
+            "file": "popup",
+            "line": 233,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: local, key: customPreset, sender: popup, receiver: popup]"
+            ],
+            "code": "»chrome.storage.local.get(['themeSettings', 'customPreset'], async (res) => {«",
+            "spansTo": 281
+          },
+          {
+            "n": 11,
+            "file": "popup",
+            "line": 314,
+            "ops": [
+              "ELEMENT:implicit.add",
+              "ELEMENT:member-element-container",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "const »data = (presetId === 'custom') ? presets.custom : CONFIG.PRESETS[presetId]«;"
+          },
+          {
+            "n": 12,
+            "file": "popup",
+            "line": 322,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...data«,"
+          },
+          {
+            "n": 13,
+            "file": "popup",
+            "line": 320,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            const newSettings = {«",
+            "spansTo": 325
+          },
+          {
+            "n": 14,
+            "file": "popup",
+            "line": 326,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 328
+          },
+          {
+            "n": 15,
+            "file": "popup",
+            "line": 214,
+            "ops": [
+              "ELEMENT:member-element-container"
+            ],
+            "code": "const val = settings[id] !== undefined ? »settings[id]« : (id === 'hueRotate' ? 0 : 100);"
+          },
+          {
+            "n": 16,
+            "file": "popup",
+            "line": 215,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateLabel(id, »val«);"
+          },
+          {
+            "n": 17,
+            "file": "popup",
+            "line": 166,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "el.value = »val«;"
+          },
+          {
+            "n": 18,
+            "file": "popup",
+            "line": 163,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »el = document.getElementById(id)«;"
+          },
+          {
+            "n": 19,
+            "file": "popup",
+            "line": 167,
+            "ops": [
+              "ASSIGN:binary-left"
+            ],
+            "code": "const percent = (»(el.value - el.min) / (el.max - el.min)«) * 100;"
+          },
+          {
+            "n": 20,
+            "file": "popup",
+            "line": 169,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (fill) »fill.style.width = percent + '%'«;"
+          },
+          {
+            "n": 21,
+            "file": "popup",
+            "line": 173,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "const offset = »val« - 100;"
+          },
+          {
+            "n": 22,
+            "file": "popup",
+            "line": 174,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "label.textContent = (offset >= 0 ? '+' : '') + »offset«;"
+          },
+          {
+            "n": 23,
+            "file": "popup",
+            "line": 162,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »label = document.getElementById(id + '-val')«;"
+          },
+          {
+            "n": 24,
+            "file": "popup",
+            "line": 176,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "label.textContent = »val« + '°';"
+          },
+          {
+            "n": 25,
+            "file": "popup",
+            "line": 178,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val«;"
+          },
+          {
+            "n": 26,
+            "file": "popup",
+            "line": 217,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»document.getElementById('invert').checked = !!settings.invert«;"
+          }
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "file": "popup",
+      "frame": "POPUP_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "From storage.local.set('customPreset') in popup",
+        "file": "popup",
+        "loc": "L156:C19 -> L156:C71",
+        "line": 156,
+        "col": [
+          19,
+          71
+        ],
+        "spansTo": null,
+        "code": "hueRotate: »parseInt(document.getElementById('hueRotate').value)«,"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "themeSettings",
+          "file": "popup",
+          "loc": "L326:C12 -> L328:C14",
+          "line": 326,
+          "col": [
+            12,
+            14
+          ],
+          "spansTo": 328,
+          "code": "»chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+          "frame": "POPUP_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 82,
+        "distinctLines": 26,
+        "steps": [
+          {
+            "n": 1,
+            "file": "popup",
+            "line": 156,
+            "ops": [
+              "RETURN:parseInt"
+            ],
+            "code": "hueRotate: »parseInt(document.getElementById('hueRotate').value)«,"
+          },
+          {
+            "n": 2,
+            "file": "popup",
+            "line": 151,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»    return {«",
+            "spansTo": 158
+          },
+          {
+            "n": 3,
+            "file": "popup",
+            "line": 194,
+            "ops": [
+              "ASSIGN:template-literal",
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-left"
+            ],
+            "code": "return »`brightness(${s.brightness / 100}) contrast(${s.contrast / 100}) sepia(${s.sepia / 100}) grayscale(${s.grayscale / 100}) hue-rotate(${s.hueRotate}deg) invert(${s.invert ? 1 : 0})`«;"
+          },
+          {
+            "n": 4,
+            "file": "popup",
+            "line": 200,
+            "ops": [
+              "ELEMENT:object.setProperty",
+              "COPY:object-spread",
+              "ASSIGN:identifier"
+            ],
+            "code": "const »settingsToSend = { ...values, gridFilter, preview: true }«;"
+          },
+          {
+            "n": 5,
+            "file": "popup",
+            "line": 204,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.tabs.sendMessage(tab.id, { type: 'PREVIEW_THEME', settings: settingsToSend })«;"
+          },
+          {
+            "n": 6,
+            "file": "popup",
+            "line": 345,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        const newSettings = {«",
+            "spansTo": 350
+          },
+          {
+            "n": 7,
+            "file": "popup",
+            "line": 347,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...currentValues«,"
+          },
+          {
+            "n": 8,
+            "file": "popup",
+            "line": 352,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        chrome.storage.local.set({ «",
+            "spansTo": 359
+          },
+          {
+            "n": 9,
+            "file": "popup",
+            "line": 1,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»const wallId = (typeof CONFIG !== 'undefined') ? CONFIG.WALL_ID : \"676\";«",
+            "spansTo": 54
+          },
+          {
+            "n": 10,
+            "file": "popup",
+            "line": 233,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: local, key: customPreset, sender: popup, receiver: popup]"
+            ],
+            "code": "»chrome.storage.local.get(['themeSettings', 'customPreset'], async (res) => {«",
+            "spansTo": 281
+          },
+          {
+            "n": 11,
+            "file": "popup",
+            "line": 314,
+            "ops": [
+              "ELEMENT:implicit.add",
+              "ELEMENT:member-element-container",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "const »data = (presetId === 'custom') ? presets.custom : CONFIG.PRESETS[presetId]«;"
+          },
+          {
+            "n": 12,
+            "file": "popup",
+            "line": 322,
+            "ops": [
+              "COPY:object-spread"
+            ],
+            "code": "»...data«,"
+          },
+          {
+            "n": 13,
+            "file": "popup",
+            "line": 320,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            const newSettings = {«",
+            "spansTo": 325
+          },
+          {
+            "n": 14,
+            "file": "popup",
+            "line": 326,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            chrome.storage.local.set({ themeSettings: newSettings }, () => {«",
+            "spansTo": 328
+          },
+          {
+            "n": 15,
+            "file": "popup",
+            "line": 214,
+            "ops": [
+              "ELEMENT:member-element-container"
+            ],
+            "code": "const val = settings[id] !== undefined ? »settings[id]« : (id === 'hueRotate' ? 0 : 100);"
+          },
+          {
+            "n": 16,
+            "file": "popup",
+            "line": 215,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "updateLabel(id, »val«);"
+          },
+          {
+            "n": 17,
+            "file": "popup",
+            "line": 166,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "el.value = »val«;"
+          },
+          {
+            "n": 18,
+            "file": "popup",
+            "line": 163,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »el = document.getElementById(id)«;"
+          },
+          {
+            "n": 19,
+            "file": "popup",
+            "line": 167,
+            "ops": [
+              "ASSIGN:binary-left"
+            ],
+            "code": "const percent = (»(el.value - el.min) / (el.max - el.min)«) * 100;"
+          },
+          {
+            "n": 20,
+            "file": "popup",
+            "line": 169,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "if (fill) »fill.style.width = percent + '%'«;"
+          },
+          {
+            "n": 21,
+            "file": "popup",
+            "line": 173,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "const offset = »val« - 100;"
+          },
+          {
+            "n": 22,
+            "file": "popup",
+            "line": 174,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "label.textContent = (offset >= 0 ? '+' : '') + »offset«;"
+          },
+          {
+            "n": 23,
+            "file": "popup",
+            "line": 162,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »label = document.getElementById(id + '-val')«;"
+          },
+          {
+            "n": 24,
+            "file": "popup",
+            "line": 176,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "label.textContent = »val« + '°';"
+          },
+          {
+            "n": 25,
+            "file": "popup",
+            "line": 178,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "label.textContent = »val«;"
+          },
+          {
+            "n": 26,
+            "file": "popup",
+            "line": 217,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»document.getElementById('invert').checked = !!settings.invert«;"
+          }
+        ]
+      }
+    }
+  ]
+}

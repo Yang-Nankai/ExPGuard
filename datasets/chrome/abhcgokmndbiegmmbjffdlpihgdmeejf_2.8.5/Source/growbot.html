@@ -1,0 +1,1174 @@
+<!--
+* Copyright (C) Growbot 2016-2023 - All Rights Reserved
+*
+* Unauthorized copying of this file, via any medium is strictly prohibited
+* Proprietary and confidential
+* Written by Growbot <growbotautomator@gmail.com>, 2016-2023
+-->
+    <div id="igBotInjectedContainer" class="igBotParent">
+    <div id="igBotDialog">
+        <div id="igBotDialogHeader" style="display:none;">
+            <span id="btnDialogHelp" localeTitle="DialogHelpTooltip" title="Actions are scheduled to run automatically in the background as long as you have an Instagram tab open. You can view, edit, or cancel scheduled actions in the Actions Queue tab.">?</span>
+            <span id="btnDialogClose">&times;</span>
+        </div>
+        <div id="igBotDialogWelcome" class="growbot-hint" style="display:none;">
+            <p localeMessage="DialogWelcomeText">Welcome to action scheduling! This works the same but better than the old way of just running actions with a delay.
+                Your actions will be saved and available any time you open an instagram tab, they won't disappear if your browser crashes or you navigate the page.
+            Just keep an Instagram tab open and your actions will run on schedule.
+            You can view and manage everything in the <b>Actions Queue</b> tab.</p>
+            <a class="growbot-hint-dismiss" localeMessage="DialogWelcomeDismiss">Don't show this again</a>
+        </div>
+        <div id="igBotDialogQuestion">Question text goes here?</div>
+        <div id="igBotDialogScheduleStep1" class="ig-bot-dialog-schedule-step1" style="display:none;">
+            <p class="ig-bot-schedule-step1-hint" localeMessage="WizardStep1Hint"><b>Run Now</b> runs the first action immediately and spaces the rest using your wait time in Settings (including randomization if enabled). <b>Schedule Actions</b> opens the full scheduling options.</p>
+            <div class="ig-bot-schedule-step1-buttons">
+                <div class="igBotInjectedButton" id="btnDialogStep1RunNow" localeMessage="WizardRunNow">Run Now</div>
+                <div class="igBotInjectedButton" id="btnDialogStep1ScheduleActions" localeMessage="WizardScheduleActions">Schedule Actions</div>
+            </div>
+        </div>
+        <div id="igBotDialogScheduleConfig" style="display:none;">
+            <div id="igBotDialogScheduleExistingRow" class="ig-bot-dialog-schedule-existing" style="display:none;">
+                <p id="igBotDialogExistingUntilLine" class="ig-bot-existing-until-line"></p>
+                <div class="ig-bot-schedule-start-row">
+                    <label class="ig-bot-schedule-start-label"><span localeMessage="WizardStartNewActionsFrom">Start new actions from</span>
+                        <input type="datetime-local" id="dialogScheduleStartDate">
+                    </label>
+                    <button type="button" class="ig-bot-link-button" id="btnDialogScheduleStartToday" localeMessage="WizardTodayButton">Today</button>
+                </div>
+            </div>
+            <label><span localeMessage="WizardActionsPerDay">Actions per day</span> <input type="number" id="dialogActionsPerDay" value="30" min="1" max="500"></label>
+            <div class="igBotScheduleTimeWindow">
+                <div class="igBotScheduleTimeHeading" localeMessage="WizardTimeWindowHeading">Actions will run between these times every day:</div>
+                <div class="growbot-hint" id="hintScheduleTimeWindow">
+                    <p localeMessage="WizardTimeWindowHint">This is to simulate a human being who sleeps and doesn't do actions on IG 24/7. Actions will be evenly distributed thru this period to give the most delay. If there are too many actions to meet your minimum delay, they will move to the next day and so on.</p>
+                    <a class="growbot-hint-dismiss" localeMessage="DialogWelcomeDismiss">Don't show this again</a>
+                </div>
+                <div id="timeWindowSlider"></div>
+                <div class="igBotScheduleTimeInputs">
+                    <label><span localeMessage="WizardBeginningOfDay">Beginning of Day</span> <input type="time" id="dialogStartTime" value="06:00"></label>
+                    <label><span localeMessage="WizardEndOfDay">End of Day</span> <input type="time" id="dialogEndTime" value="22:00"></label>
+                </div>
+            </div>
+            <label><span localeMessage="WizardMinDelay">Minimum seconds between actions</span> <input type="number" id="dialogMinDelay" value="300" min="10"
+                    max="86400"></label>
+            <div id="igBotDialogScheduleEvenlyWrap" class="ig-bot-schedule-evenly-wrap">
+                <div class="ig-bot-schedule-evenly-label" localeMessage="WizardEvenlyLabel">Action spacing in the daily window</div>
+                <label class="ig-bot-schedule-evenly-option"><input type="radio" name="dialogScheduleEvenlyMode" value="evenly" checked> <span localeMessage="WizardEvenlyOptionEvenly">Spread actions evenly across the daily time window</span></label>
+                <label class="ig-bot-schedule-evenly-option"><input type="radio" name="dialogScheduleEvenlyMode" value="settings_delay"> <span localeMessage="WizardEvenlyOptionSettingsDelay">Use delay from Configure Wait Times in Settings</span></label>
+            </div>
+            <details id="igBotDialogScheduleIgAccountsWrap" class="ig-bot-schedule-ig-details">
+                <summary id="igBotDialogScheduleIgAccountsSummary" class="ig-bot-schedule-ig-summary" localeMessage="WizardIgAccountsSummary">Instagram accounts & batch sizes</summary>
+                <div id="igBotDialogScheduleIgAccounts" class="ig-bot-schedule-ig-inner">
+                    <p class="ig-bot-schedule-ig-expl" localeMessage="WizardIgAccountsExpl">Run each scheduled action logged in as the matching @username when it is due, or it will not run on time.</p>
+                    <p id="igBotScheduleIgAccountsFetchError" class="ig-bot-schedule-ig-empty" style="display:none;"></p>
+                    <p id="igBotScheduleIgAccountsEmpty" class="ig-bot-schedule-ig-empty" style="display:none;" localeMessage="WizardIgAccountsEmpty">No Instagram accounts on file yet. Use Instagram with Growbot while logged in as each account so they appear here.</p>
+                    <div id="igBotDialogScheduleIgConsumeModeWrap" class="ig-bot-schedule-consume-wrap" style="display:none;">
+                        <div class="ig-bot-schedule-consume-label" localeMessage="WizardConsumeLabel">When using multiple checked accounts:</div>
+                        <label class="ig-bot-schedule-consume-option"><input type="radio" name="dialogScheduleIgConsumeMode" value="sequential" checked> <span localeMessage="WizardConsumeSequential">Sequential — fill each account&apos;s quota in list order before the next</span></label>
+                        <label class="ig-bot-schedule-consume-option"><input type="radio" name="dialogScheduleIgConsumeMode" value="concurrent"> <span localeMessage="WizardConsumeConcurrent">Concurrent — rotate between accounts (spread across time)</span></label>
+                    </div>
+                    <div id="igBotDialogScheduleIgQuotaModeWrap" class="ig-bot-schedule-quota-mode-wrap">
+                        <div class="ig-bot-schedule-quota-mode-label" localeMessage="WizardQuotaLabel">Actions per account</div>
+                        <label class="ig-bot-schedule-quota-mode-option"><input type="radio" name="dialogScheduleIgQuotaMode" value="even"> <span localeMessage="WizardQuotaEven">Split evenly — divide eligible queue across checked accounts (counts set when you click Schedule)</span></label>
+                        <label class="ig-bot-schedule-quota-mode-option"><input type="radio" name="dialogScheduleIgQuotaMode" value="custom" checked> <span localeMessage="WizardQuotaCustom">Custom — set the Actions number for each account</span></label>
+                        <p id="igBotScheduleIgEvenPreview" class="ig-bot-schedule-ig-even-preview" style="display:none;" aria-live="polite"></p>
+                    </div>
+                    <div id="igBotDialogScheduleIgAccountsRows"></div>
+                </div>
+            </details>
+        </div>
+        <div id="igBotDialogTruncateConfig" style="display:none;">
+            <label for="dialogTruncateStart"><span localeMessage="WizardTruncateStartLabel">Start at position</span>
+                <input type="number" id="dialogTruncateStart" value="0" min="0">
+            </label>
+            <div id="dialogTruncateHelp" localeMessage="WizardTruncateHelp">
+                0 starts from the most recent accounts. Higher numbers skip the most recent N accounts.  
+                <br><br>
+                Note: Technically we will begin loading from 0, and then remove the beginning N accounts.
+            </div>
+        </div>
+        <div class="igBotInjectedButton" id="btnDialogOK" localeMessage="OkButton">OK</div>
+        <div class="igBotInjectedButton" id="btnDialogCancel" localeMessage="CancelButton">Cancel</div>
+    </div>
+    <div id="igBotSchedulingBatchProgress" class="ig-bot-scheduling-progress-overlay" style="display:none;" aria-hidden="true">
+        <div class="ig-bot-scheduling-progress-card">
+            <div id="igBotSchedulingBatchProgressText" class="ig-bot-scheduling-progress-text"></div>
+            <div class="ig-bot-scheduling-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div id="igBotSchedulingBatchProgressFill" class="ig-bot-scheduling-progress-fill"></div>
+            </div>
+        </div>
+    </div>
+    <div id="igBotLeft">
+        <div id="igBotHeading">
+            <div style="display: flex;">
+                <h1 id="h1GrowbotHeading">GrowBot Automator for Instagram™</h1>
+                <h2 id="h2FreeTrialTimeLeft"></h2>
+            </div>
+            <div id="igBotStatusDiv" localeMessage="ReadyToAcceptCommands">Ready to accept commands</div>
+        </div>
+        <div class="pc-tab">
+            <input checked="checked" id="tab1" type="radio" name="pct" />
+            <input id="tab2" type="radio" name="pct" />
+            <input id="tab3" type="radio" name="pct" />
+            <input id="tab4" type="radio" name="pct" />
+            <input id="tab5" type="radio" name="pct" />
+            <input id="tab6" type="radio" name="pct" />
+            <input id="tab7" type="radio" name="pct" />
+            <input id="tab8" type="radio" name="pct" />
+            <input id="tab9" type="radio" name="pct" />
+
+            <nav>
+                <ul>
+                    <li class="tab1"> <label for="tab1" localeMessage="TabAccountsQueue">Accounts Queue</label> </li>
+                    <li class="tab2"> <label for="tab2" localeMessage="TabMediaQueue">Media Queue</label> </li>
+                    <li class="tab8"> <label for="tab8" localeMessage="TabActionsQueue">Actions Queue</label> </li>
+                    <li class="tab3"> <label for="tab3" localeMessage="TabFilters">Filters</label> </li>
+                    <li class="tab4"> <label for="tab4" localeMessage="TabSettings">Settings</label> </li>
+                    <li class="tab5"> <label for="tab5" localeMessage="TabLog">Log</label> </li>
+                    <li class="tab6"> <label for="tab6" localeMessage="TabNewsUpdates">News &amp; Updates</label> </li>
+                    <li class="tab9"> <label for="tab9" localeMessage="TabAffiliates">Affiliates</label> </li>
+                    <li class="tab7"> <label for="tab7" localeMessage="TabHelpFaq">Help &amp; FAQ</label> </li>
+                </ul>
+            </nav>
+            <section id="mainSection">
+                <div class="tab1">
+                    <div id="queueQuantityRow">
+                        <div id="pager" class="pager">
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACSUlEQVR4AWSSA4xcARCGG6uxL7bdixvWbsOLa9uN+nJx3a7Otm1jVa5t276dvpm07/SSfzn/NzwAALt0VAgVrCpZnWJVRaLP9FvF3vidxoOsDr0Zit8d3HTyJb+NG0q1NqxQacLrP3QbvStW/su+yF2MwVgOsMN8uHvNwyi0Zr0vFIdkpgDFrTIpkc6D2x8B8Q+VvmnWzGAsejgAUtGs0lmS2VwR8MnkSxBJFiDMKpUr0W/JTB7WZX+S9VMGBj0EwL6wbMz83+yO5MATzYEvmkfR5yGJn4PMLon1jzp8d9GLgMrBDQcfy8YHM16qXoEbQvUu8zW+CpyhLMXorF7g9Un46EXAKfEvwwb2jKWGEghYJgBWMsCazzFyAtiDWYinixCIZqC5Z3wDvQio+qNUh3FYaA7G83CJWYbrAhXwp+z4GUUAqz9DVeSLW9DR1RNGLwF+K1QIQDPp4ttFMgimHbsAZl/mXxUFaG5t5wCnVuWajWgyB4lMEfwxBCyQwRbIYFUcwORN02aMrijw6ru4Fiq7Fk18uzsE5TLg4Cj4Co8yorAq+s3gTkOhVIYlqQYY0SQ3xIqn3cG7i2syfTiexQBufUZPGoVG/E4JTGz2r7Vt+qsiI62ROyTesIIZm1tL+iIpCoymitgvtoGrJbDRFYEv9d3J17wpOqR9p/y+S8a09Y3pJX9MYPfFaSbYs8YWhuk1BbznNelffp3Yd8ocBKm3Gmx3q+um+R+FrRs8gejv3k6YNPVtx8Q5RysnrpuaMPUGRmaiODsDAKw/CRKUFv+sAAAAAElFTkSuQmCC"
+                                class="first" />
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACXklEQVR4AWyTA4ycARCFG6uxL7Z9FzesbUe1bZ9t27Zt27b5r63X/xXnSd5yvjfY2QMAduhIMKxE2Yg6KeoGxdf8jN/tzt8OHhRl/SVb/jSraT6wpWe8sX9wWOgbGBIaOkca02qnAz+mS54yh7n/ue3woZT6Jdu+4cnRlQ05lBoDjGYLKIVaj8VVCZo7B0ajyyZtmUtmu4E14YGRKaVWZwRDozdBojRAEKXSmcBQavRoaOtVRhSP2ZIBDTgX22bl//C6XI/5DS1WpHoKS1Idplc1myZl1c2jrxJXnpKlgU1W41wg294O3/Do3AFfd2/n52CMTC8jIL0lkCwNTjZ3jzVyZrY6u67FJYd6GmBRosPkigZnvxbQgN9BrjZiTapBTGpBI1ka3OjtHxS4rFWZHhfta0TVggArn/mSL6oA19zawPfsQm80IzE5VSD7x6Cnb4AG2FAYcNOrFxd+VYIGNLzi1IjzP0px1aWF3fzrwoCYuIRNg5N17UONUqUOCo0RC4I4v2ePOEI3ZtY0BGgmqhMTy2rwlxlfkCIgInlzBJvkqonA2cUNWCwAAbZ526cPrEix9VvevRhbVMNgsqC6dQi2IUWbS7R6m7L+tKq+bVSQa8EgxOqsOL6kBkE+s8DEghR+YfGjd0PGn5LdPKSAnD7b/PJ65YpEBSZKVUawGxrxmFh5fEEC34gU5eeAYlsye07ZI7nNNj49f7SldwKzK3JwJ5x5aEZASX0fPAKiRz/6FW6e8r5/pkeRM0/tw0sCvYLjGgOCQgQfv0DBxTei8bNv1u9NTZh6AyMzUZydAcyECTzxVTE0AAAAAElFTkSuQmCC"
+                                class="prev" /> <span class="pagedisplay"></span>
+                            <span localeMessage="PageLabel">Page:</span>
+                            <select class="gotoPage" localeTitle="SelectPageNumberTitle" title="Select page number"></select>
+                            <!-- this can be any element, including an input -->
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACWUlEQVR4AWxTA6xbYRhdrMV+se334oVzNCOabdu2qtm2zXLeatvt7V3N17N7hjve5JTf0Y8eAP5AHzU6JHRJGChhNMHP/I3//T3/O7GnhM7l1/MzrhkiStMnj95icwhmq13QvXfqL70MKJdczs3gDGd/E5DJvS5o4+vMDp8rmc2jWGmg2d0GUSjXEUvlYHxvdR1/5FvHWXJkAaqSbHX6i9VaE3wq9RZyxQYECaVaiz9JonXo3nwuHrnvpkgnKMBejE3nn2RvoozUlzqS4ne4Y2XEcjVZ5NFzo2vu2eQMcinQdU0fVjI2n0y+jmGbtCSRjLhYw5ANL2GLFBHJVsHHGUhAcdmkJJcCA40f3Xp2ZlSShm7USngJZ6yEqFCVBF6AsIaLyJebSIsVnLh4R08uBUZ/ttgELla20AAF6EiM2GqCJ17GkHUvJDzD8M0G8Hu92Y2z5y8K5H4T+GS2UgCMz64kD99iAF0pOnjtM9aS3p/yu5SigROnzsgCA1+9tevFYg2FShPsSTJdORxIVWQyDbgznqgIxZHzcoWu88+8ylAsi3YbCGWqYFySfckKiMFrnoK7woVttNp4/tqOdZp78iJ2LLiQmfFM+8Yl5KvyTpDI7WRnkrmgNPBGRew/dNo1QeOZQa58kBQ3zOtuP9YWk7nvg2KpyTQIpis8THSGJ5rDviMXissU9+WD9MdR3nn+zbrTl2+7TJ+9CCXzXBN2hj0o4IHWjJ2K464l++/KR/m/l2nq0eCMDYcfKHerT+kVKo2wd79S2LrviH7ZvmvKsUrn12FkJoqzMwDjPghf3VdFcgAAAABJRU5ErkJggg=="
+                                class="next" />
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACXElEQVR4AWRTA4wcYRi9WI19se3buGEd1Yhr241qu7M427a5PNs2Z229zjtjkrf8nn6EANiBg0qESpBJOCbhArH+Wcb/ds9vJ+6TEPYq13I7RzctN3QMa7t7+8Wunj5R0zqgzagflz/PNN7mDGe3C2yQ96ep59509Y8OLqxYYHN64QsECVgdHswuGqFv7RmMrRh9w1lytguEkdwzMGZzuX3g4/T4YbR5IUqwu/0AIIl6oGnqtEWVDlEkDBRgL8am8wa5sHkJi2YPFkxrmDO5MWt0b4pU1OoHHyQvsE4oBWQ52ik5Y/NZtnhw+oMa+U2Lm+ST7+pxTdkLpuEzMD4PIdMgJ5cCx/TtQ1p2ZlSSTr1XS6hHrmERM6JLEqgDBVasXlgcPiyZnIhLL9KSS4ELnd29IheLAxSgI3H2swHy0kmcfFOHq4oeMN30igseXwDJqekiuSF86ejqoQA4wK4kn/mkA50VZVM48boGV+RrApPLLimFF3EJSZsCxxqa+7QmmxtWpw90IJmuTDS+6JQEqkEBLix3ZnjGBCEqdbOCLLVmRD45u4JgEHSQyDUgeXTBCYLkS0IPWM/rD6K2sQ9vVCWbixj6OG35do26aVC0uDZ3gsSReQeG5xwkbpJHJPe/EYmDl1XDa9u4cZCEvK43hZVq24LRDiYx2X1gmoklJ7ePZCm6EX+i0mwvhdKtg7T9KH9PbXqTmFk4aOgcweSCBVwTdu6bEFGm7sJ3IXbw+d/i7Ud572W6ET1x+11kmfynMkErKFTi779y8fOfKO3LPzny/0uYegMjM1GcnQFvhQh62IVc5gAAAABJRU5ErkJggg=="
+                                class="last" />
+                            <select id="paginationLimit" class="pagesize" localeTitle="SelectPageSizeTitle" title="Select page size">
+                                <option value="10">10</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="500">500</option>
+                                <option value="1000">1000</option>
+                                <option value="5000">5000</option>
+                                <option value="9999999999" localeMessage="AllPages">All</option>
+                            </select>
+
+                        </div>
+                        <div id="igBotQueueCount"></div>
+                        <div id="igBotQueueSelectedCount"></div>
+                    </div>
+                    <div id="igBotQueueContainer">
+                        <div class="igBotQueueContainerMessage">
+                            <p localeMessage="QueueIntroLine1">1. This is the <i>queue</i>. Use the Load button below to get some accounts to work on.
+                            </p>
+                            <p localeMessage="QueueIntroLine2">2. <i>Optional</i>: You can select, remove, whitelist, etc using the With Selection
+                                button</p>
+                            <p localeMessage="QueueIntroLine3">3. Use the "Process Queue" button to start following, unfollowing, liking etc.</p>
+                            <p localeMessage="QueueIntroLine4">4. Please read the Help &amp; FAQ</p>
+                            <p localeMessage="QueueIntroLine5">5. If you experience any issues, <b>read the FAQ</b>, then please email <a
+                                    href="mailto:growbotautomator@gmail.com"
+                                    class="growbotEmailLink">growbotautomator@gmail.com</a></p>
+                            <br>
+                        </div>
+                    </div>
+
+                    <div id="igBotBottom">
+                        <div id="igBotQueueContainerButtons">
+                            <div class="igBotInjectedButton flex7" id="btnLoadMenu"><span localeMessage="LoadAccountsMenu">Load Accounts &#x2191;</span>
+                                <div class="hiddenHover">
+                                    <div class="igBotInjectedButton" id="btnViewWhiteList" title=""
+                                        localeMessage="LoadWhiteList"
+                                        title="View your whitelist (Growbot will never unfollow accounts you have added to your whitelist)">
+                                        Load whitelist</div>
+                                    <div class="igBotInjectedButton" id="btnViewBlackList"
+                                        localeMessage="LoadBlackList"
+                                        title="View your blacklist (Growbot will never interact in any way with accounts on this list)">
+                                        Load blacklist</div>
+                                    <div class="igBotInjectedButton" id="btnViewAttempted"
+                                        localeMessage="LoadAttempted"
+                                        title="View the list of accounts Growbot has already attempted to follow.  Remove accounts from this list to allow Growbot to attempt them again.">
+                                        Load attempted</div>
+                                    <div class="igBotInjectedButton flex7" id="btnLoadPendingRequests"
+                                        title="Load requests to follow private accounts which have not been approved or rejected yet (these count toward your following total)"
+                                        localeMessage="LoadPendingFollowRequests">Load Pending Follow Requests</div>
+                                    <div class="igBotInjectedButton inactive flex7" id="btnGetLikers"
+                                        title="Loads accounts which liked the current pages media"
+                                        localeMessage="LoadLikers">Load Likers</div>
+
+                                    <label for="includePinnedPostForLikes"> <input type="checkbox"
+                                            id="includePinnedPostForLikes"> <span localeMessage="IncludePinnedPosts">Include pinned posts</span></label>
+
+                                    <div class="igBotInjectedButton inactive flex7" id="btnGetCommenters"
+                                        title="Loads accounts which commented on the current pages media"
+                                        localeMessage="LoadCommenters">Load Commenters</div>
+
+                                    <label for="includePinnedPostForComments"> <input type="checkbox"
+                                            id="includePinnedPostForComments"> <span localeMessage="IncludePinnedPosts">Include pinned posts</span></label>
+
+                                    <div class="igBotInjectedButton inactive flex7" id="btnGetAllUsersFollowing"
+                                        title="Loads accounts which the current page account is following into the queue"
+                                        localeMessage="LoadCurrentFollowing">Load Current Page's Following</div>
+                                    <div class="igBotInjectedButton inactive flex7" id="btnGetAllUsersFollowers"
+                                        title="Loads the current page's followers into the queue"
+                                        localeMessage="LoadCurrentFollowers">Load Current Page's Followers</div>
+                                    <div class="igBotInjectedButton flex7" id="btnLoadSavedQueue"
+                                        localeMessage="LoadQueue">Load Queue</div>
+                                    <label for="cbLimitQueueSize" id="lblLimitQueueSize">
+                                        <input type="checkbox" checked="checked" id="cbLimitQueueSize"><span
+                                            localeMessage="queueLimit">Limit queue to</span>
+                                        <input type="number" value="50" min="1" id="txtLimitQueueSize">
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="igBotInjectedButton needsQueueAccts flex7" id="btnSelectionMenu"><span localeMessage="SelectMenu">Select...
+                                &#x2191;</span>
+                                <div class="hiddenHover">
+                                    <div class="igBotInjectedButton needsSelectedAccts" id="btnAddToWhiteList"
+                                        title="Add selected accounts to list of accounts never to UNfollow"
+                                        localeMessage="AddToWhitelist">Add selected to whitelist</div>
+                                    <div class="igBotInjectedButton needsSelectedAccts" id="btnAddToBlackList"
+                                        title="Add selected accounts to the blacklist (Growbot will never interact in any way with these accounts)"
+                                        localeMessage="AddToBlacklist">Add selected to blacklist</div>
+                                    <div class="igBotInjectedButton needsQueueAccts" id="btnInvertSelection"
+                                        title="Select the opposite of what is currently selected"
+                                        localeMessage="InvertSelection">Invert selection</div>
+                                    <div class="igBotInjectedButton needsSelectedAccts" id="btnSelectNone"
+                                        title="Select nothing" localeMessage="SelectNone">Select None</div>
+                                    <div class="igBotInjectedButton needsQueueAccts" id="btnSelectAll"
+                                        title="Select all shown accounts" localeMessage="SelectAll">Select All</div>
+                                    <div class="igBotInjectedButton needsQueueAccts" id="btnRemoveDuplicates"
+                                        title="Remove duplicate accounts (same id) from the current list, keeping the first occurrence"
+                                        localeMessage="RemoveDuplicates">Remove duplicates</div>
+                                    <div class="igBotInjectedButton needsSelectedAccts" id="btnRemoveSelected"
+                                        title="Remove all the selected accounts" localeMessage="RemoveSelected">Remove
+                                        selected</div>
+                                </div>
+                            </div>
+                            <div id="btnProcessQueueHolder" class="igBotInjectedButton">
+                                <div class="igBotInjectedButton needsQueueAccts" id="btnProcessQueue"
+                                    localeMessage="ProcessQueue">Process Queue &#x2191;</div>
+                                <div class="hiddenHover">
+                                    <div class="processQueueRadioButtons">
+                                        <label for="radioFollow">
+                                            <input type="radio" id="radioFollow" name="queueAction" value="radioFollow"
+                                                checked /> <span localeMessage="Follow">Follow</span>
+                                        </label>
+                                        <label for="cbLikeAfterFollow"
+                                            localeTitle="LikeAfterFollowTitle"
+                                            title="Like the account's recent posts after following."
+                                            style="padding-left: 20px;">
+                                            <input type="checkbox" id="cbLikeAfterFollow" /> <span localeMessage="LikeNoun">Like </span><input
+                                                type="number" value="1" step="1" min="0" max="12"
+                                                id="numberFollowLikeLatestPics">
+                                            <span localeMessage="PicsAfterFollow">Pic(s) After Follow</span>
+                                        </label>
+                                        <label for="cbUnfollowAfterFollow"
+                                            localeTitle="UnfollowAfterFollowTitle"
+                                            title="Automatically schedule an unfollow after following."
+                                            style="padding-left: 20px;">
+                                            <input type="checkbox" id="cbUnfollowAfterFollow" /> <span localeMessage="UnfollowAfterDaysLabel">Unfollow After
+                                            </span><input type="number" value="7" step="1" min="1" max="90"
+                                                id="numberUnfollowAfterDays">
+                                            <span localeMessage="DaysSuffix">Days</span>
+                                        </label>
+                                        <label for="radioLikeOnly"
+                                            localeTitle="LikeOnlyTitle"
+                                            title="Only like the account's recent posts. Uses same number as the box above.">
+                                            <input type="radio" id="radioLikeOnly" name="queueAction"
+                                                value="radioNone" /> <span localeMessage="LikeOnly">Like Only</span>
+                                        </label>
+                                        <label for="radioUnFollow">
+                                            <input type="radio" id="radioUnFollow" name="queueAction"
+                                                value="radioUnFollow" /> <span localeMessage="Unfollow">Unfollow</span>
+                                        </label>
+                                        <label for="radioRemoveFromFollowers">
+                                            <input type="radio" id="radioRemoveFromFollowers" name="queueAction"
+                                                value="radioRemoveFromFollowers" /> <span
+                                                localeMessage="RemoveFromFollowers">Remove Follower</span>
+                                        </label>
+                                        <label for="radioBlock">
+                                            <input type="radio" id="radioBlock" name="queueAction" value="radioBlock" />
+                                            <span localeMessage="Block">Block</span>
+                                        </label>
+                                        <label for="radioViewStory" localeTitle="ViewStoryTitle" title="Schedule viewing each account's story (opens a tab at each scheduled time)">
+                                            <input type="radio" id="radioViewStory" name="queueAction"
+                                                value="radioViewStory" /> <span localeMessage="ViewStory">View Story</span>
+                                        </label>
+                                        <label for="cbViewStoryLike" style="padding-left:30px;"
+                                            localeTitle="ViewStoryLikeTitle" title="Like the viewed story at the same time">
+                                            <input type="checkbox" id="cbViewStoryLike" checked="checked" /> <span localeMessage="LikeStoryWhileViewing">Like story
+                                            while viewing</span>
+                                        </label>
+                                        <label for="radioGetMoreData"
+                                            localeTitle="GetMoreDataTitle"
+                                            title="Gets more data about each account in queue: Private Status, Followers, Following, Post Count, etc">
+                                            <input type="radio" id="radioGetMoreData" name="queueAction"
+                                                value="radioGetMoreData">
+                                            <span localeMessage="GetMoreData">Get More Data</span>
+                                        </label>
+                                        <label for="cbGetLastPostDate" style="padding-left:30px;"
+                                            localeTitle="GetLastPostDateTitle"
+                                            title="Get the date of user's last post (requires 1 additional API connection to instagram server)">
+                                            <input type="checkbox" id="cbGetLastPostDate">
+                                            <span localeMessage="GetLastPostDate">Get Last Post Date + Captions for
+                                                Language</span>
+                                        </label>
+                                        <label for="cbGetExtendedData" style="padding-left:30px;"
+                                            localeTitle="GetExtendedDataTitle"
+                                            title="Get even more data about each account: Public Email, Public Phone, Address, etc  (requires 1 additional API connection to instagram server)">
+                                            <input type="checkbox" id="cbGetExtendedData">
+                                            <span localeMessage="GetExtendedData">Get Extended Data</span>
+                                        </label>
+                                        <label for="cbGuessGender" style="padding-left:30px;"
+                                            localeTitle="GuessGenderTitle"
+                                            title="Guess gender from first name using country-specific name data (requires Growbot server connection)">
+                                            <input type="checkbox" id="cbGuessGender">
+                                            <span localeMessage="GuessGender">Guess Gender from Name</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="igBotInjectedButton needsQueueAccts flex7" id="btnSaveQueueToStorage"
+                                localeMessage="SaveQueue">Save Queue</div>
+                            <div class="igBotInjectedButton needsQueueAccts flex7" id="btnExportQueue"
+                                localeMessage="ExportQueue">Export Queue (CSV)</div>
+                            <div class="igBotInjectedButton needsWhitelistAccts" id="btnSaveWhiteList"
+                                title="Saves the whitelist to local storage and/or disk" localeMessage="SaveWhiteList">
+                                Save whitelist</div>
+                            <div class="igBotInjectedButton needsBlacklistAccts" id="btnSaveBlackList"
+                                title="Saves the blacklist to local storage and/or disk" localeMessage="SaveBlackList">
+                                Save blacklist</div>
+                            <div class="igBotInjectedButton needsAttemptedAccts" id="btnSaveAttempted"
+                                title="Saves the attempted list to local storage and/or disk" localeMessage="SaveAttempted">
+                                Save attempted</div>
+                            <div class="igBotInjectedButton inactive" id="btnStop" localeMessage="Stop">Stop!</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab2">
+                    <div id="mediaqueueQuantityRow">
+                        <div id="mediapager" class="mediapager">
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACSUlEQVR4AWSSA4xcARCGG6uxL7bdixvWbsOLa9uN+nJx3a7Otm1jVa5t276dvpm07/SSfzn/NzwAALt0VAgVrCpZnWJVRaLP9FvF3vidxoOsDr0Zit8d3HTyJb+NG0q1NqxQacLrP3QbvStW/su+yF2MwVgOsMN8uHvNwyi0Zr0vFIdkpgDFrTIpkc6D2x8B8Q+VvmnWzGAsejgAUtGs0lmS2VwR8MnkSxBJFiDMKpUr0W/JTB7WZX+S9VMGBj0EwL6wbMz83+yO5MATzYEvmkfR5yGJn4PMLon1jzp8d9GLgMrBDQcfy8YHM16qXoEbQvUu8zW+CpyhLMXorF7g9Un46EXAKfEvwwb2jKWGEghYJgBWMsCazzFyAtiDWYinixCIZqC5Z3wDvQio+qNUh3FYaA7G83CJWYbrAhXwp+z4GUUAqz9DVeSLW9DR1RNGLwF+K1QIQDPp4ttFMgimHbsAZl/mXxUFaG5t5wCnVuWajWgyB4lMEfwxBCyQwRbIYFUcwORN02aMrijw6ru4Fiq7Fk18uzsE5TLg4Cj4Co8yorAq+s3gTkOhVIYlqQYY0SQ3xIqn3cG7i2syfTiexQBufUZPGoVG/E4JTGz2r7Vt+qsiI62ROyTesIIZm1tL+iIpCoymitgvtoGrJbDRFYEv9d3J17wpOqR9p/y+S8a09Y3pJX9MYPfFaSbYs8YWhuk1BbznNelffp3Yd8ocBKm3Gmx3q+um+R+FrRs8gejv3k6YNPVtx8Q5RysnrpuaMPUGRmaiODsDAKw/CRKUFv+sAAAAAElFTkSuQmCC"
+                                class="first" />
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACXklEQVR4AWyTA4ycARCFG6uxL7Z9FzesbUe1bZ9t27Zt27b5r63X/xXnSd5yvjfY2QMAduhIMKxE2Yg6KeoGxdf8jN/tzt8OHhRl/SVb/jSraT6wpWe8sX9wWOgbGBIaOkca02qnAz+mS54yh7n/ue3woZT6Jdu+4cnRlQ05lBoDjGYLKIVaj8VVCZo7B0ajyyZtmUtmu4E14YGRKaVWZwRDozdBojRAEKXSmcBQavRoaOtVRhSP2ZIBDTgX22bl//C6XI/5DS1WpHoKS1Idplc1myZl1c2jrxJXnpKlgU1W41wg294O3/Do3AFfd2/n52CMTC8jIL0lkCwNTjZ3jzVyZrY6u67FJYd6GmBRosPkigZnvxbQgN9BrjZiTapBTGpBI1ka3OjtHxS4rFWZHhfta0TVggArn/mSL6oA19zawPfsQm80IzE5VSD7x6Cnb4AG2FAYcNOrFxd+VYIGNLzi1IjzP0px1aWF3fzrwoCYuIRNg5N17UONUqUOCo0RC4I4v2ePOEI3ZtY0BGgmqhMTy2rwlxlfkCIgInlzBJvkqonA2cUNWCwAAbZ526cPrEix9VvevRhbVMNgsqC6dQi2IUWbS7R6m7L+tKq+bVSQa8EgxOqsOL6kBkE+s8DEghR+YfGjd0PGn5LdPKSAnD7b/PJ65YpEBSZKVUawGxrxmFh5fEEC34gU5eeAYlsye07ZI7nNNj49f7SldwKzK3JwJ5x5aEZASX0fPAKiRz/6FW6e8r5/pkeRM0/tw0sCvYLjGgOCQgQfv0DBxTei8bNv1u9NTZh6AyMzUZydAcyECTzxVTE0AAAAAElFTkSuQmCC"
+                                class="prev" /> <span class="pagedisplay"></span>
+                            <span localeMessage="PageLabel">Page:</span>
+                            <select class="gotoPage" localeTitle="SelectPageNumberTitle" title="Select page number"></select>
+                            <!-- this can be any element, including an input -->
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACWUlEQVR4AWxTA6xbYRhdrMV+se334oVzNCOabdu2qtm2zXLeatvt7V3N17N7hjve5JTf0Y8eAP5AHzU6JHRJGChhNMHP/I3//T3/O7GnhM7l1/MzrhkiStMnj95icwhmq13QvXfqL70MKJdczs3gDGd/E5DJvS5o4+vMDp8rmc2jWGmg2d0GUSjXEUvlYHxvdR1/5FvHWXJkAaqSbHX6i9VaE3wq9RZyxQYECaVaiz9JonXo3nwuHrnvpkgnKMBejE3nn2RvoozUlzqS4ne4Y2XEcjVZ5NFzo2vu2eQMcinQdU0fVjI2n0y+jmGbtCSRjLhYw5ANL2GLFBHJVsHHGUhAcdmkJJcCA40f3Xp2ZlSShm7USngJZ6yEqFCVBF6AsIaLyJebSIsVnLh4R08uBUZ/ttgELla20AAF6EiM2GqCJ17GkHUvJDzD8M0G8Hu92Y2z5y8K5H4T+GS2UgCMz64kD99iAF0pOnjtM9aS3p/yu5SigROnzsgCA1+9tevFYg2FShPsSTJdORxIVWQyDbgznqgIxZHzcoWu88+8ylAsi3YbCGWqYFySfckKiMFrnoK7woVttNp4/tqOdZp78iJ2LLiQmfFM+8Yl5KvyTpDI7WRnkrmgNPBGRew/dNo1QeOZQa58kBQ3zOtuP9YWk7nvg2KpyTQIpis8THSGJ5rDviMXissU9+WD9MdR3nn+zbrTl2+7TJ+9CCXzXBN2hj0o4IHWjJ2K464l++/KR/m/l2nq0eCMDYcfKHerT+kVKo2wd79S2LrviH7ZvmvKsUrn12FkJoqzMwDjPghf3VdFcgAAAABJRU5ErkJggg=="
+                                class="next" />
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACXElEQVR4AWRTA4wcYRi9WI19se3buGEd1Yhr241qu7M427a5PNs2Z229zjtjkrf8nn6EANiBg0qESpBJOCbhArH+Wcb/ds9vJ+6TEPYq13I7RzctN3QMa7t7+8Wunj5R0zqgzagflz/PNN7mDGe3C2yQ96ep59509Y8OLqxYYHN64QsECVgdHswuGqFv7RmMrRh9w1lytguEkdwzMGZzuX3g4/T4YbR5IUqwu/0AIIl6oGnqtEWVDlEkDBRgL8am8wa5sHkJi2YPFkxrmDO5MWt0b4pU1OoHHyQvsE4oBWQ52ik5Y/NZtnhw+oMa+U2Lm+ST7+pxTdkLpuEzMD4PIdMgJ5cCx/TtQ1p2ZlSSTr1XS6hHrmERM6JLEqgDBVasXlgcPiyZnIhLL9KSS4ELnd29IheLAxSgI3H2swHy0kmcfFOHq4oeMN30igseXwDJqekiuSF86ejqoQA4wK4kn/mkA50VZVM48boGV+RrApPLLimFF3EJSZsCxxqa+7QmmxtWpw90IJmuTDS+6JQEqkEBLix3ZnjGBCEqdbOCLLVmRD45u4JgEHSQyDUgeXTBCYLkS0IPWM/rD6K2sQ9vVCWbixj6OG35do26aVC0uDZ3gsSReQeG5xwkbpJHJPe/EYmDl1XDa9u4cZCEvK43hZVq24LRDiYx2X1gmoklJ7ePZCm6EX+i0mwvhdKtg7T9KH9PbXqTmFk4aOgcweSCBVwTdu6bEFGm7sJ3IXbw+d/i7Ud572W6ET1x+11kmfynMkErKFTi779y8fOfKO3LPzny/0uYegMjM1GcnQFvhQh62IVc5gAAAABJRU5ErkJggg=="
+                                class="last" />
+                            <select id="mediapaginationLimit" class="pagesize" localeTitle="SelectPageSizeTitle" title="Select page size">
+                                <option value="10">10</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="500">500</option>
+                                <option value="1000">1000</option>
+                                <option value="5000">5000</option>
+                                <option value="9999999999" localeMessage="AllPages">All</option>
+                            </select>
+
+                        </div>
+                        <div id="igBotmediaQueueCount"></div>
+                        <div id="igBotmediaQueueSelectedCount"></div>
+                    </div>
+                    <div id="igBotMediaQueueContainer"></div>
+                    <div id="igBotMediaButtonContainer">
+
+                        <div class="igBotInjectedButton flex7" id="btnLoadMediaMenu"><span localeMessage="LoadMediaMenu">Load Media &#x2191;</span>
+                            <div class="hiddenHover">
+
+                                <div class="igBotInjectedButton inactive" id="btnLoadThisPost" localeMessage="LoadThisPost">Load This Post</span>
+                                </div>
+
+                                <div class="igBotInjectedButton inactive flex7 needsMedia" id="btnLoadAccountsFromMedia"
+                                    localeTitle="LoadPostersToAccountsQueue"
+                                    title="Loads accounts from the media queue into the Accounts Queue" localeMessage="LoadPostersToAccountsQueue">Load Posters to
+                                    Accounts Queue</div>
+                                <label for="cbMediaIncludeLikersCommentersTagged"> <input type="checkbox"
+                                        id="cbMediaIncludeLikersCommentersTagged"> <span localeMessage="IncludeLikersCommentersTagged">Include (some) Likers, Commenters,
+                                    Tagged Users</span></label>
+                                <div class="igBotInjectedButton needsMedia" id="btnLoadCommentersFromMedia"
+                                    localeTitle="LoadCommentersToAccountsQueue"
+                                    title="Load all commenters from media in media queue into the Accounts Queue" localeMessage="LoadCommentersToAccountsQueue">Load
+                                    Commenters to Accounts Queue</span></div>
+                                <div class="igBotInjectedButton needsMedia" id="btnLoadLikersFromMedia"
+                                    localeTitle="LoadLikersToAccountsQueue"
+                                    title="Load ~100 Likers (limit from IG) for each media in media queue into the Accounts Queue" localeMessage="LoadLikersToAccountsQueue">
+                                    Load Likers to Accounts Queue</span></div>
+
+                                <div class="igBotInjectedButton inactive" id="btnLikeHashtag" localeMessage="LoadPostsFromHashtag">Load Posts from
+                                    #hashtag</span></div>
+
+                                <div class="igBotInjectedButton" id="btnLikeFeed" localeMessage="LoadPostsFromFeed">Load Posts from Feed</span></div>
+                                <label for="includeSuggestedPostsFromFeed"> <input type="checkbox"
+                                        id="includeSuggestedPostsFromFeed" checked="checked"> <span localeMessage="IncludeSuggestedPosts">Include Suggested
+                                    Posts</span></label>
+
+                                <div class="igBotInjectedButton inactive flex7" id="btnLoadLocationPosts"
+                                    localeTitle="LoadPostsFromLocationPage"
+                                    title="Loads posts with the current location into the media queue" localeMessage="LoadPostsFromLocationPage">Load Posts from
+                                    Location Page</div>
+
+                                <div class="igBotInjectedButton flex7" id="btnLoadSavedMediaQueue"
+                                    style="display: none;" localeMessage="LoadMediaQueue">Load Media Queue</div>
+                                <label for="cbLimitMediaQueueSize" id="lblLimitMediaQueueSize">
+                                    <input type="checkbox" checked="checked" id="cbLimitMediaQueueSize"><span
+                                        localeMessage="queueLimit">Limit queue to</span>
+                                    <input type="number" value="50" min="1" id="txtLimitMediaQueueSize">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="igBotInjectedButton needsMedia flex7" id="btnMediaSelectionMenu"><span localeMessage="SelectMenu">Select... &#x2191;</span>
+                            <div class="hiddenHover">
+                                <div class="igBotInjectedButton needsMedia" id="btnMediaInvertSelection"
+                                    title="Select the opposite of what is currently selected"
+                                    localeMessage="InvertSelection">Invert selection</div>
+                                <div class="igBotInjectedButton needsSelectedMedia" id="btnMediaSelectNone"
+                                    title="Select nothing" localeMessage="SelectNone">Select None</div>
+                                <div class="igBotInjectedButton needsMedia" id="btnMediaSelectAll"
+                                    title="Select all shown accounts" localeMessage="SelectAll">Select All</div>
+                                <div class="igBotInjectedButton needsSelectedMedia" id="btnMediaRemoveSelected"
+                                    title="Remove all the selected accounts" localeMessage="RemoveSelected">Remove
+                                    selected</div>
+                            </div>
+                        </div>
+
+                        <div class="igBotInjectedButton" id="btnLikeMediaQueue" localeMessage="LikeMediaQueuePosts">Like Media Queue Posts</div>
+                        <div class="igBotInjectedButton" id="btnWatchReels"
+                            localeTitle="WatchReelsBeta"
+                            title="Will open a new tab for each reel, wait until the video has played, and close the tab" localeMessage="WatchReelsBeta">
+                            Watch Reels (BETA)</div>
+
+                        <div
+                            style="display: flex; flex-direction: column; justify-content: center; padding-right: 10px;">
+                            <label for="LikeWhenWatchingReel" localeTitle="LikeWhenWatching" title="Click Like after watching 75% of the reel"><input
+                                    type="checkbox" id="LikeWhenWatchingReel" checked="checked" /><span localeMessage="LikeWhenWatching">Like When
+                                Watching</span></label>
+                            <label for="SaveWhenWatchingReel" localeTitle="SaveWhenWatching" title="Click Save after watching 75% of the reel"><input
+                                    type="checkbox" id="SaveWhenWatchingReel" checked="checked" /><span localeMessage="SaveWhenWatching">Save When
+                                Watching</span></label>
+                        </div>
+
+                        <div class="igBotInjectedButton inactive" id="btnStop2" localeMessage="Stop">Stop!</div>
+
+                    </div>
+                </div>
+                <div class="tab8">
+                    <div id="actionsqueueQuantityRow">
+                        <div id="actionspager" class="actionspager">
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACSUlEQVR4AWSSA4xcARCGG6uxL7bdixvWbsOLa9uN+nJx3a7Otm1jVa5t276dvpm07/SSfzn/NzwAALt0VAgVrCpZnWJVRaLP9FvF3vidxoOsDr0Zit8d3HTyJb+NG0q1NqxQacLrP3QbvStW/su+yF2MwVgOsMN8uHvNwyi0Zr0vFIdkpgDFrTIpkc6D2x8B8Q+VvmnWzGAsejgAUtGs0lmS2VwR8MnkSxBJFiDMKpUr0W/JTB7WZX+S9VMGBj0EwL6wbMz83+yO5MATzYEvmkfR5yGJn4PMLon1jzp8d9GLgMrBDQcfy8YHM16qXoEbQvUu8zW+CpyhLMXorF7g9Un46EXAKfEvwwb2jKWGEghYJgBWMsCazzFyAtiDWYinixCIZqC5Z3wDvQio+qNUh3FYaA7G83CJWYbrAhXwp+z4GUUAqz9DVeSLW9DR1RNGLwF+K1QIQDPp4ttFMgimHbsAZl/mXxUFaG5t5wCnVuWajWgyB4lMEfwxBCyQwRbIYFUcwORN02aMrijw6ru4Fiq7Fk18uzsE5TLg4Cj4Co8yorAq+s3gTkOhVIYlqQYY0SQ3xIqn3cG7i2syfTiexQBufUZPGoVG/E4JTGz2r7Vt+qsiI62ROyTesIIZm1tL+iIpCoymitgvtoGrJbDRFYEv9d3J17wpOqR9p/y+S8a09Y3pJX9MYPfFaSbYs8YWhuk1BbznNelffp3Yd8ocBKm3Gmx3q+um+R+FrRs8gejv3k6YNPVtx8Q5RysnrpuaMPUGRmaiODsDAKw/CRKUFv+sAAAAAElFTkSuQmCC"
+                                class="first" />
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACXklEQVR4AWyTA4ycARCFG6uxL7Z9FzesbUe1bZ9t27Zt27b5r63X/xXnSd5yvjfY2QMAduhIMKxE2Yg6KeoGxdf8jN/tzt8OHhRl/SVb/jSraT6wpWe8sX9wWOgbGBIaOkca02qnAz+mS54yh7n/ue3woZT6Jdu+4cnRlQ05lBoDjGYLKIVaj8VVCZo7B0ajyyZtmUtmu4E14YGRKaVWZwRDozdBojRAEKXSmcBQavRoaOtVRhSP2ZIBDTgX22bl//C6XI/5DS1WpHoKS1Idplc1myZl1c2jrxJXnpKlgU1W41wg294O3/Do3AFfd2/n52CMTC8jIL0lkCwNTjZ3jzVyZrY6u67FJYd6GmBRosPkigZnvxbQgN9BrjZiTapBTGpBI1ka3OjtHxS4rFWZHhfta0TVggArn/mSL6oA19zawPfsQm80IzE5VSD7x6Cnb4AG2FAYcNOrFxd+VYIGNLzi1IjzP0px1aWF3fzrwoCYuIRNg5N17UONUqUOCo0RC4I4v2ePOEI3ZtY0BGgmqhMTy2rwlxlfkCIgInlzBJvkqonA2cUNWCwAAbZ526cPrEix9VvevRhbVMNgsqC6dQi2IUWbS7R6m7L+tKq+bVSQa8EgxOqsOL6kBkE+s8DEghR+YfGjd0PGn5LdPKSAnD7b/PJ65YpEBSZKVUawGxrxmFh5fEEC34gU5eeAYlsye07ZI7nNNj49f7SldwKzK3JwJ5x5aEZASX0fPAKiRz/6FW6e8r5/pkeRM0/tw0sCvYLjGgOCQgQfv0DBxTei8bNv1u9NTZh6AyMzUZydAcyECTzxVTE0AAAAAElFTkSuQmCC"
+                                class="prev" /> <span class="pagedisplay"></span>
+                            <span localeMessage="PageLabel">Page:</span>
+                            <select class="gotoPage" localeTitle="SelectPageNumberTitle" title="Select page number"></select>
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACWUlEQVR4AWxTA6xbYRhdrMV+se334oVzNCOabdu2qtm2zXLeatvt7V3N17N7hjve5JTf0Y8eAP5AHzU6JHRJGChhNMHP/I3//T3/O7GnhM7l1/MzrhkiStMnj95icwhmq13QvXfqL70MKJdczs3gDGd/E5DJvS5o4+vMDp8rmc2jWGmg2d0GUSjXEUvlYHxvdR1/5FvHWXJkAaqSbHX6i9VaE3wq9RZyxQYECaVaiz9JonXo3nwuHrnvpkgnKMBejE3nn2RvoozUlzqS4ne4Y2XEcjVZ5NFzo2vu2eQMcinQdU0fVjI2n0y+jmGbtCSRjLhYw5ANL2GLFBHJVsHHGUhAcdmkJJcCA40f3Xp2ZlSShm7USngJZ6yEqFCVBF6AsIaLyJebSIsVnLh4R08uBUZ/ttgELla20AAF6EiM2GqCJ17GkHUvJDzD8M0G8Hu92Y2z5y8K5H4T+GS2UgCMz64kD99iAF0pOnjtM9aS3p/yu5SigROnzsgCA1+9tevFYg2FShPsSTJdORxIVWQyDbgznqgIx5HzcoWu88+8ylAsi3YbCGWqYFySfckKiMFrnoK7woVttNp4/tqOdZp78iJ2LLiQmfFM+8Yl5KvyTpDI7WRnkrmgNPBGRew/dNo1QeOZQa58kBQ3zOtuP9YWk7nvg2KpyTQIpis8THSGJ5rDviMXissU9+WD9MdR3nn+zbrTl2+7TJ+9CCXzXBN2hj0o4IHWjJ2K464l++/KR/m/l2nq0eCMDYcfKHerT+kVKo2wd79S2LrviH7ZvmvKsUrn12FkJoqzMwDjPghf3VdFcgAAAABJRU5ErkJggg=="
+                                class="next" />
+                            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACXElEQVR4AWRTA4wcYRi9WI19se3buGEd1Yhr241qu7M427a5PNs2Z229zjtjkrf8nn6EANiBg0qESpBJOCbhArH+Wcb/ds9vJ+6TEPYq13I7RzctN3QMa7t7+8Wunj5R0zqgzagflz/PNN7mDGe3C2yQ96ep59509Y8OLqxYYHN64QsECVgdHswuGqFv7RmMrRh9w1lytguEkdwzMGZzuX3g4/T4YbR5IUqwu/0AIIl6oGnqtEWVDlEkDBRgL8am8wa5sHkJi2YPFkxrmDO5MWt0b4pU1OoHHyQvsE4oBWQ52ik5Y/NZtnhw+oMa+U2Lm+ST7+pxTdkLpuEzMD4PIdMgJ5cCx/TtQ1p2ZlSSTr1XS6hHrmERM6JLEqgDBVasXlgcPiyZnIhLL9KSS4ELnd29IheLAxSgI3H2swHy0kmcfFOHq4oeMN30igseXwDJqekiuSF86ejqoQA4wK4kn/mkA50VZVM48boGV+RrApPLLimFF3EJSZsCxxqa+7QmmxtWpw90IJmuTDS+6JQEqkEBLix3ZnjGBCEqdbOCLLVmRD45u4JgEHSQyDUgeXTBCYLkS0IPWM/rB6K2sQ9vVCWbixj6OG35do26aVC0uDZ3gsSReQeG5xwkbpJHJPe/EYmDl1XDa9u4cZCEvK43hZVq24LRDiYx2X1gmoklJ7ePZCm6EX+i0mwvhdKtg7T9KH9PbXqTmFk4aOgcweSCBVwTdu6bEFGm7sJ3IXbw+d/i7Ud572W6ET1x+11kmfynMkErKFTi779y8fOfKO3LPzny/0uYegMjM1GcnQFvhQh62IVc5gAAAABJRU5ErkJggg=="
+                                class="last" />
+                            <select id="actionspaginationLimit" class="pagesize" localeTitle="SelectPageSizeTitle" title="Select page size">
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="500" selected="selected">500</option>
+                                <option value="1000">1000</option>
+                                <option value="5000">5000</option>
+                                <option value="9999999999" localeMessage="AllPages">All</option>
+                            </select>
+                        </div>
+                        <div class="actions-queue-pager-meta"></div>
+                        <div class="actions-queue-pager-meta"></div>
+                    </div>
+                    <div id="divScheduledActions">
+                        <div class="schedule-card">
+                            <h2 localeMessage="ScheduleNewAction">Schedule New Action</h2>
+                            <form id="action-form">
+                                <input type="hidden" id="user_guid">
+                                <input type="hidden" id="editing_id">
+                                <div class="form-group full-width">
+                                    <label for="ig_username" localeMessage="MyInstagramAccount">My Instagram Account</label>
+                                    <input type="text" id="ig_username" placeholder="e.g. fitness_daily" required>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="scheduledTime" localeMessage="ScheduleFor">Schedule For</label>
+                                    <input type="datetime-local" id="scheduledTime" required>
+                                </div>
+
+                                <div class="form-group full-width checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="repeatDaily">
+                                        <span class="checkbox-custom"></span>
+                                        <span localeMessage="RepeatDaily">Repeat Daily</span>
+                                    </label>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label localeMessage="ActionType">Action Type</label>
+                                    <div class="action-type-selector" id="type-selector">
+                                        <div class="action-option" data-value="follow">
+                                            <span class="action-icon">👤+</span>
+                                            <span class="action-name" localeMessage="ActionFollowUser">Follow User</span>
+                                        </div>
+                                        <div class="action-option selected" data-value="unfollow">
+                                            <span class="action-icon">👤-</span>
+                                            <span class="action-name" localeMessage="ActionUnfollowUser">Unfollow User</span>
+                                        </div>
+                                        <div class="action-option" data-value="remove_follower">
+                                            <span class="action-icon">🚫</span>
+                                            <span class="action-name" localeMessage="ActionRemoveFollower">Remove Follower</span>
+                                        </div>
+                                        <div class="action-option" data-value="block">
+                                            <span class="action-icon">⛔</span>
+                                            <span class="action-name" localeMessage="ActionBlockUser">Block User</span>
+                                        </div>
+                                        <!-- Hidden for now:
+                                        <div class="action-option" data-value="like">
+                                            <span class="action-icon">❤️</span>
+                                            <span class="action-name">Like Post</span>
+                                        </div>
+                                        <div class="action-option" data-value="comment">
+                                            <span class="action-icon">💬</span>
+                                            <span class="action-name">Comment</span>
+                                        </div>
+                                        <div class="action-option" data-value="story_view">
+                                            <span class="action-icon">👁️</span>
+                                            <span class="action-name">View Story</span>
+                                        </div>
+                                        <div class="action-option" data-value="switch_account">
+                                            <span class="action-icon">🔄</span>
+                                            <span class="action-name">Switch Account</span>
+                                        </div>
+                                        -->
+                                        <div class="action-option" data-value="ajaxLikeAllPostsFromFeed">
+                                            <span class="action-icon">📥</span>
+                                            <span class="action-name" localeMessage="ActionLoadPostsFromFeed">Load Posts From Feed</span>
+                                        </div>
+                                        <div class="action-option" data-value="watchReels">
+                                            <span class="action-icon">🎬</span>
+                                            <span class="action-name" localeMessage="ActionWatchReels">Watch Reels</span>
+                                        </div>
+                                        <div class="action-option" data-value="likeAllMedia">
+                                            <span class="action-icon">💖</span>
+                                            <span class="action-name" localeMessage="ActionLikeMediaQueue">Like Media Queue</span>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="type" value="unfollow">
+                                </div>
+
+                                <!-- Dynamic Action Inputs (populated by JavaScript) -->
+                                <div id="action-inputs" class="action-inputs">
+                                    <div class="form-group full-width">
+                                        <label for="target_username" localeMessage="TargetUsername">Target Username</label>
+                                        <input type="text" id="target_username" placeholder="e.g. fitness_influencer">
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="submit" id="submit-btn" localeMessage="ScheduleActionButton">Schedule Action</button>
+                                    <button type="button" id="cancel-edit-btn" class="secondary-btn" localeMessage="CancelButton">Cancel</button>
+                                </div>
+                            </form>
+                            <br>
+                        </div>
+
+                        <div class="list-card">
+                            <div class="list-header">
+                                <div class="header-left">
+                                    <h2 localeMessage="ScheduledActions">Scheduled Actions</h2>
+                                    <div id="action-stats" class="action-stats">
+                                        <span id="stat-pending">0</span> <span localeMessage="PendingActionsCount">Pending Actions</span> |
+                                        <span id="stat-completed">0</span> <span localeMessage="CompletedActionsCount">Completed Actions</span> |
+                                        <span id="stat-total">0</span> <span localeMessage="TotalActionsCount">Total Actions</span> |
+                                        <span id="stat-avg-pending-per-day" class="stat-avg-pending-per-day" localeTitle="AvgPendingPerDayLabel" title="Mean pending actions per calendar day (after list filters)">—</span> <span localeMessage="AvgPendingPerDayLabel">avg pending/day</span> |
+                                        <span id="igBotActionsQueueSelectedCount">0 selected</span>
+                                    </div>
+                                </div>
+                                <div class="list-header-actions">
+                                    <label for="toggle-completed-cb" class="secondary-btn checkbox-toggle"><input type="checkbox"
+                                            id="toggle-completed-cb"> <span localeMessage="HideCompleted">Hide Completed</span></label>
+                                    <label for="toggle-account-cb" class="secondary-btn checkbox-toggle"><input type="checkbox"
+                                            id="toggle-account-cb"> <span localeMessage="CurrentAccountOnly">Current Account Only</span></label>
+                                    <span id="actionsHiddenByFiltersHint" class="actions-hidden-by-filters-hint" aria-live="polite"></span>
+                                    <button id="refresh-btn" class="secondary-btn" localeMessage="Refresh">Refresh</button>
+                                    <button id="btn-toggle-scheduler" class="secondary-btn" localeTitle="ToggleScheduler" title="Toggle Scheduler" localeMessage="ToggleScheduler"> >></button>
+                                </div>
+                            </div>
+                            <div id="igBotActionsQueueContainer">
+                                <table id="actions-table" class="tablesorter tablesorter-blue">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 40px;">✓</th>
+                                            <th localeMessage="ColAccount">Account</th>
+                                            <th localeMessage="ColTarget">Target</th>
+                                            <th localeMessage="ColType">Type</th>
+                                            <th localeMessage="ColScheduledFor">Scheduled For</th>
+                                            <th localeMessage="ColRepeat">Repeat</th>
+                                            <th localeMessage="ColStatus">Status</th>
+                                            <th style="width: 1%"></th>
+                                            <th style="width: 1%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="actions-list">
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Bottom buttons -->
+                            <div id="actions-bottom-buttons" class="actions-bottom-buttons">
+                                <div class="left-buttons">
+                                    <button id="btn-select-all" class="secondary-btn" localeMessage="SelectAll">Select All</button>
+                                    <button id="btn-select-none" class="secondary-btn" localeMessage="SelectNone">Select None</button>
+                                    <button id="btn-invert-selection" class="secondary-btn" localeMessage="InvertSelection">Invert Selection</button>
+                                    <button id="btn-delete-selected" class="delete-btn" localeMessage="DeleteSelected">Delete Selected</button>
+                                </div>
+                                <div class="reschedule-box">
+                                    <label localeMessage="RescheduleByLabel">Reschedule by:</label>
+                                    <input type="number" id="reschedule-days" value="0" min="-365" max="365" style="width: 55px;"> <span localeMessage="DaysShort">days</span>
+                                    <input type="number" id="reschedule-hours" value="0" min="-23" max="23" style="width: 55px;"> <span localeMessage="HoursShort">hrs</span>
+                                    <input type="number" id="reschedule-mins" value="0" min="-59" max="59" style="width: 55px;"> <span localeMessage="MinsShort">mins</span>
+                                    <button id="btn-reschedule-selected" class="secondary-btn" localeMessage="RescheduleSelected">Reschedule Selected</button>
+                                    <button id="btn-redistribute-selected" class="secondary-btn" localeMessage="RedistributeSelected">Redistribute Selected</button>
+                                    <button id="btn-reassign-selected" class="secondary-btn" localeMessage="ReassignSelected">Re-assign Selected</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="redistribute-modal" class="redistribute-modal" style="display:none;">
+                            <div class="redistribute-modal-content">
+                                <h3 localeMessage="RedistributeModalTitle">Redistribute Selected Actions</h3>
+                                <p id="redistribute-count"></p>
+                                <div class="redistribute-fields">
+                                    <label><span localeMessage="RedistributeActionsPerDay">Actions per day</span> <input type="number" id="redist-actions-per-day" value="30" min="1"
+                                            max="500"></label>
+                                    <label><span localeMessage="RedistributeStartTime">Start time</span> <input type="time" id="redist-start-time" value="06:00"></label>
+                                    <label><span localeMessage="RedistributeEndTime">End time</span> <input type="time" id="redist-end-time" value="22:00"></label>
+                                    <label><span localeMessage="RedistributeMinDelay">Min seconds between actions</span> <input type="number" id="redist-min-delay" value="300" min="10"
+                                            max="86400"></label>
+                                    <label class="ig-bot-schedule-evenly-row" for="redist-schedule-evenly">
+                                        <input type="checkbox" id="redist-schedule-evenly" checked>
+                                        <span localeMessage="RedistributeSpreadEvenly">Spread evenly across the daily window (off: use Configure Wait Times delay)</span>
+                                    </label>
+                                    <p id="redist-avg-pending-per-day" class="redist-avg-pending-line" aria-live="polite"></p>
+                                </div>
+                                <div class="redistribute-buttons">
+                                    <button id="btn-redist-confirm" class="primary-btn" localeMessage="RedistributeButton">Redistribute</button>
+                                    <button id="btn-redist-cancel" class="secondary-btn" localeMessage="CancelButton">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="reassign-modal" class="redistribute-modal" style="display:none;">
+                            <div class="redistribute-modal-content">
+                                <h3 localeMessage="ReassignModalTitle">Re-assign selected actions</h3>
+                                <p id="reassign-count"></p>
+                                <p class="reassign-modal-expl" localeMessage="ReassignModalExpl1">Move the selected scheduled actions to a different Instagram account. They will run as that account from now on.</p>
+                                <p class="reassign-modal-expl" localeMessage="ReassignModalExpl2">You need to be <strong>logged in to Instagram as that same @username</strong> (with Growbot running) when each action is due, or it will not execute on time.</p>
+                                <p id="reassign-accounts-empty" class="reassign-accounts-empty" style="display:none;" localeMessage="ReassignAccountsEmpty">No Instagram accounts on file yet. Use Instagram with Growbot while logged in as each account so they appear here.</p>
+                                <div class="reassign-field">
+                                    <label for="reassign-ig-select" localeMessage="ReassignAssignToLabel">Assign to Instagram account</label>
+                                    <select id="reassign-ig-select">
+                                        <option value="" localeMessage="ReassignChooseAccount">Choose an Instagram account…</option>
+                                    </select>
+                                </div>
+                                <div class="redistribute-buttons">
+                                    <button id="btn-reassign-confirm" class="primary-btn" localeMessage="ReassignButton">Re-assign</button>
+                                    <button id="btn-reassign-cancel" class="secondary-btn" localeMessage="CancelButton">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="toast" class="toast" localeMessage="ToastActionScheduled">Action scheduled successfully!</div>
+                    </div>
+                </div>
+                <div class="tab3">
+                    <div id="multiFilter">
+                        <h3 localeMessage="AccountFilters">Account Filters</h3>
+                        <div localeMessage="AccountFiltersHint">You can enable automatically apply filters when
+                            following or unfollowing in settings. This is recommended for efficiency and avoiding rate
+                            limits.</div>
+                        <div id="sliders">
+                            <span localeMessage="Followers">Followers</span>
+                            <div id="followersSlider"></div>
+                            <span localeMessage="Following">Following</span>
+                            <div id="followingSlider"></div>
+                            <span localeMessage="FollowRatio">Follow Ratio</span>
+                            <div id="followRatioSlider"></div>
+                            <span localeMessage="MutualFollowedBy">Mutual Followed By (Followers in Common)</span>
+                            <div id="mutualFollowedBySlider"></div>
+                            <span localeMessage="Posts">Posts</span>
+                            <div id="postsSlider"></div>
+                            <span localeMessage="LastPosted">Last Posted (days ago) Note: Growbot cannot know when a
+                                private account last posted, so this filter does not apply to private accounts..</span>
+                            <div id="lastPostedSlider"></div>
+                        </div>
+                        <div class="filter-columns-row">
+                            <div class="filter-column">
+                                <div class="filter-checkbox-pair filter-checkbox-pair--paired">
+                                    <label for="cbFilterNoProfilePic" id="lblFilterNoProfilePic">
+                                        <input type="checkbox" id="cbFilterNoProfilePic" checked="checked" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="HasNoProfilePicture">Has No Profile Picture</span>
+                                    </label>
+                                    <label for="cbFilterProfilePic" id="lblFilterProfilePic">
+                                        <input type="checkbox" id="cbFilterProfilePic" checked="checked" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="HasProfilePicture">Has Profile Picture</span>
+                                    </label>
+                                </div>
+                                <div class="filter-checkbox-pair filter-checkbox-pair--matching">
+                                    <label for="cbFilterExternalUrlContains">
+                                        <input type="checkbox" id="cbFilterExternalUrlContains" />
+                                        <span class="filter-pair-label-text" localeMessage="ExternalUrlContainsText">Link in Bio Has</span>
+                                        <input type="text" id="txtFilterExternalUrlContains" placeholder="youtube.com" localeMessage="LinkInBioHasPlaceholder">
+                                    </label>
+                                    <label for="cbFilterExternalUrlNotContains">
+                                        <input type="checkbox" id="cbFilterExternalUrlNotContains" />
+                                        <span class="filter-pair-label-text" localeMessage="ExternalUrlNotContainsText">Link in Bio Does Not Have</span>
+                                        <input type="text" id="txtFilterExternalUrlNotContains" placeholder="onlyfans.com" localeMessage="LinkInBioDoesNotHavePlaceholder">
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="filter-column">
+                                <div class="filter-checkbox-pair filter-checkbox-pair--paired">
+                                    <label for="cbFilterJoinedRecently">
+                                        <input type="checkbox" id="cbFilterJoinedRecently" checked="checked" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="JoinedRecentlyAccounts">Joined Recently Accounts</span>
+                                    </label>
+                                    <label for="cbFilterNonJoinedRecently">
+                                        <input type="checkbox" id="cbFilterNonJoinedRecently" checked="checked" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="NonJoinedRecentlyAccounts">Non-Joined Recently Accounts</span>
+                                    </label>
+                                </div>
+                                <div class="filter-checkbox-pair filter-checkbox-pair--matching">
+                                    <label for="cbFilterBioContains">
+                                        <input type="checkbox" id="cbFilterBioContains" />
+                                        <span class="filter-pair-label-text" localeMessage="BioContainsText">Bio Has Text</span>
+                                        <input type="text" id="txtFilterBioContains">
+                                    </label>
+                                    <label for="cbFilterBioNotContains">
+                                        <input type="checkbox" id="cbFilterBioNotContains" />
+                                        <span class="filter-pair-label-text" localeMessage="BioNotContainsText">Bio Does Not Have Text</span>
+                                        <input type="text" id="txtFilterBioNotContains">
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="filter-column">
+                                <div class="filter-checkbox-pair filter-checkbox-pair--paired">
+                                    <label for="cbFollowPrivateAccounts" id="lblFollowPrivateAccounts">
+                                        <input type="checkbox" id="cbFollowPrivateAccounts" checked="checked" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="PrivateAccounts">Private Accounts</span>
+                                    </label>
+                                    <label for="cbFilterNonPrivate">
+                                        <input type="checkbox" id="cbFilterNonPrivate" checked="checked" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="PublicAccounts">Public Accounts</span>
+                                    </label>
+                                </div>
+                                <div class="filter-checkbox-pair filter-checkbox-pair--paired">
+                                    <label for="cbFilterBusiness" id="lblFilterBusiness">
+                                        <input type="checkbox" id="cbFilterBusiness" checked="checked" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="BusinessAccounts">Business Accounts</span>
+                                    </label>
+                                    <label for="cbFilterNonBusiness">
+                                        <input type="checkbox" id="cbFilterNonBusiness" checked="checked" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="NonBusinessAccounts">Non-Business Accounts</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="filter-column">
+                                <div class="filter-checkbox-pair filter-checkbox-pair--paired">
+                                    <label for="cbFilterVerified">
+                                        <input type="checkbox" id="cbFilterVerified" checked="checked" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="VerifiedAccounts">Verified Accounts</span>
+                                    </label>
+                                    <label for="cbFilterNonVerified">
+                                        <input type="checkbox" id="cbFilterNonVerified" checked="checked" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="NonVerifiedAccounts">Non-Verified Accounts</span>
+                                    </label>
+                                </div>
+                                <div class="filter-checkbox-pair filter-checkbox-pair--matching">
+                                    <label for="cbFilterBusinessCategoryNameContains">
+                                        <input type="checkbox" id="cbFilterBusinessCategoryNameContains" />
+                                        <span class="filter-pair-label-text" localeMessage="BusinessCategoryNameContainsText">Business Category Has Text</span>
+                                        <input type="text" id="txtFilterBusinessCategoryNameContains" />
+                                    </label>
+                                    <label for="cbFilterBusinessCategoryNameNotContains">
+                                        <input type="checkbox" id="cbFilterBusinessCategoryNameNotContains" />
+                                        <span class="filter-pair-label-text" localeMessage="BusinessCategoryNameNotContainsText">Business Category Does Not Have Text</span>
+                                        <input type="text" id="txtFilterBusinessCategoryNameNotContains">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="filter-checkbox-pair-spacer"></div>
+                        <div localeMessage="BelowFiltersApply">The below filters only apply when following (not
+                            unfollowing):</div>
+                        <div class="filter-columns-row">
+                            <div class="filter-column">
+                                <div class="filter-checkbox-pair filter-checkbox-pair--paired">
+                                    <label for="cbFollowsMe">
+                                        <input type="checkbox" id="cbFollowsMe" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="FollowsMe">Follows Me</span>
+                                    </label>
+                                    <label for="cbNonFollowsMe">
+                                        <input type="checkbox" id="cbNonFollowsMe" checked="checked" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="DoesntFollowMe">Doesn't Follow Me</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="filter-column">
+                                <div class="filter-checkbox-pair filter-checkbox-pair--paired">
+                                    <label for="cbFollowedByMe">
+                                        <input type="checkbox" id="cbFollowedByMe" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="FollowedByMe">Followed by Me</span>
+                                    </label>
+                                    <label for="cbNonFollowedByMe">
+                                        <input type="checkbox" id="cbNonFollowedByMe" checked="checked" />
+                                        <span class="filter-pair-warning" aria-hidden="true">⚠️</span>
+                                        <span class="filter-pair-label-text" localeMessage="NotFollowedByMe">Not Followed by Me</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="filter-checkbox-pair-spacer"></div>
+                        <div class="igBotInjectedButton" id="btnResetFilter" localeMessage="ResetFilters">Reset Filters
+                        </div>
+                        <div class="igBotInjectedButton" id="btnApplyFilter" localeMessage="ApplyFilters">Apply Filters
+                            to Current Queue</div>
+                    </div>
+                </div>
+                <div class="tab4">
+                    <div id="igBotOptions">
+                        <h3 localeMessage="Settings">Settings</h3>
+                        <details id="growbotAccountSection" open>
+                            <summary localeMessage="GrowbotAccount">Growbot Account</summary>
+                            <div id="growbotAccountInfo" class="followOptions">
+                                <div id="growbot-account-status" style="font-size: 13px; margin-bottom: 8px;" localeMessage="GrowbotAccountChecking">
+                                    Checking...</div>
+                                <div>
+                                    <button type="button" id="btnGrowbotLogin"
+                                        class="igBotInjectedButton" localeMessage="SignInRegister">Sign In /
+                                        Register</button>
+                                    <div id="btnGrowbotLogout" class="igBotInjectedButton" localeMessage="SignOut">Sign Out</div>
+                                </div>
+                            </div>
+                        </details>
+                        <details id="relinkSubscription">
+                            <summary localeMessage="relinkSubscription">Re-link Subscription</summary>
+                            <br>
+                            <form id="formRelinkSubscription">
+                                <input type="text" id="email" name="email" placeholder="email@address.com"
+                                    style="border:1px solid #666;" localeMessage="RelinkEmailPlaceholder"></input>
+                                <input type="text" id="last4" name="last4" placeholder="Last 4 digits of payment card"
+                                    maxlength="4" style="border:1px solid #666;" localeMessage="RelinkLast4Placeholder"></input>
+                                <select id="month" name="month">
+                                    <option localeMessage="CcExpMonth">CC Exp Month</option>
+                                    <option value="01">01</option>
+                                    <option value="02">02</option>
+                                    <option value="03">03</option>
+                                    <option value="04">04</option>
+                                    <option value="05">05</option>
+                                    <option value="06">06</option>
+                                    <option value="07">07</option>
+                                    <option value="08">08</option>
+                                    <option value="09">09</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                </select>
+                                <select id="year" name="year">
+                                    <option localeMessage="CcExpYear">CC Exp Year</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                    <option value="2029">2029</option>
+                                    <option value="2030">2030</option>
+                                    <option value="2031">2031</option>
+                                    <option value="2032">2032</option>
+                                    <option value="2033">2033</option>
+                                    <option value="2034">2034</option>
+                                    <option value="2035">2035</option>
+                                    <option value="2036">2036</option>
+                                </select>
+                            </form>
+                            <br>
+                            <button id="btnFindSubscription" localeMessage="FindSubscription">Find Subscription</button>
+                            <br>
+                            <div id="resultFindSubscription"></div>
+                            <br>
+                        </details>
+                        <details id="detailsAppearance">
+                            <summary localeMessage="AppearanceOptions">Appearance Options</summary>
+                            <div class="followOptions growbot-appearance-options">
+                                <label><input type="radio" name="growbotUiColorTheme" value="system" checked="checked" /> <span localeMessage="ThemeMatchSystem">Match
+                                    system</span></label>
+                                <label><input type="radio" name="growbotUiColorTheme" value="light"  />
+                                    <span localeMessage="ThemeLight">Light (Growbot Classic theme)</span></label>
+                                <label><input type="radio" name="growbotUiColorTheme" value="dark" /> <span localeMessage="ThemeDark">Dark</span></label>
+                                <label><input type="radio" name="growbotUiColorTheme" value="easter" /> <span localeMessage="ThemeEaster">Easter
+                                    (pastels)</span></label>
+                                <label><input type="radio" name="growbotUiColorTheme" value="darkred" /> <span localeMessage="ThemeDarkRed">Dark Red
+                                    (night / low eye strain)</span></label>
+                            </div>
+                        </details>
+                        <details id="detailsLanguage">
+                            <summary localeMessage="LanguageOptions">Language</summary>
+                            <div id="growbotLanguageOptions" class="followOptions growbot-appearance-options"></div>
+                        </details>
+                        <details id="detailsPerformanceOptions">
+                            <summary localeMessage="PerformanceOptions">Performance Options</summary>
+                            <div class="followOptions">
+                                <label for="cbShowStamps">
+                                    <input type="checkbox" checked="checked" id="cbShowStamps" /> <span
+                                        localeMessage="cbShowStamps">Show stamps in queue</span>
+                                </label>
+                                <label for="cbRemoveFromQueue" style="display:none;">
+                                    <input type="checkbox" id="cbRemoveFromQueue" /> <span
+                                        localeMessage="cbRemoveFromQueue">Remove accounts from queue after
+                                        processing</span>
+                                </label>
+                                <label for="cbConvenienceLinks">
+                                    <input type="checkbox" checked="checked" id="cbConvenienceLinks" /> <span
+                                        localeMessage="cbConvenienceLinks">Show convenience buttons on feed and profile (Whitelist / Blacklist / Queue / Unfollow)</span>
+                                </label>
+                                <label for="cbShowQueueOnScreen">
+                                    <input type="checkbox" checked="checked" id="cbShowQueueOnScreen" /> <span
+                                        localeMessage="cbShowQueueOnScreen">Show queue on screen</span>
+                                </label>
+                                <label for="cbRemoveUnusedColumns">
+                                    <input type="checkbox" checked="checked" id="cbRemoveUnusedColumns" /> <span localeMessage="RemoveUnusedColumns">Remove
+                                        Unchecked Columns From Queue Data</span>
+                                </label>
+                                <label for="cbShowLikesInQueue">
+                                    <input type="checkbox" checked="checked" id="cbShowLikesInQueue" /> <span
+                                        localeMessage="cbShowLikesInQueue">Show likes in queue</span>
+                                </label>
+                                <label for="cbShowProfilePicInQueue">
+                                    <input type="checkbox" checked="checked" id="cbShowProfilePicInQueue" /> <span
+                                        localeMessage="cbShowProfilePicInQueue">Show profile pictures in queue</span>
+                                </label>
+                                <label for="cbClickNotNow">
+                                    <input type="checkbox" id="cbClickNotNow" /><span
+                                        localeMessage="cbClickNotNow">Click
+                                        "Not Now" when Instagram asks to show
+                                        notifications or Save Account</span>
+                                </label>
+                                <label for="cbShowNotifications">
+                                    <input type="checkbox" id="cbShowNotifications" /><span localeMessage="ShowBrowserNotifications">Show browser notifications
+                                        for scheduled actions</span>
+                                </label>
+                                <label for="cbLoadQueueOnStartup">
+                                    <input type="checkbox" id="cbLoadQueueOnStartup" /><span
+                                        localeMessage="cbLoadQueueOnStartup">Load the last known queue on startup</span>
+                                </label>
+                                <label for="cbKeepInstagramTabsAwake">
+                                    <input type="checkbox" checked="checked" id="cbKeepInstagramTabsAwake" /><span
+                                        localeMessage="cbKeepInstagramTabsAwake">Keep Instagram tabs running in the background</span>
+                                </label>
+                            </div>
+                        </details>
+                        <details id="detailsWaitTime">
+                            <summary localeMessage="ConfigureWaitTimes">Configure Wait Times</summary>
+                            <div class="followOptions">
+                                <span><span localeMessage="Wait">Wait</span> <input type="number" value="60" step="1"
+                                        min="0" id="textSecondsBetweenActions"></input> <span
+                                        localeMessage="secondsAfterAction">seconds after
+                                        follow/unfollow/like</span></span>
+                                <span><span localeMessage="Wait">Wait</span> <input type="number" value="1" step="1"
+                                        min="0" id="textSecondsAfterSkip"></input> <span
+                                        localeMessage="secondsAfterSkip">seconds
+                                        after skip</span></span>
+                                <label for="cbRandomizeTimeDelay">
+                                    <input type="checkbox" checked="checked" id="cbRandomizeTimeDelay" /><span
+                                        localeMessage="randomizeWaitTime">Randomize wait time by up to</span>
+                                    <input type="number" value="50" step="1" min="0"
+                                        id="igBotPercentRandomTimeDelay"></input>%
+                                </label>
+                                <span><span localeMessage="Retry">Retry</span> <input type="number" value="10" step="1"
+                                        id="textMinutesAfterSoftRateLimit"></input> <span
+                                        localeMessage="minutesAfterSoft">minutes after soft rate limit</span></span>
+                                <span><span localeMessage="Retry">Retry</span> <input type="number" min="1" value="1"
+                                        step="1" id="textHoursAfterHardRateLimit"></input> <span
+                                        localeMessage="hoursAfterHard">hours after hard rate limit</span></span>
+                                <span><span localeMessage="Retry">Retry</span> <input type="number" value="10" step="1"
+                                        id="textMinutesAfter429RateLimit"></input> <span
+                                        localeMessage="minutesAfter429">minutes after 429 rate limit</span></span>
+                                <span>
+                                    <input type="checkbox" id="cbuseTimeDelayAfterAdditionalInfo" />
+                                    <span localeMessage="Wait">Wait</span> <input type="number" value="2" step="1"
+                                        id="texttimeDelayAfterAdditionalInfo"></input> <span
+                                        localeMessage="SecondsAfterAdditionalInfo">seconds after loading additional
+                                        account info</span>
+                                </span>
+                                <span>
+                                    <span localeMessage="Retry">Retry</span> <input type="number" value="10" step="1"
+                                        id="textRetryAfterAdditionalInfo404"></input> <span
+                                        localeMessage="RetryAfterAdditionalInfo404"> times after 404 error getting
+                                        additional info</span>
+                                </span>
+                                <span>
+                                    <input type="checkbox" id="cbLimitActions" /> <span localeMessage="Wait">Wait</span>
+                                    <input type="number" value="24" step="1" id="textLimitActionsPerTime"> <span
+                                        localeMessage="hoursAfterActions">hours after performing</span> <input
+                                        type="number" value="50" step="1" id="textLimitActionsPer"></input> <span
+                                        localeMessage="followsUnfollows">follows / unfollows</span>
+                                </span>
+                            </div>
+                        </details>
+                        <details id="detailsProcessingQueueOptions">
+                            <summary localeMessage="QueueProcessingOptions">Queue Processing Options</summary>
+                            <div class="followOptions">
+                                <label for="cbAutoSaveQueue">
+                                    <input type="checkbox" id="cbAutoSaveQueue" /> <span
+                                        localeMessage="saveQueueAutomatically">Automatically save queue (to local
+                                        storage) after each processed account</span>
+                                </label>
+                                <label for="cbAllowDuplicateAccounts">
+                                    <input type="checkbox" id="cbAllowDuplicateAccounts" /> <span localeMessage="AllowDuplicateAccounts">Allow duplicate accounts in
+                                    Accounts Queue</span>
+                                </label>
+                            </div>
+                        </details>
+                        <details id="detailsFollowingOptions">
+                            <summary localeMessage="FollowingOptions">Following Options</summary>
+                            <div class="followOptions">
+                                <label for="cbFollowAlreadyAttempted">
+                                    <input type="checkbox" id="cbFollowAlreadyAttempted" /> <span
+                                        localeMessage="followAlreadyAttempted">Follow people I've already
+                                        attempted</span>
+                                </label>
+                                <label for="cbApplyFilterAutomatically"
+                                    title="Apply the currently selected filters automatically from now on">
+                                    <input type="checkbox" id="cbApplyFilterAutomatically" /> <span
+                                        localeMessage="applyFiltersAutomatically">Apply Filters Automatically While
+                                        Following</span>
+                                </label>
+                            </div>
+                        </details>
+                        <details id="detailsUnfollowingOptions">
+                            <summary localeMessage="UnfollowingOptions">Unfollowing Options</summary>
+                            <div class="followOptions">
+                                <label for="cbDontUnfollowFollowers">
+                                    <input type="checkbox" checked="checked" id="cbDontUnfollowFollowers" /> <span
+                                        localeMessage="dontUnfollowFollowers">Don't unfollow people who follow me</span>
+                                </label>
+                                <label for="cbUnfollowOld">
+                                    <input type="checkbox" id="cbUnfollowOld" /> <span
+                                        localeMessage="unfollowDaysAgo1">Unfollow people I began following more
+                                        than</span>
+                                    <input type="number" value="30" step="1" id="textUnfollowOld"></input> <span
+                                        localeMessage="unfollowDaysAgo2">days ago (even if they follow me)</span>
+                                </label>
+                                <label for="cbDontUnfollowFresh">
+                                    <input type="checkbox" checked="checked" id="cbDontUnfollowFresh" /> <span
+                                        localeMessage="dontUnfollowDaysAgo1">Don't unfollow people I began following
+                                        less than</span>
+                                    <input type="number" value="3" step="1" id="textUnfollowNew"></input> <span
+                                        localeMessage="dontUnfollowDaysAgo2">days ago</span>
+                                </label>
+                                <label for="cbDontUnfollowNonGrowbot">
+                                    <input type="checkbox" checked="checked" id="cbDontUnfollowNonGrowbot" /> <span
+                                        localeMessage="dontUnfollowNonGrowbot">Don't unfollow people followed outside of
+                                        Growbot</span>
+                                </label>
+                                <label for="cbDontUnfollowFilters">
+                                    <input type="checkbox" checked="checked" id="cbDontUnfollowFilters" /> <span
+                                        localeMessage="dontUnfollowFilters">Don't unfollow people who match my
+                                        filters</span>
+                                </label>
+                            </div>
+                        </details>
+                        <details id="detailsUnfollowingOptions">
+                            <summary localeMessage="RemovingAndBlockingOptions">Removing and Blocking Options</summary>
+                            <div class="followOptions">
+                                <label for="cbDontRemoveOrBlockFilters">
+                                    <input type="checkbox" checked="checked" id="cbDontRemoveOrBlockFilters" /> <span
+                                        localeMessage="dontRemoveOrBlockFilters">Don't remove or block people who match
+                                        my filters</span>
+                                </label>
+                            </div>
+                        </details>
+                        <details id="detailsGenderCountry">
+                            <summary localeMessage="GenderCountryOptions">Gender from names</summary>
+                            <div class="followOptions growbot-appearance-options">
+                                <label for="selGenderCountry">
+                                    <span localeMessage="GenderCountryLabel">Country for name data</span>
+                                    <select id="selGenderCountry"></select>
+                                </label>
+                                <div localeMessage="GenderCountryHint">Growbot uses profile pronouns when available. Otherwise it guesses gender from the display name or username using first-name statistics for the country you pick. The same name can differ by country—for example, Andrea is usually female in the US but male in Italy. Auto follows your browser locale. Global uses country-neutral data.</div>
+                            </div>
+                        </details>
+                        <details id="detailsQueueColumns">
+                            <summary localeMessage="QueueColumnsOptions">Columns to Show in Queue and CSV Export *BETA*
+                            </summary>
+                            <div class="followOptions" id="queueColumnsOptions"></div>
+                            <a href="javascript:void(0);" id="aResetQueueColumns" localeMessage="ResetColumnsLink">Reset Columns</a>
+                        </details>
+                    </div>
+                </div>
+                <div class="tab5">
+                    <div id="igBotLog">
+                        <h3 localeMessage="Log">Log</h3>
+                        <textarea id="txtConsole" spellcheck="false"></textarea>
+                        <br>
+                        <a href="javascript:void(0);" id="btnTrimLog" localeMessage="TrimLog">Trim Log</a>
+                    </div>
+                </div>
+                <div class="tab6 igBotNewsAndUpdates">
+                    <details id="detailsUpdateInstructions" class="igBotUpdateNote">
+                        <summary><span localeMessage="UpdateCheckBlurbPrefix">You can force Chrome to check for Growbot updates (you have version </span><span
+                                id="igBotExtensionVersion">x.x.x</span>)</summary>
+                        <ol>
+                            <li localeMessage="UpdateInstructionsStep1"> Go to chrome://extensions by typing it into the address bar</li>
+                            <li localeMessage="UpdateInstructionsStep2"> Check the Developer mode checkbox on the right-hand side.</li>
+                            <li localeMessage="UpdateInstructionsStep3"> Click the "Update extensions now" button. </li>
+                        </ol>
+                    </details>
+                    <iframe id="iframeNews" src="https://www.growbotforfollowers.com/news/"></iframe>
+                    <p><a href="https://www.growbotforfollowers.com/news/" target="_blank" rel="noopener">Open release notes in browser</a></p>
+                </div>
+                <div class="tab7">
+                    <div id="faqhelp">
+                        <iframe id="iframeFAQ"
+                            src="https://www.growbotforfollowers.com/index.php?faqonly=true"></iframe>
+                        <p localeMessage="HelpFaqIntro">Please read the entire FAQ. If your question is not answered, contact me. Please include
+                            screenshots and the Log.</p>
+                        <p>
+                            <a href="https://www.growbotforfollowers.com/" target="_blank"
+                                id="iconHelp">https://www.growbotforfollowers.com</a>
+                            <a href="mailto:growbotautomator@gmail.com" id="iconEmail"
+                                class="growbotEmailLink">growbotautomator@gmail.com</a>
+                            <a href="https://www.youtube.com/@growbotautomator/videos" target="_blank"
+                                id="iconYoutube">https://www.youtube.com/@growbotautomator</a>
+                            <a href="https://www.instagram.com/growbot.spam" target="_blank"
+                                id="iconInstagram">@growbot.spam</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="tab9">
+                    <div id="affiliatediv">
+                        <iframe id="iframeAffiliate" src="https://www.growbotforfollowers.com/affiliate.php"></iframe>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

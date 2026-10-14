@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="popup">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>MAX Video Downloader v2.17.1</title>
+	<script src="popup-bootstrap.js"></script>
+	<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+	<header class="header">
+		<nav class="tab-navigation">
+			<button class="tab-button active" data-tab-id="videos-tab" data-i18n="tabVideos">
+				<span class="counter"></span>
+			</button>
+			<button class="tab-button" data-tab-id="downloads-tab" data-i18n="tabDownloads">
+				<span class="counter"></span>
+			</button>
+			<button class="tab-button" data-tab-id="settings-tab" data-i18n="tabSettings">
+				<span class="counter"></span>
+			</button>
+		</nav>
+	</header>
+	<main class="container">
+		<section class="tab-contents">
+			<div class="tab-content active" data-tab-id="videos-tab">
+				<div class="controls">
+					
+					<div class="filter-dropdown" id="filter-dropdown">
+						<button class="filter-btn rounded-btn" id="filter-btn">
+							<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="3" width="12" height="1.5" rx="0.75" fill="currentColor"></rect><rect x="4" y="7" width="8" height="1.5" rx="0.75" fill="currentColor"></rect><rect x="6" y="11" width="4" height="1.5" rx="0.75" fill="currentColor"></rect></svg>
+						</button>
+						<div class="filter-options" id="filter-options">
+							
+							<div class="sort-controls">
+								<button class="sort-btn active descending" id="sort-detection-time" data-sort="detection-time" data-i18n="sortDetectedAt">
+								</button>
+								<button class="sort-btn" id="sort-duration" data-sort="duration" data-i18n="sortDuration">
+								</button>
+								<button class="sort-btn" id="sort-title" data-sort="title" data-i18n="sortTitle">
+								</button>
+							</div>
+							<div class="filter-options-separator"></div>
+							
+							<label class="filter-option">
+								<input type="checkbox" value="hls" checked>
+								<span data-i18n="filterShowHLS"></span>
+							</label>
+							<label class="filter-option">
+								<input type="checkbox" value="dash" checked>
+								<span data-i18n="filterShowDASH"></span>
+							</label>
+							<label class="filter-option">
+								<input type="checkbox" value="direct" checked>
+								<span data-i18n="filterShowDirect"></span>
+							</label>
+							<label class="filter-option">
+								<input type="checkbox" value="subs" checked>
+								<span data-i18n="labelSubtitles"></span>
+							</label>
+							<button type="button" class="btn btn-small btn-secondary remember-site-preference-btn hidden" id="remember-site-filter-preference-btn" data-i18n="rememberSiteFilterPreference"></button>
+						</div>
+					</div>
+					
+					
+					<div class="search-container" id="search-container">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
+						<input type="text" id="search-input" class="search-input" data-i18n-placeholder="searchPlaceholder">
+						<button class="search-clear-btn" id="search-clear-btn" data-i18n-aria-label="clearSearchLabel">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<line x1="18" y1="6" x2="6" y2="18"></line>
+								<line x1="6" y1="6" x2="18" y2="18"></line>
+							</svg>
+						</button>
+					</div>
+					
+					
+					<button class="stop-detection-button rounded-btn" id="stop-detection-button" data-i18n-constraint="stopDetectionEverywhere">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"></path><path d="M18.4 6.6a9 9 0 1 1-12.77.04"></path></svg>
+					</button>
+
+					
+					<button class="pause-detection-button rounded-btn" id="pause-detection-button" data-i18n-constraint="pauseDetection">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="3" width="5" height="18" rx="1"/><rect x="5" y="3" width="5" height="18" rx="1"/></svg>
+					</button>
+
+					
+					<button class="force-refresh-button rounded-btn" id="force-refresh-button" data-i18n-constraint="forcePageRefresh">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+					</button>
+					
+					
+					<button class="clear-cache-button rounded-btn" id="clear-cache-button" data-constraint="">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" x2="10" y1="11" y2="17"></line><line x1="14" x2="14" y1="11" y2="17"></line></svg>
+					</button>
+				</div>
+				
+				<div class="top-media-disclaimer telegram hidden">
+					<div class="section-header collapsible">
+						<h3 class="section-title media" data-i18n="telegramDisclaimerTitle"></h3>
+						<div class="toggle-icon rotated">
+							<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+							</svg>
+						</div>
+					</div>
+					<div class="section-content collapsed">
+						<ul>
+							<li data-i18n="telegramDisclaimer1"></li>
+							<li data-i18n="telegramDisclaimer3"></li>
+							<li data-i18n="telegramDisclaimer4"></li>
+							<li data-i18n="telegramDisclaimer5"></li>
+							<li data-i18n="telegramDisclaimer6"></li>
+							<li data-i18n="telegramDisclaimer7"></li>
+						</ul>
+						<p class="footer-notice" data-i18n="telegramDisclaimerFeedback"></p>
+					</div>
+				</div>
+				
+				<div class="top-media-disclaimer meta hidden">
+					<div class="section-header collapsible">
+						<h3 class="section-title media" data-i18n="metaDisclaimerTitle"></h3>
+						<div class="toggle-icon rotated">
+							<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+							</svg>
+						</div>
+					</div>
+					<div class="section-content collapsed">
+						<p data-i18n="metaDisclaimerMessage"></p>
+					</div>
+				</div>
+				<section id="videos-list" class="videos-container">
+					<div class="initial-message videos-empty-message">
+						<div class="content">
+							<p id="videos-empty-message-text" data-i18n="foundMediaWillAppearHere"></p>
+							<div id="disconnect-banner" class="disconnect-content hidden">
+								<p data-i18n="disconnectMessage"></p>
+								<button id="reconnect-button" class="btn btn-primary" data-i18n="buttonReconnect"></button>
+							</div>
+						</div>
+					</div>
+					<div class="initial-message videos-youtube-message hidden">
+						<div class="content youtube-message">
+							<p data-i18n="youtubeDisabledMessage"></p>
+						</div>
+					</div>
+					<div class="initial-message videos-no-matches-message hidden">
+						<div class="content">
+							<p data-i18n="noMatchesMessage"></p>
+							<p data-i18n="noMatchesHint"></p>
+						</div>
+					</div>
+					
+					<div class="video-type-group hidden" data-video-type="hls">
+						<div class="section-header collapsible">
+							<h3 class="section-title media" data-i18n="sectionHLS"><span class="counter"></span></h2>
+							<div class="toggle-icon">
+								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+								</svg>
+							</div>
+						</div>
+						<div class="section-content">
+							
+						</div>
+					</div>
+					
+					
+					<div class="video-type-group hidden" data-video-type="dash">
+						<div class="section-header collapsible">
+							<h3 class="section-title media" data-i18n="sectionDASH"><span class="counter"></span></h2>
+							<div class="toggle-icon">
+								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+								</svg>
+							</div>
+						</div>
+						<div class="section-content">
+							
+						</div>
+					</div>
+					
+					
+					<div class="video-type-group hidden" data-video-type="direct">
+						<div class="section-header collapsible">
+							<h3 class="section-title media" data-i18n="sectionDirect"><span class="counter"></span></h2>
+							<div class="toggle-icon">
+								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+								</svg>
+							</div>
+						</div>
+						<div class="section-content">
+							
+						</div>
+					</div>
+					
+					
+					<div class="video-type-group hidden" data-video-type="subs">
+						<div class="section-header collapsible">
+							<h3 class="section-title media" data-i18n="labelSubtitles"><span class="counter"></span></h2>
+							<div class="toggle-icon">
+								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+								</svg>
+							</div>
+						</div>
+						<div class="section-content">
+							
+						</div>
+					</div>
+					
+					
+					<div class="video-type-group hidden" data-video-type="unknown">
+						<div class="section-header collapsible">
+							<h3 class="section-title media" data-i18n="sectionOther"><span class="counter"></span></h2>
+							<div class="toggle-icon">
+								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+								</svg>
+							</div>
+						</div>
+						<div class="section-content">
+							
+						</div>
+					</div>
+				</section>
+				<div class="videos-status hidden">
+					<div class="content paused-message hidden">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="10" x2="10" y1="15" y2="9"></line><line x1="14" x2="14" y1="15" y2="9"></line></svg>
+						<p data-i18n="detectionPausedMessage"></p>
+					</div>
+					<div class="content stopped-message hidden">
+						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"></path><path d="M18.4 6.6a9 9 0 1 1-12.77.04"></path></svg>
+						<p data-i18n="detectionStoppedEverywhereMessage"></p>
+					</div>
+				</div>
+				
+				
+				<div class="videos-footer">
+					<div class="content default-message">
+						<div class="section-header collapsible default-message-toggle" data-local-meta-toggle="expandVideosFooterDefaultMessage">
+							<h3 class="section-title">
+								<span class="title" data-i18n="videosFooterDefaultMessageTitle"></span>
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4.1 12 6"></path><path d="m5.1 8-2.9-.8"></path><path d="m6 12-1.9 2"></path><path d="M7.2 2.2 8 5.1"></path><path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"></path></svg>
+							</h3>
+						</div>
+						<div class="section-content default-message-body collapsed hidden" id="videos-footer-default-message-body">
+							<p>
+								<strong data-i18n="videosFooterDefaultMessageDetectionLabel"></strong>
+								<span data-i18n="videosFooterDefaultMessageDetectionText"></span>
+							</p>
+							<p>
+								<strong data-i18n="videosFooterDefaultMessageDownloadLabel"></strong>
+								<span data-i18n="videosFooterDefaultMessageDownloadText"></span>
+							</p>
+							<p>
+								<strong data-i18n="videosFooterDefaultMessageCantOpenLabel"></strong>
+								<span data-i18n="videosFooterDefaultMessageCantOpenText"></span>
+							</p>
+							<p>
+								<strong data-i18n="videosFooterDefaultMessageSlowSpeedLabel"></strong>
+								<span data-i18n="videosFooterDefaultMessageSlowSpeedText"></span>
+							</p>
+							<p>
+								<strong data-i18n="videosFooterDefaultMessageDrmLabel"></strong>
+								<span data-i18n="videosFooterDefaultMessageDrmText"></span>
+							</p>
+							<p>
+								<strong data-i18n="videosFooterDefaultMessageBulkLabel"></strong>
+								<span data-i18n="videosFooterDefaultMessageBulkText"></span>
+							</p>
+							<p>
+								<strong data-i18n="videosFooterDefaultMessageOtherLabel"></strong>
+								<span data-i18n="videosFooterDefaultMessageOtherText"></span>
+							</p>
+							<p class="default-message-note">
+								<span data-i18n="videosFooterDefaultMessageClosingText"></span>
+							</p>
+							<div class="no-videos-actions">
+								<button class="btn btn-small btn-secondary force-refresh-button">
+									<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M16 16h5v5"></path></svg>
+									<span data-i18n="forcePageRefresh"></span>
+								</button>
+								<button class="btn btn-small btn-secondary report-page-button" id="report-page-button">
+									<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-9"></path><path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z"></path><path d="M14.12 3.88 16 2"></path><path d="M21 21a4 4 0 0 0-3.81-4"></path><path d="M21 5a4 4 0 0 1-3.55 3.97"></path><path d="M22 13h-4"></path><path d="M3 21a4 4 0 0 1 3.81-4"></path><path d="M3 5a4 4 0 0 0 3.55 3.97"></path><path d="M6 13H2"></path><path d="m8 2 1.88 1.88"></path><path d="M9 7.13V6a3 3 0 1 1 6 0v1.13"></path></svg>
+									<span data-i18n="buttonReport"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="tab-content" data-tab-id="downloads-tab">
+				<section class="downloads-container">
+					<div class="active-downloads-section">
+						<div class="section-header collapsible">
+							<h3 class="section-title media" data-i18n="activeQueuedTitle"></h3>
+							<div class="toggle-icon">
+								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+								</svg>
+							</div>
+						</div>
+						<div class="section-content active-downloads">
+							<div class="initial-message">
+								<div class="content">
+									<p data-i18n="noActiveDownloads"></p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="downloads-history-section">
+						<div class="section-header collapsible">
+							<h3 class="section-title media" data-i18n="historyTitle"><span class="counter"></span></h3>
+							<div class="toggle-icon">
+								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+								</svg>
+							</div>
+						</div>
+						<div class="section-content downloads-history">
+							<div class="initial-message">
+								<div class="content">
+									<p data-i18n="historyEmpty"></p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+			</div>
+			
+			<div class="tab-content" data-tab-id="settings-tab">
+				<section class="settings-container">
+					<h1 class="app-title-row">
+						<span class="app-title-text" data-i18n="appTitle"></span>
+						<span class="app-version"> v2.17.1</span>
+						<button type="button" class="app-title-refresh-button" id="manual-update-check-button" data-i18n-tooltip="tooltipCheckForUpdates" data-i18n-aria-label="tooltipCheckForUpdates">
+							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+								<path d="M1 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+								<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+							</svg>
+						</button>
+					</h1>
+					<div class="top-actions-group">
+						<button class="btn btn-secondary feedback-button" type="button">
+							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle-warning-icon lucide-message-circle-warning"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
+							<span data-i18n="buttonReport"></span>
+						</button>
+						<a href="https://t.me/maxvideodownloader" target="_blank" rel="noopener noreferrer" class="btn btn-secondary chat">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="m22 2-7 20-4-9-9-4Z"/>
+								<path d="M22 2 11 13"/>
+							</svg>
+							<span data-i18n="chat"></span>
+						</a>
+						<a href="https://maxvideodownloader.pro/changelog?utm_source=extension&utm_medium=settings-tab" target="_blank" rel="noopener noreferrer" class="btn btn-secondary changelog">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/>
+								<path d="M14 2v5a1 1 0 0 0 1 1h5"/>
+								<path d="M10 9H8"/>
+								<path d="M16 13H8"/>
+								<path d="M16 17H8"/>
+							</svg>
+							<span data-i18n="changelog"></span>
+						</a>
+						<div class="feedback-form">
+							<textarea class="feedback-textarea" placeholder="describe what is not working"></textarea>
+							<button class="btn btn-small btn-primary feedback-submit-button" data-i18n="buttonSubmit" type="button"></button>
+						</div>
+					</div>
+
+					
+				
+					
+					<div class="settings-section coapp-section">
+						<div class="coapp-toggle-header">
+							<h2 class="section-title settings">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>
+								<span data-i18n="coapp"></span>
+								<div class="tooltip-icon" data-i18n-tooltip="tooltipCoapp">?</div>
+							</h2>
+							<label class="toggle-switch coapp-header-toggle">
+								<input type="checkbox" data-setting="preferCoapp" />
+								<span class="toggle-slider"></span>
+							</label>
+						</div>
+						<div id="coapp-section-content" class="section-content hidden">
+							<div class="notification warning hidden" id="version-update-notification">
+								<div class="notification-text">
+									<h2 class="notification-title">
+										<span data-i18n="versionUpdateTitle"></span>
+									</h2>
+									<p class="notification-body" data-i18n="versionUpdateMessage"></p>
+								</div>
+								<div class="notification-actions">
+									<a href="https://maxvideodownloader.pro/install?utm_source=popup&utm_medium=update-btn#download-coapp" target="_blank" rel="noopener noreferrer" class="btn btn-small btn-primary" data-i18n="buttonUpdateCoApp"></a>
+								</div>
+							</div>
+							
+							<div class="status-info">
+								<span class="status-label" data-i18n="status"></span>
+								<div class="status-value">
+									<div class="status-dot disconnected" id="connection-status-dot"></div>
+									<span id="connection-status-text"></span>
+									<span id="connection-version"></span>
+									<button type="button" class="reconnect-icon" id="reconnect-icon" data-i18n-tooltip="buttonReconnect">
+										<svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+											<path d="M1 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+											<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+										</svg>
+									</button>
+								</div>
+								<span class="status-label hidden" data-i18n="statusLocation"></span>
+								<span class="status-value hidden" id="connection-location"></span>
+								<span class="status-label hidden" data-i18n="statusDiskSpace"></span>
+								<span class="status-value hidden" id="connection-diskspace"></span>
+								<span class="status-label hidden" data-i18n="statusLogs"></span>
+								<span class="status-value hidden" id="connection-logsfolder"></span>
+							</div>
+							
+							<div id="coapp-install-section">
+								<span class="coapp-description">
+									<span data-i18n="coappDescription"></span><br>
+									<span class="warning">
+										<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-badge-check-icon lucide-badge-check"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+										<span data-i18n="coappWarning"></span>
+									</span>
+								</span>
+								<div class="status-actions" id="status-actions">
+									<a href="https://maxvideodownloader.pro/install?utm_source=popup&utm_medium=install-section#download-coapp" target="_blank" rel="noopener noreferrer" class="btn btn-small btn-primary">
+										<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+											<polyline points="7,10 12,15 17,10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+											<line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+										</svg>
+										<span data-i18n="install"></span>
+									</a>
+									<a href="https://maxvideodownloader.pro/faq?utm_source=popup&utm_medium=install-section" target="_blank" rel="noopener noreferrer" class="btn btn-small btn-secondary">
+										<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+											<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"></circle>
+											<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+											<path d="M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+										</svg>
+										<span data-i18n="buttonHelp"></span>
+									</a>
+									<a href="https://github.com/suwot/mvd-coapp/" target="_blank" rel="noopener noreferrer" class="btn btn-small btn-secondary">
+										<svg width="12" height="12" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg>
+										<span data-i18n="buttonSourceCode"></span>
+									</a>
+								</div>
+							</div>
+							
+							<div class="input-group horizontal path-input-group">
+								<label class="input-label" data-i18n="settingDefaultSavePath">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipDefaultSavePath">?</div>
+								</label>
+								<div class="input-container">
+									<div class="input-constraint-wrapper" data-i18n-constraint="rootFolderWarning">
+										<input 
+											type="text" 
+											data-setting="defaultSavePath"
+											class="input-field path-input clickable" 
+											readonly
+											data-i18n-placeholder="pathPlaceholder"
+										/>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+					
+					
+					<div class="settings-section appearance-section collapsible-section">
+						<div class="section-header collapsible">
+							<h2 class="section-title settings">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></svg>
+								<span data-i18n="sectionAppearance"></span>
+							</h2>
+							<div class="toggle-icon">
+								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+								</svg>
+							</div>
+						</div>
+						<div class="section-content">
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingTheme">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipTheme">?</div>
+								</label>
+								<div class="input-container">
+									<div class="unit-toggle" data-setting="theme" data-unit-toggle="theme">
+										<div class="unit-option active" data-value="system" data-i18n="settingThemeSystem"></div>
+										<div class="unit-option" data-value="dark" data-i18n="settingThemeDark"></div>
+										<div class="unit-option" data-value="light" data-i18n="settingThemeLight"></div>
+									</div>
+								</div>
+							</div>
+							
+							
+							<div class="input-group horizontal" id="ui-mode-setting-group">
+								<label class="input-label" data-i18n="settingUiMode">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipUiMode">?</div>
+								</label>
+								<div class="input-container">
+									<div class="unit-toggle" data-setting="uiMode" data-unit-toggle="uiMode">
+										<div class="unit-option active" data-value="popup" data-i18n="settingUiModePopup"></div>
+										<div class="unit-option" data-value="sidebar" data-i18n="settingUiModeSidebar"></div>
+									</div>
+								</div>
+							</div>
+
+							<div class="input-group horizontal" id="popup-width-setting-group">
+								<label class="input-label" data-i18n="settingPopupWidth">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipPopupWidth">?</div>
+								</label>
+								<div class="input-container">
+									<div class="input-constraint-wrapper" data-constraint="360-600 px">
+										<input 
+											type="number" 
+											class="input-field" 
+											data-setting="popupWidth" 
+											min="360" 
+											max="600"
+										/>
+									</div>
+								</div>
+							</div>
+							
+							
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingLanguage">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipLanguage">?</div>
+								</label>
+								<div class="input-container">
+									<div class="combobox-wrapper ui-language" data-setting="language">
+										<button type="button" class="combobox-trigger" aria-label="Open language selector">
+											<span class="combobox-value">-</span>
+											<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" class="combobox-icon">
+												<path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+											</svg>
+										</button>
+										<div class="combobox-content hidden" role="listbox">
+											<div class="combobox-search-wrapper">
+												<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="combobox-search-icon"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+												<input type="text" class="combobox-search" data-i18n-placeholder="searchLanguagesPlaceholder" aria-label="Search languages"/>
+											</div>
+											<div class="combobox-list" role="presentation">
+												
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					
+					<div class="settings-section downloads-section collapsible-section">
+						<div class="section-header collapsible">
+							<h2 class="section-title settings">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+								<span data-i18n="sectionDownloads"></span>
+							</h2>
+							<div class="toggle-icon">
+								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+								</svg>
+							</div>
+						</div>
+						<div class="section-content">
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingConcurrentDownloads">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipConcurrentDownloads">?</div>
+								</label>
+								<div class="input-container">
+									<div class="input-inline-controls">
+										<button type="button" class="setting-warning-icon hidden" id="concurrent-downloads-warning" aria-label="High concurrency warning" data-i18n-tooltip="tooltipHighConcurrencyWarning" data-tooltip-clickable="true">
+											<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+												<path d="m10.29 3.86-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.71-3.14l-8-14a2 2 0 0 0-3.42 0"></path>
+												<path d="M12 9v4"></path>
+												<path d="M12 17h.01"></path>
+											</svg>
+										</button>
+										<div class="input-constraint-wrapper compact" data-constraint="1-20">
+											<input 
+												type="number" 
+												data-setting="maxConcurrentDownloads"
+												class="input-field" 
+												min="1" 
+												max="20" 
+												value="1"
+												placeholder="1"
+											/>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingShowNotifications">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipShowNotifications">?</div>
+								</label>
+								<label class="toggle-switch">
+									<input 
+										type="checkbox" 
+										data-setting="showDownloadNotifications"
+										checked
+									/>
+									<span class="toggle-slider"></span>
+								</label>
+							</div>
+
+							<div class="input-group horizontal browser-downloads-folder-group">
+								<label class="input-label" data-i18n="settingBrowserDownloadsFolder">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipBrowserDownloadsFolder">?</div>
+								</label>
+								<div class="input-container setting-action-row">
+									<button type="button" id="browser-downloads-folder-btn" class="btn btn-small btn-secondary cursor-pointer" data-i18n="buttonChange"></button>
+								</div>
+							</div>
+
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingAlwaysAskSaveLocation">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipAlwaysAskSaveLocation">?</div>
+								</label>
+								<label class="toggle-switch">
+									<input
+										type="checkbox"
+										data-setting="alwaysAskSaveLocation"
+									/>
+									<span class="toggle-slider"></span>
+								</label>
+							</div>
+
+							
+							<div class="input-group vertical-group">
+								<div class="input-group-header horizontal">
+									<label class="input-label" data-i18n="customProgressDisplay">
+										<span class="tooltip-icon" data-i18n-tooltip="customProgressDisplayTooltip">?</span>
+									</label>
+									<div class="setting-actions">
+										<button type="button" id="progress-template-edit-btn" class="btn btn-small btn-secondary cursor-pointer hidden" data-i18n-tooltip="edit" aria-expanded="false">
+											<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+												<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+												<path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"></path>
+											</svg>
+										</button>
+										<label class="toggle-switch">
+											<input 
+												type="checkbox" 
+												data-setting="customProgressDisplay"
+											/>
+											<span class="toggle-slider"></span>
+										</label>
+									</div>
+								</div>
+
+								
+								<div class="progress-template-bubble" id="progress-template-bubble" aria-hidden="true">
+									<div class="input-group">
+										<label class="input-label" data-i18n="progressTemplateHover"></label>
+										<div class="progress-template-row">
+											<input
+												type="text"
+												id="progress-hover-template-input"
+												class="input-field progress-template-input"
+												data-setting="progressHoverTemplate"
+												placeholder="{segments}[ • {speed}]"
+												maxlength="240"
+											/>
+											<button type="button" id="progress-hover-reset" data-reset="progressHoverTemplate" class="btn btn-small btn-secondary cursor-pointer progress-template-reset-btn" data-i18n-tooltip="reset">
+												<svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+													<path d="M1 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+													<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+												</svg>
+											</button>
+										</div>
+									</div>
+
+									<div class="input-group">
+										<label class="input-label" data-i18n="progressTemplateRegular"></label>
+										<div class="progress-template-row">
+											<input
+												type="text"
+												id="progress-inline-template-input"
+												class="input-field progress-template-input"
+												data-setting="progressRegularTemplate"
+												placeholder="{progress} • ↓ {downloaded}[ • {eta}]"
+												maxlength="240"
+											/>
+											<button type="button" id="progress-inline-reset" data-reset="progressRegularTemplate" class="btn btn-small btn-secondary cursor-pointer progress-template-reset-btn" data-i18n-tooltip="reset">
+												<svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+													<path d="M1 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+													<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+												</svg>
+											</button>
+										</div>
+									</div>
+
+									<div class="input-group">
+										<label class="input-label" data-i18n="progressTemplateLive"></label>
+										<div class="progress-template-row">
+											<input
+												type="text"
+												id="progress-live-template-input"
+												class="input-field progress-template-input"
+												data-setting="progressLiveTemplate"
+												placeholder="REC: {timeProcessed} • ↓ {downloaded}[ • {speed}]"
+												maxlength="240"
+											/>
+											<button type="button" id="progress-live-reset" data-reset="progressLiveTemplate" class="btn btn-small btn-secondary cursor-pointer progress-template-reset-btn" data-i18n-tooltip="reset">
+												<svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+													<path d="M1 4v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+													<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+												</svg>
+											</button>
+										</div>
+									</div>
+
+									<div class="progress-template-chips" aria-label="Progress template tokens">
+										<button type="button" class="progress-template-chip cursor-pointer" data-progress-template-chip="{progress}" data-i18n-tooltip="chipProgressTooltip">{progress}</button>
+										<button type="button" class="progress-template-chip cursor-pointer" data-progress-template-chip="{downloaded}" data-i18n-tooltip="chipDownloadedTooltip">{downloaded}</button>
+										<button type="button" class="progress-template-chip cursor-pointer" data-progress-template-chip="{total}" data-i18n-tooltip="chipTotalTooltip">{total}</button>
+										<button type="button" class="progress-template-chip cursor-pointer" data-progress-template-chip="{speed}" data-i18n-tooltip="chipSpeedTooltip">{speed}</button>
+										<button type="button" class="progress-template-chip cursor-pointer" data-progress-template-chip="{eta}" data-i18n-tooltip="chipEtaTooltip">{eta}</button>
+										<button type="button" class="progress-template-chip cursor-pointer" data-progress-template-chip="{segments}" data-i18n-tooltip="chipSegmentsTooltip">{segments}</button>
+										<button type="button" class="progress-template-chip cursor-pointer" data-progress-template-chip="{timePassed}" data-i18n-tooltip="chipTimePassedTooltip">{timePassed}</button>
+										<button type="button" class="progress-template-chip cursor-pointer" data-progress-template-chip="{timeProcessed}" data-i18n-tooltip="chipTimeProcessedTooltip">{timeProcessed}</button>
+									</div>
+								</div>
+							</div>
+							
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingAudioContainerPreference">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipAudioContainerPreference">?</div>
+								</label>
+								<div class="input-container">
+									<div class="unit-toggle" data-setting="audioContainerPreference">
+										<div class="unit-option active" data-value="best" data-i18n="orig"></div>
+										<div class="unit-option" data-value="mp3">MP3</div>
+										<div class="unit-option" data-value="m4a">M4A</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingLiveRecordingContainerPreference">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipLiveRecordingContainerPreference">?</div>
+								</label>
+								<div class="input-container">
+									<div class="unit-toggle" data-setting="liveRecordingContainerPreference" data-unit-toggle="liveRecordingContainerPreference">
+										<div class="unit-option cursor-pointer active" data-value="mkv" data-i18n-tooltip="tooltipLiveRecordingContainerMkv">MKV</div>
+										<div class="unit-option cursor-pointer" data-value="fmp4" data-i18n-tooltip="tooltipLiveRecordingContainerFmp4">fMP4</div>
+										<div class="unit-option cursor-pointer" data-value="mp4" data-i18n-tooltip="tooltipLiveRecordingContainerMp4">MP4</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingAddMediaTypeSuffixToExtractedFilenames">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipAddMediaTypeSuffixToExtractedFilenames">?</div>
+								</label>
+								<label class="toggle-switch">
+									<input
+										type="checkbox"
+										data-setting="addMediaTypeSuffixToExtractedFilenames"
+									/>
+									<span class="toggle-slider"></span>
+								</label>
+							</div>
+						</div>
+					</div>
+
+					
+					<div class="settings-section processing-section collapsible-section">
+						<div class="section-header collapsible">
+							<h2 class="section-title settings">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></svg>
+								<span data-i18n="sectionProcessing"></span>
+							</h2>
+							<div class="toggle-icon">
+								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+								</svg>
+							</div>
+						</div>
+						<div class="section-content">
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingMinFileSize">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipMinFileSize">?</div>
+								</label>
+								<div class="input-container">
+									<div class="unit-input-group">
+										<div class="unit-toggle" data-unit-toggle="minFileSizeFilter">
+											<button type="button" class="unit-option active" data-multiplier="1024" data-i18n="unitKB">KB</button>
+											<button type="button" class="unit-option" data-multiplier="1048576" data-i18n="unitMB">MB</button>
+										</div>
+										<div class="input-constraint-wrapper" data-i18n-constraint="constraintMinFileSize">
+											<input 
+												type="number" 
+												data-setting="minFileSizeFilter"
+												class="input-field unit-number-input" 
+												min="0" 
+												max="102400"
+												step="0.01"
+												value="100"
+												placeholder="100"
+											/>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingPreferredResolution">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipPreferredResolution">?</div>
+								</label>
+								<div class="input-container">
+									<div class="combobox-wrapper video-quality" data-setting="preferredResolution">
+										<button type="button" class="combobox-trigger" aria-label="Open preferred resolution selector">
+											<span class="combobox-value">-</span>
+											<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" class="combobox-icon">
+												<path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+											</svg>
+										</button>
+										<div class="combobox-content hidden" role="listbox">
+											<div class="combobox-list" role="presentation"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingPreferredAudioLanguage">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipPreferredAudioLanguage">?</div>
+								</label>
+								<div class="input-container">
+									<div class="combobox-wrapper audio-language" data-setting="preferredAudioLanguage">
+										<button type="button" class="combobox-trigger" data-i18n-aria-label="ariaOpenPreferredAudioLanguageSelector">
+											<span class="combobox-value">-</span>
+											<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" class="combobox-icon"><path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+										</button>
+										<div class="combobox-content hidden" role="listbox">
+											<div class="combobox-search-wrapper">
+												<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="combobox-search-icon"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+												<input type="text" class="combobox-search" data-i18n-placeholder="searchLanguagesPlaceholder" aria-label="Search languages"/>
+											</div>
+											<div class="combobox-list" role="presentation"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="input-group horizontal hidden" id="preferred-audio-language-patterns-setting-group">
+								<label class="input-label" data-i18n="settingPreferredAudioLanguagePatterns">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipPreferredAudioLanguagePatterns">?</div>
+								</label>
+								<div class="input-container"><input type="text" data-setting="preferredAudioLanguagePatterns" class="input-field" placeholder="en, eng, ru0" /></div>
+							</div>
+
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingAutoGeneratePreviews">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipAutoGeneratePreviews">?</div>
+								</label>
+								<div class="input-container">
+									<div class="unit-toggle" data-setting="autoGeneratePreviews" data-unit-toggle="autoGeneratePreviews">
+										<div class="unit-option" data-value="off" data-i18n="labelOff"></div>
+										<div class="unit-option active" data-value="image" data-i18n="labelImage"></div>
+										<div class="unit-option" data-value="video" data-i18n="labelVideo"></div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingSmartNaming">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipSmartNaming">?</div>
+								</label>
+								<div class="setting-actions">
+									<a href="../smart-naming/smart-naming.html" data-i18n-tooltip="edit" target="_blank" id="manage-smart-naming-btn" class="btn btn-small btn-secondary">
+										<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+											<path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
+										</svg>
+									</a>
+									<label class="toggle-switch">
+										<input 
+											type="checkbox" 
+											data-setting="smartNaming"
+										/>
+										<span class="toggle-slider"></span>
+									</label>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+					
+						
+						<div class="settings-section behavior-section collapsible-section">
+							<div class="section-header collapsible">
+								<h2 class="section-title settings">
+									<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4.1 12 6"/><path d="m5.1 8-2.9-.8"/><path d="m6 12-1.9 2"/><path d="M7.2 2.2 8 5.1"/><path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"/></svg>
+									<span data-i18n="sectionBehavior"></span>
+								</h2>
+								<div class="toggle-icon">
+									<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+									</svg>
+								</div>
+							</div>
+							<div class="section-content">
+								<div class="input-group horizontal">
+									<label class="input-label" data-i18n="settingAddMaxToPageContextMenu">
+										<div class="tooltip-icon" data-i18n-tooltip="tooltipAddMaxToPageContextMenu">?</div>
+									</label>
+									<label class="toggle-switch">
+										<input 
+											type="checkbox" 
+											data-setting="addToPageContextMenu"
+										/>
+										<span class="toggle-slider"></span>
+									</label>
+								</div>
+
+								<div class="input-group horizontal">
+									<label class="input-label" data-i18n="settingExtendDetection">
+										<div class="tooltip-icon" data-i18n-tooltip="tooltipExtendDetection">?</div>
+									</label>
+									<label class="toggle-switch">
+										<input 
+											type="checkbox" 
+											data-setting="extendDetection"
+											checked
+										/>
+										<span class="toggle-slider"></span>
+									</label>
+								</div>
+
+								<div class="input-group horizontal">
+									<label class="input-label" data-i18n="settingMergeSplitViewTabs">
+										<div class="tooltip-icon" data-i18n-tooltip="tooltipMergeSplitViewTabs">?</div>
+									</label>
+									<label class="toggle-switch">
+										<input 
+											type="checkbox" 
+											data-setting="mergeSplitViewTabs"
+										/>
+										<span class="toggle-slider"></span>
+									</label>
+								</div>
+
+								<div class="input-group horizontal">
+									<label class="input-label" data-i18n="settingShowMediaFromAllTabs">
+										<div class="tooltip-icon" data-i18n-tooltip="tooltipShowMediaFromAllTabs">?</div>
+									</label>
+									<div class="input-inline-controls">
+										<button type="button" class="setting-warning-icon" id="show-media-from-all-tabs-warning" aria-label="Experimental feature warning" data-i18n-tooltip="tooltipShowMediaFromAllTabsWarning">
+											<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+												<path d="m10.29 3.86-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.71-3.14l-8-14a2 2 0 0 0-3.42 0"></path>
+												<path d="M12 9v4"></path>
+												<path d="M12 17h.01"></path>
+											</svg>
+										</button>
+										<label class="toggle-switch">
+											<input 
+												type="checkbox" 
+												data-setting="showMediaFromAllTabs"
+											/>
+											<span class="toggle-slider"></span>
+										</label>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					
+					<div class="settings-section shortcuts-section collapsible-section">
+						<div class="section-header collapsible">
+							<h2 class="section-title settings">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/></svg>
+								<span data-i18n="shortcutsTitle"></span>
+							</h2>
+							<div class="toggle-icon">
+								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+								</svg>
+							</div>
+						</div>
+						<div class="section-content">
+							<div class="input-group horizontal shortcut-row">
+								<label class="input-label" data-i18n="activateExtension">
+									<div class="tooltip-icon" data-i18n-tooltip="activateExtensionTooltip">?</div>
+								</label>
+								<div class="input-container">
+									<button id="shortcut-activate-button" type="button" class="input-field shortcut-button">
+										<span id="shortcut-activate-display"></span>
+									</button>
+								</div>
+							</div>
+							<div class="shortcut-settings-bubble">
+								<div class="input-group horizontal shortcut-row">
+									<label class="input-label" data-i18n="shortcutDownloadLatest">
+										<div class="tooltip-icon" data-i18n-tooltip="tooltipShortcutDownloadLatest">?</div>
+									</label>
+									<div class="input-container">
+										<button id="shortcut-latest-button" type="button" class="input-field shortcut-button">
+											<span id="shortcut-latest-display"></span>
+										</button>
+									</div>
+								</div>
+								<div class="input-group horizontal">
+									<label class="input-label" data-i18n="settingDownloadLatestAction">
+										<div class="tooltip-icon" data-i18n-tooltip="tooltipDownloadLatestAction">?</div>
+									</label>
+									<div class="input-container">
+										<div class="combobox-wrapper video-quality" data-setting="downloadLatestAction">
+											<button type="button" class="combobox-trigger" aria-label="Open latest media hotkey action selector">
+												<span class="combobox-value">-</span>
+												<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" class="combobox-icon">
+													<path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+											</button>
+											<div class="combobox-content hidden" role="listbox">
+												<div class="combobox-list" role="presentation"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="input-group horizontal">
+									<label class="input-label" data-i18n="settingDownloadLatestMediaTypes">
+										<div class="tooltip-icon" data-i18n-tooltip="tooltipDownloadLatestMediaTypes">?</div>
+									</label>
+									<div class="input-container">
+										<div class="combobox-wrapper shortcut-multiselect" data-setting="downloadLatestMediaTypes">
+											<button type="button" class="combobox-trigger" aria-haspopup="true" aria-expanded="false">
+												<span class="combobox-value" data-i18n="choose"></span>
+												<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" class="combobox-icon" aria-hidden="true">
+													<path d="M3.25 5.25 7 9l3.75-3.75" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+											</button>
+											<div class="combobox-content hidden">
+												<div class="shortcut-multiselect-list">
+												<label class="shortcut-multiselect-option">
+													<input type="checkbox" value="hls" checked>
+													<span data-i18n="sectionHLS"></span>
+												</label>
+												<label class="shortcut-multiselect-option">
+													<input type="checkbox" value="dash" checked>
+													<span data-i18n="sectionDASH"></span>
+												</label>
+												<label class="shortcut-multiselect-option">
+													<input type="checkbox" value="video" checked>
+													<span data-i18n="labelVideo"></span>
+												</label>
+												<label class="shortcut-multiselect-option">
+													<input type="checkbox" value="audio" checked>
+													<span data-i18n="labelAudio"></span>
+												</label>
+												<label class="shortcut-multiselect-option">
+													<input type="checkbox" value="subs" checked>
+													<span data-i18n="labelSubtitles"></span>
+												</label>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="input-group horizontal">
+									<label class="input-label" data-i18n="settingSkipDownloadedLatestMedia">
+										<div class="tooltip-icon" data-i18n-tooltip="tooltipSkipDownloadedLatestMedia">?</div>
+									</label>
+									<label class="toggle-switch">
+										<input type="checkbox" data-setting="skipDownloadedLatestMedia" checked />
+										<span class="toggle-slider"></span>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+					
+					<div class="settings-section history-section collapsible-section">
+						<div class="section-header collapsible">
+							<h2 class="section-title settings">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+								<span data-i18n="historyTitle"></span>
+							</h2>
+							<div class="toggle-icon">
+								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M1.70833 3.125C1.31771 2.73438 0.683333 2.73438 0.292708 3.125C-0.0979167 3.51562 -0.0979167 4.15 0.292708 4.54062L4.29271 8.54062C4.68333 8.93125 5.31771 8.93125 5.70833 8.54062L9.70833 4.54062C10.099 4.15 10.099 3.51562 9.70833 3.125C9.31771 2.73438 8.68333 2.73438 8.29271 3.125L5 6.41875L1.70833 3.125Z"/>
+								</svg>
+							</div>
+						</div>
+						<div class="section-content">
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingSaveInHistory">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipSaveInHistory">?</div>
+								</label>
+								<label class="toggle-switch">
+									<input 
+										type="checkbox" 
+										data-setting="saveDownloadsInHistory"
+										checked
+									/>
+									<span class="toggle-slider"></span>
+								</label>
+							</div>
+							
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingMaxHistoryItems">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipMaxHistoryItems">?</div>
+								</label>
+								<div class="input-container">
+									<div class="input-constraint-wrapper" data-constraint="0-200">
+										<input 
+											type="number" 
+											data-setting="maxHistorySize"
+											class="input-field" 
+											min="0" 
+											max="200"
+											value="50"
+											placeholder="50"
+										/>
+									</div>
+								</div>
+							</div>
+							
+							<div class="input-group horizontal">
+								<label class="input-label" data-i18n="settingAutoRemoveDays">
+									<div class="tooltip-icon" data-i18n-tooltip="tooltipAutoRemoveDays">?</div>
+								</label>
+								<div class="input-container">
+									<div class="input-constraint-wrapper" data-constraint="0-365">
+										<input 
+											type="number" 
+											data-setting="historyAutoRemoveInterval"
+											class="input-field" 
+											min="0" 
+											max="365"
+											value="30"
+											placeholder="30"
+										/>
+									</div>
+								</div>
+							</div>
+							<div class="input-group horizontal">
+								<div class="input-group">
+									<button id="clear-history-button" class="btn clear-history-button"><h3 data-i18n="buttonClearHistory"></h3></button>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="settings-footer">
+						<div class="settings-footer-actions">
+							<input type="file" id="import-settings-input" accept=".json" class="hidden">
+							<button id="import-settings-btn" class="btn btn-secondary feedback-button">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+								<span data-i18n="import"></span>
+							</button>
+							<button id="export-settings-btn" class="btn btn-secondary feedback-button">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+								<span data-i18n="export"></span>
+							</button>
+							<button id="reset-settings-btn" class="btn feedback-button btn-warn">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-ccw"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+								<span data-i18n="reset"></span>
+							</button>
+						</div>
+					</div>
+				</section>
+			</div>
+		</section>
+	</main>
+	<script type="module" src="popup.js"></script>
+</body>
+</html>

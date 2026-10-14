@@ -1,0 +1,332 @@
+{
+  "schema_version": "expguard-extension-dataset/v1",
+  "extension": {
+    "platform": "firefox",
+    "extension_id": "{cb2b337b-99d7-4b86-aa04-84a6f5c3e218}",
+    "version": "6.1.1",
+    "name": "Just Read",
+    "rank": 1833,
+    "manifest_version": 3,
+    "catalog_manifest_version": 3,
+    "catalog_metadata": {
+      "rank": 1833,
+      "manifest_version": 3,
+      "user_count": 2175,
+      "rating_count": 27,
+      "rating_average": 4.8148,
+      "name": "Just Read"
+    },
+    "source": {
+      "directory": "Source",
+      "manifest_sha256": "f93608b8e25bd55cdd5d4eae325d7bc1ae275510001ac5bed4a0f643a09e05d2"
+    }
+  },
+  "tools": {
+    "ExPGuard": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "ExPGuard/analysis.log",
+          "ExPGuard/report.flows.json",
+          "ExPGuard/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 1,
+        "reported_no_duplicate": 1,
+        "tp_no_duplicate": 1,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [
+          {
+            "flow_id": "expguard-opti:firefox:{cb2b337b-99d7-4b86-aa04-84a6f5c3e218}:6.1.1:830e7afdbcb010d9:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://justread.link/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "messager",
+              "loc": "L10:C19 -> L10:C38",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://justread.link/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "messager",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://justread.link/*"
+                ]
+              },
+              "code_preview": ") => {\n      if (tab>>>Array.length) execu<<<teScripts(tabArray[0"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "jrSecret",
+              "file": "background",
+              "loc": "L220:C4 -> L220:C59",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "est.jrSecret) {\n    >>>chrome.storage.sync.set({ jrSecret: request.jrSecret })<<<;\n  } else if (reque"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "messager",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[messager->background]",
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ],
+        "no_duplicate": [
+          {
+            "flow_id": "expguard-opti:firefox:{cb2b337b-99d7-4b86-aa04-84a6f5c3e218}:6.1.1:830e7afdbcb010d9:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://justread.link/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "messager",
+              "loc": "L10:C19 -> L10:C38",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://justread.link/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "messager",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://justread.link/*"
+                ]
+              },
+              "code_preview": ") => {\n      if (tab>>>Array.length) execu<<<teScripts(tabArray[0"
+            },
+            "sink": {
+              "type": "CHROME_SYNC_STORAGE",
+              "remark": "jrSecret",
+              "file": "background",
+              "loc": "L220:C4 -> L220:C59",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "est.jrSecret) {\n    >>>chrome.storage.sync.set({ jrSecret: request.jrSecret })<<<;\n  } else if (reque"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "messager",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[messager->background]",
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ]
+      }
+    },
+    "CoCo": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "CoCo/report.flows.json",
+          "CoCo/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    },
+    "DoubleX": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "DoubleX/report.flows.json",
+          "DoubleX/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    }
+  },
+  "ground_truth": {
+    "verdict": "TP",
+    "flow_count": 1,
+    "flow_ids": [
+      "gtf-385d0930c19d982f"
+    ],
+    "flows": [
+      {
+        "ground_truth_flow_id": "gtf-385d0930c19d982f",
+        "verification": "TP",
+        "source_family": "page",
+        "sink_family": "CHROME_SYNC_STORAGE",
+        "matched_tools": [
+          "ExPGuard"
+        ],
+        "match_region": "ExPGuard only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "ExPGuard",
+            "flow_id": "expguard-opti:firefox:{cb2b337b-99d7-4b86-aa04-84a6f5c3e218}:6.1.1:830e7afdbcb010d9:01",
+            "source_report": "ExPGuard/report.flows.json",
+            "flow": {
+              "flow_id": "expguard-opti:firefox:{cb2b337b-99d7-4b86-aa04-84a6f5c3e218}:6.1.1:830e7afdbcb010d9:01",
+              "flow_index": 0,
+              "flow_order": 1,
+              "flow_label": "F001",
+              "flow_type": "STORAGE_POISONING",
+              "rule_id": "attacker-input-storage-write",
+              "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+              "severity": "MEDIUM",
+              "severity_reason": "Host is restricted, but path is wildcarded.",
+              "severity_evidence": [
+                "https://justread.link/*"
+              ],
+              "source": {
+                "type": "WINDOW_MESSAGE_EVENT",
+                "remark": "window.addEventListener(message)",
+                "file": "messager",
+                "loc": "L10:C19 -> L10:C38",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "https://justread.link/*"
+                      ]
+                    }
+                  }
+                ],
+                "provenance": "CONTENT_SCRIPT",
+                "origin_context": "messager",
+                "origin_frame_family": "CS",
+                "constraint": {
+                  "matches": [
+                    "https://justread.link/*"
+                  ]
+                },
+                "code_preview": ") => {\n      if (tab>>>Array.length) execu<<<teScripts(tabArray[0"
+              },
+              "sink": {
+                "type": "CHROME_SYNC_STORAGE",
+                "remark": "jrSecret",
+                "file": "background",
+                "loc": "L220:C4 -> L220:C59",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "url_taint_control": null,
+                "code_preview": "est.jrSecret) {\n    >>>chrome.storage.sync.set({ jrSecret: request.jrSecret })<<<;\n  } else if (reque"
+              },
+              "structural": {
+                "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+                "privilege_crossing": true,
+                "privilege_reason": "sink grants capability beyond the source origin",
+                "message_passing": true,
+                "storage_passing": false,
+                "message_sender": "messager",
+                "message_sender_provenance": "CONTENT_SCRIPT",
+                "channel": "runtime.single.sender.message[messager->background]",
+                "storage_area": null
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

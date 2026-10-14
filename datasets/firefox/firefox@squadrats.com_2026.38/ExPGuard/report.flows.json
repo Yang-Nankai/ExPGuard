@@ -1,0 +1,101 @@
+{
+  "extensionId": "firefox@squadrats.com",
+  "extensionVersion": "2026.38",
+  "sourceType": "XPI",
+  "stats": {
+    "filesWithIssues": 4,
+    "totalFiles": 5,
+    "distinctFlows": 1,
+    "rawIssueEntries": 4,
+    "sinklessSourcesSkipped": 12
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "squadratsCaller",
+      "frame": "CS_2",
+      "constraint": {
+        "matches": [
+          "https://*.strava.com/*"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "squadratsCaller",
+        "loc": "L1:C270 -> L1:C281",
+        "line": 1,
+        "col": [
+          270,
+          281
+        ],
+        "spansTo": null,
+        "code": "…EventListener(\"message\",(async e=>{if(e.source===window&&e.origin===window.location.origin)if(\"SQUADRATS_SAFARI_AUTH\"!==»e.data.type«){if(\"SQUADRATS_SET_UID\"===e.data.type){const{id:t,uid:a}=e.data;console.log(\"[squadrats-caller] SET_UID received\",{id:t…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "squadrant_uid",
+          "file": "squadratsCaller",
+          "loc": "L1:C654 -> L1:C700",
+          "line": 1,
+          "col": [
+            654,
+            700
+          ],
+          "spansTo": null,
+          "code": "…e({type:\"SQUADRATS_SET_UID_RESPONSE\",id:t,ok:!chrome.runtime.lastError,error:chrome.runtime.lastError?.message})};try{a?»browser.storage.local.set({squadrant_uid:a},s)«:browser.storage.local.remove([\"squadrant_uid\"],s)}catch(e){console.error(\"[squadrats-caller] storage call threw\",e),win…",
+          "frame": "CS_2",
+          "constraint": {
+            "matches": [
+              "https://*.strava.com/*"
+            ]
+          }
+        },
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "[UNKNOWN ORIGIN]",
+          "file": "squadratsCaller",
+          "loc": "L1:C517 -> L1:C646",
+          "line": 1,
+          "col": [
+            517,
+            646
+          ],
+          "spansTo": null,
+          "code": "…id:t,uid:a});const s=()=>{console.log(\"[squadrats-caller] storage callback fired\",{lastError:chrome.runtime.lastError}),»window.postMessage({type:\"SQUADRATS_SET_UID_RESPONSE\",id:t,ok:!chrome.runtime.lastError,error:chrome.runtime.lastError?.message})«};try{a?browser.storage.local.set({squadrant_uid:a},s):browser.storage.local.remove([\"squadrant_uid\"],s)}catch(e){consol…",
+          "frame": "CS_2",
+          "constraint": {
+            "matches": [
+              "https://*.strava.com/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 27,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "squadratsCaller",
+            "line": 1,
+            "ops": [
+              "ELEMENT:member-element",
+              "ASSIGN:binary-right",
+              "ELEMENT:destructure-property[squadratsUrl]",
+              "ELEMENT:destructure-property[id]",
+              "ELEMENT:destructure-property[uid]",
+              "ASSIGN:identifier",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "…RATS_SAFARI_AUTH\"!==»e.data.type){if(\"SQUADRATS_SET_UID\"===e.data.type){const{id:t,uid:a}=e.data;console.log(\"[squadrats-caller] SET_UID rece …⟨tainted span: 772 chars⟩… Url:t}=e.data;if(!t)return;let a=!1;try{const e=await browser.runtime.sendMessage({action:\"safari-auth\",squadratsUrl:t})«;e?.uid&&(a=!0,brows…"
+          }
+        ]
+      }
+    }
+  ]
+}

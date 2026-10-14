@@ -1,0 +1,1 @@
+import{e as n}from"./v_7_4_3_70_852a2017-6c59-445a-bdb5-28beaffc087f2.js";import{s}from"./v_7_4_3_70_852a2017-6c59-445a-bdb5-28beaffc087f43.js";function a(t){const r=n.useRef(void 0);return o=>{const e=t(o);return s(r.current,e)?r.current:r.current=e}}export{a as u};

@@ -1,0 +1,491 @@
+{
+  "schema_version": "expguard-extension-dataset/v1",
+  "extension": {
+    "platform": "firefox",
+    "extension_id": "zerodelay@joaogfc",
+    "version": "1.5.0",
+    "name": "ZeroDelay",
+    "rank": 2183,
+    "manifest_version": 3,
+    "catalog_manifest_version": 3,
+    "catalog_metadata": {
+      "rank": 2183,
+      "manifest_version": 3,
+      "user_count": 1675,
+      "rating_count": 5,
+      "rating_average": 5.0,
+      "name": "ZeroDelay"
+    },
+    "source": {
+      "directory": "Source",
+      "manifest_sha256": "b18b53aaa114629d0dd0959290fd67046c97e97f180c407155225aad5c98f75c"
+    }
+  },
+  "tools": {
+    "ExPGuard": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "ExPGuard/analysis.log",
+          "ExPGuard/report.flows.json",
+          "ExPGuard/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 2,
+        "reported_no_duplicate": 2,
+        "tp_no_duplicate": 1,
+        "fp_no_duplicate": 1
+      },
+      "flows": {
+        "reported": [
+          {
+            "flow_id": "expguard-opti:firefox:zerodelay@joaogfc:1.5.0:03fc4950540f5378:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://www.youtube.com/*"
+            ],
+            "source": {
+              "type": "TARGET_CUSTOM_EVENT",
+              "remark": "target.addEventListener(_live_catch_up_video_meta)",
+              "file": "content",
+              "loc": "L143:C94 -> L143:C102",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://www.youtube.com/*"
+                ]
+              },
+              "code_preview": "nelIdUpdate(common, >>>e.detail<<<));\r\n        // Turn"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "unknown",
+              "file": "content",
+              "loc": "L443:C37 -> L443:C66",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "t.keys(upd).length) >>>chrome.storage.local.set(upd)<<<;\r\n    });\r\n}\r\n"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:zerodelay@joaogfc:1.5.0:17c3a83d56e670d6:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "rule_description": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://www.youtube.com/*"
+            ],
+            "source": {
+              "type": "TARGET_CUSTOM_EVENT",
+              "remark": "target.addEventListener(_zd_badge)",
+              "file": "content",
+              "loc": "L106:C58 -> L106:C66",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://www.youtube.com/*"
+                ]
+              }
+            },
+            "sink": {
+              "type": "CHROME_ACTION_BADGE_OPTIONS",
+              "remark": null,
+              "file": "background",
+              "loc": "L69:C8 -> L69:C79",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": ", 4) : '';\r\n        >>>chrome.action.setBadgeText({ tabId: sender.tab.id, text: raw || null })<<<;\r\n        if (raw) "
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[content->background]",
+              "storage_area": null
+            },
+            "verification_evidence": "FP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ],
+        "no_duplicate": [
+          {
+            "flow_id": "expguard-opti:firefox:zerodelay@joaogfc:1.5.0:03fc4950540f5378:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://www.youtube.com/*"
+            ],
+            "source": {
+              "type": "TARGET_CUSTOM_EVENT",
+              "remark": "target.addEventListener(_live_catch_up_video_meta)",
+              "file": "content",
+              "loc": "L143:C94 -> L143:C102",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://www.youtube.com/*"
+                ]
+              },
+              "code_preview": "nelIdUpdate(common, >>>e.detail<<<));\r\n        // Turn"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "unknown",
+              "file": "content",
+              "loc": "L443:C37 -> L443:C66",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "t.keys(upd).length) >>>chrome.storage.local.set(upd)<<<;\r\n    });\r\n}\r\n"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "channel": null,
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:zerodelay@joaogfc:1.5.0:17c3a83d56e670d6:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "rule_description": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://www.youtube.com/*"
+            ],
+            "source": {
+              "type": "TARGET_CUSTOM_EVENT",
+              "remark": "target.addEventListener(_zd_badge)",
+              "file": "content",
+              "loc": "L106:C58 -> L106:C66",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.youtube.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://www.youtube.com/*"
+                ]
+              }
+            },
+            "sink": {
+              "type": "CHROME_ACTION_BADGE_OPTIONS",
+              "remark": null,
+              "file": "background",
+              "loc": "L69:C8 -> L69:C79",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": ", 4) : '';\r\n        >>>chrome.action.setBadgeText({ tabId: sender.tab.id, text: raw || null })<<<;\r\n        if (raw) "
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[content->background]",
+              "storage_area": null
+            },
+            "verification_evidence": "FP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ]
+      }
+    },
+    "CoCo": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "CoCo/report.flows.json",
+          "CoCo/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    },
+    "DoubleX": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "DoubleX/report.flows.json",
+          "DoubleX/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    }
+  },
+  "ground_truth": {
+    "verdict": "TP",
+    "flow_count": 1,
+    "flow_ids": [
+      "gtf-eca35cfbe1d2bab3"
+    ],
+    "flows": [
+      {
+        "ground_truth_flow_id": "gtf-eca35cfbe1d2bab3",
+        "verification": "TP",
+        "source_family": "custom",
+        "sink_family": "CHROME_LOCAL_STORAGE",
+        "matched_tools": [
+          "ExPGuard"
+        ],
+        "match_region": "ExPGuard only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "ExPGuard",
+            "flow_id": "expguard-opti:firefox:zerodelay@joaogfc:1.5.0:03fc4950540f5378:01",
+            "source_report": "ExPGuard/report.flows.json",
+            "flow": {
+              "flow_id": "expguard-opti:firefox:zerodelay@joaogfc:1.5.0:03fc4950540f5378:01",
+              "flow_index": 0,
+              "flow_order": 1,
+              "flow_label": "F001",
+              "flow_type": "STORAGE_POISONING",
+              "rule_id": "attacker-input-storage-write",
+              "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+              "severity": "MEDIUM",
+              "severity_reason": "Host is restricted, but path is wildcarded.",
+              "severity_evidence": [
+                "https://www.youtube.com/*"
+              ],
+              "source": {
+                "type": "TARGET_CUSTOM_EVENT",
+                "remark": "target.addEventListener(_live_catch_up_video_meta)",
+                "file": "content",
+                "loc": "L143:C94 -> L143:C102",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "https://www.youtube.com/*"
+                      ]
+                    }
+                  }
+                ],
+                "provenance": "CONTENT_SCRIPT",
+                "origin_context": "content",
+                "origin_frame_family": "CS",
+                "constraint": {
+                  "matches": [
+                    "https://www.youtube.com/*"
+                  ]
+                },
+                "code_preview": "nelIdUpdate(common, >>>e.detail<<<));\r\n        // Turn"
+              },
+              "sink": {
+                "type": "CHROME_LOCAL_STORAGE",
+                "remark": "unknown",
+                "file": "content",
+                "loc": "L443:C37 -> L443:C66",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "https://www.youtube.com/*"
+                      ]
+                    }
+                  }
+                ],
+                "url_taint_control": null,
+                "code_preview": "t.keys(upd).length) >>>chrome.storage.local.set(upd)<<<;\r\n    });\r\n}\r\n"
+              },
+              "structural": {
+                "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+                "privilege_crossing": true,
+                "privilege_reason": "sink grants capability beyond the source origin",
+                "message_passing": false,
+                "storage_passing": false,
+                "message_sender": null,
+                "message_sender_provenance": null,
+                "channel": null,
+                "storage_area": null
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

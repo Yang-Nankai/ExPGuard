@@ -1,0 +1,1 @@
+(()=>{(m=>{let n=(c,o)=>{let e=document.createElement("script");document.documentElement.append(e),e.src=chrome.runtime.getURL(c),Array(o).map(t=>{if(typeof t=="object"){let[r,s]=Object.entries(t)[0];e[r]=s}else e[t]=!0})};n("ga.bundle.js"),n("webpage.bundle.js","defer")})();})();

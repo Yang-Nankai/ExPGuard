@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="icon" type="image/png" href="img/dle16.png" sizes="16x16">
+	<link rel="icon" type="image/png" href="img/dle32.png" sizes="32x32">
+	<link rel="icon" type="image/png" href="img/dle64.png" sizes="64x64">
+	<link rel="icon" type="image/png" href="img/dle128.png" sizes="128x128">
+	<title>Configurar la extensión RAE en bocadillo</title>
+	<script type="text/javascript" src="configurar.js"></script>
+	<style>
+		* {
+			-moz-user-select: none;
+			-webkit-user-select: none;
+		}
+		body {
+			background: #fff5e6;
+			font-family: "Segoe UI", Tahoma, sans-serif;
+			font-size: 95%;
+		}
+		select { font-size:15px; font-weight: bold; }
+		table, th, td {
+		  border: 0px solid black;
+		  border-collapse: collapse;
+		}
+		th, td {
+		  padding: 10px;
+		}
+		th {
+		  text-align: left;
+		  font-size: 20px;
+		  padding-bottom: 15px;
+		}
+		sup {
+		  font-size: 8px;
+		}
+		.deshabilitado {
+			color: gray;
+		}
+		button {
+		  padding: 2px;
+		  margin-left:10px;
+		  margin-top:6px;
+		}
+		#cont-rango {
+			position: relative;
+			width: 80%;
+			left: 45%; transform: translateX(-45%);
+		}
+		.rango {
+			position: relative;
+			display: block;
+			width: 110%;
+			left: 50%; transform: translateX(-50%);
+			height: 25px;
+			padding: 0;
+			margin-top: 2em;
+			margin-bottom: 0.6em;
+		  border-radius: 5px;
+		  background: rgb(255, 230, 204);
+		}
+
+		.rango::-moz-range-thumb {
+			width: 45px;
+			height: 60px;
+			border: 0;
+			border-radius: 0px;
+			background: url('img/cronometro40.png');
+			background-repeat: no-repeat;
+			background-position: 2px 9px;
+			background-color: transparent;
+			cursor: pointer;
+		}
+
+		#etiqtespera {
+			display: inline-block;
+			-moz-user-select: none;
+			position:absolute;
+			margin-top: -2em;
+			margin-left: -1em;
+			font-size: 0.8em;
+		}
+
+		#etiqmin {
+			position: absolute;
+			left: 1%;
+			top: 54%;
+			font-size: 0.9em;
+		}
+
+		#etiqmax {
+			position: absolute;
+			right: calc(2% - 4px);
+			top: 54%;
+			font-size: 0.9em;
+		}
+
+		@media (max-width: 400px) {
+			#etiqmin, #etiqmax {
+				font-size: 0.7em;
+				top: 57%;
+			}
+		}
+</style>
+</head>
+
+<body>
+<div id="cuerpo-escritorio" style="display: none; max-width: 700px; position: relative; left:50%; transform: translateX(-50%);">
+	<div style="font-size: 1.3em; padding:17px; -webkit-border-radius: 5px 10px; border-radius: 5px 10px; background: #ffa94d; background-image: url('img/ruedagris.png'), url('img/50dle-bocadillo.png'); background-position:2% 50%, 97% 50%; background-repeat: no-repeat;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Configure la extensión&nbsp;&nbsp;<i>Diccionario RAE en bocadillo</i></div>
+	<table style="width:100%">
+	  <tr>
+	    <th><span>Elija los métodos de activación...</span></th>
+	    <th colspan="2"><span>...y la presentación</span></th>
+	  </tr>
+	  <tr>
+	    <td style="padding-top:10px;">
+			<label style="padding:17px; padding-top: 15px; -webkit-border-radius: 5px 10px; border-radius: 5px 10px; background:rgb(255, 169, 77); background-image: url('img/clic-derecho40.png'), url('img/40contextual.png'); background-position:78% 40%, 97% 65%; background-repeat: no-repeat;"><b>Menú contextual&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
+				<form  name="formSeleccion" style="width:300px; margin-left:30px; margin-top:8px; margin-bottom:0px; padding:14px; -webkit-border-radius: 10px 10px; border-radius: 10px 10px; background:rgb(255, 230, 204);">
+					<label style="background-image: url('img/cursor.png'); background-position:76% 53%; background-repeat: no-repeat;"><input style="margin-top:8px; margin-bottom:12px;" type="checkbox" id="checkSinSeleccion" checked> para la palabra apuntada <samp>&nbsp;&nbsp;&nbsp;&nbsp;¡NUEVO!</samp></label>
+					<br>
+					<label><input type="checkbox" id="checkContextual" checked> para el texto <span style="-webkit-user-select: all; -moz-user-select: none;" id="seleccioname">seleccionado</span> <br>
+					<samp>&nbsp;&nbsp;(requerido en vista lectura y PDF)</samp>
+					</label>
+			</form>
+	    </td>
+	    <td id="flecha2" style="font-size:48px; vertical-align:middle; padding:0px;"><span>&rArr;</span></td>
+	    <td style="padding-top: 2px;">
+			<form  name="formResulContextual" style="width:190px; margin-left:0px; margin-top:16px; margin-bottom:0px; padding:1px; -webkit-border-radius: 10px 10px; border-radius: 10px 10px; background:rgb(254, 255, 199);">
+				<fieldset id="resulContextual">
+					<label><input type="radio" name="resulContextual" value="bocadillo" checked> en bocadillo</label> <br>
+					<label><input type="radio" name="resulContextual" value="ventana"> en ventana nueva</label>
+				</fieldset>
+			</form>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td style="padding-top:20px;">
+	    	<label style="padding:17px; -webkit-border-radius: 5px 10px; border-radius: 5px 10px; background:rgb(255, 169, 77); background-image: url('img/doble-clic40.png'); background-position:96% 48%; background-repeat: no-repeat;"><input type="checkbox" id="checkDobleclic" checked > <b>Doble clic en palabra&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
+			<form  name="formTeclas" style="width:300px; margin-left:30px; margin-top:4px; margin-bottom:0px; padding:14px; -webkit-border-radius: 10px 10px; border-radius: 10px 10px; background:rgb(255, 230, 204);">
+				<fieldset id="teclas">
+					<legend> tecla necesaria pulsada </legend>
+					<label id="radioTeclaCMD"><input type="radio" name="tecla" value="CMD"> <kbd>[⌘]</kbd> tecla 'command' en Mac<sup>TM</sup><br></label>
+					<label id="radioTeclaCTRL"><input type="radio" name="tecla" value="CTRL" checked> <kbd>[ctrl]</kbd> tecla 'control'</label> <br>
+					<label><input type="radio" name="tecla" value="ALT"> <kbd>[alt]</kbd>  tecla 'alternativa'</label> <br>
+					<label><input type="radio" name="tecla" value=""> ninguna: basta con doble clic</label>
+				</fieldset>
+			</form>
+		</td>
+	    <td id="flecha1" style="font-size:48px; vertical-align:middle; padding:0px;"><span>&rArr;</span></td>
+	    <td style="vertical-align:middle; padding-top:2px;">
+			<form  name="formResulDobleclic" style="width:190px; margin-left:0px; margin-top:16px; margin-bottom:0px; padding:1px; -webkit-border-radius: 10px 10px; border-radius: 10px 10px; background:rgb(254, 255, 199);">
+				<fieldset id="resulDobleclic">
+					<label><input type="radio" name="resulDobleclic" value="bocadillo" checked> en bocadillo</label> <br>
+					<label><input type="radio" name="resulDobleclic" value="ventana"> en ventana nueva</label>
+				</fieldset>
+			</form>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td style="padding-top:20px;">
+	    	<label style="padding:17px; -webkit-border-radius: 5px 10px; border-radius: 5px 10px; background:rgb(255, 169, 77); background-image: url('img/cursor.png'), url('img/bctrl.png'); background-position: 75% 58%, 96% 48%; background-repeat: no-repeat;"><input type="checkbox" id="checkLabTeclado"> <b>Tecla&nbsp;&nbsp;&nbsp;(sin clics)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
+			<form  name="formLabTeclado" style="width:300px; margin-left:30px; margin-top:4px; margin-bottom:0px; padding:14px; -webkit-border-radius: 10px 10px; border-radius: 10px 10px; background:rgb(255, 230, 204);">
+				<fieldset id="labteclas">
+					<legend> doble pulsación rápida </legend>
+					<label id="radioLabTeclaCMD"><input type="radio" name="labtecla" value="CMD"> <kbd>[⌘]</kbd><samp>x2</samp>&nbsp;&nbsp;tecla 'command' en Mac<sup>TM</sup><br></label>
+					<label><input type="radio" name="labtecla" value="CTRL" checked> <kbd>[ctrl]</kbd><samp>x2</samp>&nbsp;&nbsp;tecla 'control' </label> <br>
+					<label><input type="radio" name="labtecla" value="SHF"> <kbd>[</kbd><kbd style="background-image: url('img/mayus13.png'); background-position:15% 48%; background-repeat: no-repeat;">&nbsp;&nbsp;]</kbd><samp>x2</samp>&nbsp;&nbsp;tecla 'mayúsculas' / 'shift'</label>
+				</fieldset>
+			</form>
+			<form  name="formLabChivato" style="width:270px; margin-left:60px; margin-top:-14px; margin-bottom:0px; padding:14px; -webkit-border-radius: 10px 10px; border-radius: 10px 10px; background:rgb(255, 230, 204);">
+				<fieldset id="labchivato">
+					<label><input type="checkbox" id="checkLabchivato" checked> mostrar chivato con la palabra </label>
+				</fieldset>
+			</form>
+		</td>
+	    <td id="flecha3" style="font-size:48px; vertical-align:middle; padding:0px;"><span>&rArr;</span></td>
+	    <td style="vertical-align:middle; padding-top:2px;">
+			<form  name="formLabResulTeclado" style="width:190px; margin-left:0px; margin-top:16px; margin-bottom:0px; padding:1px; -webkit-border-radius: 10px 10px; border-radius: 10px 10px; background:rgb(254, 255, 199);">
+				<fieldset id="labresulTeclado">
+					<label><input type="radio" name="labresulTeclado" value="bocadillo" checked> en bocadillo</label> <br>
+					<label><input type="radio" name="labresulTeclado" value="ventana"> en ventana nueva</label>
+				</fieldset>
+			</form>
+	    </td>
+	  </tr>
+	</table>
+	<div id="opcionesavanzadas" style="display: none;">
+		<hr style="width: 100%">	
+		<h3 style="margin-block-start: 0.8em; margin-block-end: 0.8em;">Opciones avanzadas del bocadillo</h3>
+		<label style="display: block; margin:8px; padding:8px; -webkit-border-radius: 5px 10px; border-radius: 5px 10px; background:rgb(255, 230, 204);"><input type="checkbox" id="checkCerrarAutom"> Cerrar el bocadillo al mover el ratón fuera de la página
+		</label>
+		<label style="display: block; margin:8px; padding:8px; -webkit-border-radius: 5px 10px; border-radius: 5px 10px; background:rgb(255, 230, 204);"><input type="checkbox" id="checkPermitirEnlazarTodas"> Permitir enlaces subsiguientes hacia cualquier palabra del resultado <br>
+			<samp>&nbsp;&nbsp;&nbsp;&nbsp;(Poco recomendable si desea mantener la concentración y la productividad)</samp>
+		</label>
+		<label style="display: block; margin:8px; padding:8px; -webkit-border-radius: 5px 10px; border-radius: 5px 10px; background:rgb(255, 230, 204);"><input type="checkbox" id="checkCederColores"> Ceder la gestión de colores a terceros <samp>(temas oscuros, "Dark Reader", etc.)</samp>
+		</label>
+		<label style="display: none; margin:8px; padding:8px; -webkit-border-radius: 5px 10px; border-radius: 5px 10px; background:rgb(255, 230, 204);"><input type="checkbox" id="checkAuxilio"> <b>Resolver automáticamente los bloqueos de bocadillo abriendo nueva ventana</b>
+		</label>
+	</div>
+
+	<hr style="width: 100%">	
+	<button id="bguardar" style="display: none;">Guardar</button>
+
+	<button id="blisto" title="Los cambios son guardados automáticamente" style="background-image: url('img/tic.png'); background-position:97% 15%; background-repeat: no-repeat; font-family: monospace; font-size:16px;">&nbsp;¡Hecho!&nbsp;&nbsp;&nbsp;</button>
+
+	<button id="bpordefecto" title="Perderá la configuración actual" style="background-image: url('img/flechagiro20.png'); background-position:98% 50%; background-repeat: no-repeat; font-family: monospace; font-size:16px;">&nbsp;Recuperar la configuración por defecto&nbsp;&nbsp;&nbsp;&nbsp;</button>
+
+	<div id="barra_avisos" style="font-family: 'Gill Sans', sans-serif; font-size:14px; margin:4px; padding:4px; opacity: 1">&#9432; Para que los cambios tengan efecto en las páginas ya abiertas, deberá recargarlas</div>
+</div>
+
+<div id="cuerpo-android" style="display: none; max-width: 600px;">
+	<fieldset id="fconfiguraciones" style="padding:10px 10px 20px 10px;; -webkit-border-radius: 10px 10px; border-radius: 10px 10px;">
+	<legend  style="font-size: large; font-weight: bold;"> ⚙️ Métodos de activación </legend>
+	<table style="width:100%">
+	  <tr>
+	    <td style="padding: 0px;">
+			<form  name="formRango" style="padding:10px; -webkit-border-radius: 10px 10px; border-radius: 10px 10px; background:rgb(255, 169, 77);">
+			<fieldset id="fRango" style="position: relative;">
+				<legend  style="font-size: medium; font-weight: bold;"> 👆🏻 Tiempo de toque de palabra </legend>
+				<div id="cont-rango">
+					<span id="etiqtespera"></span>
+					<input class="rango" type="range" id="tesperatoque" name="tesperatoque" min="50" max="2000" value="1100" step="50">
+				</div>
+				<div id="etiqmin">mín.</div>
+				<div id="etiqmax">máx.</div>
+			</fieldset>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td style="padding: 25px 0px 10px 0px;">
+		<label style="padding:17px; -webkit-border-radius: 5px 10px; border-radius: 5px 10px; background:rgb(255, 169, 77); font-size: medium; font-weight: bold;"><input type="checkbox" id="checkDobleclicAndroid" checked > <b>Doble toque en palabra</b></label>
+	    </td>
+	  </tr>
+	</table>
+	</fieldset>
+	<div id="barra_avisos_android" style="font-family: 'Gill Sans', sans-serif; font-size:14px; margin:4px; padding:4px; opacity: 1">&#9432; Para que los cambios tengan efecto en las páginas ya abiertas, deberá recargarlas</div>
+</div>
+</body>
+</html>

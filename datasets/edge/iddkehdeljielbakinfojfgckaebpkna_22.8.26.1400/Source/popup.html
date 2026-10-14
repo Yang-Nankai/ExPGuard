@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,700">
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
+    <link href="lib/material/material-components-web.min.css" rel="stylesheet">
+
+    <!--    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">-->
+    <!--    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">-->
+    <!--    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.css" rel="stylesheet">-->
+    <!--    <link href="lib/material/material-components-web.css" rel="stylesheet">-->
+    <!--    <link  href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
+    <!--    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" rel="stylesheet">-->
+    <!--    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">-->
+    <!--    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>-->
+
+
+    <link rel="stylesheet" href="styles/popup.css">
+</head>
+<body>
+<!-- =========================== Logged-in Panel ============================================= -->
+<div class="container-fluid" id="loggedin">
+    <div style="display:flex;justify-content:center; align-items: flex-end;">
+        <button id="extract-btn" class="mdc-button mdc-button--raised mdc-button--leading "
+        >
+<!--                style="width: 100%"-->
+            <span class="mdc-button__ripple"
+            ></span>
+<!--            <i class="material-icons mdc-button__icon" aria-hidden="true">cloud_download</i>-->
+            <i class="material-icons mdc-button__icon" aria-hidden="true">content_cut</i>
+            <span class="mdc-button__label">Clip</span>
+        </button>
+    </div>
+    <!-- ....................................................... -->
+    <h3 class="mt-2" id="url" aria-hidden="true"></h3>
+</div>
+
+<!-- =========================== Recipe-View Panel ============================================= -->
+<div class="container-fluid mt-2" id="recipe-controls-panel" style="display: none">
+    <div class="mdc-card">
+        <form>
+            <!-- .................... Ok and Cancel Buttons ........................................ -->
+            <div class="mdc-card__actions" style="padding: 0">
+                <button id="post-recipe-to-inventory-btn"
+                        class="mdc-button mdc-button--raised mdc-button--leading">
+                    <span class="mdc-button__ripple"></span>
+                    <i class="material-icons mdc-button__icon" aria-hidden="true">save</i>
+                    <span class="mdc-button__label">Save</span>
+                </button>
+                <button id="close-recipe-btn" class="mdc-button">
+                    <span class="mdc-button__ripple"></span>
+                    <span class="mdc-button__label">Cancel</span>
+                </button>
+            </div>
+            <!-- .................... Folder  ........................................ -->
+            <div class="mdc-card__content">
+                <div class="external-label">Folder</div>
+<!--                <h4 class="external-label">Folder</h4>-->
+                <select id="folders-select" style="border-radius: 0.1rem"></select>
+
+            </div>
+        </form>
+    </div>
+    <!-- ....................................................... -->
+    <div id="recipe-view-panel"></div>
+    <!-- ....................................................... -->
+</div>
+
+<!-- =========================== Logged-out Panel ============================================= -->
+<div class="container-fluid" id="loggedout">
+    <div class="mdc-card">
+        <h1>Login</h1>
+        <div style="margin-bottom: 1rem;">
+            Please login in order to use OrganizEat recipe clipper
+        </div>
+        <div>
+            <button id="login-webapp-btn" class="mdc-button mdc-button--raised mdc-button--leading">
+                <span class="mdc-button__ripple"></span>
+                <i class="material-icons mdc-button__icon" aria-hidden="true">login</i>
+                <span class="mdc-button__label">Login</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- =========================== Progress  ============================================= -->
+<div class="container-fluid"
+     id="progress-container"
+>
+        <h1 id="progress-title">Login</h1>
+        <div
+                class="mdc-circular-progress"
+                style="width:48px;height:48px;" role="progressbar"
+                aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1">
+            <div class="mdc-circular-progress__determinate-container">
+                <svg class="mdc-circular-progress__determinate-circle-graphic" viewBox="0 0 48 48"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <circle class="mdc-circular-progress__determinate-track" cx="24" cy="24" r="18" stroke-width="4"/>
+                    <circle class="mdc-circular-progress__determinate-circle" cx="24" cy="24" r="18"
+                            stroke-dasharray="113.097" stroke-dashoffset="113.097" stroke-width="4"/>
+                </svg>
+            </div>
+            <div class="mdc-circular-progress__indeterminate-container">
+                <div class="mdc-circular-progress__spinner-layer">
+                    <div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-left">
+                        <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 48 48"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="56.549"
+                                    stroke-width="4"/>
+                        </svg>
+                    </div>
+                    <div class="mdc-circular-progress__gap-patch">
+                        <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 48 48"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="56.549"
+                                    stroke-width="3.2"/>
+                        </svg>
+                    </div>
+                    <div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-right">
+                        <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 48 48"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="56.549"
+                                    stroke-width="4"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- ....................................................... -->
+</div>
+
+
+<!-- =========================== Footer ============================================= -->
+
+<footer>
+    <div style="display:flex;justify-content:right; align-items: flex-end;">
+        <span id="version"></span>
+    </div>
+</footer>
+<!-- =========================== Scripts ============================================= -->
+<script src="lib/material/material-components-web.min.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

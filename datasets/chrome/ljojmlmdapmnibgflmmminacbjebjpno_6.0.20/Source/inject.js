@@ -1,0 +1,1 @@
+(()=>{var t;(t=document.createElement("script")).setAttribute("type","text/javascript"),t.setAttribute("src",chrome.runtime.getURL("utilities.js")),(document.head||document.documentElement).prepend(t)})();

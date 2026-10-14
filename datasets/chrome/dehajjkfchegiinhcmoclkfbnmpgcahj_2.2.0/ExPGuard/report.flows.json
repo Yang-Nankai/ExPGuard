@@ -1,0 +1,393 @@
+{
+  "extensionId": "dehajjkfchegiinhcmoclkfbnmpgcahj",
+  "extensionVersion": "2.2.0",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 2,
+    "totalFiles": 4,
+    "distinctFlows": 3,
+    "rawIssueEntries": 3,
+    "sinklessSourcesSkipped": 6
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "version",
+      "frame": "CS_1",
+      "constraint": {
+        "matches": [
+          "https://docentedu.com/*",
+          "https://insertlearning.com/*",
+          "https://www.okeebo.com/*"
+        ]
+      },
+      "source": {
+        "kind": "CHROME_IDENTITY_TOKEN",
+        "remark": "identity.authToken",
+        "file": "version",
+        "loc": "L78:C4 -> L97:C6",
+        "line": 78,
+        "col": [
+          4,
+          6
+        ],
+        "spansTo": 97,
+        "code": "»chrome.runtime.sendMessage(msg, function(token) {«"
+      },
+      "sinks": [
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "location.origin",
+          "file": "version",
+          "loc": "L96:C8 -> L96:C48",
+          "line": 96,
+          "col": [
+            8,
+            48
+          ],
+          "spansTo": null,
+          "code": "»window.postMessage(msg, location.origin)«;",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "https://docentedu.com/*",
+              "https://insertlearning.com/*",
+              "https://www.okeebo.com/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 9,
+        "distinctLines": 5,
+        "steps": [
+          {
+            "n": 1,
+            "file": "version",
+            "line": 78,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»    chrome.runtime.sendMessage(msg, function(token) {«",
+            "spansTo": 97,
+            "crossContextHop": "runtime.single.response.message[background->version]"
+          },
+          {
+            "n": 2,
+            "file": "version",
+            "line": 83,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary"
+            ],
+            "code": "if (»!token«) {"
+          },
+          {
+            "n": 3,
+            "file": "version",
+            "line": 93,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "token: »token«,"
+          },
+          {
+            "n": 4,
+            "file": "version",
+            "line": 92,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»        var msg = {«",
+            "spansTo": 95
+          },
+          {
+            "n": 5,
+            "file": "version",
+            "line": 132,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»    chrome.runtime.sendMessage(msg, function() {«",
+            "spansTo": 137,
+            "crossContextHop": "runtime.single.response.message[background->version]"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "background",
+        "loc": "L185:C0 -> L234:C2",
+        "line": 185,
+        "col": [
+          0,
+          2
+        ],
+        "spansTo": 234,
+        "code": "»chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {«"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L231:C8 -> L231:C76",
+          "line": 231,
+          "col": [
+            8,
+            76
+          ],
+          "spansTo": null,
+          "code": "»fetch('https://dnmkr7tf85gze.cloudfront.net/data/p/' + request.uuid)«.then(response => response.json()).then(json => sendResponse(json));",
+          "urlControl": "PARTIAL",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 82,
+        "distinctLines": 15,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 185,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {«",
+            "spansTo": 234,
+            "crossContextHop": "runtime.single.sender.message[version->background]"
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 186,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»request.type« == 'tutorial') {"
+          },
+          {
+            "n": 3,
+            "file": "background",
+            "line": 187,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "tutorial[sender.tab.id] = »request.page«;"
+          },
+          {
+            "n": 4,
+            "file": "background",
+            "line": 183,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "var »tutorial = {}«;"
+          },
+          {
+            "n": 5,
+            "file": "background",
+            "line": 189,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "else if (»request.type« == 'login') {"
+          },
+          {
+            "n": 6,
+            "file": "background",
+            "line": 204,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "else if (»request.type« == 'relayFromIframeBridge') {"
+          },
+          {
+            "n": 7,
+            "file": "background",
+            "line": 210,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "else if (»request.type« == 'userType') {"
+          },
+          {
+            "n": 8,
+            "file": "background",
+            "line": 213,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "else if (»request.type« == 'logout') {"
+          },
+          {
+            "n": 9,
+            "file": "background",
+            "line": 214,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "chrome.identity.getAuthToken({ 'interactive': false, scopes: »request.scopes }, function(token) {«",
+            "spansTo": 227
+          },
+          {
+            "n": 10,
+            "file": "background",
+            "line": 230,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "else if (»request.type« == 'getReadworksArticle') {"
+          },
+          {
+            "n": 11,
+            "file": "background",
+            "line": 231,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-right"
+            ],
+            "code": "fetch('https://dnmkr7tf85gze.cloudfront.net/data/p/' + »request.uuid«).then(response => response.json()).then(json => sendResponse(json));"
+          },
+          {
+            "n": 12,
+            "file": "background",
+            "line": 42,
+            "ops": [
+              "ELEMENT:computed-member-unknown-alternative",
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-right"
+            ],
+            "code": "else if (details.url == »tutorial[details.tabId]«) {"
+          },
+          {
+            "n": 13,
+            "file": "background",
+            "line": 46,
+            "ops": [
+              "ELEMENT:computed-member-unknown-alternative",
+              "ELEMENT:member-element-container",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty",
+              "ASSIGN:logical-left"
+            ],
+            "code": "else if (»!tutorial[details.tabId] && Object.values(tutorial).includes(details.url)«) {"
+          },
+          {
+            "n": 14,
+            "file": "background",
+            "line": 196,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.identity.getAuthToken({interactive: request.interactive, scopes: request.scopes }, sendResponse)«;"
+          },
+          {
+            "n": 15,
+            "file": "background",
+            "line": 207,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "chrome.tabs.sendMessage(sender.tab.id, »request«, {frameId: iframeBridge?.parentFrameId || 0 });"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "CHROME_IDENTITY_TOKEN",
+        "remark": "identity.authToken",
+        "file": "background",
+        "loc": "L218:C58 -> L218:C63",
+        "line": 218,
+        "col": [
+          58,
+          63
+        ],
+        "spansTo": null,
+        "code": "chrome.identity.removeCachedAuthToken({token: »token« }, function() {"
+      },
+      "sinks": [
+        {
+          "kind": "XML_HTTP_REQUEST_OPEN",
+          "remark": null,
+          "file": "background",
+          "loc": "L222:C12 -> L222:C89",
+          "line": 222,
+          "col": [
+            12,
+            89
+          ],
+          "spansTo": null,
+          "code": "»xhr.open('GET', 'https://accounts.google.com/o/oauth2/revoke?token=' + token)«;",
+          "urlControl": "PARTIAL",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 4,
+        "distinctLines": 2,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 218,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "chrome.identity.removeCachedAuthToken({token: »token }, function() {«",
+            "spansTo": 220
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 222,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right"
+            ],
+            "code": "xhr.open('GET', 'https://accounts.google.com/o/oauth2/revoke?token=' + »token«);"
+          }
+        ]
+      }
+    }
+  ]
+}

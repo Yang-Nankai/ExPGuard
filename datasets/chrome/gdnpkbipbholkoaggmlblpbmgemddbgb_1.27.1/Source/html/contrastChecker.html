@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>Accessible Web Contrast Checker</title>
+    <meta charset="utf-8" />
+    <link type="text/css" href="../css/contrast-checker.min.css" rel="stylesheet" />
+  </head>
+  <body>
+    <h1 class="visually-hidden">Color Contrast Checker Tool</h1>
+    <div role="region" id="copy-alert" class="mb-0 alert alert-icon alert-dismissible visually-hidden border-0" aria-live="polite">
+      <p id="copy-status" class="mb-0"></p>
+      <button type="button" class="btn-close"><span class="visually-hidden">Dismiss Notification</span></button>
+    </div>
+    <div class="bg-body-tertiary p-4">
+      <div class="d-flex align-items-center justify-content-between">
+        <h2 class="h4 mb-0">Select Colors</h2>
+        <div>
+          <button id="rev-button" class="btn btn-xs btn-secondary">
+            <i class="bi bi-arrow-left-right me-1" aria-hidden="true"></i>
+            Reverse <span class="visually-hidden">Foreground and Background Colors</span>
+          </button>
+          <button id="copy-button" class="btn btn-xs btn-secondary">
+            <i class="bi bi-clipboard me-1" aria-hidden="true"></i>
+            Copy <span class="visually-hidden">Foreground and Background Colors</span>
+          </button>
+        </div>
+      </div> <!-- / header row -->
+      <div class="row mt-4">
+        <div class="col-sm-6 mt-2 mb-3">
+          <div>
+            <label for="color-foreground-swatch">Foreground Color <span class="visually-hidden">Picker</span></label>
+            <div class="color-picker-wrapper">
+              <input type="color" name="foreground" id="color-foreground-swatch" value="#000000">
+              <div>
+                <button id="foreground-eydropper">
+                  <span class="visually-hidden">Foreground Color Eye Dropper</span>
+                  <i id="foreground-eyedropper-icon" class="bi bi-eyedropper"></i>
+                </button>
+                <input class="form-control text-center" type="text" aria-label="Foreground Color Input" name="foreground-text" id="color-foreground-text" value="#000000" spellcheck="false">
+              </div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <label for="color-background-swatch">Background Color <span class="visually-hidden">Picker</span></label>
+            <div class="color-picker-wrapper">
+              <input type="color" name="background" id="color-background-swatch" value="#FFFFFF">
+              <div>
+                <button id="background-eydropper">
+                  <span class="visually-hidden">Background Color Eye Dropper</span>
+                  <i id="background-eyedropper-icon" class="bi bi-eyedropper"></i>
+                </button>
+                <input class="form-control text-center" type="text" aria-label="Background Color Input" name="background-text" id="color-background-text" value="#FFFFFF" spellcheck="false">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 d-flex">
+          <div class="bg-body text-center w-100 h-100 p-4 d-flex justify-content-center flex-column-reverse">
+            <p class="mb-0" role="heading" aria-level="2">Contrast Ratio</p>
+            <p id="ratio-result" class="h1 mb-0">21.00:1</p>
+          </div>
+        </div>
+      </div> <!-- / color pickers and ratios row -->
+    </div>
+
+    <div id="conformance-results" class="p-4">
+      <div>
+        <h2 class="h4">WCAG Conformance Results</h2>
+        <details>
+          <summary class="text-muted">Disclaimer and Additional Info</summary>
+          <p class="mt-3">This contrast checker attempts to calculate contrast ratios as accurately as possible. There may be situations where a color combination meets the calculated ratio; but the element being checked still fails overall. This may be due to other visually related factors (ex. hover/focus states and effects, etc).</p>
+          <p>Refer to the following links for more details and specifics on contrast success criterion requirements:</p>
+          <ul>
+            <li><a href="https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html" target="_blank" rel="noreferrer">Understanding Success Criterion 1.4.3: Contrast (Minimum)</a></li>
+            <li><a href="https://www.w3.org/WAI/WCAG21/Understanding/non-text-contrast.html" target="_blank" rel="noreferrer">Understanding Success Criterion 1.4.11: Non-text Contrast</a></li>
+            <li><a href="https://www.w3.org/WAI/WCAG21/Understanding/contrast-enhanced" target="_blank" rel="noreferrer">Understanding Success Criterion 1.4.6: Contrast (Enhanced)</a></li>
+          </ul>
+        </details>
+      </div>
+    </div>
+
+    <div class="px-4">
+      <div class="row">
+        <div class="col-sm-4 mb-3 mb-sm-0">
+          <table>
+            <caption class="visually-hidden">Small text validation</caption>
+            <tbody>
+              <tr>
+                <th colspan="2" class="fw-normal pb-2">Small Text</th>
+              </tr>
+              <tr>
+                <td>AA</td>
+                <td id="aa-small-result" class="pass-fail"></td>
+              </tr>
+              <tr>
+                <td>AAA</td>
+                <td id="aaa-small-result" class="pass-fail"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-sm-4 mb-3 mb-sm-0">
+          <table>
+            <caption class="visually-hidden">Large text validation</caption>
+            <tbody>
+              <tr>
+                <th colspan="2" class="fw-normal pb-2">Large Text</th>
+              </tr>
+              <tr>
+                <td>AA</td>
+                <td id="aa-large-result" class="pass-fail"></td>
+              </tr>
+              <tr>
+                <td>AAA</td>
+                <td id="aaa-large-result" class="pass-fail"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-sm-4 mb-3 mb-sm-0">
+          <table>
+            <caption class="visually-hidden">UI component validation</caption>
+            <tbody>
+              <tr>
+                <th colspan="2" class="fw-normal pb-2">UI Component</th>
+              </tr>
+              <tr>
+                <td>AA</td>
+                <td id="aa-ui-result" class="pass-fail"></td>
+              </tr>
+              <tr>
+                <td>AAA</td>
+                <td id="aaa-ui-result" class="pass-fail"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="sample-output-container m-4 border p-4 text-center">
+      <p class="small-smpl-txt">SMALL sample text (18.5px)</p>
+      <p class="large-smpl-txt">LARGE sample text (24px)</p>
+      <div class="fs-2 d-flex justify-content-center">
+        <i class="bi bi-bookmark-fill mx-3"></i>
+        <i class="bi bi-cart mx-3"></i>
+        <i class="bi bi-play-circle-fill mx-3"></i>
+        <i class="bi bi-x-circle mx-3"></i>
+      </div>
+    </div>
+
+    <footer class="sticky-bottom border-top p-4 bg-body d-flex justify-content-center" data-aweb-authenticated="false">
+      <img src="../icons/aweb-stacked.svg" width="71" alt="The Accessible Web Logo"/>
+      <div class="ms-4 ps-4 border-start d-flex align-items-center last-child-mb-0">
+        <p>
+          Check color contrasts of every element on your site with RAMP. <a href="https://ramp.accessibleweb.com/accounts/register/" target="_blank">Try it free for 14 days</a>
+        </p>
+      </div>
+    </footer>
+
+    <script src="../js/contrast-checker.min.js" charset="utf-8"></script>
+  </body>
+</html>

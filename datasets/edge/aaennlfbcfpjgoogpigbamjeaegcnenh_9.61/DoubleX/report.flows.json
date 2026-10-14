@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L56",
+      "sourceCode": "e",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L166",
+      "sinkCode": "chrome.storage.local.set(None, <pdg_js.node.FunctionExpression object at 0x7fa882a24c40>)",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": null,
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    },
+    {
+      "flowType": "DATA_LEAK",
+      "ruleId": "doublex-sensitive-api-egress",
+      "ruleDescription": "DoubleX detected permission-gated data sent to a web-accessible channel.",
+      "sourceType": "STORAGE_ALL_ITEMS",
+      "sourceRemark": "chrome.storage.local.get",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L150",
+      "sourceCode": "chrome.storage.local.get(None, <pdg_js.node.FunctionExpression object at 0x7fa882a24100>)",
+      "sinkType": "WINDOW_POSTMESSAGE",
+      "sinkRemark": "{\n\t\t\t\t\t\t\tok: true,\n\t\t\t\t\t\t\tdata: r || {}\n\t\t\t\t\t\t}",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L158",
+      "sinkCode": "{\n\t\t\t\t\t\t\tok: true,\n\t\t\t\t\t\t\tdata: r || {}\n\t\t\t\t\t\t}",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": "window.postMessage",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": true,
+      "privilegeReason": "Sensitive extension data is returned to a web-accessible channel.",
+      "doublexCategory": "exfiltration_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "cs:direct_dangers:danger1",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L48",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set({'menuimg': 'window.localStorage.getItem(menuimg)'}, <pdg_js.node.FunctionExpression object at 0x7fa882cee070>)",
+        "sink-param1": {
+          "menuimg": "window.localStorage.getItem(menuimg)"
+        },
+        "sink-param2": "function() {\n\t\t\te(!chrome.runtime.lastError)\n\t\t}",
+        "line": "48 - 50",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_aaennlfbcfpjgoogpigbamjeaegcnenh_2f387c34674d/dx_xufec8hs/unpacked/aaennlfbcfpjgoogpigbamjeaegcnenh.9.61/content_scripts.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger2",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L145",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x7fa882c21a60>, 400)",
+        "sink-param1": "function() {\n\t\t\t\tif (!a[n]) return;\n\t\t\t\tdelete a[n];\n\t\t\t\ttry {\n\t\t\t\t\tr({\n\t\t\t\t\t\tok: false,\n\t\t\t\t\t\terror: \"timeout\"\n\t\t\t\t\t})\n\t\t\t\t} catch (e) {}\n\t\t\t}",
+        "sink-param2": 400,
+        "line": "145 - 154",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_aaennlfbcfpjgoogpigbamjeaegcnenh_2f387c34674d/dx_xufec8hs/unpacked/aaennlfbcfpjgoogpigbamjeaegcnenh.9.61/content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:exfiltration_dangers:danger1",
+      "component": "cs",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L36",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(<pdg_js.node.ValueExpr object at 0x7fa882c48910>, <pdg_js.node.FunctionExpression object at 0x7fa882ccd880>)",
+        "sink-param1": "[\"menuimg\"]",
+        "sink-param2": "function(e) {\n\t\t\tif (chrome.runtime.lastError) {\n\t\t\t\tt({});\n\t\t\t\treturn\n\t\t\t}\n\t\t\tt(e || {})\n\t\t}",
+        "line": "36 - 42",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_aaennlfbcfpjgoogpigbamjeaegcnenh_2f387c34674d/dx_xufec8hs/unpacked/aaennlfbcfpjgoogpigbamjeaegcnenh.9.61/content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L166",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(None, <pdg_js.node.FunctionExpression object at 0x7fa882a24c40>)",
+        "sink-param1": null,
+        "sink-param2": "function() {\n\t\t\t\t\t\tif (chrome.runtime.lastError) {\n\t\t\t\t\t\t\tt({\n\t\t\t\t\t\t\t\tok: false,\n\t\t\t\t\t\t\t\terror: chrome.runtime.lastError.message\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\treturn\n\t\t\t\t\t\t}\n\t\t\t\t\t\tt({\n\t\t\t\t\t\t\tok: true\n\t\t\t\t\t\t})\n\t\t\t\t\t}",
+        "line": "166 - 177",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_aaennlfbcfpjgoogpigbamjeaegcnenh_2f387c34674d/dx_xufec8hs/unpacked/aaennlfbcfpjgoogpigbamjeaegcnenh.9.61/background.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "e",
+            "line": "56 - 56",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_aaennlfbcfpjgoogpigbamjeaegcnenh_2f387c34674d/dx_xufec8hs/unpacked/aaennlfbcfpjgoogpigbamjeaegcnenh.9.61/background.js",
+            "where": "e"
+          }
+        },
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": true,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L150",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(None, <pdg_js.node.FunctionExpression object at 0x7fa882a24100>)",
+        "sink-param1": null,
+        "sink-param2": "function(r) {\n\t\t\t\t\t\tif (chrome.runtime.lastError) {\n\t\t\t\t\t\t\tt({\n\t\t\t\t\t\t\t\tok: false,\n\t\t\t\t\t\t\t\terror: chrome.runtime.lastError.message\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\treturn\n\t\t\t\t\t\t}\n\t\t\t\t\t\tt({\n\t\t\t\t\t\t\tok: true,\n\t\t\t\t\t\t\tdata: r || {}\n\t\t\t\t\t\t})\n\t\t\t\t\t}",
+        "line": "150 - 162",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_aaennlfbcfpjgoogpigbamjeaegcnenh_2f387c34674d/dx_xufec8hs/unpacked/aaennlfbcfpjgoogpigbamjeaegcnenh.9.61/background.js",
+        "dataflow": true,
+        "sent_to_wa_1": {
+          "wa": "{\n\t\t\t\t\t\t\tok: true,\n\t\t\t\t\t\t\tdata: r || {}\n\t\t\t\t\t\t}",
+          "line": "158 - 161",
+          "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_aaennlfbcfpjgoogpigbamjeaegcnenh_2f387c34674d/dx_xufec8hs/unpacked/aaennlfbcfpjgoogpigbamjeaegcnenh.9.61/background.js",
+          "where": "r"
+        }
+      }
+    }
+  ]
+}

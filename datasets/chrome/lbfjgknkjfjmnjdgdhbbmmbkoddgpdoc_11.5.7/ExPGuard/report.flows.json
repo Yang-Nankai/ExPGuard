@@ -1,0 +1,127 @@
+{
+  "extensionId": "lbfjgknkjfjmnjdgdhbbmmbkoddgpdoc",
+  "extensionVersion": "11.5.7",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 4,
+    "totalFiles": 6,
+    "distinctFlows": 2,
+    "rawIssueEntries": 2,
+    "sinklessSourcesSkipped": 5
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+        "file": "background",
+        "loc": "L1:C3014 -> L1:C3015",
+        "line": 1,
+        "col": [
+          3014,
+          3015
+        ],
+        "spansTo": null,
+        "code": "…e,t){window.gmpCommand({command:e,data:t})}chrome.runtime.onMessageExternal.addListener(async(e,t,o)=>{\"open_new_tab\"===»e«.type?chrome.tabs.create({url:e.url},t=>{e.title&&setTimeout(()=>{chrome.runtime.lastError||chrome.scripting.executeScri…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_TABS_CREATE_OPTIONS",
+          "remark": null,
+          "file": "background",
+          "loc": "L1:C3021 -> L1:C3210",
+          "line": 1,
+          "col": [
+            3021,
+            3210
+          ],
+          "spansTo": null,
+          "code": "…ndow.gmpCommand({command:e,data:t})}chrome.runtime.onMessageExternal.addListener(async(e,t,o)=>{\"open_new_tab\"===e.type?»chrome.tabs.create({url:e.url},t=>{e.title&&setTimeout(()=>{chrome.runtime.lastError||chrome.scripting.executeScript({target:{tabId:t.id},func:e=>{document.title=e},args:[e.title]})},5e3)})«:\"initGDrive\"===e.type?l(e=>{o({status:e})}):\"logoutGDrive\"===e.type?(await s(),a&&function(){try{fetch(\"https://account…",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 210,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 1,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-right",
+              "ELEMENT:object.setProperty",
+              "ELEMENT:implicit.add",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right"
+            ],
+            "code": "…00)}function d(e,t){»window.gmpCommand({command:e,data:t})}chrome.runtime.onMessageExternal.addListener(async(e,t,o)=>{\"open_new_tab\"===e.typ …⟨tainted span: 2496 chars⟩… ws.getAll({populate:!0},(function(t){t.forEach(t=>{const n=t.tabs;for(var a=0;a<n.length;a++){const i=n[a];i.url===e.url«&&(chrome.windows.up…"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "CHROME_IDENTITY_TOKEN",
+        "remark": "identity.authToken",
+        "file": "background",
+        "loc": "L1:C2169 -> L1:C2170",
+        "line": 1,
+        "col": [
+          2169,
+          2170
+        ],
+        "spansTo": null,
+        "code": "…):t&&t(null)})}async function s(){return new Promise(e=>{a?e(a):chrome.identity.getAuthToken({interactive:!0},t=>{t&&(a=»t«,e(t))})})}function u(e,t){e.targetFileId?r(null,e.fileContent,null,e.fileType,e.targetFileId,e=>{t({status:e})}):c(0,o=…"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "background",
+          "loc": "L1:C3308 -> L1:C3369",
+          "line": 1,
+          "col": [
+            3308,
+            3369
+          ],
+          "spansTo": null,
+          "code": "…gs:[e.title]})},5e3)}):\"initGDrive\"===e.type?l(e=>{o({status:e})}):\"logoutGDrive\"===e.type?(await s(),a&&function(){try{»fetch(\"https://accounts.google.com/o/oauth2/revoke?token=\"+a)«.then(e=>e.json()).then(e=>{}),chrome.identity.removeCachedAuthToken({token:a},e=>{}),a=null}catch(e){}}(),o({status:\"OK…",
+          "urlControl": "PARTIAL",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 12,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 1,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "…urn new Promise(e=>{»a?e(a):chrome.identity.getAuthToken({interactive:!0},t=>{t&&(a=t,e(t))})})}function u(e,t){e.targetFileId?r(null,e.fileC …⟨tainted span: 1348 chars⟩… ogle.com/o/oauth2/revoke?token=\"+a).then(e=>e.json()).then(e=>{}),chrome.identity.removeCachedAuthToken({token:a},e=>{})«,a=null}catch(e){}}(…"
+          }
+        ]
+      }
+    }
+  ]
+}

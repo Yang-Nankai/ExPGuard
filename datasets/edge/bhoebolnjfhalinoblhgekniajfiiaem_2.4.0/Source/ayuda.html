@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/png" href="img/dle16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="img/dle32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="img/dle64.png" sizes="64x64">
+<link rel="icon" type="image/png" href="img/dle128.png" sizes="128x128">
+<title>Extensión Diccionario RAE en bocadillo</title>
+<script type="text/javascript" src="ayuda.js"></script>
+<style>
+	body {
+		background: #fff5e6;
+		font-size: 1.2em;
+	}
+
+	* {
+		-moz-user-select: none;
+		-webkit-user-select: none;
+	}
+	
+	#dcontenedor {
+		width: 50%;
+		position: relative;
+		left:50%; transform: translateX(-50%);
+		min-width: 310px;
+		max-width: 630px;
+	}
+	@media (max-width: 900px) {
+	    #dcontenedor {
+	        width: 60%;
+	    }
+	}
+	@media (max-width: 600px) {
+	    #dcontenedor {
+	        width: 80%;
+	    }
+	}
+
+	figure {
+	    border: thin #c0c0c0 solid;
+	    padding: 5px;
+	    margin: auto;
+	}
+
+	figcaption {
+	    background-color: #888;
+	    color:  #fff;
+	    font: italic smaller sans-serif;
+	    padding: 3px;
+	    text-align: right;
+	}
+
+	.entrada {
+		-moz-user-select: none;
+		user-select: none;
+		cursor:pointer;
+		font-size: 1em;
+		margin-bottom: 10px;
+		padding: 10px 35px 10px 10px;
+		-webkit-border-radius: 5px 10px;
+		border-radius: 5px 10px;
+		background: #ffe696;
+		background-image: url('img/doble-flecha-abajo.png');
+		background-position:98% 50%;
+		background-repeat: no-repeat;
+	}
+
+	.entrada:hover, .entrada:active, .entrada:focus {
+		background-color: #ffc400;
+		outline: none;
+	}
+
+	.entrada-abierta {
+		background: #ffc400;
+		background-image: url('img/doble-flecha-arriba.png');
+		background-position:98% 50%;
+		background-repeat: no-repeat;
+	}
+
+	#dflotador_chrome,#dflotador_edge {
+		display: none;
+		position: fixed;
+		top: 0.6em;
+		right: 0%;
+		margin-right: 2em;
+		background-color:#fff5e6;
+		border:2px solid black;
+		padding:0px 4px 0px 4px;
+		z-index: 2;
+		-webkit-border-radius: 6px;
+		border-radius: 6px;
+		-webkit-box-shadow: 4px 4px 14px #000;
+		box-shadow: 4px 4px 14px #000;
+		font-size: 0.8em;
+	}
+
+	#aopciones > span:before {
+		content: "Configurar las opciones";
+	}
+	@media (max-width: 768px) {
+		#aopciones > span:before {
+			content: "Opciones";
+		}
+	}
+
+</style>
+</head>
+
+<body>
+<img src='img/128dle-bocadillo.png' alt='Extensión Diccionario RAE en bocadillo' title='Diccionario RAE en bocadillo' style='position: relative; left:50%; transform: translateX(-50%);'>
+<br> 
+<div id="dflotador_chrome"><b>&nbsp;&nbsp;↑↑&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑↑&nbsp;</b><small><br>
+	Fije el icono <img src='img/dle16.png' alt='Icono DLE' style='position: relative; transform: translateY(20%);'><br>
+	&nbsp;&nbsp;<img src='img/puzle.png' alt='Extensiones' style='position: relative; transform: translateY(10%);'><sup>&nbsp;&nbsp;➕&nbsp;&nbsp;</sup><img src='img/pin-azul.png' alt='Fijar' style='position: relative; transform: translateY(10%);'>
+</small>
+</div>
+<div id="dflotador_edge"><b>&nbsp;&nbsp;↑↑&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑↑&nbsp;</b><small><br>
+	Mostrar icono <img src='img/dle16.png' alt='Icono DLE' style='position: relative; transform: translateY(20%);'><br>
+	&nbsp;&nbsp;<img src='img/puzle.png' alt='Extensiones' style='position: relative; transform: translateY(10%);'><sup>&nbsp;&nbsp;➕&nbsp;&nbsp;&nbsp;&nbsp;👁️</sup>
+</small>
+</div>
+
+<div id="dcontenedor">
+
+	<h3 style="text-align: center;">Extensión no oficial de consulta del Diccionario&nbsp;de&nbsp;la&nbsp;lengua&nbsp;española&nbsp;(DLE)</h3>
+
+	<div style="font-size: 1.3em; padding:17px; -webkit-border-radius: 5px 10px; border-radius: 5px 10px; background: #ffa94d;">Cómo funciona</div>
+	<p>Esta extensión ofrece <u>cuatro</u> formas de consulta sin necesidad de abandonar la página web que se esté visitando.</p>
+
+	<div id="entrada-el1" class='entrada'><b>1.- Opción en el menú contextual</b></div>
+	<div id="el1" style="display: none;">
+		<p>Al activar el menú contextual<sup>1</sup> se ofrece la opción <span style='font-style: italic;'>&#xab;Buscar&nbsp;"texto"&nbsp;en&nbsp;la&nbsp;RAE&#xbb;</span>.</p>
+		<figure>
+			<img src='img/contextual-resaltado.png' alt='Menú contextual' style='width: 60%; position: relative; left:50%; transform: translateX(-50%);'>
+			<figcaption>Nueva opción en menú contextual</figcaption>
+		</figure>
+		<p> Disponible en los siguientes casos:<br>
+		<ul>
+			<li><strong><span style="background-image: url('img/cursor-texto.png'), url('img/cursor.png'), url('img/mano.png'); background-position:86% 100%, 92.5% 63%, 100% 53% ; background-repeat: no-repeat;">para la palabra apuntada por el ratón&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li></strong><p>Incluso para las palabras no seleccionables como las contenidas en enlaces e hipervínculos.</p>
+			<li><strong>para el texto <span style="-webkit-user-select: all; -moz-user-select: none;" id="seleccioname1">seleccionado</span> o <span style="-webkit-user-select: all; -moz-user-select: none;" id="seleccioname2">resalta</span>do por el usuario<sup>2</sup></strong><p>Útil para locuciones formadas por varias palabras o para partes de ellas como prefijos y elementos compositivos.</p></li>
+		</ul></p>
+		<p>________________________</p>
+		<div style='position: relative; transform: translateY(-90%);'><small style= "font-size: 0.9rem;"><sup>1</sup> El menú contextual se activa con el botón secundario del ratón o con la tecla </small> <img src='img/tecla-contextual.jpg' alt='Tecla menú contextual' style='position: relative; transform: translateY(30%);'></div>
+		<div style='position: relative; transform: translateY(-50%);'><small style= "font-size: 0.9rem;"><sup>2</sup> La selección de texto es el único método utilizable en documentos PDF o en la "vista de lectura" del navegador donde, además, la presentación no se realiza en bocadillo sino automáticamente en ventana nueva.</small></div>
+		<div style="font-style: italic;">Aviso: en esta página de ayuda no funcionan las pruebas de menú contextual.</div>
+		<hr style="width: 100%">
+	</div>
+
+	<div id="entrada-el2" class='entrada'><b>2.- Doble clic en una palabra</b></div>
+	<div id="el2" style="display: none;">
+		<p>Al hacer doble clic en una palabra de una página web, inmediatamente se muestra su significado.</p>
+		<figure>
+			<img src='img/bocadillo.gif' alt='Ejemplo de bocadillo' style='width: 100%; position: relative; left:50%; transform: translateX(-50%);'>
+			<figcaption>Muestra de bocadillo tras doble clic en palabra</figcaption>
+		</figure>
+		<p style="font-style: italic;">Aviso: en esta página de ayuda no funcionan las pruebas de doble clic.</p>
+		<hr style="width: 100%">
+	</div>
+
+	<div id="entrada-el3" class='entrada'><b>3.- Sin clics</b></div>
+	<div id="el3" style="display: none;">
+		<p><span style="background-image: url('img/cursor-texto.png'), url('img/cursor.png'), url('img/mano.png'); background-position:96% 53%, 98% 53%, 100% 53% ; background-repeat: no-repeat;">La doble pulsación de la tecla elegida en la <a href=configurar.html target="_self" rel="noopener noreferrer">configuración</a>, como por ejemplo <kbd>[ctrl]</kbd>, provoca la búsqueda de la palabra apuntada por el ratón&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+		<p>Al mismo tiempo, se muestra momentáneamente un chivato con la palabra detectada bajo el puntero del ratón.</p>
+		<figure>
+			<img src='img/sinclics.png' alt='Ejemplo de bocadillo y chivato' style='width: 90%; position: relative; left:50%; transform: translateX(-50%);'>
+			<figcaption>Chivato y bocadillo</figcaption>
+		</figure>
+		<p style="font-style: italic;">Aviso: en esta página de ayuda no funcionan las pruebas.</p>
+		<hr style="width: 100%">
+	</div>
+
+	<div id="entrada-el4" class='entrada'><b>4.- Cuadro de búsqueda</b></div>
+	<div id="el4" style="display: none;">
+		<p>A la derecha de la barra de direcciones del navegador se encuentra el icono de acceso al cuadro de búsqueda <img src='img/dle16.png' alt='Icono DLE' style='position: relative; transform: translateY(10%);'> <br><span id="sno_firefox1" style="font-style: italic;"><small>
+			(si no lo ve, pulse <img src='img/puzle.png' alt='Extensiones' style='position: relative; transform: translateY(30%);'> y use la opción 'Fijar' <img src='img/pin-azul.png' alt='Fijar' style='position: relative; transform: translateY(30%);'>)</small></span>
+		</p>
+		<p>En este cuadro se puede escribir la palabra o lema a buscar.</p>
+		<figure>
+			<img src='img/cuadrobusqueda.png' alt='Cuadro de búsqueda' style='width: 90%; position: relative; left:50%; transform: translateX(-50%);'>
+			<figcaption>Cuadro de búsqueda DLE</figcaption>
+		</figure>
+		<p>Válido también para locuciones formadas por varias palabras o para partes de ellas.</p>
+		<small>
+			💡 Atajo de teclado: <span id=atajo_defecto><i><strong>Ctrl+Q</strong></i> &nbsp;(<i><strong>Alt+Q</strong></i> en MacOs) <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Modificable en <a id="aatajos" href=chrome://extensions/shortcuts target="_blank" rel="noopener noreferrer">chrome://extensions/shortcuts</a></span><i><strong><span id=atajo_comprobado></span></strong></i>
+		</small>
+		<hr style="width: 100%">
+	</div>
+	<br> 
+	<div style="font-size: 1em; padding:10px; -webkit-border-radius: 5px 10px; border-radius: 5px 10px; background: #ffa94d;">Otras funcionalidades</div>
+	<ul>
+		<li>Simplifica el aspecto de las páginas del tipo <span style="font-style: italic;">https://dle.rae.es/palabra</span> que muestran definiciones de palabras</li>
+	</ul>
+
+	<small>
+		Si detecta algún mal funcionamiento, notifíquelo a través de este <a id="aformulario" rel="nofollow" target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLScqF2qfNzR9FHjyLae7NiUCS0bVRvF-m8FxjUpuFe4leS4SNw/viewform">formulario</a>.
+	</small>
+	
+	<p>
+		<a id="aopciones" href=configurar.html target="_self" rel="noopener noreferrer"><img style='margin-right:5px;' src='img/ruedagris.png' alt='Configurar opciones' title='Ir a configurar opciones' height='14'><span></span></a>
+		<a href=faq.html style="position: fixed; right: 0%;"><span>Dudas frecuentes</span><img style='margin-left: 10px; transform: translateY(15%);' src='img/flecha-derecha.png' alt='Dudas frecuentes' title='Ir a dudas frecuentes'></a>
+	</p>
+</div>
+
+</body>
+</html>

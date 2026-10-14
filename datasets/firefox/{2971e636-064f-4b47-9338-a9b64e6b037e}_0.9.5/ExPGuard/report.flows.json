@@ -1,0 +1,244 @@
+{
+  "extensionId": "{2971e636-064f-4b47-9338-a9b64e6b037e}",
+  "extensionVersion": "0.9.5",
+  "sourceType": "XPI",
+  "stats": {
+    "filesWithIssues": 5,
+    "totalFiles": 5,
+    "distinctFlows": 2,
+    "rawIssueEntries": 2,
+    "sinklessSourcesSkipped": 17
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "content",
+      "frame": "CS_1",
+      "constraint": {
+        "matches": [
+          "http://*/*",
+          "https://*/*",
+          "file:///*"
+        ],
+        "excludeMatches": [
+          "https://hangouts.google.com/*",
+          "https://meet.google.com/*"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "content",
+        "loc": "L20:C38 -> L20:C56",
+        "line": 20,
+        "col": [
+          38,
+          56
+        ],
+        "spansTo": null,
+        "code": "if (event.source !== window || !»event.data?.source«?.startsWith(\"vsc-\")) {"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_SYNC_STORAGE",
+          "remark": "storage.fuzzy.settings",
+          "file": "content",
+          "loc": "L26:C10 -> L26:C39",
+          "line": 26,
+          "col": [
+            10,
+            39
+          ],
+          "spansTo": null,
+          "code": "»chrome.storage.sync.set(data)«;",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*",
+              "file:///*"
+            ],
+            "excludeMatches": [
+              "https://hangouts.google.com/*",
+              "https://meet.google.com/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 76,
+        "distinctLines": 9,
+        "steps": [
+          {
+            "n": 1,
+            "file": "content",
+            "line": 20,
+            "ops": [
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ASSIGN:unary",
+              "ASSIGN:logical-right"
+            ],
+            "code": "if (»event.source !== window || !event.data?.source?.startsWith(\"vsc-\")«) {"
+          },
+          {
+            "n": 2,
+            "file": "content",
+            "line": 23,
+            "ops": [
+              "ELEMENT:destructure-property[source]",
+              "ELEMENT:destructure-property[action]",
+              "ELEMENT:destructure-property[data]"
+            ],
+            "code": "const { »source, action, data« } = event.data;"
+          },
+          {
+            "n": 3,
+            "file": "content",
+            "line": 24,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»source« === \"vsc-page\") {"
+          },
+          {
+            "n": 4,
+            "file": "content",
+            "line": 25,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»action« === \"storage-update\") {"
+          },
+          {
+            "n": 5,
+            "file": "content",
+            "line": 26,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "chrome.storage.sync.set(»data«);"
+          },
+          {
+            "n": 6,
+            "file": "content",
+            "line": 27,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "} else if (»action« === \"runtime-message\") {"
+          },
+          {
+            "n": 7,
+            "file": "content",
+            "line": 28,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»data.type« !== \"VSC_STATE_UPDATE\") {"
+          },
+          {
+            "n": 8,
+            "file": "content",
+            "line": 31,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left"
+            ],
+            "code": "} else if (»action« === \"get-storage\") {"
+          },
+          {
+            "n": 9,
+            "file": "content",
+            "line": 29,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "chrome.runtime.sendMessage(»data«);"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "content",
+      "frame": "CS_1",
+      "constraint": {
+        "matches": [
+          "http://*/*",
+          "https://*/*",
+          "file:///*"
+        ],
+        "excludeMatches": [
+          "https://hangouts.google.com/*",
+          "https://meet.google.com/*"
+        ]
+      },
+      "source": {
+        "kind": "STORAGE_ALL_ITEMS",
+        "remark": "storage.all.items[sync]",
+        "file": "content",
+        "loc": "L33:C12 -> L37:C19",
+        "line": 33,
+        "col": [
+          12,
+          19
+        ],
+        "spansTo": 37,
+        "code": "»window.postMessage({«"
+      },
+      "sinks": [
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "*",
+          "file": "content",
+          "loc": "L33:C12 -> L37:C19",
+          "line": 33,
+          "col": [
+            12,
+            19
+          ],
+          "spansTo": 37,
+          "code": "»window.postMessage({«",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "http://*/*",
+              "https://*/*",
+              "file:///*"
+            ],
+            "excludeMatches": [
+              "https://hangouts.google.com/*",
+              "https://meet.google.com/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 2,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "content",
+            "line": 33,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»            window.postMessage({«",
+            "spansTo": 37
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+import{_ as e}from"./_plugin-vue_export-helper.js";import{c as t,r,o as n}from"./data.js";const c={};function s(_,a){const o=r("RouterView");return n(),t(o)}const p=e(c,[["render",s]]);export{p as default};

@@ -1,0 +1,655 @@
+/**
+ * Gmail-specific styles
+ * Hides the floating toggle and styles the Gmail-integrated sidebar
+ */
+
+:root {
+  --gmail-sidebar-width: 66px;
+  --gmail-app-sidebar-width: 500px;
+  --gmail-app-sidebar-default-width: 300px;
+}
+
+/* Hide the floating toggle for Gmail */
+#lemlist-sidebar.gmail-integration .toggle {
+  display: none;
+}
+
+/* Gmail sidebar width */
+#lemlist-sidebar.gmail-integration .sidebar {
+  width: var(--gmail-app-sidebar-width);
+}
+
+/* Sidebar open DOM edition - resize Gmail's main container */
+body[jsmodel]:has(#lemlist-sidebar .sidebar.open) {
+  > div > div.nH[style] {
+    /* Resize the main body container to account for the sidebar */
+    width: calc(100% - var(--gmail-app-sidebar-width)) !important;
+  }
+
+  /* Fake element to move every composer to the left */
+  > div.dw .nH > .no[style*='float: right']::after {
+    content: '';
+    float: left;
+    width: var(--gmail-app-sidebar-width);
+  }
+
+  /* Highlight icon in the sidebar */
+  .gmail-action-bar-icon {
+    > div.actions {
+      background-color: rgba(32, 33, 36, 0.059);
+    }
+
+    .active-border {
+      display: block;
+    }
+  }
+}
+
+/* Disable transition for Gmail sidebar */
+body[jsmodel] #lemlist-sidebar .sidebar {
+  transition: none !important;
+}
+
+/* Gmail composer toolbar styles */
+body[jsmodel] {
+  /* Override Gmail button styles */
+  .btn {
+    margin-left: unset !important;
+    border-radius: 10px;
+
+    &::before {
+      width: unset;
+      height: unset;
+      margin: unset;
+      opacity: unset;
+    }
+
+    &::after {
+      content: unset;
+    }
+
+    &.sm {
+      height: 32px;
+    }
+  }
+
+  .text-edit .input-wrapper {
+    input,
+    textarea {
+      height: unset;
+      resize: vertical !important;
+      width: 100% !important;
+    }
+  }
+
+  /* Gmail action bar (composer toolbar) */
+  .gmail-action-bar {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #edeff1;
+    border-bottom: 1px solid #edeff1;
+    padding: 0 15px;
+    margin-bottom: 16px;
+    gap: 8px;
+
+    .logo {
+      width: 16px;
+      height: 16px;
+    }
+
+    .vertical-separator {
+      height: 16px;
+      border-left: 1px solid var(--border-grey-light);
+    }
+  }
+
+  /* Action bar in a composer modal */
+  div[role='dialog'] .gmail-action-bar {
+    padding: 0 !important;
+    border-top: none;
+    margin-bottom: unset;
+  }
+
+  /* Email top bar buttons */
+  .lemlist-email-top-bar-buttons {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-6px);
+    margin-right: 8px;
+
+    .logo {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  /* Import template button */
+  .gmail-import-template-button {
+    padding: 4px;
+    margin: 0 5px 0 10px;
+    width: auto;
+    min-width: unset;
+
+    /* Remove hubspot extension style */
+    background-color: unset !important;
+    border-color: unset !important;
+    color: unset !important;
+
+    &:hover {
+      box-shadow: unset;
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--primary-color);
+    }
+  }
+
+  /* Custom variables */
+  .lemlist-custom-variable {
+    cursor: pointer;
+    background-color: var(--primary-color-100);
+    color: var(--primary-color);
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+
+  input.custom-variable-edition-input {
+    border-radius: 10px;
+    border: 1px solid var(--primary-color);
+    background: var(--ll-white);
+    padding: 6px 12px;
+    outline: 3px solid #dfe8ff;
+    overflow: visible;
+    margin: 3px;
+  }
+
+  [data-tippy-root] .tippy-box[data-theme~='lemlist-gmail-composer-tooltip'] {
+    font-family: var(--lemlist-font);
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--border-grey-light);
+    box-shadow:
+      0px 0px 4px rgba(0, 0, 0, 0.04),
+      0px 8px 16px rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    color: var(--text-standard);
+    background-color: var(--ll-white);
+    padding: 16px;
+    width: max-content !important;
+  }
+
+  [data-tippy-root] .tippy-box[data-theme~='lemlist-gmail-composer-tooltip'] .tippy-content {
+    max-height: unset;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    width: 100% !important;
+  }
+
+  /* Composer states */
+  [data-lemlist-composer-id]:not([data-lemlist-composer-id='']) {
+    &.is-from-thread {
+      div.composer-ai-draft-dropdown {
+        display: none;
+      }
+
+      &.is-empty {
+        div.composer-ai-reply-dropdown {
+          display: flex;
+        }
+
+        div.composer-ai-rewrite-dropdown {
+          display: none;
+        }
+      }
+
+      &:not(.is-empty) {
+        div.composer-ai-rewrite-dropdown {
+          display: flex;
+        }
+
+        div.composer-ai-reply-dropdown {
+          display: none;
+        }
+      }
+    }
+
+    &:not(.is-from-thread) {
+      div.composer-ai-reply-dropdown {
+        display: none;
+      }
+
+      &.is-empty {
+        div.composer-ai-draft-dropdown {
+          display: flex;
+        }
+
+        div.composer-ai-rewrite-dropdown {
+          display: none;
+        }
+      }
+
+      &:not(.is-empty) {
+        div.composer-ai-rewrite-dropdown {
+          display: flex;
+        }
+
+        div.composer-ai-draft-dropdown {
+          display: none;
+        }
+      }
+    }
+
+    &.processing {
+      /* Composer body */
+      .editable,
+      div[contenteditable='true']:not([id='subject']) {
+        -webkit-user-modify: read-only;
+        pointer-events: none;
+        cursor: not-allowed;
+        color: rgba(50, 50, 50, 0.3) !important;
+
+        * {
+          color: rgba(50, 50, 50, 0.3) !important;
+        }
+      }
+
+      .gmail-action-bar {
+        /* Hide buttons (templates, coach AI, etc) */
+        > button {
+          display: none !important;
+        }
+
+        .composer-ask-ai-elements {
+          > div:not(.processing-state) {
+            display: none !important;
+          }
+
+          .processing-state {
+            display: flex;
+            color: var(--text-inactive);
+
+            i.far.fa-times {
+              cursor: pointer;
+            }
+          }
+        }
+      }
+    }
+
+    &.coach-analyzing {
+      .gmail-action-bar {
+        /* Hide buttons (templates, coach AI, etc) */
+        > button {
+          display: none !important;
+        }
+
+        .composer-ask-ai-elements {
+          > div:not(.processing-state) {
+            display: none !important;
+          }
+
+          .processing-state {
+            display: flex;
+            color: var(--text-inactive);
+
+            i.far.fa-times {
+              cursor: pointer;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Gmail action bar icon styles */
+body[jsmodel] .gmail-action-bar-icon {
+  width: 56px;
+  height: 56px;
+  cursor: pointer;
+
+  &:hover > div.actions {
+    background-color: rgba(32, 33, 36, 0.059);
+
+    .gmail-action-bar-icon-label {
+      visibility: visible;
+    }
+  }
+
+  div.actions {
+    position: relative;
+
+    .gmail-action-bar-icon-label {
+      position: absolute;
+      left: 50%;
+      bottom: -32px;
+      transform: translateX(-50%);
+      visibility: hidden;
+    }
+  }
+
+  > div {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+
+    i {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .active-border {
+    display: none;
+    background-color: var(--btn-primary-250);
+    border-radius: 3px 0 0 3px;
+    height: 40px;
+    position: absolute;
+    right: 1px;
+    top: 8px;
+    width: 3px;
+  }
+}
+
+/* Gmail Label Shortcuts Styles */
+.gmail-label-shortcut-accordion-trigger {
+  .logo {
+    width: 60px;
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-right: 16px;
+
+    i {
+      width: 16px;
+      color: #444746;
+      font-size: 11px;
+      transform: translate(2px, 0px);
+    }
+  }
+}
+
+.gmail-label-shortcut {
+  height: 32px;
+
+  &.active {
+    font-weight: bold;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-right: 16px;
+
+    i {
+      width: 16px;
+      color: #444746;
+    }
+  }
+
+  .aio.UKr6le span {
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Bottom composer toolbar */
+.lemlist-bottom-composer-toolbar {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 4px;
+  margin-left: 4px;
+}
+
+/* Tracking popup styles */
+.gmail-composer-tracking-popup {
+  position: relative;
+  width: 270px;
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 16px;
+
+    .title {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      i {
+        font-size: 12px;
+        color: var(--text-light);
+      }
+    }
+
+    .action-btn {
+      width: fit-content;
+
+      &::before {
+        content: unset;
+      }
+    }
+
+    .item-disabled {
+      opacity: 0.5;
+    }
+
+    .ui-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+
+      &.gmail-sm {
+        font-size: 12px;
+      }
+
+      &.align-center {
+        align-items: center;
+      }
+
+      .text-sm {
+        font-size: 12px;
+        color: var(--text-standard);
+      }
+
+      .ui-col {
+        display: flex;
+        flex-direction: column;
+
+        &.relative {
+          position: relative;
+        }
+
+        &.no-custom-domain {
+          opacity: 0.5;
+        }
+      }
+    }
+  }
+}
+
+/* Brand footer */
+.lemlist-brand-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 400;
+
+  .spacer {
+    border-style: unset;
+    border-top: 1px solid var(--border-grey-light);
+    margin: 0;
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-inactive);
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      svg,
+      #lemlist-logotype {
+        width: 64px;
+        height: 16px;
+      }
+    }
+  }
+}
+
+/* No custom domain link */
+.no-custom-domain-link {
+  color: var(--primary-color);
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--primary-color-600);
+  }
+}
+
+/* Tracking popup row in inbox */
+.tracking-popup-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--primary-color);
+  margin-left: auto;
+  border-bottom: unset !important;
+
+  &:has(.interaction-count) {
+    margin-right: 8px;
+  }
+
+  .tracking-popup-row-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 4px;
+    width: 24px;
+
+    &::before,
+    &::after {
+      content: unset;
+    }
+
+    .interaction-count {
+      color: var(--primary-color);
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: normal;
+    }
+  }
+}
+
+/* Tracking popup content styles */
+.tracking-popup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--text-standard);
+
+    .interaction-line {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .times {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+
+        i {
+          font-size: 12px;
+          color: var(--primary-color);
+        }
+      }
+
+      .date {
+        font-size: 11px;
+        color: var(--text-light);
+        margin-left: 20px;
+      }
+    }
+  }
+}
+
+/* Tippy theme for tracking popup */
+[data-tippy-root] .tippy-box[data-theme~='lemlist-dropdown-menu-grey'] {
+  font-family: var(--lemlist-font);
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--border-grey-light);
+  box-shadow:
+    0px 0px 4px rgba(0, 0, 0, 0.04),
+    0px 8px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  color: var(--text-standard);
+  background-color: var(--ll-white);
+  padding: 0;
+  width: max-content !important;
+}
+
+[data-tippy-root] .tippy-box[data-theme~='lemlist-dropdown-menu-grey'] .tippy-content {
+  max-height: unset;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  width: 100% !important;
+}
+
+.chip-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 20px;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}

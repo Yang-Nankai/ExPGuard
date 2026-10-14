@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html class="smart-naming">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Smart Naming Rules - MAX Video Downloader</title>
+	<link rel="stylesheet" href="../popup/popup.css">
+</head>
+<body>
+	<div class="app-container">
+		<aside class="sidebar">
+			<div class="sidebar-header">
+				<h1>Smart Naming</h1>
+				<button id="add-rule-btn" class="btn btn-small btn-primary">
+					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<line x1="12" y1="5" x2="12" y2="19"></line>
+						<line x1="5" y1="12" x2="19" y2="12"></line>
+					</svg>
+					New Rule
+				</button>
+			</div>
+			<div class="search-box">
+				<input type="text" id="rule-search" placeholder="Search rules..." class="input-field">
+			</div>
+			<div id="rules-list" class="rules-list">
+				
+			</div>
+		</aside>
+		
+		<main class="editor-panel">
+			<div id="editor-form" class="editor-form">
+				<div class="form-header">
+					<h2 id="editor-title">Edit Rule</h2>
+					<div class="actions">
+						<button id="reset-default-btn" class="btn btn-small btn-warn hidden">Reset</button>
+						<button id="delete-rule-btn" class="btn btn-small btn-danger">Delete</button>
+						<button id="save-rule-btn" class="btn btn-small btn-primary">Save Changes</button>
+					</div>
+				</div>
+
+				<div class="form-group" id="url-group">
+					<h3>Domain / URL Pattern</h3>
+					<input type="text" id="rule-url" class="input-field" placeholder="e.g. domain.com/path/">
+					<span class="help-text">Partial URL match. Separate multiple patterns with commas to share this ruleset. For non-Latin domains, use punycode (e.g. xn--...).</span>
+				</div>
+
+				<div class="form-group">
+					<div class="template-row">
+						<div class="form-group template-container">
+							<h3>Filename Template</h3>
+							<input type="text" id="rule-template" class="input-field" placeholder="e.g. {pageTitle}">
+						</div>
+						<div class="form-group maxLength-container">
+							<h3 title="Strictly limit filename length (1-240)">Max Length</h3>
+							<input type="number" id="rule-maxLength" class="input-field" value="240" min="1" max="240">
+						</div>
+					</div>
+					<div class="template-chips">
+						<button class="chip cursor-pointer" data-value="{pageTitle}" data-tooltip="The document title of the page" data-tooltip-position="below">pageTitle</button>
+						<button class="chip cursor-pointer" data-value="{pageUrl}" data-tooltip="Full URL of the page" data-tooltip-position="below">pageUrl</button>
+						<button class="chip cursor-pointer" data-value="{pageSlug}" data-tooltip="Last path segment of the page URL" data-tooltip-position="below">pageSlug</button>
+						<button class="chip cursor-pointer" data-value="{hostname}" data-tooltip="Domain name of the page (without protocol)" data-tooltip-position="below">hostname</button>
+						<button class="chip cursor-pointer" data-value="{filename}" data-tooltip="Filename from the Content-Disposition response header, if provided by the server" data-tooltip-position="below">filename</button>
+						<button class="chip cursor-pointer" data-value="{mediaSlug}" data-tooltip="Last path segment of the media file URL" data-tooltip-position="below">mediaSlug</button>
+						<button class="chip cursor-pointer" data-value="{timeNow}" data-tooltip="Current time in HH-MM format (24-hour)" data-tooltip-position="below">timeNow</button>
+						<button class="chip cursor-pointer" data-value="{dateToday}" data-tooltip="Current date in YYYY-MM-DD format" data-tooltip-position="below">dateToday</button>
+					</div>
+				</div>
+
+				<div class="form-group" id="custom-variables-group">
+					<div class="strategy-builder editor-card">
+						<div class="section-header-sn">
+							<h2>Custom Variables</h2>
+							<span class="help-text">Define dynamic variables from the page context. To create fallback chain, add new variable with the <strong>same Alias</strong>, they will be iterated from top to bottom until a match is found.</span>
+						</div>
+						<div id="strategy-list" class="strategy-list hidden">
+							
+						</div>
+						<button id="add-strategy-btn" class="add-row-btn btn btn-small">
+							+ Add New Variable
+						</button>
+					</div>
+				</div>
+
+				<div class="form-group transformations-group">
+					<div class="transformations-card editor-card">
+						<div class="section-header-sn">
+							<div class="transformations-title-row">
+								<h2>Final Output Transformations</h2>
+								<span class="text-badge">Applied after the template is resolved</span>
+							</div>
+							<span class="help-text">Transform the final filename before it is returned and used.</span>
+						</div>
+
+						<div class="transformations-layout">
+							<div class="case-column">
+								<h3>Case Transformation</h3>
+								<select id="rule-caseMode" class="input-field">
+									<option value="none">No change</option>
+									<option value="capitalize">Capitalize</option>
+									<option value="lowercase">lowercase</option>
+									<option value="uppercase">UPPERCASE</option>
+									<option value="titlecase">Title Case</option>
+								</select>
+								<span class="help-text">Change the case of the entire result.</span>
+							</div>
+							
+							<div class="divider"></div>
+
+							<div class="substitutions-column">
+								<div class="transformations-title-row compact">
+									<h3>String Substitutions</h3>
+									<span class="text-badge">Applied in order (top to bottom)</span>
+								</div>
+								<div id="substitution-list" class="substitution-list hidden">
+									
+								</div>
+								<button type="button" id="add-substitution-btn" class="add-row-btn btn btn-small">
+									+ Add Substitution
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group scraper-delay">
+					<h3>Scraper Delay (ms)</h3>
+					<input type="number" id="rule-delay" class="input-field" placeholder="0" min="0" step="100">
+					<span class="help-text">Optional delay before the scraper starts. Useful for pages where content loads dynamically.</span>
+				</div>
+
+			</div>
+		</main>
+	</div>
+	<script type="module" src="smart-naming-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+import{r as n}from"./store-g-2qfnwC.js";import"./cn-DTPxTs8l.js";function e(t,[r,o]){return Math.min(o,Math.max(r,t))}var a=n.createContext(void 0);function i(t){const r=n.useContext(a);return t||r||"ltr"}export{e as c,i as u};

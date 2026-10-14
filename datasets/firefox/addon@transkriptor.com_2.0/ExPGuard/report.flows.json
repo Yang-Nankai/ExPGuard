@@ -1,0 +1,128 @@
+{
+  "extensionId": "addon@transkriptor.com",
+  "extensionVersion": "2.0",
+  "sourceType": "XPI",
+  "stats": {
+    "filesWithIssues": 5,
+    "totalFiles": 6,
+    "distinctFlows": 1,
+    "rawIssueEntries": 1,
+    "sinklessSourcesSkipped": 6
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+        "file": "background",
+        "loc": "L6:C5 -> L6:C12",
+        "line": 6,
+        "col": [
+          5,
+          12
+        ],
+        "spansTo": null,
+        "code": "if(»request«.action == \"loginUser\") {"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "userData",
+          "file": "background",
+          "loc": "L11:C4 -> L15:C6",
+          "line": 11,
+          "col": [
+            4,
+            6
+          ],
+          "spansTo": 15,
+          "code": "»chrome.storage.local.set({ userData: { uid, language, email } }, function() {«",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 28,
+        "distinctLines": 7,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 6,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if(»request.action« == \"loginUser\") {"
+          },
+          {
+            "n": 2,
+            "file": "background",
+            "line": 7,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element",
+              "RETURN:json.parse"
+            ],
+            "code": "let widgetData = »JSON.parse(request.widgetData)«"
+          },
+          {
+            "n": 3,
+            "file": "background",
+            "line": 8,
+            "ops": [
+              "ELEMENT:member-element",
+              "RETURN:fallback-return"
+            ],
+            "code": "let uid = »widgetData.userId.replace(\"User#\", \"\")«"
+          },
+          {
+            "n": 4,
+            "file": "background",
+            "line": 9,
+            "ops": [
+              "ELEMENT:member-element"
+            ],
+            "code": "let email = »widgetData.email«"
+          },
+          {
+            "n": 5,
+            "file": "background",
+            "line": 10,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:member-element"
+            ],
+            "code": "let language = »request.language«"
+          },
+          {
+            "n": 6,
+            "file": "background",
+            "line": 11,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "chrome.storage.local.set({ userData: { »uid, language, email } }, function() {«",
+            "spansTo": 15
+          },
+          {
+            "n": 7,
+            "file": "background",
+            "line": 12,
+            "ops": [
+              "ASSIGN:identifier"
+            ],
+            "code": "console.log(»uid, email, language«)"
+          }
+        ]
+      }
+    }
+  ]
+}

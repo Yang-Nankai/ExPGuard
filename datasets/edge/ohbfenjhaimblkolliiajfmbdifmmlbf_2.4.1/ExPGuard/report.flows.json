@@ -1,0 +1,451 @@
+{
+  "extensionId": "ohbfenjhaimblkolliiajfmbdifmmlbf",
+  "extensionVersion": "2.4.1",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 5,
+    "totalFiles": 6,
+    "distinctFlows": 4,
+    "rawIssueEntries": 7,
+    "sinklessSourcesSkipped": 15
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "content",
+      "frame": "CS_1",
+      "constraint": {
+        "matches": [
+          "*://discord.com/*"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "content",
+        "loc": "L4:C51 -> L4:C62",
+        "line": 4,
+        "col": [
+          51,
+          62
+        ],
+        "spansTo": null,
+        "code": "e.source===window&&\"DISCORD_TOKEN_EXTRACTED_EXT\"===»e.data.type«&&e.data.token&&sendToken(e.data.token)});let e=null,o=0"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "discordToken",
+          "file": "content",
+          "loc": "L1:C72 -> L1:C114",
+          "line": 1,
+          "col": [
+            72,
+            114
+          ],
+          "spansTo": null,
+          "code": "function sendToken(e){e&&(console.log(\"[Discord Exporter] Token found\"),»chrome.storage.local.set({discordToken:e})«,",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "*://discord.com/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 11,
+        "distinctLines": 3,
+        "steps": [
+          {
+            "n": 1,
+            "file": "content",
+            "line": 4,
+            "ops": [
+              "ELEMENT:member-element",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right",
+              "ASSIGN:logical-left"
+            ],
+            "code": "»e.source===window&&\"DISCORD_TOKEN_EXTRACTED_EXT\"===e.data.type&&e.data.token&&sendToken(e.data.token«)});let e=null,o=0"
+          },
+          {
+            "n": 2,
+            "file": "content",
+            "line": 1,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "function sendToken(e){e&&(console.log(\"[Discord Exporter] Token found\"),»chrome.storage.local.set({discordToken:e})«,"
+          },
+          {
+            "n": 3,
+            "file": "content",
+            "line": 2,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»chrome.runtime.sendMessage({type:\"TOKEN_FOUND\",token:e})«)}console.log(\"[Discord Exporter] Content script loaded\"),"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "background/service-worker",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "background/service-worker",
+        "loc": "L42:C55 -> L71:C18",
+        "line": 42,
+        "col": [
+          55,
+          18
+        ],
+        "spansTo": 71,
+        "code": "console.error(\"[Service Worker] Cleanup error:\",e)}}}),»chrome.runtime.onMessage.addListener((e,r,a)=>{«"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "discordToken",
+          "file": "background/service-worker",
+          "loc": "L68:C37 -> L68:C85",
+          "line": 68,
+          "col": [
+            37,
+            85
+          ],
+          "spansTo": null,
+          "code": "})),\"TOKEN_FOUND\"===e.type){e.token&&»chrome.storage.local.set({discordToken:e.token})«;let t=r&&r.tab?r.tab.url:null",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_HEADERS",
+          "remark": "[Unknown URL]",
+          "file": "background/service-worker",
+          "loc": "L28:C10 -> L28:C86",
+          "line": 28,
+          "col": [
+            10,
+            86
+          ],
+          "spansTo": null,
+          "code": "},c=await »fetch(`https://discord.com/api/v9/guilds/${n}?with_counts=true`,{headers:i})«;let l=null;if(c.ok){",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_HEADERS",
+          "remark": "[Unknown URL]",
+          "file": "background/service-worker",
+          "loc": "L31:C14 -> L31:C75",
+          "line": 31,
+          "col": [
+            14,
+            75
+          ],
+          "spansTo": null,
+          "code": "const e=await »fetch(`https://discord.com/api/v9/channels/${r}`,{headers:i})«;if(e.ok){const t=await e.json();d={id:t.id,",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 12,
+        "distinctLines": 5,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background/service-worker",
+            "line": 42,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»console.error(\"[Service Worker] Cleanup error:\",e)}}}),chrome.runtime.onMessage.addListener((e,r,a)=>{«",
+            "spansTo": 71,
+            "crossContextHop": "runtime.single.sender.message[content->background/service-worker]"
+          },
+          {
+            "n": 2,
+            "file": "background/service-worker",
+            "line": 68,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "})),\"TOKEN_FOUND\"===e.type){e.token&&»chrome.storage.local.set({discordToken:e.token})«;let t=r&&r.tab?r.tab.url:null"
+          },
+          {
+            "n": 3,
+            "file": "background/service-worker",
+            "line": 27,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": ";const a=await chrome.storage.local.get([\"discordToken\"]),s=»t||a.discordToken;if(!s)return;const i={Authorization:s«",
+            "spansTo": 28
+          },
+          {
+            "n": 4,
+            "file": "background/service-worker",
+            "line": 28,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "},»c=await fetch(`https://discord.com/api/v9/guilds/${n}?with_counts=true`,{headers:i})«;let l=null;if(c.ok){"
+          },
+          {
+            "n": 5,
+            "file": "background/service-worker",
+            "line": 31,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »e=await fetch(`https://discord.com/api/v9/channels/${r}`,{headers:i})«;if(e.ok){const t=await e.json();d={id:t.id,"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "file": "background/service-worker",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "From storage.local.set('discordToken') in content",
+        "file": "background/service-worker",
+        "loc": "L4:C51 -> L4:C62",
+        "line": 4,
+        "col": [
+          51,
+          62
+        ],
+        "spansTo": null,
+        "code": "}),chrome.sidePanel&&chrome.sidePanel.setPanelBehav»ior&&chrome«.sidePanel.setPanelBehavior({openPanelOnActionClick:!0"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_HEADERS",
+          "remark": "[Unknown URL]",
+          "file": "background/service-worker",
+          "loc": "L28:C10 -> L28:C86",
+          "line": 28,
+          "col": [
+            10,
+            86
+          ],
+          "spansTo": null,
+          "code": "},c=await »fetch(`https://discord.com/api/v9/guilds/${n}?with_counts=true`,{headers:i})«;let l=null;if(c.ok){",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_HEADERS",
+          "remark": "[Unknown URL]",
+          "file": "background/service-worker",
+          "loc": "L31:C14 -> L31:C75",
+          "line": 31,
+          "col": [
+            14,
+            75
+          ],
+          "spansTo": null,
+          "code": "const e=await »fetch(`https://discord.com/api/v9/channels/${r}`,{headers:i})«;if(e.ok){const t=await e.json();d={id:t.id,",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 2,
+      "propagation": {
+        "rawSteps": 30,
+        "distinctLines": 6,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background/service-worker",
+            "line": 4,
+            "ops": [
+              "ELEMENT:member-element",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-right",
+              "ASSIGN:logical-left"
+            ],
+            "code": "»}),chrome.sidePanel&&chrome.sidePanel.setPanelBehavior&&chrome.sidePanel.setPanelBehavior({openPanel«OnActionClick:!0"
+          },
+          {
+            "n": 2,
+            "file": "content",
+            "line": 1,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "function sendToken(e){e&&(console.log(\"[Discord Exporter] Token found\"),»chrome.storage.local.set({discordToken:e})«,"
+          },
+          {
+            "n": 3,
+            "file": "background/service-worker",
+            "line": 2,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»;e.startBackground(),e.onPaid.addListener(e=>{console.lo«g(\"[Service Worker] User paid!\",e),chrome.runtime.sendMessage({"
+          },
+          {
+            "n": 4,
+            "file": "background/service-worker",
+            "line": 27,
+            "ops": [
+              "STORAGE:STORAGE_FLOW[area: local, key: discordToken, sender: content, receiver: background/service-worker]",
+              "ASSIGN:logical-right",
+              "ASSIGN:identifier",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": ";const a=await »chrome.storage.local.get([\"discordToken\"]),s=t||a.discordToken;if(!s)return;const i={Authorization:s«",
+            "spansTo": 28
+          },
+          {
+            "n": 5,
+            "file": "background/service-worker",
+            "line": 28,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "},»c=await fetch(`https://discord.com/api/v9/guilds/${n}?with_counts=true`,{headers:i})«;let l=null;if(c.ok){"
+          },
+          {
+            "n": 6,
+            "file": "background/service-worker",
+            "line": 31,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »e=await fetch(`https://discord.com/api/v9/channels/${r}`,{headers:i})«;if(e.ok){const t=await e.json();d={id:t.id,"
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "file": "background/service-worker",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "From storage.local.set('discordToken') in background/service-worker",
+        "file": "background/service-worker",
+        "loc": "L42:C55 -> L71:C18",
+        "line": 42,
+        "col": [
+          55,
+          18
+        ],
+        "spansTo": 71,
+        "code": "console.error(\"[Service Worker] Cleanup error:\",e)}}}),»chrome.runtime.onMessage.addListener((e,r,a)=>{«"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_HEADERS",
+          "remark": "[Unknown URL]",
+          "file": "background/service-worker",
+          "loc": "L28:C10 -> L28:C86",
+          "line": 28,
+          "col": [
+            10,
+            86
+          ],
+          "spansTo": null,
+          "code": "},c=await »fetch(`https://discord.com/api/v9/guilds/${n}?with_counts=true`,{headers:i})«;let l=null;if(c.ok){",
+          "frame": "BG_1"
+        },
+        {
+          "kind": "FETCH_HEADERS",
+          "remark": "[Unknown URL]",
+          "file": "background/service-worker",
+          "loc": "L31:C14 -> L31:C75",
+          "line": 31,
+          "col": [
+            14,
+            75
+          ],
+          "spansTo": null,
+          "code": "const e=await »fetch(`https://discord.com/api/v9/channels/${r}`,{headers:i})«;if(e.ok){const t=await e.json();d={id:t.id,",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 3,
+      "propagation": {
+        "rawSteps": 23,
+        "distinctLines": 5,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background/service-worker",
+            "line": 42,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»console.error(\"[Service Worker] Cleanup error:\",e)}}}),chrome.runtime.onMessage.addListener((e,r,a)=>{«",
+            "spansTo": 71,
+            "crossContextHop": "runtime.single.sender.message[content->background/service-worker]"
+          },
+          {
+            "n": 2,
+            "file": "background/service-worker",
+            "line": 68,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "})),\"TOKEN_FOUND\"===e.type){e.token&&»chrome.storage.local.set({discordToken:e.token})«;let t=r&&r.tab?r.tab.url:null"
+          },
+          {
+            "n": 3,
+            "file": "background/service-worker",
+            "line": 27,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:logical-left",
+              "ASSIGN:unary",
+              "ELEMENT:object.setProperty",
+              "STORAGE:STORAGE_FLOW[area: local, key: discordToken, sender: background/service-worker, receiver: background/service-worker]",
+              "ASSIGN:logical-right"
+            ],
+            "code": ";const a=await »chrome.storage.local.get([\"discordToken\"]),s=t||a.discordToken;if(!s)return;const i={Authorization:s«",
+            "spansTo": 28
+          },
+          {
+            "n": 4,
+            "file": "background/service-worker",
+            "line": 28,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "},»c=await fetch(`https://discord.com/api/v9/guilds/${n}?with_counts=true`,{headers:i})«;let l=null;if(c.ok){"
+          },
+          {
+            "n": 5,
+            "file": "background/service-worker",
+            "line": 31,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "const »e=await fetch(`https://discord.com/api/v9/channels/${r}`,{headers:i})«;if(e.ok){const t=await e.json();d={id:t.id,"
+          }
+        ]
+      }
+    }
+  ]
+}

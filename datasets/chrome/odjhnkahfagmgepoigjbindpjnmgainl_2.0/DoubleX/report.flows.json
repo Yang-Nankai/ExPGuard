@@ -1,0 +1,496 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [],
+  "taintResults": [
+    {
+      "id": "cs:direct_dangers:danger1",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L2994",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x0000023A3E7EFA00>, SCAN_THROTTLE_MS)",
+        "sink-param1": "\t\tdocument.addEventListener('DOMContentLoaded', () => {\r\n",
+        "sink-param2": "SCAN_THROTTLE_MS",
+        "line": "2994 - 2997",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger2",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L2929",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(initialScan, 200)",
+        "sink-param1": "initialScan",
+        "sink-param2": 200,
+        "line": "2929 - 2929",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger3",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L2848",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x0000023A3E7735E0>, 3000)",
+        "sink-param1": "─────────\r\n\t//\r\n\t// When the HLS filter strips all segments from an ad-only playlist, the IVS\r\n\t// player ",
+        "sink-param2": 3000,
+        "line": "2848 - 2851",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger4",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setInterval",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L2750",
+      "legacy": {
+        "danger": "setInterval",
+        "value": "setInterval(<pdg_js.node.FunctionExpression object at 0x0000023A3E770400>, 500)",
+        "sink-param1": "play: none !important;\r\n visibility: hidden !important;\r\n pointer-events: none !important;\r\n }\r\n `;\r\n\t\tcontainer.appendChild(s",
+        "sink-param2": 500,
+        "line": "2750 - 2757",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger5",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setInterval",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L2779",
+      "legacy": {
+        "danger": "setInterval",
+        "value": "setInterval(<pdg_js.node.FunctionExpression object at 0x0000023A3E771120>, 1000)",
+        "sink-param1": "CSS hides known ad elements with display:none — hidden elements\r\n\t\t// have offsetParent===null. If our CSS fired successfully the element\r\n\t\t// exists in the DOM but is invisible, so we must not mute live audio.\r\n\t\treturn AD_PLAYING_SELECTORS.some(sel => {\r\n\t\t\tconst el = document.querySelector(sel);\r\n\t\t\treturn el !== null && el.offsetParent !== null;\r\n\t\t});\r\n\t}\r\n\r\n\t/**\r\n\t * Detects Twitch's \"purple screen\" / low-quality replacement stream.\r\n\t *\r\n\t * When Twitch's server-side ad insertion (SSAI) delivers an ad without\r\n\t * SCTE-35 markers, it sometimes substitutes the normal stream with a\r\n\t * very-low-resolution placeholder (typically 284×160). We detect this by\r\n\t * comparing the current videoWidth against the highest quality seen so far\r\n\t * on this page, ignoring cases where the user has always been on low quality.\r\n\t */\r\n\tfunction isLowQualityPlaceholder() {\r\n\t\tconst video = document.querySelector('video');\r\n\t\tif (!video || video.paused || video.readyState < 2 || video.videoWidth === 0) return false;\r\n\r\n\t\tconst w = video.videoWidth;\r\n\t\t// Update the running maximum (quality can legitimately increase over time).\r\n\t\tif (w > lastVideoWidth) {\r\n\t\t\tlastVideoWidth = w;\r\n\t\t\treturn false;\r\n\t\t}\r\n\r\n\t\t// Only flag as a placeholder if we have previously seen a decent-quality\r\n\t\t// stream (>= 640px wide) AND the current width is very low (< 300px).\r\n\t\t// This avoids false positives when the user has manually set quality to 160p.\r\n\t\treturn lastVideoWidth >= 640 && w < 300;\r\n\t}\r\n\r\n\tfunction muteForAd() {\r\n\t\tif (mutedForAd) ",
+        "sink-param2": 1000,
+        "line": "2779 - 2823",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger6",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L1416",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x0000023A3CCE1360>, None)",
+        "sink-param1": "r = document.querySelector('.html5-video-player');\r\n\t\t\t// Guard: only attach once per player element instance.\r\n\t\t\t// YouT",
+        "sink-param2": null,
+        "line": "1416 - 1421",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger7",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setInterval",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L1478",
+      "legacy": {
+        "danger": "setInterval",
+        "value": "setInterval(<pdg_js.node.Identifier object at 0x0000023A3CCE28F0>, 2000)",
+        "sink-param1": "<pdg_js.node.Identifier object at 0x0000023A3CCE28F0>",
+        "sink-param2": 2000,
+        "line": "1478 - 1478",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger8",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L1561",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x0000023A3CD629E0>, 100)",
+        "sink-param1": "rmed = isConfirmedAd(player);\r\n\t\t\t\t\tif (video.playbackRate > 8 && !isAdConfirmed) {\r\n\t\t\t\t\t\tvideo.playbackRate = 1;",
+        "sink-param2": 100,
+        "line": "1561 - 1564",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger9",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setInterval",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L1361",
+      "legacy": {
+        "danger": "setInterval",
+        "value": "setInterval(<pdg_js.node.FunctionExpression object at 0x0000023A3CC772E0>, 200)",
+        "sink-param1": "\n\t\tconst hasMediaFallback =\r\n\t\t\tmediaState.confirmed && (hasPlayerAdUi(player) || mediaState.safeToJump);\r\n\r\n\t\t// Primary path is still ad-s",
+        "sink-param2": 200,
+        "line": "1361 - 1368",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger10",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L1016",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.Identifier object at 0x0000023A3CB05750>, 500)",
+        "sink-param1": "<pdg_js.node.Identifier object at 0x0000023A3CB05750>",
+        "sink-param2": 500,
+        "line": "1016 - 1016",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger11",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L1017",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.Identifier object at 0x0000023A3CB05750>, 1500)",
+        "sink-param1": "<pdg_js.node.Identifier object at 0x0000023A3CB05750>",
+        "sink-param2": 1500,
+        "line": "1017 - 1017",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger12",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L873",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x0000023A3CA8C790>, 100)",
+        "sink-param1": "ner('yt-ad-blocker-intercepted', () => {\r\n\t\t\tif (isEnabled) reportBlocked(1);\r\n\t\t});\r\n\t\twindow.addEventListener('yt-ad-b",
+        "sink-param2": 100,
+        "line": "873 - 879",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger13",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setInterval",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L479",
+      "legacy": {
+        "danger": "setInterval",
+        "value": "setInterval(<pdg_js.node.FunctionExpression object at 0x0000023A3C8B2800>, 50)",
+        "sink-param1": "result;\r\n\t\t\t};\r\n\t\t}\r\n\t}\r\n\r\n\t// ytcfg may not exist yet — intercept its creation\r\n\tif (win",
+        "sink-param2": 50,
+        "line": "479 - 484",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger14",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L485",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x0000023A3C8B2B30>, 30000)",
+        "sink-param1": "cfg();\r\n\t} else {\r\n\t\tlet ",
+        "sink-param2": 30000,
+        "line": "485 - 485",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger15",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setInterval",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L673",
+      "legacy": {
+        "danger": "setInterval",
+        "value": "setInterval(<pdg_js.node.FunctionExpression object at 0x0000023A3C9A37F0>, 500)",
+        "sink-param1": "data = JSON.parse(this.responseText);\r\n\t\t\t\t\t\tstripAds(data);\r\n\t\t\t\t\t\tconst stripped = JSON.stringify(data);\r\n\t\t\t\t\t\tObject.defineProperty(this, 'responseText', {\r\n\t\t\t\t\t\t\tvalue: stripped,\r\n\t\t\t\t\t\t\tconfigurable: true,\r\n\t\t\t\t\t\t});\r\n\t\t\t\t\t\tObject.defineProperty(this, 'response', {\r\n\t\t\t\t\t\t\tvalue: this.responseType === 'json' ? data : stripped,\r\n\t\t\t\t\t\t\tconfigurable: true,\r\n\t\t\t\t\t\t});\r\n\t\t\t\t\t} catch {}\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t}\r\n\t\treturn _xhrSend.apply(this, args);\r\n\t};\r\n\r\n\t// ── 6) Periodic Safety Net ────────────────────────────────────────────\r\n\t// Re-checks globals every 500ms for the first 30 seconds in case\r\n\t// YouTube overwrites our property hooks or sets data after the fact.\r\n\tlet safetyCount = 0;\r\n\tcon",
+        "sink-param2": 500,
+        "line": "673 - 698",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger16",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setInterval",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/content_scripts.js",
+      "sinkLoc": "L2495",
+      "legacy": {
+        "danger": "setInterval",
+        "value": "setInterval(publish, 5000)",
+        "sink-param1": "publish",
+        "sink-param2": 5000,
+        "line": "2495 - 2495",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/background.js",
+      "sinkLoc": "L67",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x0000023A3F5526E0>, 1000)",
+        "sink-param1": "etTimeout(() => {\r\n\t\tstatsFlushTimer = null;\r\n\t\tchrome.storage.local.set({\r\n\t\t\tadsBlocked\r",
+        "sink-param2": 1000,
+        "line": "67 - 72",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger2",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/background.js",
+      "sinkLoc": "L69",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x0000023A3F552A10>)",
+        "sink-param1": "local.set({\r\n\t\t\tadsBl",
+        "line": "69 - 71",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger3",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/background.js",
+      "sinkLoc": "L21",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x0000023A3F551660>)",
+        "sink-param1": "{\r\n\t\t\tdebugLogs\r\n\t\t}",
+        "line": "21 - 23",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger4",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.create",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/background.js",
+      "sinkLoc": "L184",
+      "legacy": {
+        "danger": "chrome.tabs.create",
+        "value": "chrome.tabs.create(<pdg_js.node.ValueExpr object at 0x0000023A3D47FD90>)",
+        "sink-param1": "tabs.create({\r\n\t\t\turl: 'welcome_page/inde",
+        "line": "184 - 186",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger1",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": false,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/background.js",
+      "sinkLoc": "L127",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(chrome.runtime.getURL(video/rules.json))",
+        "sink-param1": "chrome.runtime.getURL(video/rules.json)",
+        "line": "127 - 127",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/background.js",
+      "sinkLoc": "L308",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(<pdg_js.node.ValueExpr object at 0x0000023A3DC65060>, <pdg_js.node.FunctionExpression object at 0x0000023A3DC65090>)",
+        "sink-param1": "Promise((resolve) => {\r\n\t\tchrome.s",
+        "sink-param2": "rage.sync.get(['globalEnabled', 'disabledSites'], function(result) {\r\n\t\t\tconst globalEnabled = result.globalEnabled !== false; // Default to true\r\n\t\t\tconst disabledSites = result.disabledSites || [];\r\n\t\t\tconst siteEnabled = globalEnabled && !disabledSite",
+        "line": "308 - 313",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger2",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/background.js",
+      "sinkLoc": "L218",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(globalEnabled)",
+        "sink-param1": "globalEnabled",
+        "line": "218 - 218",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger3",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.sync.get",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/background.js",
+      "sinkLoc": "L85",
+      "legacy": {
+        "danger": "chrome.storage.sync.get",
+        "value": "chrome.storage.sync.get(<pdg_js.node.ValueExpr object at 0x0000023A3F553250>)",
+        "sink-param1": ".sync.get(['disabledSites', 'globa",
+        "line": "85 - 85",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger4",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/background.js",
+      "sinkLoc": "L61",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(adsBlocked)",
+        "sink-param1": "adsBlocked",
+        "line": "61 - 61",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger5",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "C:/Users/ph0jav7/AppData/Local/Temp/doublex_bundle_ii84fzf0/background.js",
+      "sinkLoc": "L16",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(debugLogs)",
+        "sink-param1": "debugLogs",
+        "line": "16 - 16",
+        "filename": "C:\\Users\\ph0jav7\\AppData\\Local\\Temp\\doublex_bundle_ii84fzf0\\background.js",
+        "dataflow": false
+      }
+    }
+  ]
+}

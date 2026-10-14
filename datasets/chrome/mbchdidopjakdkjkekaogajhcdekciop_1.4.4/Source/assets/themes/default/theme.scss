@@ -1,0 +1,150 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$primary-palette-config: (
+    50 : #fefefe,
+    100 : #FCFCFC,
+    200 : #FAFAFA,
+    300 : #F8F8F8,
+    400 : #f7f7f7,
+    500 : #f5f5f5,
+    600 : #EAEAEA,
+    700 : #E0E0E0,
+    800 : #c8c8c8,
+    900 : #a5a5a5,
+    contrast: (
+      // Text colors when the palette is used as background.
+        50: rgba(black, 0.87),
+        100: rgba(black, 0.87),
+        200: rgba(black, 0.87),
+        300: rgba(black, 0.87),
+        400: rgba(black, 0.87),
+        500: rgba(black, 0.87),
+        600: rgba(black, 0.87),
+        700: rgba(black, 0.87),
+        800: rgba(black, 0.87),
+        900: rgba(black, 0.87),
+    )
+);
+$accent-palette-config: (
+    50 : #e0f7f0,
+    100 : #b3ecd9,
+    200 : #80e0c0,
+    300 : #4dd3a6,
+    400 : #26c993,
+    500 : #00c080,
+    600 : #00ba78,
+    700 : #00b26d,
+    800 : #00aa63,
+    900 : #009c50,
+    A100 : #c7ffe0,
+    A200 : #94ffc4,
+    A400 : #61ffa7,
+    A700 : #47ff99,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$primary-palette: mat.define-palette($primary-palette-config, 500, 50, 900, 900);
+$accent-palette: mat.define-palette($accent-palette-config, 500, 50, 900, 900);
+
+$theme: mat.define-light-theme((
+    color: (
+        primary: $primary-palette,
+        accent: $accent-palette,
+    ),
+    typography: mat.define-typography-config(),
+    density: 0,
+));
+
+@include mat.all-component-themes($theme);
+
+// Generating css variables.
+$color-levels: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900;
+:root {
+  @each $level in $color-levels {
+    --bb-primary-#{$level}: #{mat.get-theme-color($theme, primary, $level)};
+    --bb-accent-#{$level}: #{mat.get-theme-color($theme, accent, $level)};
+    --bb-warn-#{$level}: #{mat.get-theme-color($theme, warn, $level)};
+  }
+
+  --mdc-checkbox-state-layer-size: 18px;
+  --mdc-checkbox-selected-focus-icon-color: #2396FE;
+  --mdc-checkbox-selected-hover-icon-color: #2396FE;
+  --mdc-checkbox-selected-icon-color: #2396FE;
+  --mdc-checkbox-selected-pressed-icon-color: #2396FE;
+  --mdc-filled-button-container-shape: 9999px;
+  --mdc-outlined-button-container-shape: 9999px;
+  --mdc-filled-button-container-height: 32px;
+  --mdc-outlined-button-container-height: 32px;
+  --mdc-checkbox-unselected-icon-color: #b4a0a7;
+  --mdc-checkbox-unselected-focus-icon-color: #b4a0a7;
+  --mdc-checkbox-unselected-hover-icon-color: #a7989d;
+
+  --mdc-checkbox-selected-checkmark-color: white;
+
+  --mdc-dialog-container-shape: 10px;
+
+  --mdc-snackbar-container-color: white;
+  --mdc-snackbar-container-shape: 10px;
+
+  --mat-table-header-container-height: 48px;
+}
+
+.mat-mdc-checkbox {
+  --mdc-form-field-label-text-size: 1em;
+  --mdc-form-field-label-text-line-height: 1em;
+  --mdc-form-field-label-text-weight: 400;
+}
+
+.mdc-checkbox__ripple {
+  display: none;
+}
+
+.mdc-label {
+  font-weight: 400;
+}
+
+.mdc-checkbox__background {
+  width: 14px;
+  height: 14px;
+  top: 2px !important;
+}
+
+.mdc-switch__icons {
+  display: none;
+}
+
+.mat-icon.mat-accent {
+  --mat-icon-color: var(--bb-accent-500);
+}
+
+.mdc-data-table__row:last-child .mat-mdc-cell {
+  border-bottom: 1px solid var(--mat-table-row-item-outline-color, rgba(0, 0, 0, 0.12));
+}
+
+html .mat-mdc-slide-toggle.mat-accent {
+  --mdc-switch-selected-hover-handle-color: var(--bb-accent-600);
+  --mdc-switch-selected-focus-handle-color: var(--bb-accent-600);
+  --mdc-switch-selected-pressed-handle-color: var(--bb-accent-600);
+  --mdc-switch-selected-handle-color: var(--bb-accent-600);
+  --mdc-switch-unselected-focus-handle-color: #616161;
+  --mdc-switch-unselected-hover-handle-color: #616161;
+  --mdc-switch-unselected-pressed-handle-color: #616161;
+  --mdc-switch-unselected-handle-color: #616161;
+}

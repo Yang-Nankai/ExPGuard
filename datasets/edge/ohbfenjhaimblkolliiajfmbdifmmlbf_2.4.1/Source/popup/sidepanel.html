@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Discord Media Downloader</title>
+  <link rel="stylesheet" href="../lib/flatpickr.min.css">
+  <style>
+    body {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f2f3f5;
+      color: #2e3338;
+      padding: 12px;
+      margin: 0;
+      font-size: 14px;
+      overflow-y: auto; /* 允许主体内容滚动，防挤压 */
+    }
+
+    .card {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .channel-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .channel-icon {
+      font-size: 24px;
+      color: #747f8d;
+    }
+
+    .channel-details {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .channel-name {
+      color: #060607;
+      font-weight: 700;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+
+    .guild-id {
+      font-size: 14px;
+      color: #060607;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      color: #4f5660;
+      font-size: 12px;
+      margin-bottom: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    /* Segmented Control CSS */
+    .segmented-control {
+      display: flex;
+      background-color: #e3e5e8;
+      border-radius: 6px;
+      padding: 2px;
+      margin-bottom: 12px;
+    }
+    
+    .segmented-control label {
+      flex: 1;
+      text-align: center;
+      padding: 6px 0;
+      margin: 0;
+      font-size: 13px;
+      font-weight: 500;
+      color: #4f5660;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+      text-transform: none;
+    }
+    
+    .segmented-control input[type="radio"] {
+      display: none;
+    }
+    
+    .segmented-control input[type="radio"]:checked + span {
+      background-color: #ffffff;
+      color: #060607;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      display: block;
+      padding: 6px 0;
+      border-radius: 4px;
+    }
+    
+    .segmented-control span {
+      display: block;
+      padding: 6px 0;
+    }
+
+    .form-group-inline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    
+    .form-group-inline label {
+      margin-bottom: 0;
+    }
+
+    .checkbox-group-inline {
+        display: flex;
+        gap: 16px;
+    }
+    
+    .date-range-row {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .date-range-row .form-group {
+      flex: 1;
+      margin-bottom: 12px;
+    }
+
+    .tooltip-icon {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background-color: #747f8d;
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      margin-left: 4px;
+      cursor: help;
+    }
+
+    .tooltip-icon:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      transform: translateX(0); /* Remove the centering transform */
+      margin-bottom: 6px;
+      background-color: #18191c;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      white-space: normal; /* Allow wrapping */
+      width: max-content; /* Ensure it tries to fit content */
+      max-width: 200px; /* But don't let it get wider than 200px */
+      z-index: 100;
+      font-weight: normal;
+      pointer-events: none;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      line-height: 1.3;
+    }
+    
+    .tooltip-icon:hover::before {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 7px; /* Align arrow with the icon (14px/2) */
+      transform: translateX(-50%);
+      margin-bottom: 2px;
+      border-width: 4px;
+      border-style: solid;
+      border-color: #18191c transparent transparent transparent;
+      z-index: 100;
+    }
+    
+    .radio-item, .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #2e3338;
+        cursor: pointer;
+    }
+    
+    .radio-item input, .checkbox-item input {
+        cursor: pointer;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background-color: #e3e5e8;
+      border: 1px solid #e3e5e8;
+      color: #2e3338;
+      padding: 10px;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    
+    input[type="text"]:focus {
+        border-color: #5865f2;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      box-sizing: border-box;
+    }
+
+    .btn-primary {
+      background-color: #5865f2;
+    }
+
+    .btn-primary:hover {
+      background-color: #4752c4;
+    }
+    
+    .btn-primary:disabled {
+        background-color: #9aa1f8;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        background-color: #4f545c;
+        margin-top: 8px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #43474d;
+    }
+    
+    .btn-stop {
+        background-color: #ed4245;
+        margin-top: 8px;
+    }
+    
+    .btn-stop:hover {
+        background-color: #c03537;
+    }
+
+    #progress-view {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+    
+    .error-msg {
+        color: #ed4245;
+        font-size: 12px;
+        margin-bottom: 12px;
+        background-color: rgba(237, 66, 69, 0.1);
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid rgba(237, 66, 69, 0.2);
+    }
+    
+    .info-text {
+        font-size: 12px;
+        color: #747f8d;
+        margin-bottom: 16px;
+        line-height: 1.4;
+    }
+    
+    .progress-container {
+        height: 8px;
+        background-color: #e3e5e8;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        background-color: #5865f2;
+        width: 0%;
+        transition: width 0.2s;
+    }
+    
+    .stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #747f8d;
+        margin-bottom: 8px;
+    }
+    
+    #config-form {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #running-view {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden; /* Prevent parent from scrolling */
+    }
+
+    .preview-area {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* Responsive grid for sidepanel */
+        align-content: start; /* 强制网格行从顶部开始排列，避免因高度剩余导致行间距被拉大 */
+        gap: 8px;
+        overflow-y: auto;
+        flex: 1; /* Take up remaining vertical space */
+        min-height: 0; /* Important for flexbox scrolling */
+        padding-bottom: 8px;
+        margin-bottom: 12px;
+    }
+    
+    .preview-item-wrapper {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1;
+    }
+    
+    .preview-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+    
+    .preview-item-wrapper.selected .preview-img {
+        border-color: #5865f2;
+    }
+    
+    .item-checkbox {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        margin: 0;
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        z-index: 10;
+    }
+    
+    .gallery-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    
+    .gallery-actions button {
+        background: none;
+        border: none;
+        color: #5865f2;
+        font-size: 12px;
+        cursor: pointer;
+        padding: 0;
+    }
+    
+    .gallery-actions button:hover {
+        text-decoration: underline;
+    }
+    
+    #free-limit-warning {
+        font-size: 12px;
+        color: #ed4245;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+    @keyframes pulse-text {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+    }
+    @keyframes spin {
+        100% { transform: rotate(360deg); }
+    }
+    
+    #capture-hint {
+        animation: pulse-text 2s infinite ease-in-out;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background-color: rgba(88, 101, 242, 0.1);
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid rgba(88, 101, 242, 0.2);
+    }
+  </style>
+    <style>
+        /* Flatpickr overrides for sidepanel */
+        .flatpickr-calendar {
+            width: 300px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            right: auto !important;
+            margin-top: -30px !important; /* Move it up slightly */
+        }
+        .flatpickr-calendar.arrowTop:before,
+        .flatpickr-calendar.arrowTop:after,
+        .flatpickr-calendar.arrowBottom:before,
+        .flatpickr-calendar.arrowBottom:after {
+            display: none !important; /* Hide arrows as we are centering manually */
+        }
+    </style>
+</head>
+<body>
+  <div class="card" id="user-status-card" style="padding: 10px; margin-bottom: 12px; margin-top: 4px;">
+    <div id="user-status-text" style="font-weight: bold; font-size: 12px; margin-bottom: 0;">Checking status...</div>
+    
+    <div id="upgrade-promo" class="hidden">
+      <div style="font-size: 12px; color: #4f5660; margin-bottom: 4px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        Free limit: 10 items per task. <a id="upgrade-btn-promo" style="color: #5865f2; text-decoration: underline; cursor: pointer; font-weight: bold;">Get Pro for unlimited.</a>
+      </div>
+      <div style="overflow: hidden; white-space: nowrap;">
+          <div style="display: inline-block; animation: scroll-left 10s linear infinite; color: #eb459e; font-weight: bold; font-size: 11px;">
+              🎉 50% OFF Limited Time Offer! Upgrade Now! 🎉
+          </div>
+      </div>
+    </div>
+
+    <div id="premium-msg" class="hidden">
+      <div style="color: #3ba55c; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 6px;">
+        <span>✨</span> Premium User: Unlimited Access
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="channel-info">
+      <div class="channel-icon"></div>
+      <div class="channel-details">
+        <div class="channel-name" id="channel-name">Loading...</div>
+        <div class="guild-id" id="channel-id"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="error-msg" class="error-msg hidden"></div>
+
+  <div id="config-form">
+    <div class="form-group">
+      <label>Mode <span class="tooltip-icon" data-tooltip="Scan: API history search. Capture: Current screen media.">?</span></label>
+      <div class="segmented-control">
+          <label>
+              <input type="radio" name="scanMode" value="scan" checked>
+              <span>Scan</span>
+          </label>
+          <label>
+              <input type="radio" name="scanMode" value="capture">
+              <span>Capture</span>
+          </label>
+      </div>
+    </div>
+
+    <div class="form-group-inline">
+      <label>Media Type</label>
+      <div class="checkbox-group-inline">
+          <label class="checkbox-item">
+              <input type="checkbox" id="type-images" checked> Images
+          </label>
+          <label class="checkbox-item">
+              <input type="checkbox" id="type-videos" checked> Videos
+          </label>
+      </div>
+    </div>
+
+    <div id="date-range-container" class="date-range-row">
+        <div class="form-group">
+          <label for="start-time">Start Time <span class="tooltip-icon" data-tooltip="Required. The date to start scanning from.">?</span></label>
+          <input type="text" id="start-time" placeholder="Select Date & Time">
+        </div>
+
+        <div class="form-group">
+          <label for="end-time">End Time <span class="tooltip-icon" data-tooltip="Optional. Defaults to current time if left blank.">?</span></label>
+          <input type="text" id="end-time" placeholder="Select Date & Time">
+        </div>
+    </div>
+    
+    <div class="info-text hidden" id="capture-hint" style="margin-bottom: 12px; color: #5865f2; font-weight: 500;">
+        <span>🖱️</span> Click Start Capture, then scroll the Discord page to capture media.
+    </div>
+
+    <button id="start-btn" class="btn btn-primary" disabled>Start Scan</button>
+    <button id="open-discord-home-btn" class="btn btn-secondary hidden">Open Discord</button>
+    
+    <div style="margin-top: 12px; text-align: center;">
+        <a href="#" id="upgrade-btn" style="color: #5865f2; text-decoration: none; font-size: 12px; font-weight: 500;">Upgrade to Pro</a>
+    </div>
+  </div>
+
+  <div id="running-view" class="hidden">
+    <div class="gallery-header">
+        <span id="gallery-title" style="font-weight: 600; font-size: 14px;">Found 0 items</span>
+        <div class="gallery-actions" style="margin-left: auto;">
+            <button id="select-all-btn">Select All</button> | 
+            <button id="clear-all-btn">Clear All</button>
+        </div>
+    </div>
+    
+    <div id="scan-progress-container" class="hidden" style="margin-bottom: 12px; background-color: #f8f9fa; padding: 8px; border-radius: 6px; border: 1px solid #e3e5e8;">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #23a559; margin-bottom: 6px; font-weight: 500;">
+            <span id="scan-status-text">Scanning history...</span>
+            <span id="scan-pct-text">0%</span>
+        </div>
+        <div style="height: 6px; background-color: #e3e5e8; border-radius: 3px; overflow: hidden;">
+            <div id="scan-progress-bar" style="height: 100%; background-color: #23a559; width: 0%; transition: width 0.2s ease-out, background-color 0.2s;"></div>
+        </div>
+    </div>
+
+    <div class="preview-area" id="preview-area">
+        <!-- Previews will appear here -->
+    </div>
+    
+    <div id="free-limit-warning" class="hidden">Free limit: 10 items per task. You selected <span id="selected-count-warning">0</span>.</div>
+    
+    <button id="download-btn" class="btn btn-primary">Download 0 Items as ZIP</button>
+    <button id="back-btn" class="btn btn-secondary">Stop & Back to Config</button>
+  </div>
+  
+  <div id="progress-view" class="hidden">
+      <div class="info-text" id="progress-info">Downloading Media...</div>
+      
+      <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      
+      <div class="stats">
+          <span id="status-text">DOWNLOADING</span>
+          <span id="count-text">0 / 0</span>
+      </div>
+      
+      <button id="stop-btn" class="btn btn-stop">Cancel Download</button>
+  </div>
+  
+  <!-- 极简通栏广告卡片开始 -->
+  <a href="https://discordkit.com/" target="_blank" style="margin-top: auto; padding: 10px; background-color: #5865F2; color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-decoration: underline; font-size: 12px; font-weight: bold; cursor: pointer;">
+    👉 Get more professional Discord tools
+  </a>
+  <!-- 极简通栏广告卡片结束 -->
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

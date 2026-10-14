@@ -1,0 +1,1 @@
+var e=document.createElement("script");function n(){document.querySelectorAll('link[as="script"]').forEach((e=>{e.removeAttribute("rel")}))}e.src=chrome.runtime.getURL("fb.js"),(document.head||document.documentElement).insertBefore(e,(document.head||document.documentElement).firstChild);const c=setInterval(n,200);setTimeout((()=>{clearInterval(c)}),3e3);

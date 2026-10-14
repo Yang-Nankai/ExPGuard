@@ -1,0 +1,170 @@
+{
+  "extensionId": "21681cbf10b2a519660257e880195e4dcb1b9dd@skrapp.io",
+  "extensionVersion": "2.6.1",
+  "sourceType": "XPI",
+  "stats": {
+    "filesWithIssues": 2,
+    "totalFiles": 2,
+    "distinctFlows": 2,
+    "rawIssueEntries": 2,
+    "sinklessSourcesSkipped": 5
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "keyContentScript.bundle",
+      "frame": "CS_1",
+      "constraint": {
+        "matches": [
+          "*://*.skrapp.io/*"
+        ]
+      },
+      "source": {
+        "kind": "DOCUMENT_COOKIE",
+        "remark": "document.cookie",
+        "file": "keyContentScript.bundle",
+        "loc": "L1:C1705169 -> L1:C1705170",
+        "line": 1,
+        "col": [
+          1705169,
+          1705170
+        ],
+        "spansTo": null,
+        "code": "…1;const M=A.distinct_id;return\"string\"==typeof M&&M.length>0}const U=()=>\"undefined\"==typeof document?null:(A=>{try{if(!»A«)return null;const M=A.split(\";\");for(const A of M){const M=A.trim(),N=M.indexOf(\"=\");if(-1===N)continue;if(\"ph_phc_AWAq…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "posthog_distinct_id",
+          "file": "keyContentScript.bundle",
+          "loc": "L1:C1706210 -> L1:C1706243",
+          "line": 1,
+          "col": [
+            1706210,
+            1706243
+          ],
+          "spansTo": null,
+          "code": "…erval(()=>{(async()=>{try{const A=U();if(!A)return;const M=await chrome.storage.local.get(D);if(M?.[D]===A)return;await »chrome.storage.local.set({[D]:A})«}catch{}})()},1e3),chrome.runtime.sendMessage({type:\"getVersion\"},function(A){A?.version&&A.key&&(localStorage[A.key]=A.…",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "*://*.skrapp.io/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 139,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "keyContentScript.bundle",
+            "line": 1,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary",
+              "ELEMENT:member-element-container",
+              "ELEMENT:string.split",
+              "ELEMENT:object.setProperty",
+              "ELEMENT:implicit.add",
+              "ITERATE:loop.iteration",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ASSIGN:binary-right",
+              "ASSIGN:binary-left",
+              "RETURN:decodeURIComponent",
+              "RETURN:json.parse",
+              "ASSIGN:conditional-consequent",
+              "ASSIGN:conditional-alternate"
+            ],
+            "code": "…ypeof document?null:»(A=>{try{if(!A)return null;const M=A.split(\";\");for(const A of M){const M=A.trim(),N=M.indexOf(\"=\");if(-1===N)continue;i …⟨tainted span: 1087 chars⟩… =U();if(!A)return;const M=await chrome.storage.local.get(D);if(M?.[D]===A)return;await chrome.storage.local.set({[D]:A})«}catch{}})()},1e3),c…"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "keyContentScript.bundle",
+      "frame": "CS_1",
+      "constraint": {
+        "matches": [
+          "*://*.skrapp.io/*"
+        ]
+      },
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "access_key",
+        "file": "keyContentScript.bundle",
+        "loc": "L1:C1705701 -> L1:C1705702",
+        "line": 1,
+        "col": [
+          1705701,
+          1705702
+        ],
+        "spansTo": null,
+        "code": "…ument.getElementById(\"access_key\");A?.value&&await(async A=>{window.clearInterval(u),chrome.storage.sync.set({accessKey:»A«});const{configSM:M}=await chrome.storage.sync.get(\"configSM\");if(!M||M.ts&&Date.now()-M.ts>3e5){const M=await fetch(z.c…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_SYNC_STORAGE",
+          "remark": "accessKey",
+          "file": "keyContentScript.bundle",
+          "loc": "L1:C1705666 -> L1:C1705704",
+          "line": 1,
+          "col": [
+            1705666,
+            1705704
+          ],
+          "spansTo": null,
+          "code": "…nct_id\",Z=async()=>{try{const A=document.getElementById(\"access_key\");A?.value&&await(async A=>{window.clearInterval(u),»chrome.storage.sync.set({accessKey:A})«;const{configSM:M}=await chrome.storage.sync.get(\"configSM\");if(!M||M.ts&&Date.now()-M.ts>3e5){const M=await fetch(z.con…",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "*://*.skrapp.io/*"
+            ]
+          }
+        },
+        {
+          "kind": "FETCH_HEADERS",
+          "remark": "https://api.skrapp.io/config/extension",
+          "file": "keyContentScript.bundle",
+          "loc": "L1:C1705813 -> L1:C1705910",
+          "line": 1,
+          "col": [
+            1705813,
+            1705910
+          ],
+          "spansTo": null,
+          "code": "…cessKey:A});const{configSM:M}=await chrome.storage.sync.get(\"configSM\");if(!M||M.ts&&Date.now()-M.ts>3e5){const M=await »fetch(z.configAPIUrl,{method:\"GET\",headers:{\"Content-Type\":\"application/json\",\"X-Access-Key\":A}})«,N=await M.json();N?.sm&&chrome.storage.sync.set({configSM:{ts:Date.now(),config:N.sm.t}})}})(A.value)}catch(A){console.…",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "*://*.skrapp.io/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 5,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "keyContentScript.bundle",
+            "line": 1,
+            "ops": [
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "…ow.clearInterval(u),»chrome.storage.sync.set({accessKey:A});const{configSM:M}=await chrome.storage.sync.get(\"configSM\");if(!M||M.ts&&Date.now …⟨tainted span: 244 chars⟩… .ts>3e5){const M=await fetch(z.configAPIUrl,{method:\"GET\",headers:{\"Content-Type\":\"application/json\",\"X-Access-Key\":A}})«,N=await M.json();N?…"
+          }
+        ]
+      }
+    }
+  ]
+}

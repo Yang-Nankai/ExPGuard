@@ -1,0 +1,162 @@
+{
+  "extensionId": "plafaneablgcojpbaeefkmnheilloopl",
+  "extensionVersion": "0.2.1",
+  "sourceType": "DIR",
+  "status": "success",
+  "duration": 0.261,
+  "files": [
+    {
+      "file": "javascripts/background.js",
+      "frame": "BG_1",
+      "frameTags": [
+        "BG_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "size": 3687,
+      "durationMs": 8.933899999999994
+    },
+    {
+      "file": "javascripts/content.js",
+      "frame": "CS_1",
+      "frameTags": [
+        "CS_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "CS_1",
+          "family": "CS",
+          "constraint": {
+            "matches": [
+              "<all_urls>"
+            ]
+          }
+        }
+      ],
+      "size": 36538,
+      "durationMs": 157.46339999999998
+    },
+    {
+      "file": "javascripts/popup.js",
+      "frame": "POPUP_1",
+      "frameTags": [
+        "POPUP_1"
+      ],
+      "frameDetails": [
+        {
+          "id": "POPUP_1",
+          "family": "EX"
+        }
+      ],
+      "size": 2008,
+      "durationMs": 4.199600000000032
+    }
+  ],
+  "totalFiles": 3,
+  "totalSize": 42233,
+  "cacheStats": {
+    "totalCalls": 0,
+    "hits": 0,
+    "misses": 0,
+    "evictions": 0,
+    "hitRate": 0,
+    "cacheSize": 0,
+    "maxEntries": 4096
+  },
+  "coverage": {
+    "totalNodes": 540,
+    "coveredNodes": 508,
+    "nodeCoverage": 0.9407407407407408,
+    "totalScopes": 77,
+    "coveredScopes": 77,
+    "scopeCoverage": 1,
+    "analyzedScripts": 3,
+    "scripts": [
+      {
+        "file": "javascripts/background",
+        "frame": "BG_1",
+        "totalNodes": 44,
+        "coveredNodes": 41,
+        "nodeCoverage": 0.9318181818181818,
+        "totalScopes": 11,
+        "coveredScopes": 11,
+        "scopeCoverage": 1
+      },
+      {
+        "file": "javascripts/content",
+        "frame": "CS_1",
+        "totalNodes": 475,
+        "coveredNodes": 446,
+        "nodeCoverage": 0.9389473684210526,
+        "totalScopes": 60,
+        "coveredScopes": 60,
+        "scopeCoverage": 1
+      },
+      {
+        "file": "javascripts/popup",
+        "frame": "POPUP_1",
+        "totalNodes": 21,
+        "coveredNodes": 21,
+        "nodeCoverage": 1,
+        "totalScopes": 6,
+        "coveredScopes": 6,
+        "scopeCoverage": 1
+      }
+    ]
+  },
+  "analysisConfiguration": {
+    "enableModuleResolution": true,
+    "enableStorageImplicitPropagation": true
+  },
+  "hasFlows": true,
+  "flows": [
+    {
+      "flowType": "DATA_LEAK",
+      "ruleId": "system-info-message-egress",
+      "ruleDescription": "Fingerprint / system info (navigator.*, screen.*, chrome.system.*) leaving via a message channel. The navigator/screen carve-out lives in 'suppress' below — pure-navigator leaks are too noisy to report by default.",
+      "sourceType": "CHROME_FONTSETTINGS_FONTLIST",
+      "sourceProvenance": "UNKNOWN",
+      "sourceOriginContext": "javascripts/background",
+      "sourceOriginFrameFamily": "BG",
+      "sourceFile": "javascripts/background",
+      "sourceFrame": "BG_1",
+      "sourceFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sourceLoc": "L13:C0 -> L16:C2",
+      "sinkType": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+      "sinkRemark": "chrome.runtime.onMessageExternal.addListener[sendResponse]",
+      "sinkFile": "javascripts/background",
+      "sinkFrame": "BG_1",
+      "sinkFrames": [
+        {
+          "id": "BG_1",
+          "family": "BG"
+        }
+      ],
+      "sinkLoc": "L39:C4 -> L39:C41",
+      "ctx": "javascripts/background",
+      "messagePassing": false,
+      "storagePassing": false,
+      "constraintKind": "EXTERNALLY_CONNECTABLE",
+      "severity": "MEDIUM",
+      "severityReason": "Host is restricted, but path is wildcarded.",
+      "severityEvidence": [
+        "https://wordmark.it/*"
+      ],
+      "privilegeCrossing": true,
+      "privilegeReason": "sink grants capability beyond the source origin",
+      "sourceCode": "hen extension loads\n>>>chrome.fontSettings.getFontList(function (array) {\n  extensionFonts = array;\n  log(\"Fonts prepared:\", extensionFonts.length, \"fonts\");\n})<<<;\n\n// listening call",
+      "sinkCode": "\"\n    }));\n    \n    >>>sendResponse({ result: fontsToSend })<<<;\n    syncComplete ="
+    }
+  ],
+  "privilegeSuppressedCount": 0,
+  "privilegeSuppressed": []
+}

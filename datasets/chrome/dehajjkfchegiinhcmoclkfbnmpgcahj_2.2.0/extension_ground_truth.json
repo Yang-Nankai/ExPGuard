@@ -1,0 +1,568 @@
+{
+  "schema_version": "expguard-extension-dataset/v1",
+  "extension": {
+    "platform": "chrome",
+    "extension_id": "dehajjkfchegiinhcmoclkfbnmpgcahj",
+    "version": "2.2.0",
+    "name": "InsertLearning",
+    "rank": 438,
+    "manifest_version": 3,
+    "catalog_manifest_version": 3,
+    "catalog_metadata": {
+      "rank": 438,
+      "manifest_version": 3,
+      "user_count": 800000,
+      "rating_count": 60,
+      "rating_average": 4.333,
+      "name": "InsertLearning",
+      "developer_name": "InsertLearning"
+    },
+    "source": {
+      "directory": "Source",
+      "manifest_sha256": "9425a863c3f6e45ae0394df466e4fd8d95e6cf87a3caf149052562d907d9135e"
+    }
+  },
+  "tools": {
+    "ExPGuard": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "ExPGuard/analysis.log",
+          "ExPGuard/report.flows.json",
+          "ExPGuard/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 2,
+        "reported_no_duplicate": 2,
+        "tp_no_duplicate": 1,
+        "fp_no_duplicate": 1
+      },
+      "flows": {
+        "reported": [
+          {
+            "flow_id": "expguard-opti:chrome:dehajjkfchegiinhcmoclkfbnmpgcahj:2.2.0:05e8cf7ef3564dca:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "version",
+              "loc": "L124:C8 -> L124:C44",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://docentedu.com/*",
+                      "https://insertlearning.com/*",
+                      "https://www.okeebo.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "version",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "background",
+              "loc": "L231:C8 -> L231:C76",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "PARTIAL"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "version",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification_evidence": "FP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:chrome:dehajjkfchegiinhcmoclkfbnmpgcahj:2.2.0:5dba644adceca2bf:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "DATA_LEAK",
+            "rule_id": "sensitive-data-message-egress",
+            "rule_description": "User-permission-gated data (bookmarks, history, cookies, identity, ...) leaving via a cross-extension or window message channel.",
+            "severity": "LOW",
+            "source": {
+              "type": "CHROME_IDENTITY_TOKEN",
+              "remark": "identity.authToken",
+              "file": "version",
+              "loc": "L78:C4 -> L97:C6",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://docentedu.com/*",
+                      "https://insertlearning.com/*",
+                      "https://www.okeebo.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "version",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "location.origin",
+              "file": "version",
+              "loc": "L96:C8 -> L96:C48",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://docentedu.com/*",
+                      "https://insertlearning.com/*",
+                      "https://www.okeebo.com/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "UNKNOWN",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "version",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ],
+        "no_duplicate": [
+          {
+            "flow_id": "expguard-opti:chrome:dehajjkfchegiinhcmoclkfbnmpgcahj:2.2.0:05e8cf7ef3564dca:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "severity": "MEDIUM",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "version",
+              "loc": "L124:C8 -> L124:C44",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://docentedu.com/*",
+                      "https://insertlearning.com/*",
+                      "https://www.okeebo.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "version",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "background",
+              "loc": "L231:C8 -> L231:C76",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "PARTIAL"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "version",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification_evidence": "FP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:chrome:dehajjkfchegiinhcmoclkfbnmpgcahj:2.2.0:5dba644adceca2bf:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "DATA_LEAK",
+            "rule_id": "sensitive-data-message-egress",
+            "rule_description": "User-permission-gated data (bookmarks, history, cookies, identity, ...) leaving via a cross-extension or window message channel.",
+            "severity": "LOW",
+            "source": {
+              "type": "CHROME_IDENTITY_TOKEN",
+              "remark": "identity.authToken",
+              "file": "version",
+              "loc": "L78:C4 -> L97:C6",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://docentedu.com/*",
+                      "https://insertlearning.com/*",
+                      "https://www.okeebo.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "version",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "location.origin",
+              "file": "version",
+              "loc": "L96:C8 -> L96:C48",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://docentedu.com/*",
+                      "https://insertlearning.com/*",
+                      "https://www.okeebo.com/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "UNKNOWN",
+              "privilege_crossing": true,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "version",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ]
+      }
+    },
+    "CoCo": {
+      "scan_status": "not_available",
+      "report_files": {
+        "scan_reports": []
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    },
+    "DoubleX": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "DoubleX/report.flows.json",
+          "DoubleX/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 1,
+        "reported_no_duplicate": 1,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 1
+      },
+      "flows": {
+        "reported": [
+          {
+            "flow_id": "doublex:chrome:dehajjkfchegiinhcmoclkfbnmpgcahj:2.2.0:37964abcde0693a3:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "HIGH",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L125",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://docentedu.com/*",
+                      "https://insertlearning.com/*",
+                      "https://www.okeebo.com/*",
+                      "https://insertlearning.com/v1/share/*",
+                      "https://insertlearning.com/v1/lesson/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "fetch",
+              "file": "background.js",
+              "loc": "L239",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": false,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content_scripts.js",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification_evidence": "FP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ],
+        "no_duplicate": [
+          {
+            "flow_id": "doublex:chrome:dehajjkfchegiinhcmoclkfbnmpgcahj:2.2.0:37964abcde0693a3:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "doublex-edg-provenance",
+            "severity": "HIGH",
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "DoubleX web-accessible message input",
+              "file": "content_scripts.js",
+              "loc": "L125",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://docentedu.com/*",
+                      "https://insertlearning.com/*",
+                      "https://www.okeebo.com/*",
+                      "https://insertlearning.com/v1/share/*",
+                      "https://insertlearning.com/v1/lesson/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content_scripts.js",
+              "origin_frame_family": "CS"
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "fetch",
+              "file": "background.js",
+              "loc": "L239",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": false,
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content_scripts.js",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "privilege_reason": "DoubleX matched external input to a sensitive API parameter."
+            },
+            "verification_evidence": "FP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ground_truth": {
+    "verdict": "TP",
+    "flow_count": 1,
+    "flow_ids": [
+      "gtf-d211b8afd24a15fe"
+    ],
+    "flows": [
+      {
+        "ground_truth_flow_id": "gtf-d211b8afd24a15fe",
+        "verification": "TP",
+        "source_family": "CHROME_IDENTITY_TOKEN",
+        "sink_family": "WINDOW_POSTMESSAGE",
+        "matched_tools": [
+          "ExPGuard"
+        ],
+        "match_region": "ExPGuard only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "ExPGuard",
+            "flow_id": "expguard-opti:chrome:dehajjkfchegiinhcmoclkfbnmpgcahj:2.2.0:5dba644adceca2bf:01",
+            "source_report": "ExPGuard/report.flows.json",
+            "flow": {
+              "flow_id": "expguard-opti:chrome:dehajjkfchegiinhcmoclkfbnmpgcahj:2.2.0:5dba644adceca2bf:01",
+              "flow_index": 1,
+              "flow_order": 2,
+              "flow_label": "F002",
+              "flow_type": "DATA_LEAK",
+              "rule_id": "sensitive-data-message-egress",
+              "rule_description": "User-permission-gated data (bookmarks, history, cookies, identity, ...) leaving via a cross-extension or window message channel.",
+              "severity": "LOW",
+              "source": {
+                "type": "CHROME_IDENTITY_TOKEN",
+                "remark": "identity.authToken",
+                "file": "version",
+                "loc": "L78:C4 -> L97:C6",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "https://docentedu.com/*",
+                        "https://insertlearning.com/*",
+                        "https://www.okeebo.com/*"
+                      ]
+                    }
+                  }
+                ],
+                "provenance": "CONTENT_SCRIPT",
+                "origin_context": "version",
+                "origin_frame_family": "CS"
+              },
+              "sink": {
+                "type": "WINDOW_POSTMESSAGE",
+                "remark": "location.origin",
+                "file": "version",
+                "loc": "L96:C8 -> L96:C48",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "https://docentedu.com/*",
+                        "https://insertlearning.com/*",
+                        "https://www.okeebo.com/*"
+                      ]
+                    }
+                  }
+                ],
+                "url_taint_control": null
+              },
+              "structural": {
+                "constraint_kind": "UNKNOWN",
+                "privilege_crossing": true,
+                "message_passing": true,
+                "storage_passing": false,
+                "message_sender": "version",
+                "message_sender_provenance": "CONTENT_SCRIPT",
+                "privilege_reason": "sink grants capability beyond the source origin"
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

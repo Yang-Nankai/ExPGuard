@@ -1,0 +1,1 @@
+(()=>{"use strict";window.addEventListener("message",function(e){e.origin.indexOf("linkedin.com")>-1&&e.data&&"__traffic_listener_xhr_aW50ZXJjZXB0b3I="===e.data.type&&chrome.runtime.sendMessage(e.data.payload)}),function(){const e=document.createElement("script");e.src=chrome.runtime.getURL("scripti.js"),e.onload=function(){this.remove()},document.head.prepend(e)}()})();

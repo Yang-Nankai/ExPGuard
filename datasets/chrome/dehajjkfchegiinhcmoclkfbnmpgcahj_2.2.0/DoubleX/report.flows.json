@@ -1,0 +1,436 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "REQUEST_FORGERY",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "content_scripts.js",
+      "sourceFrame": "CS_1",
+      "sourceLoc": "L125",
+      "sourceCode": "event",
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L239",
+      "sinkCode": "fetch(https://dnmkr7tf85gze.cloudfront.net/data/p/event.data.uuid)",
+      "ctx": "background",
+      "messagePassing": true,
+      "channel": "doublex-edg",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "indirect_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "cs:direct_dangers:danger1",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L160",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7efc2b868130>, <pdg_js.node.FunctionExpression object at 0x7efc2b868160>)",
+        "sink-param1": "{\n\tdocentShareCode: docentURL.dataset.shareCode\n}",
+        "sink-param2": "() => {\n\twindow.location = docentURL;\n\tdocument.body.innerHTML = '';\n}",
+        "line": "160 - 165",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/content_scripts.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger2",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L179",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(sessionStorage, <pdg_js.node.FunctionExpression object at 0x7efc2b8874f0>)",
+        "sink-param1": "sessionStorage",
+        "sink-param2": "() => {\n\t\twindow.location = docentURL;\n\t\tdocument.body.innerHTML = '';\n\t}",
+        "line": "179 - 182",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/content_scripts.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "cs:exfiltration_dangers:danger1",
+      "component": "cs",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L5",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get()",
+        "line": "5 - 5",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L175",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7efc2b592700>)",
+        "sink-param1": "{\n\t\ttarget,\n\t\tfiles: [\n\t\t\t'/lib/js/jquery.min.js',\n\t\t\t'/lib/js/tutorial.js'\n\t\t]\n\t}",
+        "line": "175 - 181",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger2",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L113",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7efc2b5d2a30>)",
+        "sink-param1": "{\n\t\t\ttarget,\n\t\t\tfunc: initExample\n\t\t}",
+        "line": "113 - 116",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger3",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L123",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7efc2b5d2e50>, <pdg_js.node.FunctionExpression object at 0x7efc2b5d2e80>)",
+        "sink-param1": "{\n\t\t\ttarget,\n\t\t\tfunc: needsLoading\n\t\t}",
+        "sink-param2": "results => {\n\t\t\tif (results[0].result) {\n\t\t\t\tchrome.scripting.insertCSS({\n\t\t\t\t\ttarget,\n\t\t\t\t\tfiles: [\n\t\t\t\t\t\t'/lib/css/lato.css',\n\t\t\t\t\t\t'/lib/css/font-awesome.css',\n\t\t\t\t\t\t'/lib/css/docent.css'\n\t\t\t\t\t]\n\t\t\t\t});\n\t\t\t\tchrome.scripting.executeScript({\n\t\t\t\t\ttarget,\n\t\t\t\t\tfiles: [\n\t\t\t\t\t\t'/lib/js/jquery.min.js',\n\t\t\t\t\t\t'/lib/js/jquery.textHighlighter.min.js',\n\t\t\t\t\t\t'/lib/js/md5.js',\n\t\t\t\t\t\t'/lib/js/docent.js',\n\t\t\t\t\t\t'/lib/js/docent.emoji.js',\n\t\t\t\t\t\t'/lib/js/twemoji.min.js'\n\t\t\t\t\t]\n\t\t\t\t});\n\t\t\t} else {\n\t\t\t\tfunction refresh() {\n\t\t\t\t\tif ($.contains(document, docent.container[0])) {\n\t\t\t\t\t\tdocent.iframeBridge();\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdocent.init();\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tchrome.scripting.executeScript({\n\t\t\t\t\ttarget,\n\t\t\t\t\tfunc: refresh\n\t\t\t\t});\n\t\t\t}\n\t\t}",
+        "line": "123 - 161",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger4",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L137",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7efc2b5736d0>)",
+        "sink-param1": "{\n\t\t\t\t\ttarget,\n\t\t\t\t\tfiles: [\n\t\t\t\t\t\t'/lib/js/jquery.min.js',\n\t\t\t\t\t\t'/lib/js/jquery.textHighlighter.min.js',\n\t\t\t\t\t\t'/lib/js/md5.js',\n\t\t\t\t\t\t'/lib/js/docent.js',\n\t\t\t\t\t\t'/lib/js/docent.emoji.js',\n\t\t\t\t\t\t'/lib/js/twemoji.min.js'\n\t\t\t\t\t]\n\t\t\t\t}",
+        "line": "137 - 147",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger5",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L156",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7efc2b573fa0>)",
+        "sink-param1": "{\n\t\t\t\t\ttarget,\n\t\t\t\t\tfunc: refresh\n\t\t\t\t}",
+        "line": "156 - 159",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger6",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.update",
+      "sinkFile": "background.js",
+      "sinkLoc": "L4",
+      "legacy": {
+        "danger": "chrome.tabs.update",
+        "value": "chrome.tabs.update(tab.id, <pdg_js.node.ValueExpr object at 0x7efc2bca7460>)",
+        "sink-param1": "tab.id",
+        "sink-param2": "{\n\t\t\turl: 'https://insertlearning.com/v1/dashboard/'\n\t\t}",
+        "line": "4 - 6",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger7",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L17",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7efc2bd139d0>)",
+        "sink-param1": "{\n\t\t\ttarget,\n\t\t\tfunc: () => docent.iframeBridge.useChromeExtension()\n\t\t}",
+        "line": "17 - 20",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger8",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L23",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7efc2b803670>)",
+        "sink-param1": "{\n\t\t\ttarget,\n\t\t\tfunc: () => (typeof useExtensionForLogin == 'function') ? useExtensionForLogin() : (window.noCookies = 1)\n\t\t}",
+        "line": "23 - 26",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger9",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L29",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7efc2b803eb0>)",
+        "sink-param1": "{\n\t\t\ttarget,\n\t\t\tfunc: (oldUrl, newUrl) => $(`iframe[src=\"${oldUrl}\"]`).attr('src', newUrl).css('display', ''),\n\t\t\targs: [details.url, chrome.runtime.getURL(details.url.replace('https://insertlearning.com/v1/video/', '/lib/iframe/video.html#'))]\n\t\t}",
+        "line": "29 - 33",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger10",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L52",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7efc2b9b3d60>, <pdg_js.node.FunctionExpression object at 0x7efc2b9b3d90>)",
+        "sink-param1": "{\n\t\t\t\ttarget: {\n\t\t\t\t\ttabId: details.tabId\n\t\t\t\t},\n\t\t\t\tfunc: testReferrer\n\t\t\t}",
+        "sink-param2": "results => {\n\t\t\t\tif (results[0].result) {\n\t\t\t\t\tactivateTutorial(details.tabId);\n\t\t\t\t}\n\t\t\t}",
+        "line": "52 - 62",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger11",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "background.js",
+      "sinkLoc": "L74",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(docent.iframeBridge, 1000)",
+        "sink-param1": "docent.iframeBridge",
+        "sink-param2": 1000,
+        "line": "74 - 74",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger12",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_EXECUTE",
+      "sinkRemark": "chrome.scripting.executeScript",
+      "sinkFile": "background.js",
+      "sinkLoc": "L77",
+      "legacy": {
+        "danger": "chrome.scripting.executeScript",
+        "value": "chrome.scripting.executeScript(<pdg_js.node.ValueExpr object at 0x7efc2b5b3160>)",
+        "sink-param1": "{\n\t\ttarget: {\n\t\t\ttabId: details.tabId,\n\t\t\tframeIds: [details.frameId]\n\t\t},\n\t\tfunc: newPage,\n\t\targs: [details.url]\n\t}",
+        "line": "77 - 84",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger13",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.update",
+      "sinkFile": "background.js",
+      "sinkLoc": "L94",
+      "legacy": {
+        "danger": "chrome.tabs.update",
+        "value": "chrome.tabs.update(result.0.id, <pdg_js.node.ValueExpr object at 0x7efc2b5b3fd0>)",
+        "sink-param1": "result.0.id",
+        "sink-param2": "{\n\t\t\t\turl: 'https://insertlearning.com/v1/?source=chrome-web-store'\n\t\t\t}",
+        "line": "94 - 96",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false,
+        "param_id0": {},
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger1",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": false,
+      "sinkType": "XML_HTTP_REQUEST_OPEN",
+      "sinkRemark": "XMLHttpRequest.open",
+      "sinkFile": "background.js",
+      "sinkLoc": "L231",
+      "legacy": {
+        "danger": "XMLHttpRequest.open",
+        "value": "XMLHttpRequest().open(GET, https://accounts.google.com/o/oauth2/revoke?token=None)",
+        "sink-param1": "GET",
+        "sink-param2": "https://accounts.google.com/o/oauth2/revoke?token=None",
+        "line": "231 - 231",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:indirect_dangers:danger2",
+      "component": "bp",
+      "category": "indirect_dangers",
+      "detected": true,
+      "sinkType": "FETCH_RESOURCE",
+      "sinkRemark": "fetch",
+      "sinkFile": "background.js",
+      "sinkLoc": "L239",
+      "legacy": {
+        "danger": "fetch",
+        "value": "fetch(https://dnmkr7tf85gze.cloudfront.net/data/p/event.data.uuid)",
+        "sink-param1": "https://dnmkr7tf85gze.cloudfront.net/data/p/event.data.uuid",
+        "line": "239 - 239",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "event",
+            "line": "125 - 125",
+            "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/content_scripts.js",
+            "where": "event",
+            "sent_to_wa_1": {
+              "wa": "{\n\t\t\ttoken: token,\n\t\t\tgoogleClassroom: googleClassroom\n\t\t}",
+              "line": "98 - 98",
+              "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/content_scripts.js",
+              "where": "event"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.identity.getAuthToken",
+      "sinkFile": "background.js",
+      "sinkLoc": "L196",
+      "legacy": {
+        "danger": "chrome.identity.getAuthToken",
+        "value": "chrome.identity.getAuthToken(<pdg_js.node.ValueExpr object at 0x7efc2b5347c0>, sendResponse)",
+        "sink-param1": "{\n\t\t\t\t\tinteractive: request.interactive,\n\t\t\t\t\tscopes: request.scopes\n\t\t\t\t}",
+        "sink-param2": "sendResponse",
+        "line": "196 - 199",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger2",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.identity.getAuthToken",
+      "sinkFile": "background.js",
+      "sinkLoc": "L218",
+      "legacy": {
+        "danger": "chrome.identity.getAuthToken",
+        "value": "chrome.identity.getAuthToken(<pdg_js.node.ValueExpr object at 0x7efc2b553b50>, <pdg_js.node.FunctionExpression object at 0x7efc2b553b80>)",
+        "sink-param1": "{\n\t\t\t'interactive': false,\n\t\t\tscopes: request.scopes\n\t\t}",
+        "sink-param2": "function(token) {\n\t\t\tif (chrome.runtime.lastError) {\n\t\t\t\treturn;\n\t\t\t}\n\t\t\tchrome.identity.removeCachedAuthToken({\n\t\t\t\ttoken: token\n\t\t\t}, function() {\n\t\t\t\tconsole.log('Token removed from cache');\n\t\t\t});\n\t\t\tvar xhr = new XMLHttpRequest();\n\t\t\txhr.open('GET', 'https://accounts.google.com/o/oauth2/revoke?token=' + token);\n\t\t\txhr.onload = function() {\n\t\t\t\tconsole.log('Token revoked');\n\t\t\t};\n\t\t\txhr.send();\n\t\t}",
+        "line": "218 - 236",
+        "filename": "/dev/shm/ccs2027-doublex-chrome-full/dx_2srfge2q/unpacked/dehajjkfchegiinhcmoclkfbnmpgcahj.2.2.0/background.js",
+        "dataflow": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+$(function(){let a=new Clipboard(".copy");a.on("success",function(b){$.toast({heading:"Success",text:"\u590d\u5236\u6210\u529f",showHideTransition:"slide",icon:"success",loader:!1,position:"top-center",hideAfter:800})});a.on("error",function(b){})});

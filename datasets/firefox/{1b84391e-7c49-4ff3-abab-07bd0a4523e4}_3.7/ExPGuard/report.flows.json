@@ -1,0 +1,271 @@
+{
+  "extensionId": "{1b84391e-7c49-4ff3-abab-07bd0a4523e4}",
+  "extensionVersion": "3.7",
+  "sourceType": "XPI",
+  "stats": {
+    "filesWithIssues": 5,
+    "totalFiles": 5,
+    "distinctFlows": 4,
+    "rawIssueEntries": 4,
+    "sinklessSourcesSkipped": 21
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "js/content",
+      "frame": "CS_2",
+      "constraint": {
+        "matches": [
+          "https://www.youtube.com/*"
+        ],
+        "excludeMatches": [
+          "https://www.youtube.com/error?*",
+          "https://www.youtube.com/howyoutubeworks/*",
+          "https://www.youtube.com/intl/*",
+          "https://www.youtube.com/kids/*",
+          "https://www.youtube.com/live_chat?*",
+          "https://www.youtube.com/pop-up-player/*"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_CUSTOM_EVENT",
+        "remark": "window.addEventListener(msfy-inner-message)",
+        "file": "js/content",
+        "loc": "L1:C626 -> L1:C634",
+        "line": 1,
+        "col": [
+          626,
+          634
+        ],
+        "spansTo": null,
+        "code": "…>a.dispatchEvent(new CustomEvent(o,t)))({detail:JSON.stringify({type:t,value:o})});function r(e){try{const t=JSON.parse(»e.detail«),{type:a,value:i}=t;switch(a){case\"average\":case\"barPosition\":case\"callout\":case\"collapsed\":case\"filterPosition\":case\"h…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "unknown",
+          "file": "js/content",
+          "loc": "L1:C777 -> L1:C805",
+          "line": 1,
+          "col": [
+            777,
+            805
+          ],
+          "spansTo": null,
+          "code": "…itch(a){case\"average\":case\"barPosition\":case\"callout\":case\"collapsed\":case\"filterPosition\":case\"handle\":case\"menuWidth\":»o.storage.local.set({[a]:i})«;break;case\"url\":o.runtime.sendMessage(t)}}catch(e){}}function d(e){const{type:t,value:o}=e;if(\"command\"===t)c(t,o)}func…",
+          "frame": "CS_2",
+          "constraint": {
+            "matches": [
+              "https://www.youtube.com/*"
+            ],
+            "excludeMatches": [
+              "https://www.youtube.com/error?*",
+              "https://www.youtube.com/howyoutubeworks/*",
+              "https://www.youtube.com/intl/*",
+              "https://www.youtube.com/kids/*",
+              "https://www.youtube.com/live_chat?*",
+              "https://www.youtube.com/pop-up-player/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 21,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "js/content",
+            "line": 1,
+            "ops": [
+              "ELEMENT:member-element",
+              "RETURN:json.parse",
+              "ELEMENT:destructure-property[type]",
+              "ELEMENT:destructure-property[value]",
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "…t,o=n,a=e)=>a.dispatchEvent(new CustomEvent(o,t)))({detail:JSON.stringify({type:t,value:o})});function r(e){try{const t=»JSON.parse(e.detail),{type:a,value:i}=t;switch(a){case\"average\":case\"barPosition\":case\"callout\":case\"collapsed\":case\"filterPosition\":case\"handle\":case\"menuWidth\":o.storage.local.set({[a]:i})«;break;case\"url\":o.runtime.sendMessage(t)}}catch(e){}}function d(e){const{type:t,value:o}=e;if(\"command\"===t)c(t,o)}func…"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "background",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_CUSTOM_EVENT",
+        "remark": "window.addEventListener(msfy-inner-message)",
+        "file": "background",
+        "loc": "L1:C334 -> L1:C443",
+        "line": 1,
+        "col": [
+          334,
+          443
+        ],
+        "spansTo": null,
+        "code": "…Window:!0});e.action.disable(),e.runtime.onConnect.addListener((i=>{e.action.enable(i.sender.tab.id),i.sender.tab.id})),»e.runtime.onMessage.addListener((i=>{const{type:n,value:t}=i;if(\"url\"===n)e.tabs.create({url:t,active:!0})}))«,e.runtime.onInstalled.addListener((i=>{if(i.reason===e.runtime.OnInstalledReason.INSTALL)e.storage.local.set({installed…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_TABS_CREATE_OPTIONS",
+          "remark": null,
+          "file": "background",
+          "loc": "L1:C408 -> L1:C440",
+          "line": 1,
+          "col": [
+            408,
+            440
+          ],
+          "spansTo": null,
+          "code": "…on.enable(i.sender.tab.id),i.sender.tab.id})),e.runtime.onMessage.addListener((i=>{const{type:n,value:t}=i;if(\"url\"===n)»e.tabs.create({url:t,active:!0})«})),e.runtime.onInstalled.addListener((i=>{if(i.reason===e.runtime.OnInstalledReason.INSTALL)e.storage.local.set({instal…",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 10,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "background",
+            "line": 1,
+            "ops": [
+              "MESSAGE",
+              "ELEMENT:destructure-property[type]",
+              "ELEMENT:destructure-property[value]",
+              "ASSIGN:identifier",
+              "ASSIGN:binary-right",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "…Window:!0});e.action.disable(),e.runtime.onConnect.addListener((i=>{e.action.enable(i.sender.tab.id),i.sender.tab.id})),»e.runtime.onMessage.addListener((i=>{const{type:n,value:t}=i;if(\"url\"===n)e.tabs.create({url:t,active:!0})}))«,e.runtime.onInstalled.addListener((i=>{if(i.reason===e.runtime.OnInstalledReason.INSTALL)e.storage.local.set({installed…",
+            "crossContextHop": "runtime.single.sender.message[js/content->background]"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "file": "js/options",
+      "frame": "OPTIONS_1",
+      "constraint": null,
+      "source": {
+        "kind": "ELEMENT_VALUE",
+        "remark": "event(change)",
+        "file": "js/options",
+        "loc": "L1:C944 -> L1:C951",
+        "line": 1,
+        "col": [
+          944,
+          951
+        ],
+        "spansTo": null,
+        "code": "…o);e&&(e.checked=n)}function r(t){const n=t.target,i=\"radio\"===n.type?n.name:n.id,s=e(i);if(s){const t=\"radio\"===n.type?»n.value«:n.checked;t===s.default?o.storage.local.remove(i):o.storage.local.set({[i]:t})}}function l(t,n){t?.addEventListener(\"cl…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "unknown",
+          "file": "js/options",
+          "loc": "L1:C1002 -> L1:C1030",
+          "line": 1,
+          "col": [
+            1002,
+            1030
+          ],
+          "spansTo": null,
+          "code": "…o\"===n.type?n.name:n.id,s=e(i);if(s){const t=\"radio\"===n.type?n.value:n.checked;t===s.default?o.storage.local.remove(i):»o.storage.local.set({[i]:t})«}}function l(t,n){t?.addEventListener(\"click\",(t=>{t.preventDefault(),o.tabs.create({url:n,active:!0}),s&&a&&window.clos…",
+          "frame": "OPTIONS_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 8,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "js/options",
+            "line": 1,
+            "ops": [
+              "ASSIGN:conditional-consequent",
+              "ASSIGN:identifier",
+              "ASSIGN:binary-left",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "…o);e&&(e.checked=n)}function r(t){const n=t.target,i=\"radio\"===n.type?n.name:n.id,s=e(i);if(s){const t=\"radio\"===n.type?»n.value:n.checked;t===s.default?o.storage.local.remove(i):o.storage.local.set({[i]:t})«}}function l(t,n){t?.addEventListener(\"click\",(t=>{t.preventDefault(),o.tabs.create({url:n,active:!0}),s&&a&&window.clos…"
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "file": "js/polymer",
+      "frame": "MAIN_js_polymer",
+      "constraint": null,
+      "source": {
+        "kind": "NAVIGATOR_CLIPBOARD",
+        "remark": null,
+        "file": "js/polymer",
+        "loc": "L1:C2441 -> L1:C2442",
+        "line": 1,
+        "col": [
+          2441,
+          2442
+        ],
+        "spansTo": null,
+        "code": "…try{navigator.clipboard.readText().then((t=>{if(/^\\s*\\[(\\s*\\\"[\\w-]{11}\\\"\\s*,\\s*)*(\\s*\\\"[\\w-]{11}\\\"\\s*,?\\s*\\])\\s*$/.test(»t«)){const o=JSON.parse(t);Ut(o)&&(Ut(Ft)&&(n=Ft,(e=o).length===n.length&&e.toString()===n.toString())||(Ft=o,Bt(o)))}var …"
+      },
+      "sinks": [
+        {
+          "kind": "WEB_LOCAL_STORAGE_SET_VALUE",
+          "remark": null,
+          "file": "js/polymer",
+          "loc": "L1:C2156 -> L1:C2209",
+          "line": 1,
+          "col": [
+            2156,
+            2209
+          ],
+          "spansTo": null,
+          "code": "…t=>Array.isArray(t)&&t.every((t=>\"string\"==typeof t&&11===t.length)),Jt=()=>Ut(Ft)?Ft.length:0,Yt=()=>Jt()>0,Bt=e=>{try{»t.localStorage.setItem(jt,JSON.stringify({videos:e}))«}catch(t){}},qt=()=>{try{return JSON.parse(t.localStorage.getItem(jt)).videos}catch(t){return[]}},Wt=()=>{if(!c)try{navi…",
+          "frame": "MAIN_js_polymer"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 31,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "js/polymer",
+            "line": 1,
+            "ops": [
+              "ASSIGN:identifier",
+              "RETURN:json.parse",
+              "ELEMENT:member-element",
+              "RETURN:fallback-return",
+              "ASSIGN:logical-right",
+              "ELEMENT:member.length",
+              "ASSIGN:binary-left",
+              "ASSIGN:logical-left",
+              "ELEMENT:object.setProperty",
+              "RETURN:json.stringify",
+              "ASSIGN:conditional-consequent"
+            ],
+            "code": "…;let Ft;const Ut=t=>»Array.isArray(t)&&t.every((t=>\"string\"==typeof t&&11===t.length)),Jt=()=>Ut(Ft)?Ft.length:0,Yt=()=>Jt()>0,Bt=e=>{try{t.l …⟨tainted span: 503 chars⟩… ,?\\s*\\])\\s*$/.test(t)){const o=JSON.parse(t);Ut(o)&&(Ut(Ft)&&(n=Ft,(e=o).length===n.length&&e.toString()===n.toString())«||(Ft=o,Bt(o)))}var …"
+          }
+        ]
+      }
+    }
+  ]
+}

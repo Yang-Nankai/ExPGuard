@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="card">
+
+    <!-- Tutorial Overlay -->
+    <div id="tutorialOverlay" class="tutorial-overlay hidden">
+      <div class="tutorial-backdrop"></div>
+      <div id="tutorialArrow" class="tutorial-arrow"></div>
+      <div id="tutorialBox" class="tutorial-box">
+        <button id="closeTutorial" class="close-tutorial" title="Close tutorial">✕</button>
+        <div class="tutorial-content">
+          <h3 id="tutorialTitle"></h3>
+          <p id="tutorialText"></p>
+          <div class="tutorial-nav">
+            <button id="prevStep" class="tutorial-nav-btn">← Previous</button>
+            <span id="tutorialProgress"></span>
+            <button id="nextStep" class="tutorial-nav-btn">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Restart Nudge Banner -->
+    <div id="restartNudge" class="restart-nudge hidden">
+      <div class="nudge-content">
+        <div class="nudge-text">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; color: #818cf8;">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span>Restart browser for best experience</span>
+        </div>
+        <button id="closeNudge" class="close-nudge" title="Dismiss">✕</button>
+      </div>
+    </div>
+
+
+    <!-- LOGIN -->
+    <div id="loginView">
+      <h1>Sign in</h1>
+      <div class="subtitle">Access your capsules</div>
+
+      <div class="auth-section">
+        <div class="section-label"><span class="brand-text">Guidera</span> account</div>
+        <input id="email" type="email" placeholder="Email address" />
+        <input id="password" type="password" placeholder="Password" />
+        <button id="loginBtn" class="btn-primary">
+          <span id="loginSpinner" class="spinner hidden"></span>
+          <span id="loginText">Sign in</span>
+        </button>
+        <div class="register-link">
+          Don't have an account? <a href="https://guidera.tilantra.com/register" target="_blank">Register here</a>
+        </div>
+      </div>
+
+      <div class="divider">OR</div>
+
+      <button id="googleLoginBtn" class="btn-google">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+        <span id="googleSpinner" class="spinner hidden"
+          style="border-top-color: #4285f4; border-color: rgba(66, 133, 244, 0.2);"></span>
+        <span id="googleText">Sign in with Google</span>
+      </button>
+    </div>
+
+    <!-- TEAM SELECTION -->
+    <div id="teamView" class="hidden">
+      <div class="teams-header-main">
+        <h1>Select Team</h1>
+        <button id="refreshTeams" class="btn-refresh" title="Refresh Teams">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="subtitle">Choose a team context</div>
+      <span id="workPrivatelyLink" class="work-privately-link">Work Privately</span>
+      <div class="list-wrapper">
+        <div id="teamScrollUp" class="scroll-arrow scroll-up hidden">▲</div>
+        <div id="teamList" class="teams-list"></div>
+        <div id="teamScrollDown" class="scroll-arrow scroll-down hidden">▼</div>
+      </div>
+      <button id="createTeamFromSelection" class="btn-primary-small">+ Create Team</button>
+    </div>
+
+    <!-- ACTIONS -->
+    <div id="actionView" class="hidden">
+      <button id="helpButton" class="help-circle" title="Replay Tutorial">?</button>
+      <h1>CapsuleHub <i>by Tilantra</i></h1>
+      <div class="subtitle">Seamless cross-platform intelligence</div>
+
+      <div class="selected-team-display">
+        <div class="team-selector-container">
+          <select id="teamSelectDropdown" class="team-mini-dropdown"></select>
+        </div>
+        <span id="changeTeamLink" class="change-team-link">Manage Team</span>
+      </div>
+
+      <input id="capsuleTag" type="text" placeholder="Name your capsule" />
+
+      <div class="actions main-actions-grid">
+        <button id="generate" class="btn-primary has-tooltip" data-tooltip="Create reusable AI context from this chat">
+          <span id="genSpinner" class="spinner hidden"></span>
+          <span id="genText">Generate Capsule</span>
+        </button>
+        <div class="sub-actions">
+          <button id="viewCapsules" class="btn-secondary">Drop Capsules</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CAPSULES VIEW -->
+    <div id="capsulesView" class="hidden">
+      <div class="view-header-with-tier">
+        <button id="backToActions" class="back-to-actions-top">← Back</button>
+        <div id="userTierBadge" class="user-tier-badge" title="Upgrade your tier">
+          <span id="tierLabel">Basic</span>
+        </div>
+      </div>
+      <div class="capsules-header">
+        <div class="header-titles">
+          <h2>My Capsules</h2>
+          <div class="capsules-instruction">Drag and Drop capsules to insert context.</div>
+        </div>
+        <div style="display: flex; gap: 4px; align-items: center;">
+          <button id="refreshCapsules" class="btn-refresh" title="Sync">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div id="teamFilterContainer" class="team-filter hidden">
+        <label for="teamFilter">Filter by team:</label>
+        <select id="teamFilter">
+          <option value="">All Teams</option>
+        </select>
+      </div>
+
+      <!-- SEARCH BAR -->
+      <div class="search-container">
+        <input id="capsuleSearch" type="text" placeholder="Search by tag or content..." />
+      </div>
+
+      <div class="list-wrapper">
+        <div id="scrollUpBtn" class="scroll-arrow scroll-up hidden">▲</div>
+        <div id="capsulesListContainer" class="capsules-list"></div>
+        <div id="scrollDownBtn" class="scroll-arrow scroll-down hidden">▼</div>
+      </div>
+    </div>
+
+    <!-- VERSION CHOICE -->
+    <div id="versionChoiceView" class="hidden">
+      <h1 class="simple-h1">Existing Capsule</h1>
+      <div class="subtitle">A capsule is already mapped to this conversation. What would you like to do?</div>
+      <input id="newCapsuleTag" type="text" placeholder="New Capsule Tag (e.g. debugging-v2)" />
+
+      <div class="actions">
+        <button id="newVersionBtn" class="btn-primary">
+          <span id="verSpinner" class="spinner hidden"></span>
+          <span id="verText">New Version</span>
+        </button>
+        <button id="newCapsuleBtn" class="btn-secondary">
+          <span id="newCapSpinner" class="spinner hidden"></span>
+          <span id="newCapText">New Capsule</span>
+        </button>
+      </div>
+
+      <button id="backFromVersion" class="back-to-actions">← Back</button>
+    </div>
+
+    <!-- CREATE TEAM VIEW -->
+    <div id="createTeamView" class="hidden">
+      <button id="backFromCreate" class="back-to-actions-top">← Back</button>
+      <h1>Create Team</h1>
+      <div class="subtitle">Set up a new collaborative workspace</div>
+
+      <div class="create-team-form">
+        <input id="newTeamName" type="text" placeholder="Team Name" />
+        <input id="newTeamDescription" type="text" placeholder="Description (optional)" />
+        <div class="color-picker-simple">
+          <div class="section-label">Choose team color</div>
+          <div id="colorSwatchGrid" class="color-swatch-grid">
+            <div class="color-swatch selected" data-color="#6366f1" style="background: #6366f1;"></div>
+            <div class="color-swatch" data-color="#ef4444" style="background: #ec3535;"></div>
+            <div class="color-swatch" data-color="#f59e0b" style="background: #f59e0b;"></div>
+            <div class="color-swatch" data-color="#10b981" style="background: #10b981;"></div>
+            <div class="color-swatch" data-color="#3b82f6" style="background: #3b82f6;"></div>
+            <div class="color-swatch" data-color="#a855f7" style="background: #a855f7;"></div>
+            <div class="color-swatch" data-color="#ec4899" style="background: #ec4899;"></div>
+            <div class="color-swatch" data-color="#f97316" style="background: #f97316;"></div>
+            <div class="color-swatch" data-color="#14b8a6" style="background: #14b8a6;"></div>
+            <div class="color-swatch" data-color="#84cc16" style="background: #84cc16;"></div>
+            <div class="color-swatch" data-color="#d946ef" style="background: #d00b56;"></div>
+            <div class="color-swatch" data-color="#06b6d4" style="background: #06b6d4;"></div>
+            <div class="color-swatch" data-color="#78350f" style="background: #78350f;"></div>
+            <div class="color-swatch" data-color="#4b5563" style="background: #4b5563;"></div>
+            <div class="color-swatch" data-color="#000000" style="background: #000000; border: 1px solid #334155;">
+            </div>
+            <div class="color-swatch" data-color="#ffffff" style="background: #ffffff; border: 1px solid #d1d5db;">
+            </div>
+          </div>
+          <input id="newTeamColor" type="hidden" value="#6366f1" />
+        </div>
+        <div class="form-actions" style="display: flex; gap: 8px;">
+          <button id="submitCreateTeam" class="btn-primary">Create Team</button>
+          <button id="cancelCreateTeam" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEAM DETAILS PANEL -->
+    <div id="teamDetailsPanel" class="hidden team-details-panel">
+      <button id="closeTeamDetails" class="back-to-actions-top">← Back to Teams</button>
+      <div class="teams-header">
+        <div class="header-main-info">
+          <div id="teamDetailsColor" class="team-dot"></div>
+          <h2 id="teamDetailsName">Team Name</h2>
+        </div>
+        <div id="deleteTeamDetailBtn" class="delete-icon" title="Delete Team"></div>
+      </div>
+      <div id="teamDetailsDescription" class="team-description"></div>
+
+      <h4>Members</h4>
+      <div id="teamMembersList" class="team-members-list"></div>
+
+      <!-- Add Member Form (only visible to admin) -->
+      <div id="addMemberForm" class="hidden add-member-form">
+        <input id="newMemberEmail" type="email" placeholder="Member email" />
+        <button id="submitAddMember" class="btn-primary-small">Add</button>
+      </div>
+
+
+    </div>
+
+    <div class="footer">
+      <div class="footer-text">
+        CapsuleHub · v2.13
+      </div>
+      <button id="logout" class="footer-btn btn-logout">Logout</button>
+    </div>
+
+    <!-- UPGRADE MODAL -->
+    <div id="upgradeModal" class="upgrade-modal hidden">
+      <div class="upgrade-modal-backdrop"></div>
+      <div class="upgrade-modal-content">
+        <div class="upgrade-modal-header">
+          <h3 id="upgradeModalTitle">Upgrade Plan</h3>
+          <button id="closeUpgradeModal" class="close-upgrade-modal-btn">✕</button>
+        </div>
+        <div class="upgrade-modal-body">
+          <p id="upgradeModalMessage">Please upgrade your plan to access this feature.</p>
+        </div>
+        <div class="upgrade-modal-footer">
+          <button id="okUpgradeModal" class="btn-secondary-link">Close</button>
+          <button id="upgradeNowBtn" class="btn-primary-small">Upgrade Now</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>

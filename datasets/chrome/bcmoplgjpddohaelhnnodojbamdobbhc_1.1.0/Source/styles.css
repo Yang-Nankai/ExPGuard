@@ -1,0 +1,293 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+  YouTube To Transcript Extension Design Tokens
+  Centralized CSS variables for consistent theming across popup and content scripts
+  Following the same pattern as the main application design system
+*/
+
+/* Base (light) theme */
+:root {
+  /* Background surfaces */
+  --ytt-background: 0 0% 100%; /* Pure white #ffffff */
+  --ytt-background-secondary: 0 0% 98%; /* #fafafa */
+  --ytt-background-tertiary: 220 14% 96%; /* #f3f4f6 */
+  --ytt-background-accent: 25 90% 98%; /* Very light orange tint */
+
+  /* Foreground/text colors */
+  --ytt-foreground: 222 84% 5%; /* Near black #111827 */
+  --ytt-foreground-secondary: 215 25% 27%; /* #374151 */
+  --ytt-foreground-muted: 215 14% 34%; /* #6b7280 */
+  --ytt-foreground-subtle: 215 20% 65%; /* #9ca3af */
+
+  /* Brand colors (aligned with main app - Orange/Yellow theme) */
+  --ytt-primary: 25 90% 48%; /* #ea580c - Orange-600 (main brand color) */
+  --ytt-primary-foreground: 0 0% 100%; /* White text on primary */
+  --ytt-primary-hover: 25 90% 45%; /* Darker orange for hover */
+  --ytt-secondary: 50 94% 58%; /* Bright yellow (secondary brand color) */
+  --ytt-secondary-foreground: 222 84% 5%; /* Dark text on yellow (light mode) */
+  --ytt-secondary-hover: 50 94% 55%; /* Slightly darker yellow for hover */
+  --ytt-accent: 25 85% 52%; /* Orange variant for accent */
+  --ytt-accent-foreground: 0 0% 100%; /* White text on accent */
+
+  /* Semantic colors */
+  --ytt-success: 142 76% 36%; /* #16a34a */
+  --ytt-success-foreground: 210 40% 98%;
+  --ytt-warning: 45 93% 47%; /* #f59e0b */
+  --ytt-warning-foreground: 222 84% 5%;
+  --ytt-destructive: 0 84% 60%; /* #ef4444 */
+  --ytt-destructive-foreground: 210 40% 98%;
+
+  /* Borders and inputs */
+  --ytt-border: 214 32% 91%; /* #e5e7eb */
+  --ytt-border-secondary: 220 13% 82%; /* #d1d5db */
+  --ytt-input: 214 32% 91%; /* Same as border */
+  --ytt-ring: 25 90% 48%; /* Focus ring - Orange-600 */
+
+  /* Surface variations */
+  --ytt-card: 0 0% 100%; /* Same as background */
+  --ytt-card-foreground: 222 84% 5%; /* Same as foreground */
+  --ytt-popover: 0 0% 100%; /* Same as background */
+  --ytt-popover-foreground: 222 84% 5%; /* Same as foreground */
+  --ytt-muted: 210 40% 96%; /* Very light gray */
+  --ytt-muted-foreground: 215 16% 47%; /* Muted text */
+
+  /* Interactive states */
+  --ytt-hover-overlay: 0 0% 0% / 0.05; /* 5% black overlay */
+  --ytt-active-overlay: 0 0% 0% / 0.1; /* 10% black overlay */
+
+  /* Component-specific tokens */
+  --ytt-tab-active: var(--ytt-primary);
+  --ytt-tab-inactive: var(--ytt-muted);
+  --ytt-button-primary: var(--ytt-primary);
+  --ytt-button-secondary: var(--ytt-muted);
+
+  /* Animation and interaction */
+  --ytt-radius: 0.5rem; /* 8px */
+  --ytt-radius-sm: 0.25rem; /* 4px */
+  --ytt-radius-lg: 0.75rem; /* 12px */
+  --ytt-duration-fast: 150ms;
+  --ytt-duration-normal: 250ms;
+  --ytt-duration-slow: 400ms;
+  --ytt-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme */
+[data-theme="dark"],
+.ytt-dark {
+  /* Background surfaces - darker variants */
+  --ytt-background: 217 26% 11%; /* #131922 */
+  --ytt-background-secondary: 217 26% 14%; /* #171f2a */
+  --ytt-background-tertiary: 215 25% 27%; /* #374151 */
+  --ytt-background-accent: 25 30% 18%; /* Dark orange-tinted background */
+
+  /* Foreground/text colors - lighter variants */
+  --ytt-foreground: 210 40% 98%; /* Near white #f9fafb */
+  --ytt-foreground-secondary: 214 32% 91%; /* #e5e7eb */
+  --ytt-foreground-muted: 215 20% 65%; /* #9ca3af */
+  --ytt-foreground-subtle: 215 14% 34%; /* #6b7280 */
+
+  /* Brand colors - darker for better contrast with white text in dark mode */
+  --ytt-primary: 25 90% 48%; /* Orange-600 (#ea580c) - darker for better contrast */
+  --ytt-primary-foreground: 0 0% 100%; /* White text */
+  --ytt-primary-hover: 25 90% 45%; /* Slightly darker for hover */
+  --ytt-secondary: 50 85% 45%; /* Darker yellow for dark mode */
+  --ytt-secondary-foreground: 0 0% 100%; /* White text on yellow (dark mode) */
+  --ytt-secondary-hover: 50 85% 48%; /* Slightly lighter yellow for hover */
+  --ytt-accent: 25 90% 48%; /* Same as primary for consistency */
+  --ytt-accent-foreground: 0 0% 100%; /* White text */
+
+  /* Semantic colors - adjusted for dark theme */
+  --ytt-success: 142 76% 46%; /* Lighter green for contrast */
+  --ytt-success-foreground: 210 40% 98%;
+  --ytt-warning: 45 93% 57%; /* Lighter warning for contrast */
+  --ytt-warning-foreground: 222 84% 5%;
+  --ytt-destructive: 0 63% 43%; /* Slightly darker than medium red for dark theme */
+  --ytt-destructive-foreground: 210 40% 98%;
+
+  /* Borders and inputs - darker variants */
+  --ytt-border: 205 25% 21%; /* #273241 */
+  --ytt-border-secondary: 215 25% 35%; /* #4b5563 */
+  --ytt-input: 215 25% 27%; /* #374151 */
+  --ytt-ring: 25 90% 48%; /* Darker orange focus ring for dark theme */
+
+  /* Surface variations */
+  --ytt-card: 217 26% 11%; /* Same as dark background */
+  --ytt-card-foreground: 210 40% 98%; /* Light text */
+  --ytt-popover: 217 26% 11%; /* Same as dark background */
+  --ytt-popover-foreground: 210 40% 98%; /* Light text */
+  --ytt-muted: 215 25% 27%; /* Dark muted surface */
+  --ytt-muted-foreground: 215 20% 65%; /* Muted text */
+
+  /* Interactive states for dark theme */
+  --ytt-hover-overlay: 255 255% 100% / 0.05; /* 5% white overlay */
+  --ytt-active-overlay: 255 255% 100% / 0.1; /* 10% white overlay */
+
+  /* Component tokens inherit the same values */
+  --ytt-tab-active: var(--ytt-primary);
+  --ytt-tab-inactive: var(--ytt-muted);
+  --ytt-button-primary: var(--ytt-primary);
+  --ytt-button-secondary: var(--ytt-muted);
+}
+
+/* Utility classes for easy token usage */
+.ytt-bg-primary {
+  background-color: hsl(var(--ytt-background));
+}
+.ytt-bg-secondary {
+  background-color: hsl(var(--ytt-background-secondary));
+}
+.ytt-bg-tertiary {
+  background-color: hsl(var(--ytt-background-tertiary));
+}
+.ytt-text-primary {
+  color: hsl(var(--ytt-foreground));
+}
+.ytt-text-secondary {
+  color: hsl(var(--ytt-foreground-secondary));
+}
+.ytt-text-muted {
+  color: hsl(var(--ytt-foreground-muted));
+}
+.ytt-border-primary {
+  border-color: hsl(var(--ytt-border));
+}
+.ytt-border-secondary {
+  border-color: hsl(var(--ytt-border-secondary));
+}
+
+.w-120 {
+  width: 30rem;
+}
+
+/* Markdown content styling for YouTube content script using design tokens */
+.ytt-markdown-content h1,
+.ytt-markdown-content h2,
+.ytt-markdown-content h3,
+.ytt-markdown-content h4,
+.ytt-markdown-content h5,
+.ytt-markdown-content h6 {
+  font-weight: 600;
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  color: hsl(var(--ytt-foreground)) !important;
+}
+
+.ytt-markdown-content h1 {
+  font-size: 1.25em;
+}
+
+.ytt-markdown-content h2 {
+  font-size: 1.125em;
+}
+
+.ytt-markdown-content h3 {
+  font-size: 1em;
+  font-weight: 700;
+}
+
+.ytt-markdown-content h4,
+.ytt-markdown-content h5,
+.ytt-markdown-content h6 {
+  font-size: 0.95em;
+  font-weight: 700;
+}
+
+.ytt-markdown-content p {
+  margin-bottom: 1em;
+  color: hsl(var(--ytt-foreground));
+}
+
+.ytt-markdown-content strong,
+.ytt-markdown-content b {
+  font-weight: 600;
+  color: hsl(var(--ytt-foreground-secondary)) !important;
+}
+
+.ytt-markdown-content em,
+.ytt-markdown-content i {
+  font-style: italic;
+}
+
+.ytt-markdown-content ul,
+.ytt-markdown-content ol {
+  margin-bottom: 1em;
+  padding-left: 1.5em;
+}
+
+.ytt-markdown-content ul {
+  list-style-type: disc;
+}
+
+.ytt-markdown-content ol {
+  list-style-type: decimal;
+}
+
+.ytt-markdown-content li {
+  margin-bottom: 0.25em;
+  color: hsl(var(--ytt-foreground));
+}
+
+.ytt-markdown-content blockquote {
+  border-left: 4px solid hsl(var(--ytt-border-secondary));
+  padding-left: 1em;
+  margin: 1em 0;
+  font-style: italic;
+  color: hsl(var(--ytt-foreground-muted)) !important;
+  background-color: hsl(var(--ytt-muted));
+  border-radius: var(--ytt-radius-sm);
+  padding: 1em;
+}
+
+.ytt-markdown-content code {
+  background-color: hsl(var(--ytt-background-tertiary));
+  padding: 0.125em 0.25em;
+  border-radius: var(--ytt-radius-sm);
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
+  font-size: 0.875em;
+  color: hsl(var(--ytt-foreground)) !important;
+  border: 1px solid hsl(var(--ytt-border));
+}
+
+.ytt-markdown-content pre {
+  background-color: hsl(var(--ytt-background-tertiary));
+  padding: 1em;
+  border-radius: var(--ytt-radius);
+  margin: 1em 0;
+  overflow-x: auto;
+  border: 1px solid hsl(var(--ytt-border));
+}
+
+.ytt-markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
+  border: none;
+}
+
+.ytt-markdown-content a:not(.ytt-timestamp) {
+  color: hsl(var(--ytt-primary)) !important;
+  text-decoration: underline;
+  transition: opacity var(--ytt-duration-fast) var(--ytt-ease);
+}
+
+.ytt-markdown-content a:not(.ytt-timestamp):hover {
+  color: hsl(var(--ytt-primary)) !important;
+  opacity: 0.8;
+}
+
+/* Lists inherit text color properly */
+.ytt-markdown-content ul li,
+.ytt-markdown-content ol li {
+  color: inherit;
+}
+
+/* Remove outline from all buttons */
+button,
+button:focus,
+button:focus-visible,
+button:active {
+  outline: none !important;
+  box-shadow: none !important;
+}

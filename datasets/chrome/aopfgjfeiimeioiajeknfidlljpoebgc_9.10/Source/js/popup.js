@@ -1,0 +1,1 @@
+document.getElementById("version").textContent = "eRail.in   Ver " + chrome.runtime.getManifest().version;

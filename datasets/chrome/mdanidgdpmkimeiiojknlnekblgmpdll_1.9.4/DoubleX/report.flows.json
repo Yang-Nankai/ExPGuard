@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "DATA_LEAK",
+      "ruleId": "doublex-sensitive-api-egress",
+      "ruleDescription": "DoubleX detected permission-gated data sent to a web-accessible channel.",
+      "sourceType": "CHROME_MANAGEMENT_INFO",
+      "sourceRemark": "chrome.management.getAll",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L179",
+      "sourceCode": "chrome.management.getAll(<pdg_js.node.FunctionExpression object at 0x7f47dd808cd0>)",
+      "sinkType": "WINDOW_POSTMESSAGE",
+      "sinkRemark": "{\n\t\t\t\ttype: \"B4G_RESPONDABLE_OUTPUT\",\n\t\t\t\tmetrics: request.metrics\n\t\t\t}",
+      "sinkFile": "content_scripts.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L459",
+      "sinkCode": "{\n\t\t\t\ttype: \"B4G_RESPONDABLE_OUTPUT\",\n\t\t\t\tmetrics: request.metrics\n\t\t\t}",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": "window.postMessage",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": true,
+      "privilegeReason": "Sensitive extension data is returned to a web-accessible channel.",
+      "doublexCategory": "exfiltration_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "cs:direct_dangers:danger1",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setTimeout",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L397",
+      "legacy": {
+        "danger": "setTimeout",
+        "value": "setTimeout(<pdg_js.node.FunctionExpression object at 0x7f47ddad93a0>, 1000)",
+        "sink-param1": "function() {\n\t\t\t\tpollAddress(maxIterations - 1);\n\t\t\t}",
+        "sink-param2": 1000,
+        "line": "397 - 399",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_mdanidgdpmkimeiiojknlnekblgmpdll_f1a0319d2dcb/dx_yf6204iu/unpacked/mdanidgdpmkimeiiojknlnekblgmpdll.1.9.4/content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "cs:direct_dangers:danger2",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "TIME_EVAL",
+      "sinkRemark": "setInterval",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L413",
+      "legacy": {
+        "danger": "setInterval",
+        "value": "setInterval(poll, 1000)",
+        "sink-param1": "poll",
+        "sink-param2": 1000,
+        "line": "413 - 413",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_mdanidgdpmkimeiiojknlnekblgmpdll_f1a0319d2dcb/dx_yf6204iu/unpacked/mdanidgdpmkimeiiojknlnekblgmpdll.1.9.4/content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": true,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.management.getAll",
+      "sinkFile": "background.js",
+      "sinkLoc": "L179",
+      "legacy": {
+        "danger": "chrome.management.getAll",
+        "value": "chrome.management.getAll(<pdg_js.node.FunctionExpression object at 0x7f47dd808cd0>)",
+        "sink-param1": "function(extensions) {\n\t\t\t\tchrome.tabs.query({\n\t\t\t\t\tactive: true,\n\t\t\t\t\tcurrentWindow: true\n\t\t\t\t}, function(tabs) {\n\t\t\t\t\tchrome.tabs.sendMessage(tabs[0].id, {\n\t\t\t\t\t\tgreeting: \"extensions\",\n\t\t\t\t\t\textensions: extensions\n\t\t\t\t\t}, function(response) {});\n\t\t\t\t});\n\t\t\t}",
+        "line": "179 - 189",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_mdanidgdpmkimeiiojknlnekblgmpdll_f1a0319d2dcb/dx_yf6204iu/unpacked/mdanidgdpmkimeiiojknlnekblgmpdll.1.9.4/background.js",
+        "dataflow": true,
+        "sent_to_wa_1": {
+          "wa": "{\n\t\t\t\ttype: \"B4G_RESPONDABLE_OUTPUT\",\n\t\t\t\tmetrics: request.metrics\n\t\t\t}",
+          "line": "459 - 462",
+          "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_mdanidgdpmkimeiiojknlnekblgmpdll_f1a0319d2dcb/dx_yf6204iu/unpacked/mdanidgdpmkimeiiojknlnekblgmpdll.1.9.4/content_scripts.js",
+          "where": "extensions"
+        }
+      }
+    }
+  ]
+}

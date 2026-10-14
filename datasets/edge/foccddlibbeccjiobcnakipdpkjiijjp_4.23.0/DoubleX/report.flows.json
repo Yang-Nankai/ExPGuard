@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "content_scripts.js",
+      "sourceFrame": "CS_1",
+      "sourceLoc": "L76",
+      "sourceCode": "event",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkFrame": "CS_1",
+      "sinkLoc": "L80",
+      "sinkCode": "chrome.storage.local.set(event.data.changes, <pdg_js.node.FunctionExpression object at 0x7fc0506b77f0>)",
+      "ctx": "content",
+      "messagePassing": false,
+      "channel": null,
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "cs:direct_dangers:danger1",
+      "component": "cs",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L80",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(event.data.changes, <pdg_js.node.FunctionExpression object at 0x7fc0506b77f0>)",
+        "sink-param1": "event.data.changes",
+        "sink-param2": "() => {\n\t\t\tchrome.storage.onChanged.addListener(onConfigChange)\n\t\t}",
+        "line": "80 - 82",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_foccddlibbeccjiobcnakipdpkjiijjp_5a52959be695/dx_p9dpqla6/unpacked/foccddlibbeccjiobcnakipdpkjiijjp.4.23.0/content_scripts.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "event",
+            "line": "76 - 76",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_foccddlibbeccjiobcnakipdpkjiijjp_5a52959be695/dx_p9dpqla6/unpacked/foccddlibbeccjiobcnakipdpkjiijjp.4.23.0/content_scripts.js",
+            "where": "event"
+          }
+        },
+        "param_id1": {}
+      }
+    },
+    {
+      "id": "cs:exfiltration_dangers:danger1",
+      "component": "cs",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "content_scripts.js",
+      "sinkLoc": "L40",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(<pdg_js.node.FunctionExpression object at 0x7fc0506d8c40>)",
+        "sink-param1": "( /** @type {Partial<import(\"./types\").Config>} */ storedConfig) => {\n\t// Update deprecated config values\n\t// @ts-ignore\n\tif (storedConfig.twitterBlueChecks == 'dim') {\n\t\tstoredConfig.twitterBlueChecks = 'replace'\n\t}\n\n\t$settings = document.createElement('script')\n\t$settings.type = 'text/json'\n\t$settings.id = 'cpftSettings'\n\tdocument.documentElement.appendChild($settings)\n\t$settings.innerText = JSON.stringify(storedConfig)\n\n\tlet $main = document.createElement('script')\n\t$main.src = chrome.runtime.getURL('script.js')\n\t$main.onload = function() {\n\t\tthis.remove()\n\t}\n\tdocument.documentElement.appendChild($main)\n\n\tchrome.storage.onChanged.addListener(onConfigChange)\n}",
+        "line": "40 - 61",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_foccddlibbeccjiobcnakipdpkjiijjp_5a52959be695/dx_p9dpqla6/unpacked/foccddlibbeccjiobcnakipdpkjiijjp.4.23.0/content_scripts.js",
+        "dataflow": false
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L48",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(<pdg_js.node.ValueExpr object at 0x7fc050773c40>, <pdg_js.node.FunctionExpression object at 0x7fc050773c70>)",
+        "sink-param1": "t({\n\tenabled: true",
+        "sink-param2": ", ({\n\tenabled\n}) => {\n\tupdateToolbarIcon(enabled)",
+        "line": "48 - 54",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_foccddlibbeccjiobcnakipdpkjiijjp_5a52959be695/dx_p9dpqla6/unpacked/foccddlibbeccjiobcnakipdpkjiijjp.4.23.0/background.js",
+        "dataflow": false
+      }
+    }
+  ]
+}

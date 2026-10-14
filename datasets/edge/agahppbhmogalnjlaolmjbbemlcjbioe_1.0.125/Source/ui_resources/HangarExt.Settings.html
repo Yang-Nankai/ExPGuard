@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>HangarExt Settings</title>
+    <style>
+      @font-face {
+        font-family: 'Electrolize';
+        src: url('fonts/Electrolize-Regular.woff2') format('woff2');
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        width: 300px;
+        background:
+          /* url('images/gridbg.png') repeat center top, */
+          /* url('images/noisebg.gif') repeat top, */
+          radial-gradient(circle at top, rgba(37, 228, 255, 0.10), transparent 55%),
+          /* #020810; */
+          #09131a;
+        color: #25e4ff;
+        font-family: 'Electrolize', sans-serif;
+        font-size: 12px;
+      }
+      /* panel shell */
+      .panel {
+        position: relative;
+        background:
+          url('images/fading-bars-top.png') repeat-x top left,
+          url('images/fading-bars-bottom.png') repeat-x bottom left,
+          /* rgba(0, 0, 0, 0.72); */
+          rgba(0, 0, 0, 0.42);
+        padding: 18px 20px 20px;
+      }
+      /* corner decorations matching BulkUI */
+      .panel::before,
+      .panel::after,
+      .panel-corners::before,
+      .panel-corners::after { content: '';position: absolute;width: 8px;height: 8px;border-color: #25e4ff;border-style: solid;opacity: 0.6; }
+      .panel::before { top: 6px;right: 6px;border-width: 2px 2px 0 0; }
+      .panel::after { bottom: 6px;right: 6px;border-width: 0 2px 2px 0; }
+      .panel-corners::before { top: 6px;left: 6px;border-width: 2px 0 0 2px; }
+      .panel-corners::after { bottom: 6px;left: 6px;border-width: 0 0 2px 2px; }
+      .panel .line-top    { top: 0;    background: linear-gradient(90deg, transparent, #25e4ff55, transparent); }
+      .panel .line-bottom { bottom: 0; background: linear-gradient(90deg, transparent, #25e4ff33, transparent); }
+      /* heading */
+      h1 { font-size: 15px;font-weight: 400;letter-spacing: 0.12em;text-transform: uppercase;color: #25e4ff;margin-bottom: 2px;cursor: default; }
+      .subtitle { font-size: 9px;letter-spacing: 0.18em;text-transform: uppercase;color: #6c84a2;margin-bottom: 16px;padding-bottom: 12px;border-bottom: 1px solid #162a3f;cursor: default; }
+      /* buttons */
+      .actions { display: flex;flex-direction: column;gap: 7px; }
+      .btn { display: flex;align-items: center;border-radius: 5px;justify-content: center;gap: 8px;width: 100%;padding: 8px 12px;background: rgba(0, 183, 202, 0.07);border: 1px solid rgba(37, 228, 255, 0.25);color: #25e4ff;font-family: 'Electrolize', sans-serif;font-size: 11px;letter-spacing: 0.1em;text-transform: uppercase;cursor: pointer;text-align: left;transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;outline: none; }
+      .btn:hover { background: rgba(0, 183, 202, 0.15);border-color: rgba(37, 228, 255, 0.6);box-shadow: 0 0 10px rgba(37, 228, 255, 0.15); }
+      .btn:active { background: rgba(0, 183, 202, 0.25); }
+      /* play-triangle icon matching the download buttons in BulkUI */
+      /* .btn::before { content: '';width: 0;height: 0;border-style: solid;border-width: 4px 0 4px 7px;border-color: transparent transparent transparent #25e4ff;opacity: 0.7;flex-shrink: 0; } */
+      /* danger variant (clear cache is destructive-ish) */
+      .btn-warn { border-color: rgba(37, 228, 255, 0.18);color: #6c84a2; }
+      /* .btn-warn::before { border-left-color: #6c84a2; } */
+      .btn-warn:hover { background: rgba(200, 0, 0, 0.1);border-color: rgba(200, 80, 80, 0.5);color: #ff7070;box-shadow: 0 0 10px rgba(200, 0, 0, 0.1); }
+      /* .btn-warn:hover::before { border-left-color: #ff7070; } */
+      .btn-warn:disabled, .btn-warn:disabled:hover { background: rgba(0, 183, 202, 0.07);border-color: rgba(37, 228, 255, 0.18);color: #ff7070;box-shadow: none;cursor: default; }
+      /* .btn-warn:disabled::before, .btn-warn:disabled:hover::before { display: none; } */
+      /* close variant */
+      .btn-close { padding: 4px;margin-top: 5px;font-size: 10px;color: #6c84a2;border-color: rgba(37, 228, 255, 0.18);background: rgba(0, 183, 202, 0.04); }
+      /* .btn-close::before { display: none; } */
+      .btn-close:hover { color: #25e4ff;border-color: rgba(37, 228, 255, 0.45);background: rgba(0, 183, 202, 0.10);box-shadow: 0 0 8px rgba(37, 228, 255, 0.10); }
+      /* toggle rows */
+      .toggles { display: flex;flex-direction: column;gap: 6px;margin-bottom: 16px;padding-bottom: 14px;border-bottom: 1px solid #162a3f; }
+      .toggle-row { display: flex;align-items: center;justify-content: space-between;cursor: pointer;padding: 2px 0; }
+      .toggle-label { font-size: 10px;letter-spacing: 0.1em;text-transform: uppercase;color: #6c84a2;transition: color 0.15s; }
+      .toggle-row:hover .toggle-label { color: #25e4ff; }
+      /* hide the native checkbox */
+      .toggle-row input[type="checkbox"] { display: none; }
+      /* track */
+      .toggle-track { position: relative;width: 30px;height: 14px;border: 1px solid rgba(37, 228, 255, 0.2);border-radius: 7px;background: rgba(0, 0, 0, 0.4);flex-shrink: 0;transition: background 0.15s, border-color 0.15s; }
+      /* dot */
+      .toggle-track::after { content: '';position: absolute;top: 2px;left: 2px;width: 8px;height: 8px;border-radius: 50%;background: #6c84a2;transition: transform 0.15s, background 0.15s; }
+      /* checked state */
+      .toggle-row input:checked ~ .toggle-track { background: rgba(37, 228, 255, 0.12);border-color: rgba(37, 228, 255, 0.5); }
+      .toggle-row input:checked ~ .toggle-track::after { transform: translateX(16px);background: #25e4ff; }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <div class="panel-corners"></div>
+      <div class="line-top"></div>
+      <h1>Hangar Extension</h1>
+      <div class="subtitle"><b>Enhance your Star Citizen hangar</b></div>
+      <div class="toggles">
+        <label class="toggle-row">
+          <span class="toggle-label">Show Pledge-ID</span>
+          <input type="checkbox" id="showPledgeId">
+          <span class="toggle-track"></span>
+        </label>
+        <label class="toggle-row">
+          <span class="toggle-label">Show Base Pledge</span>
+          <input type="checkbox" id="showBasePledge">
+          <span class="toggle-track"></span>
+        </label>
+        <label class="toggle-row">
+          <span class="toggle-label">Show Production State</span>
+          <input type="checkbox" id="showProductionState">
+          <span class="toggle-track"></span>
+        </label>
+        <label class="toggle-row">
+          <span class="toggle-label">Show Hangar USD Values</span>
+          <input type="checkbox" id="showUSDValues">
+          <span class="toggle-track"></span>
+        </label>
+        <label class="toggle-row">
+          <span class="toggle-label">Show Ship & Upgrade Savings</span>
+          <input type="checkbox" id="showSavings">
+          <span class="toggle-track"></span>
+        </label>
+        <label class="toggle-row">
+          <span class="toggle-label">Show Only Usable Item Count</span>
+          <input type="checkbox" id="showOnlyUsableItemCount">
+          <span class="toggle-track"></span>
+        </label>
+        <label class="toggle-row">
+          <span class="toggle-label">Show Invalid & Duplicate Items</span>
+          <input type="checkbox" id="showAllItemEntries">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-warn" id="refreshHangar">Rebuild Hangar Cache</button>
+        <button type="button" class="btn btn-close" id="closeSettings">Close Settings</button>
+      </div>
+      <div class="line-bottom"></div>
+    </div>
+    <script src="HangarExt.Settings.js"></script>
+  </body>
+</html>

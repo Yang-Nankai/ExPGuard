@@ -1,0 +1,1 @@
+injectScript(chrome.runtime.getURL("script/helper.js"),"body"),injectScript(chrome.runtime.getURL("script/badgesContent.js"),"body");

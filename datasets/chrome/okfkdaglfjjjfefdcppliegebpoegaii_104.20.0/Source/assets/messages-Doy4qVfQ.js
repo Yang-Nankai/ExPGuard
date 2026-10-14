@@ -1,0 +1,1 @@
+var E=(i=>(i.CHECK_MICROPHONE_PERMISSION="checkMicrophonePermission",i.ON_MEDIA_PERMISSIONS_TAB_INITALIZED="onMediaPermissionsTabInitialized",i.MEDIA_PERMISSION_CHANGED="mediaPermissionChanged",i.MICROPHONE_ERROR="microphoneError",i))(E||{});export{E as V};

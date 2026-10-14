@@ -1,0 +1,137 @@
+{
+  "extensionId": "lfidjngibpklhhijphdmbmedchiiolgk",
+  "extensionVersion": "8.18.0",
+  "sourceType": "CRX",
+  "stats": {
+    "filesWithIssues": 1,
+    "totalFiles": 1,
+    "distinctFlows": 2,
+    "rawIssueEntries": 9,
+    "sinklessSourcesSkipped": 6
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "filterUrl",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+        "file": "filterUrl",
+        "loc": "L1:C9715 -> L1:C9716",
+        "line": 1,
+        "col": [
+          9715,
+          9716
+        ],
+        "spansTo": null,
+        "code": "…rome.runtime.onMessageExternal.addListener(function(t,e){e.id!==CHROME_CLIENT_APP_ID&&e.origin!==IWA_CLIENT_ORIGIN_ID||!»t«||\"updateRule\"!==t.type||(t.content?[\"enabled\",\"origin\",\"host\",\"protocols\"].reduce((e,o)=>(Object.getOwnPropertyNames(t.…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "data",
+          "file": "filterUrl",
+          "loc": "L1:C9994 -> L1:C10052",
+          "line": 1,
+          "col": [
+            9994,
+            10052
+          ],
+          "spansTo": null,
+          "code": "….error(`The content of updateRule request is missing the \"${o}\" property`)),e),!0)&&(Array.isArray(t.content.protocols)?»chrome.storage.local.set({data:JSON.stringify(t.content)})«:console.error(\"The updateRule request has no content\")):console.error(\"The updateRule request has no content\"))});",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 24,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "filterUrl",
+            "line": 1,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary",
+              "ASSIGN:logical-right",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-left",
+              "RETURN:json.stringify",
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "…tener(function(t,e){»e.id!==CHROME_CLIENT_APP_ID&&e.origin!==IWA_CLIENT_ORIGIN_ID||!t||\"updateRule\"!==t.type||(t.content?[\"enabled\",\"origin\", …⟨tainted span: 400 chars⟩… ${o}\" property`)),e),!0)&&(Array.isArray(t.content.protocols)?chrome.storage.local.set({data:JSON.stringify(t.content)})«:console.error(\"The …"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "filterUrl",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+        "remark": "From storage.local.set('data') in filterUrl",
+        "file": "filterUrl",
+        "loc": "L1:C9715 -> L1:C9716",
+        "line": 1,
+        "col": [
+          9715,
+          9716
+        ],
+        "spansTo": null,
+        "code": "…rome.runtime.onMessageExternal.addListener(function(t,e){e.id!==CHROME_CLIENT_APP_ID&&e.origin!==IWA_CLIENT_ORIGIN_ID||!»t«||\"updateRule\"!==t.type||(t.content?[\"enabled\",\"origin\",\"host\",\"protocols\"].reduce((e,o)=>(Object.getOwnPropertyNames(t.…"
+      },
+      "sinks": [
+        {
+          "kind": "CHROME_LOCAL_STORAGE",
+          "remark": "data",
+          "file": "filterUrl",
+          "loc": "L1:C6212 -> L1:C6246",
+          "line": 1,
+          "col": [
+            6212,
+            6246
+          ],
+          "spansTo": null,
+          "code": "…ve(\"tempConfigTabId\"),chrome.storage.local.get(\"data\",e=>{if(e&&e.data)try{var o=JSON.parse(e.data),t=JSON.stringify(o);»chrome.storage.local.set({data:t})«,console.log(\"Successfully read data from storage.\")}catch(e){console.error(\"Invalid JSON in chrome.storage.local:\",e.me…",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 8,
+      "propagation": {
+        "rawSteps": 593,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "filterUrl",
+            "line": 1,
+            "ops": [
+              "ASSIGN:identifier",
+              "ASSIGN:unary",
+              "ASSIGN:logical-right",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-left",
+              "RETURN:json.stringify",
+              "ELEMENT:object.setProperty",
+              "STORAGE:STORAGE_FLOW[area: local, key: data, sender: filterUrl, receiver: filterUrl]",
+              "RETURN:json.parse",
+              "RETURN:fallback-return",
+              "ITERATE:loop.iteration",
+              "ASSIGN:binary-left"
+            ],
+            "code": "…new Promise((o,t)=>{»chrome.storage.local.get(\"data\",e=>{chrome.runtime.lastError?t(new Error(chrome.runtime.lastError.message)):o(e)})});if( …⟨tainted span: 8552 chars⟩… ${o}\" property`)),e),!0)&&(Array.isArray(t.content.protocols)?chrome.storage.local.set({data:JSON.stringify(t.content)})«:console.error(\"The …"
+          }
+        ]
+      }
+    }
+  ]
+}

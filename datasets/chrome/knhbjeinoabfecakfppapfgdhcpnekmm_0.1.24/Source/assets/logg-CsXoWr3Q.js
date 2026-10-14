@@ -1,0 +1,1 @@
+const l=t=>{let e;typeof t=="object"?e=JSON.stringify(t,null,4):e=t;let o=new Date().toISOString();console.log(`${o}: ${e}`)},n=t=>{let e;typeof t=="object"?e=JSON.stringify(t,null,4):e=t;let o=new Date().toISOString();console.log(`ERROR: ${o}: ${e}`)};export{n as a,l};

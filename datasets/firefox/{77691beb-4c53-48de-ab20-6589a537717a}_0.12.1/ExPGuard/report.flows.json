@@ -1,0 +1,268 @@
+{
+  "extensionId": "{77691beb-4c53-48de-ab20-6589a537717a}",
+  "extensionVersion": "0.12.1",
+  "sourceType": "XPI",
+  "stats": {
+    "filesWithIssues": 4,
+    "totalFiles": 4,
+    "distinctFlows": 3,
+    "rawIssueEntries": 3,
+    "sinklessSourcesSkipped": 2
+  },
+  "flows": [
+    {
+      "id": 1,
+      "file": "inject",
+      "frame": "CS_1",
+      "constraint": {
+        "matches": [
+          "file://*/*",
+          "http://*/*",
+          "https://*/*"
+        ]
+      },
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "inject",
+        "loc": "L18:C10 -> L18:C47",
+        "line": 18,
+        "col": [
+          10,
+          47
+        ],
+        "spansTo": null,
+        "code": "if (»event.source === window && event.data« && event.data.type === 'eth:send') chrome.runtime.sendMessage(event.data.payload)"
+      },
+      "sinks": [
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "location.origin",
+          "file": "inject",
+          "loc": "L6:C8 -> L6:C91",
+          "line": 6,
+          "col": [
+            8,
+            91
+          ],
+          "spansTo": null,
+          "code": "»window.postMessage({type: 'eth:payload', payload: payload}, window.location.origin)«",
+          "frame": "CS_1",
+          "constraint": {
+            "matches": [
+              "file://*/*",
+              "http://*/*",
+              "https://*/*"
+            ]
+          }
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 22,
+        "distinctLines": 6,
+        "steps": [
+          {
+            "n": 1,
+            "file": "inject",
+            "line": 18,
+            "ops": [
+              "ASSIGN:logical-right",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-left",
+              "ASSIGN:logical-left"
+            ],
+            "code": "if (»event.source === window && event.data && event.data.type === 'eth:send') chrome.runtime.sendMessage(event.data.payload«)"
+          },
+          {
+            "n": 2,
+            "file": "inject",
+            "line": 3,
+            "ops": [
+              "MESSAGE"
+            ],
+            "code": "»    chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {«",
+            "spansTo": 16,
+            "crossContextHop": "runtime.single.sender.message[index->inject]"
+          },
+          {
+            "n": 3,
+            "file": "inject",
+            "line": 4,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»payload.type« === 'eth:payload') {"
+          },
+          {
+            "n": 4,
+            "file": "inject",
+            "line": 6,
+            "ops": [
+              "ELEMENT:object.setProperty"
+            ],
+            "code": "»window.postMessage({type: 'eth:payload', payload: payload}, window.location.origin)«"
+          },
+          {
+            "n": 5,
+            "file": "inject",
+            "line": 8,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»payload.type« === 'embedded:action') {"
+          },
+          {
+            "n": 6,
+            "file": "inject",
+            "line": 11,
+            "ops": [
+              "ELEMENT:member-element-container",
+              "ASSIGN:binary-left"
+            ],
+            "code": "if (»payload.type« === 'eth:event') {"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "file": "index",
+      "frame": "BG_1",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "index",
+        "loc": "L1:C36948 -> L1:C37877",
+        "line": 1,
+        "col": [
+          36948,
+          37877
+        ],
+        "spansTo": null,
+        "code": "…tMediaBlob__(e,t,n)}»chrome.runtime.onMessage.addListener((async(e,n)=>{const{tab:s,...r}=e,{method:o,params:a}=r;if(console.debug(\"Message r …⟨tainted span: 929 chars⟩… ;const l={...r,jsonrpc:\"2.0\",id:d,__frameOrigin:h,__extensionConnecting:r.__extensionConnecting};i.connection.send(l)}))«,chrome.runtime.onCo…"
+      },
+      "sinks": [
+        {
+          "kind": "FETCH_RESOURCE",
+          "remark": "[Unknown URL]",
+          "file": "index",
+          "loc": "L1:C37278 -> L1:C37290",
+          "line": 1,
+          "col": [
+            37278,
+            37290
+          ],
+          "spansTo": null,
+          "code": "…tChainId\"===e.type&&t.chainId)return y(t.chainId)}else if(\"media_blob\"===r.method){const e=r.location;try{const i=await »fetch(r.src)«,s=await i.blob(),o=URL.createObjectURL(s);chrome.scripting.executeScript({target:{tabId:n.tab.id},func:t,args:[o,e]})}c…",
+          "urlControl": "FULL",
+          "frame": "BG_1"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 284,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "index",
+            "line": 1,
+            "ops": [
+              "MESSAGE",
+              "ASSIGN:identifier",
+              "ELEMENT:destructure-property[tab]",
+              "ELEMENT:destructure-property[method]",
+              "ELEMENT:destructure-property[params]",
+              "ELEMENT:object.setProperty",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-right",
+              "ELEMENT:destructure-element[0]",
+              "ELEMENT:destructure-element[1]",
+              "ASSIGN:logical-left",
+              "ASSIGN:logical-right",
+              "ASSIGN:template-literal",
+              "ELEMENT:implicit.add",
+              "ASSIGN:unary",
+              "RETURN:fallback-return",
+              "COPY:object-spread",
+              "ASSIGN:binary-left",
+              "ELEMENT:member-element-container",
+              "ELEMENT:destructure-property[tabId]",
+              "ELEMENT:destructure-property[payloadId]",
+              "ASSIGN:conditional-consequent",
+              "ASSIGN:conditional-alternate",
+              "COPY:object.assign"
+            ],
+            "code": "…e\"];let i,s,r;const »o={},c={},a={connected:!1,availableChains:[],currentChain:\"\"},d=e=>{if(!e)return\"\";const t=e.split(\"/\");return`${t[0]}// …⟨tainted span: 3448 chars⟩… ;const l={...r,jsonrpc:\"2.0\",id:d,__frameOrigin:h,__extensionConnecting:r.__extensionConnecting};i.connection.send(l)}))«,chrome.runtime.onCo…",
+            "crossContextHop": "runtime.single.sender.message[inject->index]"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "file": "frame",
+      "frame": "MAIN_frame",
+      "constraint": null,
+      "source": {
+        "kind": "WINDOW_MESSAGE_EVENT",
+        "remark": "window.addEventListener(message)",
+        "file": "frame",
+        "loc": "L1:C18578 -> L1:C18606",
+        "line": 1,
+        "col": [
+          18578,
+          18606
+        ],
+        "spansTo": null,
+        "code": "…statechange\",(e=>{\"interactive\"===document.readyState&&setProvider()})),window.addEventListener(\"message\",(async e=>{if(»e&&e.source===window&&e.data«&&\"embedded:action\"===e.data.type&&window.self===window.top&&e.data.action){const t=e.data.action;if(c[t.type]){const e=…"
+      },
+      "sinks": [
+        {
+          "kind": "WINDOW_POSTMESSAGE",
+          "remark": "location.origin",
+          "file": "frame",
+          "loc": "L1:C18787 -> L1:C18857",
+          "line": 1,
+          "col": [
+            18787,
+            18857
+          ],
+          "spansTo": null,
+          "code": "…e.data.action){const t=e.data.action;if(c[t.type]){const e={method:\"embedded_action_res\",params:[t,await c[t.type](t)]};»window.postMessage({type:\"eth:send\",payload:e},window.location.origin)«}else console.warn(`Could not find embedded action ${t.type}`)}}))})()})();",
+          "frame": "MAIN_frame"
+        }
+      ],
+      "sanitized": false,
+      "duplicatePaths": 1,
+      "propagation": {
+        "rawSteps": 31,
+        "distinctLines": 1,
+        "steps": [
+          {
+            "n": 1,
+            "file": "frame",
+            "line": 1,
+            "ops": [
+              "ASSIGN:logical-right",
+              "ELEMENT:member-element",
+              "ASSIGN:binary-right",
+              "ASSIGN:logical-left",
+              "ASSIGN:identifier",
+              "ELEMENT:object.setProperty",
+              "ELEMENT:implicit.add",
+              "ASSIGN:template-literal"
+            ],
+            "code": "…sage\",(async e=>{if(»e&&e.source===window&&e.data&&\"embedded:action\"===e.data.type&&window.self===window.top&&e.data.action){const t=e.data.a …⟨tainted span: 340 chars⟩… Message({type:\"eth:send\",payload:e},window.location.origin)}else console.warn(`Could not find embedded action ${t.type}`«)}}))})()})();"
+          }
+        ]
+      }
+    }
+  ]
+}

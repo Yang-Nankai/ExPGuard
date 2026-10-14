@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L14",
+      "sourceCode": "e",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L16",
+      "sinkCode": "chrome.storage.local.set({'countRunned': 't.countRunned', 'isShare': 't.isShare'})",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": null,
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    },
+    {
+      "flowType": "DATA_LEAK",
+      "ruleId": "doublex-sensitive-api-egress",
+      "ruleDescription": "DoubleX detected permission-gated data sent to a web-accessible channel.",
+      "sourceType": "STORAGE_ALL_ITEMS",
+      "sourceRemark": "chrome.storage.local.get",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L15",
+      "sourceCode": "chrome.storage.local.get(None, <pdg_js.node.FunctionExpression object at 0x7f1ea0a10730>)",
+      "sinkType": "WINDOW_POSTMESSAGE",
+      "sinkRemark": "e",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L15",
+      "sinkCode": "e",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": "window.postMessage",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": true,
+      "privilegeReason": "Sensitive extension data is returned to a web-accessible channel.",
+      "doublexCategory": "exfiltration_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.create",
+      "sinkFile": "background.js",
+      "sinkLoc": "L3",
+      "legacy": {
+        "danger": "chrome.tabs.create",
+        "value": "chrome.tabs.create(<pdg_js.node.ValueExpr object at 0x7f1ea0af3c40>)",
+        "sink-param1": "{\n\t\turl: \"https://mymoneyrain.com/games/lilrooster?utm_medium=install&utm_source=ext&utm_campaign=lilrooster\",\n\t\tactive: !0\n\t}",
+        "line": "3 - 6",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_angheeakoggimjlccancomcmdhjpadao_db0beb8cbe03/dx_a_15eksu/unpacked/angheeakoggimjlccancomcmdhjpadao.2.9.8/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger2",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": false,
+      "sinkType": "CHROME_TABS_CREATE_OPTIONS",
+      "sinkRemark": "chrome.tabs.create",
+      "sinkFile": "background.js",
+      "sinkLoc": "L6",
+      "legacy": {
+        "danger": "chrome.tabs.create",
+        "value": "chrome.tabs.create(<pdg_js.node.ValueExpr object at 0x7f1ea0b3a460>)",
+        "sink-param1": "{\n\t\turl: \"https://mymoneyrain.com/games?utm_medium=update&utm_source=ext&utm_campaign=lilrooster\",\n\t\tactive: !0\n\t}",
+        "line": "6 - 9",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_angheeakoggimjlccancomcmdhjpadao_db0beb8cbe03/dx_a_15eksu/unpacked/angheeakoggimjlccancomcmdhjpadao.2.9.8/background.js",
+        "dataflow": false,
+        "param_id0": {}
+      }
+    },
+    {
+      "id": "bp:direct_dangers:danger3",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L16",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set({'countRunned': 't.countRunned', 'isShare': 't.isShare'})",
+        "sink-param1": {
+          "countRunned": "t.countRunned",
+          "isShare": "t.isShare"
+        },
+        "line": "16 - 16",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_angheeakoggimjlccancomcmdhjpadao_db0beb8cbe03/dx_a_15eksu/unpacked/angheeakoggimjlccancomcmdhjpadao.2.9.8/background.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "e",
+            "line": "14 - 14",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_angheeakoggimjlccancomcmdhjpadao_db0beb8cbe03/dx_a_15eksu/unpacked/angheeakoggimjlccancomcmdhjpadao.2.9.8/background.js",
+            "where": "e"
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": true,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L15",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(None, <pdg_js.node.FunctionExpression object at 0x7f1ea0a10730>)",
+        "sink-param1": null,
+        "sink-param2": "e => a(e)",
+        "line": "15 - 15",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_angheeakoggimjlccancomcmdhjpadao_db0beb8cbe03/dx_a_15eksu/unpacked/angheeakoggimjlccancomcmdhjpadao.2.9.8/background.js",
+        "dataflow": true,
+        "sent_to_wa_1": {
+          "wa": "e",
+          "line": "15 - 15",
+          "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_angheeakoggimjlccancomcmdhjpadao_db0beb8cbe03/dx_a_15eksu/unpacked/angheeakoggimjlccancomcmdhjpadao.2.9.8/background.js",
+          "where": "e"
+        }
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger2",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": false,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L15",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(None, <pdg_js.node.FunctionExpression object at 0x7f1ea0a10af0>)",
+        "sink-param1": null,
+        "sink-param2": "t => {\n\t\te.data.countRunned || (e.data.countRunned = t.countRunned), e.data.isShare || (e.data.isShare = t.isShare), chrome.storage.local.set(e.data)\n\t}",
+        "line": "15 - 17",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-edge/task_angheeakoggimjlccancomcmdhjpadao_db0beb8cbe03/dx_a_15eksu/unpacked/angheeakoggimjlccancomcmdhjpadao.2.9.8/background.js",
+        "dataflow": false
+      }
+    }
+  ]
+}

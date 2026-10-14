@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "doublex-expguard-aligned/v1",
+  "flows": [
+    {
+      "flowType": "STORAGE_POSOING",
+      "ruleId": "doublex-edg-provenance",
+      "ruleDescription": "DoubleX EDG provenance from externally controllable input.",
+      "sourceType": "WINDOW_MESSAGE_EVENT",
+      "sourceRemark": "DoubleX web-accessible message input",
+      "sourceFile": "content_scripts.js",
+      "sourceFrame": "CS_1",
+      "sourceLoc": "L28",
+      "sourceCode": "t",
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L45",
+      "sinkCode": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7f7d5fcc7d00>, <pdg_js.node.FunctionExpression object at 0x7f7d5fcc7d30>)",
+      "ctx": "background",
+      "messagePassing": true,
+      "channel": "doublex-edg",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": false,
+      "privilegeReason": "DoubleX matched external input to a sensitive API parameter.",
+      "doublexCategory": "direct_dangers"
+    },
+    {
+      "flowType": "DATA_LEAK",
+      "ruleId": "doublex-sensitive-api-egress",
+      "ruleDescription": "DoubleX detected permission-gated data sent to a web-accessible channel.",
+      "sourceType": "STORAGE_ALL_ITEMS",
+      "sourceRemark": "chrome.storage.local.get",
+      "sourceFile": "background.js",
+      "sourceFrame": "BG_1",
+      "sourceLoc": "L39",
+      "sourceCode": "chrome.storage.local.get(<pdg_js.node.ValueExpr object at 0x7f7d5fca7fa0>, <pdg_js.node.FunctionExpression object at 0x7f7d5fca7fd0>)",
+      "sinkType": "WINDOW_POSTMESSAGE",
+      "sinkRemark": "{\n\t\t\t\tnamespace: \"nflxmultisubs\",\n\t\t\t\taction: \"apply-settings\",\n\t\t\t\tsettings: t.settings\n\t\t\t}",
+      "sinkFile": "content_scripts.js",
+      "sinkFrame": "BG_1",
+      "sinkLoc": "L30",
+      "sinkCode": "{\n\t\t\t\tnamespace: \"nflxmultisubs\",\n\t\t\t\taction: \"apply-settings\",\n\t\t\t\tsettings: t.settings\n\t\t\t}",
+      "ctx": "background",
+      "messagePassing": false,
+      "channel": "window.postMessage",
+      "storagePassing": false,
+      "area": null,
+      "privilegeCrossing": true,
+      "privilegeReason": "Sensitive extension data is returned to a web-accessible channel.",
+      "doublexCategory": "exfiltration_dangers"
+    }
+  ],
+  "taintResults": [
+    {
+      "id": "bp:direct_dangers:danger1",
+      "component": "bp",
+      "category": "direct_dangers",
+      "detected": true,
+      "sinkType": "CHROME_LOCAL_STORAGE",
+      "sinkRemark": "chrome.storage.local.set",
+      "sinkFile": "background.js",
+      "sinkLoc": "L45",
+      "legacy": {
+        "danger": "chrome.storage.local.set",
+        "value": "chrome.storage.local.set(<pdg_js.node.ValueExpr object at 0x7f7d5fcc7d00>, <pdg_js.node.FunctionExpression object at 0x7f7d5fcc7d30>)",
+        "sink-param1": "{\n\t\t\tsettings: e\n\t\t}",
+        "sink-param2": "() => {\n\t\t\tconsole.log(\"Settings: saved into local storage\", e)\n\t\t}",
+        "line": "45 - 49",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_jepfhfjlkgobooomdgpcjikalfpcldmm_8f991e82e42f/dx_njkwh6uc/unpacked/jepfhfjlkgobooomdgpcjikalfpcldmm.3.0.3/background.js",
+        "dataflow": true,
+        "param_id0": {
+          "received_from_wa_1": {
+            "wa": "t",
+            "line": "28 - 28",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_jepfhfjlkgobooomdgpcjikalfpcldmm_8f991e82e42f/dx_njkwh6uc/unpacked/jepfhfjlkgobooomdgpcjikalfpcldmm.3.0.3/content_scripts.js",
+            "where": "t"
+          },
+          "received_from_wa_2": {
+            "wa": "{\n\t\t\tstopPlayback: 1\n\t\t}",
+            "line": "73 - 73",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_jepfhfjlkgobooomdgpcjikalfpcldmm_8f991e82e42f/dx_njkwh6uc/unpacked/jepfhfjlkgobooomdgpcjikalfpcldmm.3.0.3/background.js",
+            "where": "<pdg_js.node.ValueExpr object at 0x7f7d5ff18c70>"
+          },
+          "received_from_wa_3": {
+            "wa": "{\n\t\t\tstopPlayback: 1\n\t\t}",
+            "line": "127 - 127",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_jepfhfjlkgobooomdgpcjikalfpcldmm_8f991e82e42f/dx_njkwh6uc/unpacked/jepfhfjlkgobooomdgpcjikalfpcldmm.3.0.3/background.js",
+            "where": "<pdg_js.node.ValueExpr object at 0x7f7d5ff18c70>"
+          }
+        },
+        "param_id1": {
+          "received_from_wa_1": {
+            "wa": "t",
+            "line": "28 - 28",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_jepfhfjlkgobooomdgpcjikalfpcldmm_8f991e82e42f/dx_njkwh6uc/unpacked/jepfhfjlkgobooomdgpcjikalfpcldmm.3.0.3/content_scripts.js",
+            "where": "t"
+          },
+          "received_from_wa_2": {
+            "wa": "{\n\t\t\tstopPlayback: 1\n\t\t}",
+            "line": "73 - 73",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_jepfhfjlkgobooomdgpcjikalfpcldmm_8f991e82e42f/dx_njkwh6uc/unpacked/jepfhfjlkgobooomdgpcjikalfpcldmm.3.0.3/background.js",
+            "where": "<pdg_js.node.ValueExpr object at 0x7f7d5ff18c70>"
+          },
+          "received_from_wa_3": {
+            "wa": "{\n\t\t\tstopPlayback: 1\n\t\t}",
+            "line": "127 - 127",
+            "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_jepfhfjlkgobooomdgpcjikalfpcldmm_8f991e82e42f/dx_njkwh6uc/unpacked/jepfhfjlkgobooomdgpcjikalfpcldmm.3.0.3/background.js",
+            "where": "<pdg_js.node.ValueExpr object at 0x7f7d5ff18c70>"
+          }
+        }
+      }
+    },
+    {
+      "id": "bp:exfiltration_dangers:danger1",
+      "component": "bp",
+      "category": "exfiltration_dangers",
+      "detected": true,
+      "sinkType": "JQUERY_GET_URL",
+      "sinkRemark": "chrome.storage.local.get",
+      "sinkFile": "background.js",
+      "sinkLoc": "L39",
+      "legacy": {
+        "danger": "chrome.storage.local.get",
+        "value": "chrome.storage.local.get(<pdg_js.node.ValueExpr object at 0x7f7d5fca7fa0>, <pdg_js.node.FunctionExpression object at 0x7f7d5fca7fd0>)",
+        "sink-param1": "[\"settings\"]",
+        "sink-param2": "function(t) {\n\t\t\tconsole.log(\"Loaded: settings=\", t.settings), t.settings && n(t.settings) ? e(t.settings) : (a(s), e(s))\n\t\t}",
+        "line": "39 - 41",
+        "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_jepfhfjlkgobooomdgpcjikalfpcldmm_8f991e82e42f/dx_njkwh6uc/unpacked/jepfhfjlkgobooomdgpcjikalfpcldmm.3.0.3/background.js",
+        "dataflow": true,
+        "sent_to_wa_1": {
+          "wa": "{\n\t\t\t\tnamespace: \"nflxmultisubs\",\n\t\t\t\taction: \"apply-settings\",\n\t\t\t\tsettings: t.settings\n\t\t\t}",
+          "line": "30 - 34",
+          "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_jepfhfjlkgobooomdgpcjikalfpcldmm_8f991e82e42f/dx_njkwh6uc/unpacked/jepfhfjlkgobooomdgpcjikalfpcldmm.3.0.3/content_scripts.js",
+          "where": "t"
+        },
+        "sent_to_wa_2": {
+          "wa": "{\n\t\t\t\t\t\tsettings: e\n\t\t\t\t\t}",
+          "line": "57 - 59",
+          "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_jepfhfjlkgobooomdgpcjikalfpcldmm_8f991e82e42f/dx_njkwh6uc/unpacked/jepfhfjlkgobooomdgpcjikalfpcldmm.3.0.3/background.js",
+          "where": "t"
+        },
+        "sent_to_wa_3": {
+          "wa": "{\n\t\t\t\tsettings: r\n\t\t\t}",
+          "line": "71 - 73",
+          "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_jepfhfjlkgobooomdgpcjikalfpcldmm_8f991e82e42f/dx_njkwh6uc/unpacked/jepfhfjlkgobooomdgpcjikalfpcldmm.3.0.3/background.js",
+          "where": "t"
+        },
+        "sent_to_wa_4": {
+          "wa": "{\n\t\t\t\t\t\tsettings: r\n\t\t\t\t\t}",
+          "line": "77 - 79",
+          "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_jepfhfjlkgobooomdgpcjikalfpcldmm_8f991e82e42f/dx_njkwh6uc/unpacked/jepfhfjlkgobooomdgpcjikalfpcldmm.3.0.3/background.js",
+          "where": "t"
+        },
+        "sent_to_wa_5": {
+          "wa": "{\n\t\t\t\tsettings: c\n\t\t\t}",
+          "line": "125 - 127",
+          "filename": "/home/yangxin/CCS2027/Evaluation/scratch/doublex-chrome/task_jepfhfjlkgobooomdgpcjikalfpcldmm_8f991e82e42f/dx_njkwh6uc/unpacked/jepfhfjlkgobooomdgpcjikalfpcldmm.3.0.3/background.js",
+          "where": "t"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+import"./core.DXm7FTjx.js";class a{static run(){}static trackEvent(t,e,n,i,c,o){return a.runFunctionInPageContext((r,s,l)=>{},t,e,n)}static runFunctionInPageContext(t,e="name",n="value",i="label"){}}export{a as G};

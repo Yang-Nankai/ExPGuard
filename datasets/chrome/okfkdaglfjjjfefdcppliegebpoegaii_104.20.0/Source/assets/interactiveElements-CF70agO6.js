@@ -1,0 +1,1 @@
+const e=["a","button","details","summary",'[role="button"]','[role="link"]','[role="menuitem"]','[role="treeitem"]',"[onclick]"],t=["input","label","textarea","select","option",'[tabindex]:not([tabindex="-1"])',"[contenteditable]",'[role="option"]'],o=[...e,...t];export{o as I,e as a};

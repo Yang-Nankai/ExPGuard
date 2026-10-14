@@ -1,0 +1,1 @@
+import{w as i,F as t,bk as n,z as f}from"./index.DPA_41oi.js";var l=i,_=t,u=n,p=f;function y(s,e,r){if(!p(r))return!1;var a=typeof e;return(a=="number"?_(r)&&u(e,r.length):a=="string"&&e in r)?l(r[e],s):!1}var k=y;export{k as _};

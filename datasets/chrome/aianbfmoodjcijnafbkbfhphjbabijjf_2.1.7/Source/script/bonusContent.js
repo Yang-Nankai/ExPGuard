@@ -1,0 +1,1 @@
+getCode(e=>{chrome.runtime.sendMessage(StorageOperator.get("SLVLUP_EX_ID"),{contentScriptQuery:"queryResult",data:e})});

@@ -1,0 +1,1 @@
+import{d as t}from"./chunk-A3K5JESS.js";t();var o=function(){if(typeof self<"u")return self;if(typeof window<"u")return window;if(typeof global<"u")return global;throw new Error("unable to locate global object")},e=o(),n=e.fetch,r=e.fetch.bind(e),f=e.Headers,s=e.Request,l=e.Response;export{n as a,r as b,f as c,s as d,l as e};

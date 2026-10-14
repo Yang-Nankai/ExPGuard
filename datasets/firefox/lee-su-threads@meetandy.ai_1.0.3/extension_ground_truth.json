@@ -1,0 +1,473 @@
+{
+  "schema_version": "expguard-extension-dataset/v1",
+  "extension": {
+    "platform": "firefox",
+    "extension_id": "lee-su-threads@meetandy.ai",
+    "version": "1.0.3",
+    "name": "Lee-Su-Threads",
+    "rank": 4957,
+    "manifest_version": 3,
+    "catalog_manifest_version": 3,
+    "catalog_metadata": {
+      "rank": 4957,
+      "manifest_version": 3,
+      "user_count": 397,
+      "rating_count": 6,
+      "rating_average": 5.0,
+      "name": "Lee-Su-Threads"
+    },
+    "source": {
+      "directory": "Source",
+      "manifest_sha256": "b174b56fa5a525cb77e9660a80b4812c642c6a231aa43c941d0c4092dc0e5006"
+    }
+  },
+  "tools": {
+    "ExPGuard": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "ExPGuard/analysis.log",
+          "ExPGuard/report.flows.json",
+          "ExPGuard/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 2,
+        "reported_no_duplicate": 2,
+        "tp_no_duplicate": 1,
+        "fp_no_duplicate": 1
+      },
+      "flows": {
+        "reported": [
+          {
+            "flow_id": "expguard-opti:firefox:lee-su-threads@meetandy.ai:1.0.3:7e1d08ffa9e75999:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://www.threads.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_CUSTOM_EVENT",
+              "remark": "window.addEventListener(threads-profile-extracted)",
+              "file": "content",
+              "loc": "L10:C715 -> L10:C723",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.threads.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://www.threads.com/*"
+                ]
+              }
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "profileCache",
+              "file": "background",
+              "loc": "L1:C575 -> L1:C612",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "mestamp:Date.now()},>>>e.storage.local.set({profileCache:o})<<<)}),!1;if(t.type===\""
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[content->background]",
+              "storage_area": null
+            },
+            "verification_evidence": "FP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:lee-su-threads@meetandy.ai:1.0.3:925a5fb13674e672:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://www.threads.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_CUSTOM_EVENT",
+              "remark": "From storage.local.set('profileCache') in background",
+              "file": "content",
+              "loc": "L1:C1640 -> L1:C1674",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.threads.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "UNTRUSTED_STORAGE",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://www.threads.com/*"
+                ]
+              },
+              "code_preview": "url})}),!1}return!1}>>>e.runtime.onMessage.addListener(m)<<<;var I=\"0.3.5\";e.run"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "profileCache",
+              "file": "background",
+              "loc": "L1:C575 -> L1:C612",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "mestamp:Date.now()},>>>e.storage.local.set({profileCache:o})<<<)}),!1;if(t.type===\""
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": true,
+              "message_sender": "content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[content->background]",
+              "storage_area": "STORAGE_FLOW[area: local, key: profileCache, sender: background, receiver: background]"
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ],
+        "no_duplicate": [
+          {
+            "flow_id": "expguard-opti:firefox:lee-su-threads@meetandy.ai:1.0.3:7e1d08ffa9e75999:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://www.threads.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_CUSTOM_EVENT",
+              "remark": "window.addEventListener(threads-profile-extracted)",
+              "file": "content",
+              "loc": "L10:C715 -> L10:C723",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.threads.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://www.threads.com/*"
+                ]
+              }
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "profileCache",
+              "file": "background",
+              "loc": "L1:C575 -> L1:C612",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "mestamp:Date.now()},>>>e.storage.local.set({profileCache:o})<<<)}),!1;if(t.type===\""
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[content->background]",
+              "storage_area": null
+            },
+            "verification_evidence": "FP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:lee-su-threads@meetandy.ai:1.0.3:925a5fb13674e672:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://www.threads.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_CUSTOM_EVENT",
+              "remark": "From storage.local.set('profileCache') in background",
+              "file": "content",
+              "loc": "L1:C1640 -> L1:C1674",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://www.threads.com/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "UNTRUSTED_STORAGE",
+              "origin_context": "content",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://www.threads.com/*"
+                ]
+              },
+              "code_preview": "url})}),!1}return!1}>>>e.runtime.onMessage.addListener(m)<<<;var I=\"0.3.5\";e.run"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "profileCache",
+              "file": "background",
+              "loc": "L1:C575 -> L1:C612",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "mestamp:Date.now()},>>>e.storage.local.set({profileCache:o})<<<)}),!1;if(t.type===\""
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": true,
+              "message_sender": "content",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[content->background]",
+              "storage_area": "STORAGE_FLOW[area: local, key: profileCache, sender: background, receiver: background]"
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ]
+      }
+    },
+    "CoCo": {
+      "scan_status": "not_available",
+      "report_files": {
+        "scan_reports": []
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    },
+    "DoubleX": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "DoubleX/report.flows.json",
+          "DoubleX/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    }
+  },
+  "ground_truth": {
+    "verdict": "TP",
+    "flow_count": 1,
+    "flow_ids": [
+      "gtf-df8b5b752f67db60"
+    ],
+    "flows": [
+      {
+        "ground_truth_flow_id": "gtf-df8b5b752f67db60",
+        "verification": "TP",
+        "source_family": "custom",
+        "sink_family": "CHROME_LOCAL_STORAGE",
+        "matched_tools": [
+          "ExPGuard"
+        ],
+        "match_region": "ExPGuard only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "ExPGuard",
+            "flow_id": "expguard-opti:firefox:lee-su-threads@meetandy.ai:1.0.3:925a5fb13674e672:01",
+            "source_report": "ExPGuard/report.flows.json",
+            "flow": {
+              "flow_id": "expguard-opti:firefox:lee-su-threads@meetandy.ai:1.0.3:925a5fb13674e672:01",
+              "flow_index": 1,
+              "flow_order": 2,
+              "flow_label": "F002",
+              "flow_type": "STORAGE_POISONING",
+              "rule_id": "attacker-input-storage-write",
+              "rule_description": "Attacker-controlled data written into chrome.storage — later reads in any context become attacker-influenced.",
+              "severity": "MEDIUM",
+              "severity_reason": "Host is restricted, but path is wildcarded.",
+              "severity_evidence": [
+                "https://www.threads.com/*"
+              ],
+              "source": {
+                "type": "WINDOW_CUSTOM_EVENT",
+                "remark": "From storage.local.set('profileCache') in background",
+                "file": "content",
+                "loc": "L1:C1640 -> L1:C1674",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "https://www.threads.com/*"
+                      ]
+                    }
+                  }
+                ],
+                "provenance": "UNTRUSTED_STORAGE",
+                "origin_context": "content",
+                "origin_frame_family": "CS",
+                "constraint": {
+                  "matches": [
+                    "https://www.threads.com/*"
+                  ]
+                },
+                "code_preview": "url})}),!1}return!1}>>>e.runtime.onMessage.addListener(m)<<<;var I=\"0.3.5\";e.run"
+              },
+              "sink": {
+                "type": "CHROME_LOCAL_STORAGE",
+                "remark": "profileCache",
+                "file": "background",
+                "loc": "L1:C575 -> L1:C612",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "url_taint_control": null,
+                "code_preview": "mestamp:Date.now()},>>>e.storage.local.set({profileCache:o})<<<)}),!1;if(t.type===\""
+              },
+              "structural": {
+                "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+                "privilege_crossing": true,
+                "privilege_reason": "sink grants capability beyond the source origin",
+                "message_passing": true,
+                "storage_passing": true,
+                "message_sender": "content",
+                "message_sender_provenance": "CONTENT_SCRIPT",
+                "channel": "runtime.single.sender.message[content->background]",
+                "storage_area": "STORAGE_FLOW[area: local, key: profileCache, sender: background, receiver: background]"
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

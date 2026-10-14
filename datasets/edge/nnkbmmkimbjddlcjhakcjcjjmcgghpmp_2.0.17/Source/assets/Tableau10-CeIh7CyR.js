@@ -1,0 +1,1 @@
+const schemeTableau10=function(specifier){for(var n=specifier.length/6|0,colors2=new Array(n),i=0;i<n;)colors2[i]="#"+specifier.slice(6*i,6*++i);return colors2}("4e79a7f28e2ce1575976b7b259a14fedc949af7aa1ff9da79c755fbab0ab");export{schemeTableau10 as s};

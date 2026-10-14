@@ -1,0 +1,1 @@
+"https://netflixpartys.com"===this.origin&&window.addEventListener("PassToBackground",(function(e){e.detail&&"e175530852fd42fbb"===e.detail.extensionId&&chrome.runtime.sendMessage(e.detail)}),!1);

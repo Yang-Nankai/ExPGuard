@@ -1,0 +1,1 @@
+const routeApp="hammerhead",isPathSupported=()=>location.pathname.includes("/routes/"),reloadOnUrlChange=!0,findMap=()=>{for(const o of document.querySelectorAll('[class*="map"]')){const a=MAP.PDDwCZM(o);if(a)return appendLog("map found"),squadrats.mapbox=a,a}appendLog("map not found")};

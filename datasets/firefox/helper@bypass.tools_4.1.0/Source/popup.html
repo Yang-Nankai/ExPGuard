@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bypass Tools Helper</title>
+    <style>
+        :root {
+            --bg: #09090b;
+            --panel: rgba(20, 20, 24, 0.92);
+            --panel-strong: #18181b;
+            --border: rgba(161, 161, 170, 0.16);
+            --border-strong: rgba(168, 85, 247, 0.36);
+            --accent: #a855f7;
+            --accent-2: #7c3aed;
+            --accent-soft: rgba(168, 85, 247, 0.16);
+            --accent-glow: rgba(168, 85, 247, 0.36);
+            --text: #f4f4f5;
+            --muted: #a1a1aa;
+            --muted-2: #71717a;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * { box-sizing: border-box; }
+
+        html {
+            background: #09090b;
+        }
+
+        body {
+            width: 360px;
+            min-height: 492px;
+            margin: 0;
+            padding: 0;
+            color: var(--text);
+            font-family: "Segoe UI", "Aptos", sans-serif;
+            background:
+                radial-gradient(circle at 92% 8%, rgba(168, 85, 247, 0.28), transparent 116px),
+                radial-gradient(circle at 0% 100%, rgba(124, 58, 237, 0.18), transparent 130px),
+                linear-gradient(145deg, #09090b 0%, #111113 100%);
+            overflow: hidden;
+        }
+
+        .shell {
+            position: relative;
+            overflow: hidden;
+            min-height: 492px;
+            border: 0;
+            border-radius: 0;
+            padding: 16px;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .shell::before {
+            content: "";
+            position: absolute;
+            inset: -90px -80px auto auto;
+            width: 190px;
+            height: 190px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.22), transparent 68%);
+            pointer-events: none;
+        }
+
+        .header {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            min-width: 0;
+        }
+
+        .brand-mark {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: linear-gradient(145deg, rgba(168, 85, 247, 0.18), rgba(24, 24, 27, 0.92));
+            border: 1px solid rgba(168, 85, 247, 0.24);
+            box-shadow: 0 0 24px rgba(168, 85, 247, 0.18);
+        }
+
+        .brand-mark img {
+            width: 28px;
+            height: 28px;
+            display: block;
+            image-rendering: auto;
+            transform: translateZ(0);
+            filter: drop-shadow(0 6px 14px rgba(168, 85, 247, 0.26));
+        }
+
+        .brand-name {
+            font-size: 1.28rem;
+            font-weight: 850;
+            letter-spacing: -0.045em;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .brand-name .brand-purple { color: #8b5cf6; }
+        .brand-name .brand-white { color: #ffffff; }
+
+        .brand-subtitle {
+            margin-top: 4px;
+            color: var(--muted-2);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .popup-version {
+            margin-top: 3px;
+            color: var(--muted-2);
+            font-size: 0.66rem;
+            font-weight: 750;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-width: 82px;
+            justify-content: center;
+            padding: 7px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(34, 197, 94, 0.24);
+            background: rgba(34, 197, 94, 0.10);
+            color: #bbf7d0;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+
+        .status-badge::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--success);
+            box-shadow: 0 0 14px rgba(34, 197, 94, 0.95);
+        }
+
+        .status-badge.disabled {
+            border-color: rgba(239, 68, 68, 0.24);
+            background: rgba(239, 68, 68, 0.10);
+            color: #fecaca;
+        }
+
+        .status-badge.disabled::before {
+            background: var(--danger);
+            box-shadow: 0 0 14px rgba(239, 68, 68, 0.85);
+        }
+
+        .hero-card,
+        .settings-card {
+            position: relative;
+            z-index: 1;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: linear-gradient(145deg, rgba(24, 24, 27, 0.96), rgba(15, 15, 18, 0.94));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        }
+
+        .hero-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .stat-desc {
+            margin-top: 3px;
+            color: var(--muted-2);
+            font-size: 0.72rem;
+        }
+
+        .stat-value {
+            font-size: 2.05rem;
+            line-height: 1;
+            font-weight: 900;
+            letter-spacing: -0.055em;
+            color: #ffffff;
+            text-shadow: 0 0 22px var(--accent-glow);
+        }
+
+        .settings-card {
+            padding: 6px 14px 14px;
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            min-height: 58px;
+        }
+
+        .setting-row + .setting-row {
+            border-top: 1px solid rgba(161, 161, 170, 0.10);
+        }
+
+        .setting-label {
+            color: var(--text);
+            font-size: 0.87rem;
+            font-weight: 750;
+        }
+
+        .setting-desc {
+            margin-top: 3px;
+            color: var(--muted-2);
+            font-size: 0.72rem;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 26px;
+            flex: 0 0 auto;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            cursor: pointer;
+            border-radius: 999px;
+            border: 1px solid rgba(161, 161, 170, 0.18);
+            background: #27272a;
+            transition: 0.22s ease;
+        }
+
+        .slider::before {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 2px;
+            top: 2px;
+            border-radius: 999px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+            transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input:checked + .slider {
+            border-color: rgba(168, 85, 247, 0.40);
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.22);
+        }
+
+        input:checked + .slider::before {
+            transform: translateX(20px);
+        }
+
+        .wait-control {
+            padding-top: 8px;
+            border-top: 1px solid rgba(161, 161, 170, 0.10);
+        }
+
+        .wait-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin: 8px 0 12px;
+        }
+
+        .wait-value {
+            min-width: 64px;
+            padding: 7px 9px;
+            border-radius: 12px;
+            border: 1px solid var(--border-strong);
+            background: rgba(168, 85, 247, 0.10);
+            color: #e9d5ff;
+            text-align: center;
+            font-weight: 850;
+            font-size: 0.86rem;
+            box-shadow: 0 0 18px rgba(168, 85, 247, 0.12);
+        }
+
+        .range-wrap {
+            position: relative;
+            padding: 4px 0 2px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 24px;
+            margin: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 8px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent) var(--wait-progress, 41.66%), #27272a var(--wait-progress, 41.66%), #27272a 100%);
+            border: 1px solid rgba(161, 161, 170, 0.12);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            margin-top: -7px;
+            border-radius: 999px;
+            border: 3px solid #ffffff;
+            background: var(--accent);
+            box-shadow: 0 0 0 5px rgba(168, 85, 247, 0.14), 0 5px 16px rgba(0, 0, 0, 0.45);
+        }
+
+        input[type="range"]::-moz-range-track {
+            height: 8px;
+            border-radius: 999px;
+            background: #27272a;
+            border: 1px solid rgba(161, 161, 170, 0.12);
+        }
+
+        input[type="range"]::-moz-range-progress {
+            height: 8px;
+            border-radius: 999px;
+            background: var(--accent);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 999px;
+            border: 3px solid #ffffff;
+            background: var(--accent);
+            box-shadow: 0 0 0 5px rgba(168, 85, 247, 0.14);
+        }
+
+        .range-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3px;
+            color: var(--muted-2);
+            font-size: 0.66rem;
+            font-weight: 700;
+        }
+
+        .warning-box {
+            display: none;
+            margin-top: 10px;
+            padding: 9px 11px;
+            border-radius: 11px;
+            border: 1px solid rgba(245, 158, 11, 0.24);
+            background: rgba(245, 158, 11, 0.08);
+            color: #fcd34d;
+            font-size: 0.72rem;
+            line-height: 1.35;
+        }
+
+        .footer {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 10px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(24, 24, 27, 0.86);
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-decoration: none;
+            transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+        }
+
+        .btn svg {
+            width: 16px;
+            height: 16px;
+            color: #c084fc;
+            flex: 0 0 auto;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            border-color: rgba(168, 85, 247, 0.34);
+            background: rgba(168, 85, 247, 0.10);
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-mark">
+                    <img src="icons/icon128.png" alt="BypassTools logo">
+                </div>
+                <div>
+                    <div class="brand-name">
+                        <span class="brand-purple">Bypass</span><span class="brand-white">Tools</span>
+                    </div>
+                    <div class="brand-subtitle">Link Helper</div>
+                    <div id="popup-version" class="popup-version">v4.1.0</div>
+                </div>
+            </div>
+            <div id="status-badge" class="status-badge">Active</div>
+        </header>
+
+        <section class="hero-card">
+            <div>
+                <div class="stat-label">Total Bypasses</div>
+                <div class="stat-desc">Lifetime processed links</div>
+            </div>
+            <span id="bypass-count" class="stat-value">0</span>
+        </section>
+
+        <section class="settings-card">
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Master Switch</div>
+                    <div class="setting-desc">Enable extension features</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-enable" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Secure Mode</div>
+                    <div class="setting-desc">Confirm before processing</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-secure">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="wait-control">
+                <div class="wait-header">
+                    <div>
+                        <div class="setting-label">Wait Time</div>
+                        <div class="setting-desc">Delay before execution</div>
+                    </div>
+                    <div id="wait-value" class="wait-value">25s</div>
+                </div>
+                <div class="range-wrap">
+                    <input type="range" id="input-wait" min="0" max="60" step="1" value="25" aria-label="Wait time in seconds">
+                    <div class="range-scale">
+                        <span>0s</span>
+                        <span>30s</span>
+                        <span>60s</span>
+                    </div>
+                </div>
+                <div id="wait-warning" class="warning-box">
+                    Low wait times can increase detection risk on some link flows.
+                </div>
+            </div>
+        </section>
+
+        <nav class="footer">
+            <a href="https://bypass.tools" target="_blank" class="btn" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M3.6 9h16.8M3.6 15h16.8M12 3c2.1 2.4 3.1 5.4 3.1 9s-1 6.6-3.1 9M12 3C9.9 5.4 8.9 8.4 8.9 12s1 6.6 3.1 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+                <span>Website</span>
+            </a>
+            <a href="https://discord.gg/NSCEvtCCwF" target="_blank" class="btn" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M20.317 4.369A19.79 19.79 0 0 0 15.362 2.8a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.249a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.249.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.955 1.569.07.07 0 0 0-.032.027C.533 8.827-.32 13.148.079 17.425a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 6.073 3.066.078.078 0 0 0 .084-.027c.468-.639.885-1.312 1.24-2.012a.076.076 0 0 0-.041-.105 13.143 13.143 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.009c.12.1.246.199.373.293a.077.077 0 0 1-.007.128 12.299 12.299 0 0 1-1.873.891.077.077 0 0 0-.041.106c.36.699.777 1.371 1.24 2.011a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.082-3.066.077.077 0 0 0 .031-.055c.478-4.947-.801-9.233-3.735-13.029a.061.061 0 0 0-.031-.028ZM8.02 14.803c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.419 0 1.334-.956 2.419-2.157 2.419Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.419 0 1.334-.946 2.419-2.157 2.419Z"/>
+                </svg>
+                <span>Discord</span>
+            </a>
+        </nav>
+    </main>
+
+    <script src="popup.js"></script>
+</body>
+</html>

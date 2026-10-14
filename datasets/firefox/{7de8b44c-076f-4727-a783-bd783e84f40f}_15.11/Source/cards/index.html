@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saved Cards</title>
+    <link rel="stylesheet" href="../resource/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/cards.css">
+    <script src="../resource/bootstrap/bootstrap.bundle.min.js"></script>
+  </head>
+  <body>
+    <div id="cards-auth-gate" class="cards-auth-gate d-flex align-items-center justify-content-center" style="height: 100vh">
+      <div id="cards-auth-loading" class="text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <div id="cards-auth-login" class="text-center d-none px-4" style="max-width: 28rem">
+        <p class="mb-3" data-i18n="cards_login_required">Please log in as a member to view saved cards.</p>
+        <button id="cards-login-btn" type="button" class="btn btn-primary" data-i18n="popup_member_login">Log in</button>
+      </div>
+    </div>
+
+    <div id="cards-app" class="cards-page d-flex container flex-column d-none">
+      <div class="row" style="padding-top: 5px">
+        <div class="col d-flex align-items-center py-3 ps-3">
+          <button id="btn-create-deck" type="button" class="btn btn-link p-0 me-3 cards-toolbar-btn" aria-label="Create deck">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/></svg>
+          </button>
+          <button id="btn-remove-deck" type="button" class="btn btn-link p-0 me-3 cards-toolbar-btn" aria-label="Remove deck">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/><path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8"/></svg>
+          </button>
+          <select id="deck-select" class="form-select me-3" data-testid="deck-select"></select>
+        </div>
+        <div class="col d-flex align-items-center justify-content-end pe-0">
+          <div id="refresh-spinner" class="pe-4 d-none">
+            <div class="spinner-border spinner-border-sm" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          <button id="btn-refresh" type="button" class="btn btn-link p-0 pe-3 cards-toolbar-btn" aria-label="Refresh">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41m-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9"/><path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/></svg>
+          </button>
+          <select id="sort-select" class="form-select me-3" style="width: fit-content" data-testid="sort-select"></select>
+          <div id="export-spinner" class="pe-2 d-none">
+            <div class="spinner-border spinner-border-sm" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          <p id="export-err" class="pe-2 text-danger mb-0 small d-none"></p>
+          <button id="btn-export" type="button" class="btn btn-link p-0 pe-2 cards-toolbar-btn" aria-label="Export CSV">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293z"/><path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="cards-list" class="row px-2 pt-3 cards-list" data-testid="cards-list">
+        <div id="cards-list-inner"></div>
+      </div>
+    </div>
+
+    <!-- Create deck -->
+    <div class="modal fade" id="modal-create-deck" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" data-i18n="cards_create_deck">Create deck</h5>
+          </div>
+          <div class="modal-body">
+            <input id="create-deck-name" type="text" class="form-control" data-i18n-placeholder="cards_deck_name">
+          </div>
+          <div class="modal-footer">
+            <p id="create-deck-msg" class="pe-2 text-end text-warning mb-0 d-none"></p>
+            <p id="create-deck-err" class="pe-2 text-end text-danger mb-0 d-none"></p>
+            <button id="create-deck-submit" type="button" class="btn btn-primary" data-i18n="cards_submit">Submit</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="cards_close">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Remove deck -->
+    <div class="modal fade" id="modal-remove-deck" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" data-i18n="cards_remove_deck">Remove deck</h5>
+          </div>
+          <div class="modal-body">
+            <select id="remove-deck-select" class="form-select"></select>
+          </div>
+          <div class="modal-footer">
+            <p id="remove-deck-msg" class="pe-2 text-end text-warning mb-0 d-none"></p>
+            <p id="remove-deck-err" class="pe-2 text-end text-danger mb-0 d-none"></p>
+            <button id="remove-deck-submit" type="button" class="btn btn-primary" data-i18n="cards_submit">Submit</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="cards_close">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update card -->
+    <div class="modal fade" id="modal-update-card" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" data-i18n="cards_update_card">Update card</h5>
+          </div>
+          <div class="modal-body">
+            <select id="update-card-deck" class="form-select mb-3"></select>
+            <input id="update-card-front" type="text" class="form-control mb-3" placeholder="front">
+            <input id="update-card-frontTrans" type="text" class="form-control mb-3" placeholder="frontTrans">
+            <input id="update-card-refSent" type="text" class="form-control mb-3" placeholder="refSent">
+            <input id="update-card-refTrans" type="text" class="form-control mb-3" placeholder="refTrans">
+            <input id="update-card-frontDesc" type="text" class="form-control mb-3" placeholder="frontDesc">
+            <input id="update-card-backDesc" type="text" class="form-control mb-3" placeholder="backDesc">
+            <div id="update-card-nbs" class="pt-3 d-none">
+              <ul class="nav nav-tabs" id="nbs-tabs" role="tablist"></ul>
+              <div class="tab-content" id="nbs-tab-content"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <p id="update-card-msg" class="pe-2 text-end text-warning mb-0 d-none"></p>
+            <p id="update-card-err" class="pe-2 text-end text-danger mb-0 d-none"></p>
+            <button id="update-card-submit" type="button" class="btn btn-primary" data-i18n="cards_submit">Submit</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="cards_close">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./cards.min.js"></script>
+  </body>
+</html>
