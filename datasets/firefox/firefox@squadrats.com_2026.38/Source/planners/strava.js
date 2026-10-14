@@ -1,0 +1,1 @@
+const routeApp="strava",isPathSupported=()=>squadrats.isStravaPathSupported?.()??!1,findMap=()=>document.querySelector(".mapboxgl-canvas-container")?squadrats.findMapbox?.():squadrats.findStravaWasm?.();

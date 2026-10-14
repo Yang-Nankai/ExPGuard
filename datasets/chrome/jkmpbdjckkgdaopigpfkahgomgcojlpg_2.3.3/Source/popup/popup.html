@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Cache & Cookies</title>
+    <script src="theme.js"></script>
+    <link rel="stylesheet" href="popup.css">
+    <script src="./wall.2.1.3.js"></script>
+</head>
+<body>
+    <div class="popup-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <div class="site-info">
+                    <img id="siteFavicon" src="../images/48x48.png" alt="Favicon" class="favicon">
+                    <div class="site-domain" id="siteDomain" data-i18n="loading">Loading...</div>
+                </div>
+                <div class="header-controls">
+                    <button class="control-btn" id="themeToggle" title="Toggle theme">
+                        <span class="control-icon">🌙</span>
+                    </button>
+                    <button class="control-btn" id="accountBtn">
+                        <span class="control-icon">👤</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Панель предупреждения для ограниченных страниц -->
+        <div id="warningPanel" class="panel warning-panel hidden">
+            <div class="panel-content">
+                <div class="warning-content">
+                    <p class="warning-text" data-i18n="extensionNotWorkingText">
+                        Extensions cannot work on browser service pages and some protected sites for security reasons.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab-list">
+                <button class="tab-button active" data-tab="data">
+                    <span class="tab-text" data-i18n="dataTab">Clear Data</span>
+                </button>
+                <button class="tab-button" data-tab="settings">
+                    <span class="tab-text" data-i18n="settingsTab">Settings</span>
+                    <span class="settings-badge hidden" id="settingsBadge">1</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            
+            <!-- Auto Clear Overlay -->
+            <div class="auto-clear-overlay hidden" id="auto-clear-overlay">
+                <div class="auto-clear-content">
+                    <div class="auto-clear-status">
+                        <div id="auto-clearing" class="status auto-clearing">
+                            <div class="auto-clear-spinner"></div>
+                            <div class="auto-clear-text" data-i18n="clearing">Clearing data...</div>
+                            <div class="auto-clear-hint hidden" id="auto-clear-hint" data-i18n="clickToStop">Click to keep the extension open</div>
+                        </div>
+                        
+                        <div id="auto-done" class="status auto-done hidden">
+                            <div class="auto-clear-checkmark">✓</div>
+                            <div class="auto-clear-text" data-i18n="cleared">Data cleared!</div>
+                            <div class="auto-clear-hint hidden" id="auto-clear-hint-done" data-i18n="clickToStop">Click to keep the extension open</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Data Tab -->
+            <div class="tab-panel active" id="data-panel">
+                <div class="data-section">
+                    <!-- Строка «Выбрать все» + справа индикатор ⚡ и кнопка Premium (без новой высоты) -->
+                    <div class="master-checkbox-container" id="masterCheckboxContainer">
+                        <label class="master-checkbox-item" for="masterCheckbox">
+                            <input type="checkbox" id="masterCheckbox" class="master-checkbox" data-i18n-title="masterCheckbox" title="Select/Deselect All">
+                            <span class="master-checkbox-text" id="masterCheckboxText" data-i18n="selectAll">Select All</span>
+                        </label>
+                        <div class="usage-inline" style="display: none">
+                            <button type="button" class="usage-premium-btn" id="usagePremiumBtn" title="">
+                                <span class="usage-premium-icon" aria-hidden="true">♾️</span>
+                                <span class="usage-premium-text" data-i18n="goPro">Upgrade</span>
+                            </button>
+                            <span class="usage-indicator" id="usageIndicator">
+                                <span class="usage-icon" aria-hidden="true">⚡</span>
+                                <span class="usage-value" id="usageValue">—</span>
+                            </span>
+
+                        </div>
+                    </div>
+                    <div class="data-list">
+                        <label class="data-item">
+                            <input type="checkbox" id="cache" checked>
+                            <span class="data-icon">💾</span>
+                            <span class="data-info">
+                                <span class="data-name" data-i18n="cache">Cache</span>
+                                <a href="https://developer.chrome.com/docs/extensions/reference/browsingData/#method-removeCache" target="_blank" class="help-link">?</a>
+                            </span>
+                            <div class="data-stats">
+                                <span class="data-badge" id="cache-badge">
+                                    <span class="badge-text">...</span>
+                                </span>
+                            </div>
+                        </label>
+
+                        <label class="data-item">
+                            <input type="checkbox" id="cacheStorage">
+                            <span class="data-icon">🗃️</span>
+                            <span class="data-info">
+                                <span class="data-name" data-i18n="cacheStorage">Cache Storage</span>
+                                <a href="https://developer.chrome.com/docs/extensions/reference/browsingData/#method-removeCacheStorage" target="_blank" class="help-link">?</a>
+                            </span>
+                            <div class="data-stats">
+                                <span class="data-badge" id="cacheStorage-badge">
+                                    <span class="badge-text">...</span>
+                                </span>
+                            </div>
+                        </label>
+
+                        <label class="data-item">
+                            <input type="checkbox" id="cookies">
+                            <span class="data-icon">🍪</span>
+                            <span class="data-info">
+                                <span class="data-name" data-i18n="cookies">Cookies</span>
+                                <a href="https://developer.chrome.com/docs/extensions/reference/browsingData/#method-removeCookies" target="_blank" class="help-link">?</a>
+                            </span>
+                            <div class="data-stats">
+                                <span class="data-badge" id="cookies-badge">
+                                    <span class="badge-text">...</span>
+                                </span>
+                            </div>
+                        </label>
+
+                        <label class="data-item">
+                            <input type="checkbox" id="localStorage">
+                            <span class="data-icon">📦</span>
+                            <span class="data-info">
+                                <span class="data-name" data-i18n="localStorage">Local Storage</span>
+                                <a href="https://developer.chrome.com/docs/extensions/reference/browsingData/#method-removeLocalStorage" target="_blank" class="help-link">?</a>
+                            </span>
+                            <div class="data-stats">
+                                <span class="data-badge" id="localStorage-badge">
+                                    <span class="badge-text">...</span>
+                                </span>
+                            </div>
+                        </label>
+
+                        <label class="data-item">
+                            <input type="checkbox" id="sessionStorage">
+                            <span class="data-icon">⏱️</span>
+                            <span class="data-info">
+                                <span class="data-name" data-i18n="sessionStorage">Session Storage</span>
+                                <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage" target="_blank" class="help-link">?</a>
+                            </span>
+                            <div class="data-stats">
+                                <span class="data-badge" id="sessionStorage-badge">
+                                    <span class="badge-text">...</span>
+                                </span>
+                            </div>
+                        </label>
+
+                        <label class="data-item">
+                            <input type="checkbox" id="fileSystems">
+                            <span class="data-icon">📁</span>
+                            <span class="data-info">
+                                <span class="data-name" data-i18n="fileSystems">File Systems</span>
+                                <a href="https://developer.chrome.com/docs/extensions/reference/browsingData/#method-removeFileSystems" target="_blank" class="help-link">?</a>
+                            </span>
+                            <div class="data-stats">
+                                <span class="data-badge" id="fileSystems-badge">
+                                    <span class="badge-text">...</span>
+                                </span>
+                            </div>
+                        </label>
+
+                        <label class="data-item">
+                            <input type="checkbox" id="indexedDB">
+                            <span class="data-icon">🗄️</span>
+                            <span class="data-info">
+                                <span class="data-name" data-i18n="indexedDB">IndexedDB</span>
+                                <a href="https://developer.chrome.com/docs/extensions/reference/browsingData/#method-removeIndexedDB" target="_blank" class="help-link">?</a>
+                            </span>
+                            <div class="data-stats">
+                                <span class="data-badge" id="indexedDB-badge">
+                                    <span class="badge-text">...</span>
+                                </span>
+                            </div>
+                        </label>
+
+                        <label class="data-item">
+                            <input type="checkbox" id="serviceWorkers">
+                            <span class="data-icon">⚙️</span>
+                            <span class="data-info">
+                                <span class="data-name" data-i18n="serviceWorkers">Service Workers</span>
+                                <a href="https://developer.chrome.com/docs/extensions/reference/browsingData/#method-removeServiceWorkers" target="_blank" class="help-link">?</a>
+                            </span>
+                            <div class="data-stats">
+                                <span class="data-badge" id="serviceWorkers-badge">
+                                    <span class="badge-text">...</span>
+                                </span>
+                            </div>
+                        </label>
+
+                        <label class="data-item">
+                            <input type="checkbox" id="webSQL">
+                            <span class="data-icon">🏛️</span>
+                            <span class="data-info">
+                                <span class="data-name" data-i18n="webSQL">WebSQL</span>
+                                <a href="https://developer.chrome.com/docs/extensions/reference/browsingData/#method-removeWebSQL" target="_blank" class="help-link">?</a>
+                            </span>
+                            <div class="data-stats">
+                                <span class="data-badge" id="webSQL-badge">
+                                    <span class="badge-text">...</span>
+                                </span>
+                            </div>
+                        </label>
+
+                        <label class="data-item">
+                            <input type="checkbox" id="protectedWeb">
+                            <span class="data-icon">🔒</span>
+                            <span class="data-info">
+                                <span class="data-name" data-i18n="protectedWeb">Clear protected data</span>
+                                <a href="https://developer.chrome.com/docs/extensions/reference/browsingData/#type-RemovalOptions" target="_blank" class="help-link">?</a>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Clear Button with Status -->
+                <div class="custom-actions">
+                    <button class="btn btn-success" id="customClear">
+                        <span class="btn-icon">✨</span>
+                        <span class="btn-text" data-i18n="clearSelected">Clear Selected</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-panel" id="settings-panel">
+                <div class="settings-section">
+                    <div class="settings-list">
+                        <label class="option-item">
+                            <input type="checkbox" id="reloadPage">
+                            <span class="option-icon">🔄</span>
+                            <span class="option-text" data-i18n="reloadPageOption">Reload page after clearing</span>
+                        </label>
+
+                        <label class="option-item">
+                            <input type="checkbox" id="closePopup" checked>
+                            <span class="option-icon">✖️</span>
+                            <span class="option-text" data-i18n="closePopupOption">Close popup after clearing</span>
+                        </label>
+
+                        <label class="option-item">
+                            <input type="checkbox" id="autoClear">
+                            <span class="option-icon">⚡</span>
+                            <span class="option-text" data-i18n="autoClear">Auto-clear on extension open</span>
+                            <span class="help-link" id="autoClearHelp" title="">?</span>
+                        </label>
+
+                        <label class="option-item" id="showWidgetLabel">
+                            <input type="checkbox" id="showWidget">
+                            <span class="option-icon">🔘</span>
+                            <span class="option-text" data-i18n="showWidget">Show floating widget</span>
+                            <span class="help-link" id="showWidgetHelp" title="">?</span>
+                        </label>
+
+                        <div class="option-item-shortcut shortcut-item">
+                            <span class="option-icon">⌨️</span>
+                            <span class="option-text" data-i18n="keyboardShortcut">Keyboard shortcut</span>
+                            <div class="shortcut-display">
+                                <span id="currentShortcutPopup" class="shortcut-key">Not set</span>
+                                <button id="configureShortcutPopup" class="shortcut-btn" data-i18n="configure">Configure</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Options -->
+        <div class="options-section-old" style="display: none;">
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <!-- Left side - Rating or Version -->
+            <div class="footer-left">
+                <!-- Rating section -->
+                <div class="rating-section" id="ratingSection">
+                    <span class="footer-rate-text" data-i18n="rateUs">Rate us</span>
+                    <div class="footer-rating">
+                        <div class="rate-star" data-rating="1" data-tooltip="💀">
+                            <svg viewBox="-5 -5 51 50">
+                                <g>
+                                    <path d="M21,0.25 C21.8613281,0.25 22.6160166,0.804859996 22.8785151,1.6215626 L27.0375005,14.6875 L40.03125,14.6875 C40.8761709,14.6875 41.6226557,15.2207031 41.8933604,16.016406 C42.1640625,16.8121089 41.9015615,17.6898443 41.2371104,18.2066401 L30.5074214,26.5574229 L34.6910151,39.6824229 C34.9535161,40.5027354 34.6499995,41.4050791 33.9363291,41.8972666 C33.2308599,42.3894541 32.2875005,42.3648458 31.6066396,41.8316401 L21,33.5874995 L10.3933591,41.8316401 C9.7124995,42.3648458 8.76914012,42.3894541 8.06121004,41.8972666 C7.35410106,41.4050791 7.04976457,40.5027354 7.31144446,39.6824229 L11.4925786,26.5574229 L0.760183454,18.2066401 C0.0963043571,17.6898443 -0.166278005,16.8121089 0.106639624,16.016406 C0.379639864,15.2207031 1.12792844,14.6875 1.96874875,14.6875 L14.9707019,14.6875 L19.1214836,1.6215626 C19.3839834,0.804859996 20.1468742,0.25 20.9999987,0.25 L21,0.25 Z"></path>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="rate-star" data-rating="2" data-tooltip="😞">
+                            <svg viewBox="-5 -5 51 50">
+                                <g>
+                                    <path d="M21,0.25 C21.8613281,0.25 22.6160166,0.804859996 22.8785151,1.6215626 L27.0375005,14.6875 L40.03125,14.6875 C40.8761709,14.6875 41.6226557,15.2207031 41.8933604,16.016406 C42.1640625,16.8121089 41.9015615,17.6898443 41.2371104,18.2066401 L30.5074214,26.5574229 L34.6910151,39.6824229 C34.9535161,40.5027354 34.6499995,41.4050791 33.9363291,41.8972666 C33.2308599,42.3894541 32.2875005,42.3648458 31.6066396,41.8316401 L21,33.5874995 L10.3933591,41.8316401 C9.7124995,42.3648458 8.76914012,42.3894541 8.06121004,41.8972666 C7.35410106,41.4050791 7.04976457,40.5027354 7.31144446,39.6824229 L11.4925786,26.5574229 L0.760183454,18.2066401 C0.0963043571,17.6898443 -0.166278005,16.8121089 0.106639624,16.016406 C0.379639864,15.2207031 1.12792844,14.6875 1.96874875,14.6875 L14.9707019,14.6875 L19.1214836,1.6215626 C19.3839834,0.804859996 20.1468742,0.25 20.9999987,0.25 L21,0.25 Z"></path>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="rate-star" data-rating="3" data-tooltip="😐">
+                            <svg viewBox="-5 -5 51 50">
+                                <g>
+                                    <path d="M21,0.25 C21.8613281,0.25 22.6160166,0.804859996 22.8785151,1.6215626 L27.0375005,14.6875 L40.03125,14.6875 C40.8761709,14.6875 41.6226557,15.2207031 41.8933604,16.016406 C42.1640625,16.8121089 41.9015615,17.6898443 41.2371104,18.2066401 L30.5074214,26.5574229 L34.6910151,39.6824229 C34.9535161,40.5027354 34.6499995,41.4050791 33.9363291,41.8972666 C33.2308599,42.3894541 32.2875005,42.3648458 31.6066396,41.8316401 L21,33.5874995 L10.3933591,41.8316401 C9.7124995,42.3648458 8.76914012,42.3894541 8.06121004,41.8972666 C7.35410106,41.4050791 7.04976457,40.5027354 7.31144446,39.6824229 L11.4925786,26.5574229 L0.760183454,18.2066401 C0.0963043571,17.6898443 -0.166278005,16.8121089 0.106639624,16.016406 C0.379639864,15.2207031 1.12792844,14.6875 1.96874875,14.6875 L14.9707019,14.6875 L19.1214836,1.6215626 C19.3839834,0.804859996 20.1468742,0.25 20.9999987,0.25 L21,0.25 Z"></path>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="rate-star" data-rating="4" data-tooltip="🙂">
+                            <svg viewBox="-5 -5 51 50">
+                                <g>
+                                    <path d="M21,0.25 C21.8613281,0.25 22.6160166,0.804859996 22.8785151,1.6215626 L27.0375005,14.6875 L40.03125,14.6875 C40.8761709,14.6875 41.6226557,15.2207031 41.8933604,16.016406 C42.1640625,16.8121089 41.9015615,17.6898443 41.2371104,18.2066401 L30.5074214,26.5574229 L34.6910151,39.6824229 C34.9535161,40.5027354 34.6499995,41.4050791 33.9363291,41.8972666 C33.2308599,42.3894541 32.2875005,42.3648458 31.6066396,41.8316401 L21,33.5874995 L10.3933591,41.8316401 C9.7124995,42.3648458 8.76914012,42.3894541 8.06121004,41.8972666 C7.35410106,41.4050791 7.04976457,40.5027354 7.31144446,39.6824229 L11.4925786,26.5574229 L0.760183454,18.2066401 C0.0963043571,17.6898443 -0.166278005,16.8121089 0.106639624,16.016406 C0.379639864,15.2207031 1.12792844,14.6875 1.96874875,14.6875 L14.9707019,14.6875 L19.1214836,1.6215626 C19.3839834,0.804859996 20.1468742,0.25 20.9999987,0.25 L21,0.25 Z"></path>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="rate-star" data-rating="5" data-tooltip="😍">
+                            <svg viewBox="-5 -5 51 50">
+                                <g>
+                                    <path d="M21,0.25 C21.8613281,0.25 22.6160166,0.804859996 22.8785151,1.6215626 L27.0375005,14.6875 L40.03125,14.6875 C40.8761709,14.6875 41.6226557,15.2207031 41.8933604,16.016406 C42.1640625,16.8121089 41.9015615,17.6898443 41.2371104,18.2066401 L30.5074214,26.5574229 L34.6910151,39.6824229 C34.9535161,40.5027354 34.6499995,41.4050791 33.9363291,41.8972666 C33.2308599,42.3894541 32.2875005,42.3648458 31.6066396,41.8316401 L21,33.5874995 L10.3933591,41.8316401 C9.7124995,42.3648458 8.76914012,42.3894541 8.06121004,41.8972666 C7.35410106,41.4050791 7.04976457,40.5027354 7.31144446,39.6824229 L11.4925786,26.5574229 L0.760183454,18.2066401 C0.0963043571,17.6898443 -0.166278005,16.8121089 0.106639624,16.016406 C0.379639864,15.2207031 1.12792844,14.6875 1.96874875,14.6875 L14.9707019,14.6875 L19.1214836,1.6215626 C19.3839834,0.804859996 20.1468742,0.25 20.9999987,0.25 L21,0.25 Z"></path>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <!-- Share section (показывается после оценки) -->
+                <div class="share-section hidden" id="shareSection">
+                    <button class="footer-action-btn footer-share-btn" id="shareBtn" type="button">
+                        <span class="footer-action-icon footer-share-icon" aria-hidden="true"><svg width="11px" height="12px" viewBox="0 0 11 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><title>share</title><g id="Page-1" stroke="none" stroke-width="1"><g id="1sdc" transform="translate(-86.000000, -599.000000)"><g id="share" transform="translate(86.801085, 599.666436)"><path d="M7.56248197,6.87498361 C7.01249167,6.87498361 6.51189014,7.08982685 6.14237656,7.44217815 L4.03045075,6.12089224 C4.15721665,5.71697016 4.15721665,5.28084259 4.03045075,4.87908154 L6.14237656,3.55779563 C6.51189014,3.91014693 7.01249167,4.12499017 7.56248197,4.12499017 C8.70115113,4.12499017 9.62497705,3.20116424 9.62497705,2.06249508 C9.62497705,0.923825922 8.70115113,0 7.56248197,0 C6.42381281,0 5.49998689,0.923825922 5.49998689,2.06249508 C5.49998689,2.27303726 5.53221337,2.48357944 5.5945263,2.68340043 L3.48260049,4.00468634 C3.11308691,3.65233504 2.61248538,3.4374918 2.06249508,3.4374918 C0.923825922,3.4374918 0,4.36131773 0,5.49998689 C0,6.63865605 0.923825922,7.56248197 2.06249508,7.56248197 C2.61248538,7.56248197 3.11308691,7.34763873 3.48260049,6.99528743 L5.5945263,8.31657334 C5.53221337,8.51853438 5.49998689,8.72693651 5.49998689,8.93747869 C5.49998689,10.0761479 6.42381281,10.9999738 7.56248197,10.9999738 C8.70115113,10.9999738 9.62497705,10.0761479 9.62497705,8.93747869 C9.62497705,7.79880953 8.70115113,6.87498361 7.56248197,6.87498361 Z M7.56248197,1.03124754 C8.13181655,1.03124754 8.59372951,1.4931605 8.59372951,2.06249508 C8.59372951,2.63182966 8.13181655,3.09374262 7.56248197,3.09374262 C6.99314739,3.09374262 6.53123443,2.63182966 6.53123443,2.06249508 C6.53123443,1.4931605 6.99314739,1.03124754 7.56248197,1.03124754 Z M2.06249508,6.53123443 C1.4931605,6.53123443 1.03124754,6.06932147 1.03124754,5.49998689 C1.03124754,4.93065231 1.4931605,4.46873935 2.06249508,4.46873935 C2.63182966,4.46873935 3.09374262,4.93065231 3.09374262,5.49998689 C3.09374262,6.06932147 2.63182966,6.53123443 2.06249508,6.53123443 Z M7.56248197,9.96872623 C6.99314739,9.96872623 6.53123443,9.50681327 6.53123443,8.93747869 C6.53123443,8.36814411 6.99314739,7.90623115 7.56248197,7.90623115 C8.13181655,7.90623115 8.59372951,8.36814411 8.59372951,8.93747869 C8.59372951,9.50681327 8.13181655,9.96872623 7.56248197,9.96872623 Z" id="Shape"></path></g></g></g></svg></span>
+                        <span class="footer-action-label footer-share-label share-text" data-i18n="share">Share</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Language Switcher -->
+            <div class="footer-center">
+                <button class="footer-action-btn footer-language-btn" id="languageButton" type="button">
+                    <span class="footer-action-icon footer-language-icon" aria-hidden="true">🌐</span>
+                    <span class="footer-action-label footer-language-label" id="languageButtonLabel">EN</span>
+                </button>
+            </div>
+
+            <!-- Right side - Support -->
+            <div class="footer-right">
+                <button class="footer-action-btn footer-support-btn" id="supportButton" type="button">
+                    <span class="footer-action-icon footer-support-icon" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Zm0 2-8 5-8-5h16Zm0 12H4V8l8 5 8-5v10Z"/>
+        </svg>
+                    </span>
+                    <span class="footer-action-label footer-support-label support-text" data-i18n="support">Support</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Share Popup -->
+        <div class="share-popup hidden" id="sharePopup">
+            <div class="share-popup-content">
+                <button class="share-popup-close" id="sharePopupClose">×</button>
+                <div class="share-popup-header">
+                    <div class="share-popup-title" data-i18n="sharePopupTitle">Did this tool help you?</div>
+                    <div class="share-popup-subtitle" data-i18n="sharePopupSubtitle">Share it with friends.</div>
+                </div>
+                <div class="share-popup-buttons">
+                    <button class="share-option" data-platform="link">
+                        <div class="share-option-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="share-option-text" data-i18n="copyLink">Copy link</div>
+                    </button>
+                    <button class="share-option" data-platform="facebook">
+                        <div class="share-option-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="share-option-text">Facebook</div>
+                    </button>
+                    <button class="share-option" data-platform="x">
+                        <div class="share-option-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </div>
+                        <div class="share-option-text" data-i18n="twitter">X (Twitter)</div>
+                    </button>
+                    <button class="share-option" data-platform="telegram">
+                        <div class="share-option-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                            </svg>
+                        </div>
+                        <div class="share-option-text" data-i18n="telegram">Telegram</div>
+                    </button>
+                    <button class="share-option" data-platform="whatsapp">
+                        <div class="share-option-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                            </svg>
+                        </div>
+                        <div class="share-option-text" data-i18n="whatsapp">WhatsApp</div>
+                    </button>
+                    <button class="share-option" data-platform="linkedin">
+                        <div class="share-option-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
+                        </div>
+                        <div class="share-option-text" data-i18n="linkedin">LinkedIn</div>
+                    </button>
+                    <button class="share-option" data-platform="reddit">
+                        <div class="share-option-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
+                            </svg>
+                        </div>
+                        <div class="share-option-text" data-i18n="reddit">Reddit</div>
+                    </button>
+                    <button class="share-option" data-platform="email">
+                        <div class="share-option-icon">
+                            <svg width="11px" height="9px" viewBox="0 0 11 9" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Page-1" stroke="none" stroke-width="1"><g id="1sdc" transform="translate(-19.000000, -600.000000)"><g id="mail" transform="translate(19.000000, 600.750020)"><path d="M9.96872623,0 L1.03124754,0 C0.461703153,0 0,0.461703153 0,1.03124754 L0,7.21873279 C0,7.78827718 0.461703153,8.24998033 1.03124754,8.24998033 L9.96872623,8.24998033 C10.5382706,8.24998033 10.9999738,7.78827718 10.9999738,7.21873279 L10.9999738,1.03124754 C10.9999738,0.461703153 10.5382706,0 9.96872623,0 Z M9.96872623,1.03124754 L9.96872623,1.90790866 C9.48700741,2.30020738 8.71902676,2.91018174 7.07721739,4.19577933 C6.71540376,4.48038368 5.99867916,5.16412648 5.49998689,5.15615378 C5.00137853,5.1642104 4.28442315,4.48027878 3.92275638,4.19577933 C2.28119878,2.91037056 1.51302931,2.30027032 1.03124754,1.90790866 L1.03124754,1.03124754 L9.96872623,1.03124754 Z M1.03124754,7.21873279 L1.03124754,3.23120873 C1.52354068,3.62331862 2.2216763,4.1735397 3.28577975,5.00679158 C3.7553507,5.37643104 4.57771354,6.19243671 5.49998689,6.18746427 C6.41772838,6.19243671 7.22966378,5.38826421 7.7140052,5.00695942 C8.77808767,4.17372853 9.47641211,3.62336058 9.96872623,3.23120873 L9.96872623,7.21873279 L1.03124754,7.21873279 Z" id="Shape"></path></g></g></g></svg>
+                        </div>
+                        <div class="share-option-text" data-i18n="email">Email</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rating Popup after 3 clears -->
+        <div class="rating-popup hidden" id="ratingPopup">
+            <div class="rating-popup-content">
+                <div class="rating-popup-header">
+                    <div class="rating-popup-title" data-i18n="cleared">Data cleared!</div>
+                    <div class="rating-popup-subtitle" data-i18n="ratingPopupSubtitle">Please rate us to help others discover this tool!</div>
+                </div>
+                <div class="rating-popup-stars">
+                    <div class="rate-star" data-rating="1" data-tooltip="💀">
+                        <svg width="20" height="20" viewBox="0 0 50 50" role="img" aria-label="star">
+                            <g>
+                                <path d="M25 2 L30.5 16.5 L46 16.5 L34.5 26.5 L40 41 L25 31 L10 41 L15.5 26.5 L4 16.5 L19.5 16.5 Z"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="rate-star" data-rating="2" data-tooltip="😞">
+                        <svg width="20" height="20" viewBox="0 0 50 50" role="img" aria-label="star">
+                            <g>
+                                <path d="M25 2 L30.5 16.5 L46 16.5 L34.5 26.5 L40 41 L25 31 L10 41 L15.5 26.5 L4 16.5 L19.5 16.5 Z"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="rate-star" data-rating="3" data-tooltip="😐">
+                        <svg width="20" height="20" viewBox="0 0 50 50" role="img" aria-label="star">
+                            <g>
+                                <path d="M25 2 L30.5 16.5 L46 16.5 L34.5 26.5 L40 41 L25 31 L10 41 L15.5 26.5 L4 16.5 L19.5 16.5 Z"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="rate-star" data-rating="4" data-tooltip="🙂">
+                        <svg width="20" height="20" viewBox="0 0 50 50" role="img" aria-label="star">
+                            <g>
+                                <path d="M25 2 L30.5 16.5 L46 16.5 L34.5 26.5 L40 41 L25 31 L10 41 L15.5 26.5 L4 16.5 L19.5 16.5 Z"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="rate-star" data-rating="5" data-tooltip="😍">
+                        <svg width="20" height="20" viewBox="0 0 50 50" role="img" aria-label="star">
+                            <g>
+                                <path d="M25 2 L30.5 16.5 L46 16.5 L34.5 26.5 L40 41 L25 31 L10 41 L15.5 26.5 L4 16.5 L19.5 16.5 Z"/>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+                <div class="rating-popup-actions">
+                    <button class="rating-popup-later" id="ratingPopupLater" data-i18n="ratingPopupLater">Maybe later</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Language Modal -->
+        <div class="language-modal hidden" id="languageModal">
+            <div class="language-modal-content">
+                <button class="language-modal-close" id="languageModalClose" type="button">×</button>
+                <div class="language-list" id="languageList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html> 

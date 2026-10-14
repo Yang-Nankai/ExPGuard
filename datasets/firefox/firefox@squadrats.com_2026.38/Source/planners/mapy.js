@@ -1,0 +1,1 @@
+const routeApp="mapy",reloadOnUrlChange=!0,isPathSupported=()=>{const{href:n}=location;return!!n.includes("?planovani-trasy")&&!n.includes("m3d=1")},findMap=()=>{if(!window.Mapy)return void appendLog("map not found (window.Mapy missing)");const n=MAP.PDDwCZM(window.Mapy,"mapy",1e4);if(n)return appendLog("map found"),n;appendLog("map not found")};

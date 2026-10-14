@@ -1,0 +1,1 @@
+window.paywall.paywallContainerId = 'paywall-container';

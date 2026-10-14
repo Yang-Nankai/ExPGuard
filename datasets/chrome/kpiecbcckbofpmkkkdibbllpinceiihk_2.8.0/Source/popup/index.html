@@ -1,0 +1,2689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DotVPN - Free Per-Site VPN Protection</title>
+    <link href="assets/main.css" rel="stylesheet">
+    <link href="assets/flags.css" rel="stylesheet">
+    <script src="assets/icons.js"></script>
+    <script src="assets/controllers.js"></script>
+    <script src="js/bridge.js"></script>
+</head>
+<body>
+    <div id="appRoot" class="w-full h-full bg-white flex flex-col relative app-loading">
+        <!-- Header Component - Elegant Variant -->
+        <!-- Features gradient background with centered logo text -->
+        <header id="headerVariantContainer" class="bg-gradient-to-t from-gray-50 to-white px-4 py-2.5 flex border-b border-gray-100 items-center justify-between relative z-20">
+            <!-- App Icon -->
+            <div class="flex items-center gap-2.5 w-16">
+                <img 
+                    src="assets/logo.png" 
+                    alt="DotVPN Logo" 
+                    class="w-8 h-8 object-contain"
+                />
+            </div>
+            
+            <!-- App Title (Centered) -->
+            <div class="flex items-center justify-center flex-1">
+                <div class="flex items-center gap-2">
+                    <h1 class="text-base font-bold text-gray-900 tracking-tight">DotVPN</h1>
+                    <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">Free</span>
+                </div>
+            </div>
+            
+            <!-- Premium Crown Button -->
+            <button 
+                id="premiumCrownBtn" 
+                class="relative bg-transparent border-0 p-0 outline-none cursor-pointer transition-transform duration-200 w-16 flex justify-end"
+                aria-label="Upgrade to Premium"
+                aria-haspopup="dialog"
+                aria-expanded="false"
+            >
+                <div class="w-9 h-9 bg-orange-100 rounded-2xl flex items-center justify-center transition-all duration-300 hover:bg-orange-50 hover:scale-105 shadow-xs shadow-orange-300/80">
+                    <i data-icon="crown" class="w-4 h-4 text-orange-600"></i>
+                </div>
+                <!-- Premium indicator dot -->
+                <div class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white shadow-sm"></div>
+            </button>
+        </header>
+        <!-- Premium Overlay - Variant A: Value-Focused (Optimized for 510x302px) -->
+        
+        <div id="premiumOverlayWrapper" class="absolute top-14 z-50 hidden left-0 right-0 bottom-0">
+        <div id="premiumOverlayContainer" class="w-full h-full bg-white p-4 pb-6 flex flex-col">
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center">
+                        <i data-icon="crown" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-semibold text-gray-900">Premium Access</h3>
+                        <p class="text-sm text-gray-600">Everything unlimited</p>
+                    </div>
+                </div>
+                <button 
+                    id="closePremiumOverlay" 
+                    class="w-9 h-9 flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-600 rounded-xl transition-all duration-200"
+                    aria-label="Close premium overlay"
+                >
+                    <i data-icon="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <!-- Features List -->
+            <ul class="space-y-2 mb-3 flex-1">
+                <li class="flex items-center gap-3 text-sm bg-white/50 rounded-lg px-1 py-2 hover:bg-white/80 transition-colors duration-200">
+                    <div class="w-9 h-9 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i data-icon="globe" class="w-4 h-4 text-green-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900">70+ Global Locations</p>
+                        <p class="text-xs text-gray-600">Access servers worldwide</p>
+                    </div>
+                </li>
+                <li class="flex items-center gap-3 text-sm bg-white/50 rounded-lg px-1 py-2 hover:bg-white/80 transition-colors duration-200">
+                    <div class="w-9 h-9 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i data-icon="infinity" class="w-4 h-4 text-blue-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900">Unlimited Bandwidth</p>
+                        <p class="text-xs text-gray-600">No data caps or throttling</p>
+                    </div>
+                </li>
+                <li class="flex items-center gap-3 text-sm bg-white/50 rounded-lg px-1 py-2 hover:bg-white/80 transition-colors duration-200">
+                    <div class="w-9 h-9 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i data-icon="zap" class="w-4 h-4 text-purple-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900">Lightning Fast 1Gbps+</p>
+                        <p class="text-xs text-gray-600">Premium high-speed servers</p>
+                    </div>
+                </li>
+            </ul>
+            
+            <!-- Pricing -->
+            <div class="relative bg-gradient-to-br from-amber-50 to-yellow-50 border-2 border-amber-300 rounded-xl p-4 mb-4">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-bold px-4 py-1.5 rounded-full animate-pulse-subtle">
+                    Save $60/year
+                </div>
+                <div class="flex items-baseline justify-center gap-2 mb-2 mt-1">
+                    <span class="text-4xl font-bold text-gray-900">$4.99</span>
+                    <span class="text-base text-gray-600 font-semibold">/month</span>
+                </div>
+                <div class="flex flex-col items-center justify-center gap-1 text-sm text-gray-700">
+                    <div class="flex items-center gap-1">
+                        <i data-icon="check-circle" class="w-4 h-4 text-green-600"></i>
+                        <span class="font-medium">Cancel anytime</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <i data-icon="shield-check" class="w-4 h-4 text-blue-600"></i>
+                        <span class="font-medium">30-day guarantee</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CTA Button -->
+            <button 
+                id="upgradeToPremiumBtn" 
+                class="group w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2.5 text-base"
+                aria-label="Upgrade to premium plan"
+            >
+                <i data-icon="sparkles" class="w-5 h-5 group-hover:rotate-12 transition-transform duration-300"></i>
+                <span>Start Premium Today</span>
+            </button>
+        </div>
+        
+                  </div>
+        
+        <main class="flex-1 min-h-0 relative">
+            <!-- Per-Site Tab -->
+            <div 
+                id="perSiteTabContainer"
+                data-tab="perSite"
+                class="tab-container absolute inset-0 transition-all duration-300 ease-out opacity-100 translate-x-0 pointer-events-auto" >
+                <!-- Per-Site Tab Content -->
+                <div class="h-full flex flex-col overflow-hidden">
+                    <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+                
+                        <!-- No Site State (initial/empty state) -->
+                        <div id="perSiteNoSite" class="per-site-state" hidden>
+                            <!-- Per-Site No Site State - Compact Variant -->
+                            <div class="modal-container-fullscreen" id="noSiteContainer">
+                                <div class="flex flex-col h-full px-5 pt-6 pb-5 overflow-y-auto">
+                                    <!-- Header / Hero -->
+                                    <div class="flex flex-col items-center text-center mb-5">
+                                        <div
+                                            class="w-16 h-16 mb-4 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-200"
+                                        >
+                                            <i data-icon="globe" class="w-8 h-8 text-white" aria-hidden="true"></i>
+                                        </div>
+                            
+                                        <h2 class="text-lg font-black text-gray-900 mb-1.5">Per-Site VPN</h2>
+                                        <p class="text-[13px] text-gray-500 font-medium leading-snug max-w-[280px]">
+                                            Protect specific websites with VPN while keeping others on your regular connection
+                                        </p>
+                                    </div>
+                            
+                                    <!-- Main (centered) content: Domain input + country selection + activate -->
+                                    <div class="flex-1 flex items-center justify-center">
+                                        <div class="w-full max-w-xs">
+                                            <!-- Domain Input -->
+                                            <div class="relative mb-1">
+                                                <label for="noSiteDomainInput" class="sr-only">Website domain</label>
+                            
+                                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                                    <i
+                                                        data-icon="link"
+                                                        class="w-4 h-4 text-gray-400 transition-colors duration-200"
+                                                        id="noSiteInputIcon"
+                                                        aria-hidden="true"
+                                                    ></i>
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    id="noSiteDomainInput"
+                                                    placeholder="example.com"
+                                                    autocomplete="off"
+                                                    autocapitalize="none"
+                                                    autocorrect="off"
+                                                    spellcheck="false"
+                                                    autofocus
+                                                    aria-label="Website domain"
+                                                    aria-describedby="noSiteDomainError"
+                                                    class="w-full pl-10 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-900 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                                                />
+                                            </div>
+                            
+                                            <!-- Validation Message (intentionally empty/hidden until user clicks Activate) -->
+                                            <div
+                                                id="noSiteDomainError"
+                                                class="min-h-[1.25rem] text-xs font-medium text-red-500 px-1 transition-opacity duration-150 opacity-0"
+                                                aria-live="polite"
+                                            ></div>
+                            
+                                            <!-- Country Selection + Activate -->
+                                            <div id="noSiteCountryCard" aria-live="polite" class="mt-2">
+                                                <!-- Quick Connect (clickable — opens location selector) -->
+                                                <button
+                                                    type="button"
+                                                    id="noSiteQuickConnectBtn"
+                                                    class="w-full bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-xl p-3 mb-3 cursor-pointer transition-all duration-200 hover:border-indigo-400 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 active:scale-[0.98]"
+                                                    aria-label="Change VPN location"
+                                                >
+                                                    <div class="flex items-center gap-2">
+                                                        <div class="text-2xl" id="noSiteRecommendedFlag">
+                                                            <span class="flag-icon us"></span>
+                                                        </div>
+                            
+                                                        <div class="flex-1 min-w-0 text-left">
+                                                            <div class="text-xs text-indigo-600 font-bold uppercase">Quick Connect</div>
+                                                            <div
+                                                                class="text-sm font-black text-gray-800 truncate"
+                                                                id="noSiteRecommendedCountry"
+                                                            >
+                                                                United States
+                                                            </div>
+                                                        </div>
+                            
+                                                        <div
+                                                            class="text-xs font-bold text-green-600 flex-shrink-0"
+                                                            id="noSiteRecommendedPing"
+                                                        >
+                                                            —
+                                                        </div>
+                            
+                                                        <!-- Fixed: was data-lucide, now data-icon to match the icon build system -->
+                                                        <i data-icon="chevron-right" class="w-4 h-4 text-indigo-400 flex-shrink-0" aria-hidden="true"></i>
+                                                    </div>
+                                                </button>
+                            
+                                                <!-- Activate Button -->
+                                                <button
+                                                    id="noSiteActivateBtn"
+                                                    disabled
+                                                    class="group w-full py-4 px-5 bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 hover:from-indigo-600 hover:via-purple-600 hover:to-purple-700 text-white font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:shadow-md active:scale-[0.98] flex items-center justify-center gap-2.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:active:scale-100"
+                                                    aria-label="Activate VPN for this domain"
+                                                >
+                                                    <i
+                                                        data-icon="shield-check"
+                                                        class="w-5 h-5 group-hover:scale-110 transition-transform duration-200"
+                                                        id="noSiteActivateBtnIcon"
+                                                        aria-hidden="true"
+                                                    ></i>
+                                                    <span class="text-base" id="noSiteActivateBtnText">Activate VPN</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <!-- Available State (ready to connect) -->
+                        <div id="perSiteAvailable" class="per-site-state" hidden>
+                            <!-- Per-Site Available State - Split Variant -->
+                            
+                            <div class="modal-container-fullscreen" id="perSiteAvailableVariantContainer">
+                                <!-- Site Header -->
+                                <div class="text-center pt-6 px-4 pb-5">
+                                    <div class="w-20 h-20 mx-auto mb-4 rounded-xl flex items-center justify-center overflow-hidden bg-gray-100">
+                                        <img
+                                            src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%20viewBox%3D%220%200%20128%20128%22%3E%3Crect%20width%3D%22128%22%20height%3D%22128%22%20rx%3D%2224%22%20fill%3D%22%23F3F4F6%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%228%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M64%2028a36%2036%200%201%201-25.5%2010.5%22%3E%3CanimateTransform%20attributeName%3D%22transform%22%20type%3D%22rotate%22%20from%3D%220%2064%2064%22%20to%3D%22360%2064%2064%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fsvg%3E"
+                                            alt="Site favicon"
+                                            class="w-full h-full object-contain"
+                                            id="splitSiteFavicon"
+                                            width="80"
+                                            height="80"
+                                            loading="lazy"
+                                            decoding="async"
+                                            referrerpolicy="no-referrer"
+                                        />
+                                    </div>
+                                    <div id="splitSiteDomain" class="text-xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-1 truncate max-w-full">
+                                        example.com
+                                    </div>
+                                    <p class="text-xs text-gray-500 font-medium">Select your VPN location</p>
+                                </div>
+                            
+                                <!-- Split Layout -->
+                                <div class="px-4">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <!-- Connect -->
+                                        <div class="col-span-2 bg-white border-2 border-gray-200 rounded-2xl p-4 mb-1">
+                                            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-xl p-3 mb-3">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="text-2xl" id="splitRecommendedFlag">
+                                                        <span class="flag-icon us"></span>
+                                                    </div>
+                                                    <div class="flex-1">
+                                                        <div class="text-xs text-indigo-600 font-bold uppercase">Quick Connect</div>
+                                                        <div class="text-sm font-black text-gray-800" id="splitRecommendedCountry">United States</div>
+                                                    </div>
+                                                    <div class="text-xs font-bold text-green-600" id="splitRecommendedPing">25ms</div>
+                                                </div>
+                                            </div>
+                                            <!-- Connect Button -->
+                                            <button
+                                                id="splitConnectBtn"
+                                                class="group w-full py-4 px-5 bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 hover:from-indigo-600 hover:via-purple-600 hover:to-purple-700 text-white font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:shadow-md flex items-center justify-center gap-2.5"
+                                            >
+                                                <i data-icon="shield-check" class="w-5 h-5 group-hover:scale-110 transition-transform duration-200"></i>
+                                                <span class="text-base">Connect Now</span>
+                                            </button>
+                                        </div>
+                            
+                                        <!-- Change Location -->
+                                        <div class="col-span-2">
+                                            <button
+                                                id="splitChangeLocationBtn"
+                                                data-modal-trigger="selectCountry"
+                                                class="w-full py-4 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium text-sm rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                                            >
+                                                <i data-icon="map-pin" class="w-4 h-4"></i>
+                                                <span>Choose Different Location</span>
+                                            </button>
+                                        </div>
+                            
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <!-- Connecting State (establishing connection) -->
+                        <div id="perSiteConnecting" class="per-site-state" hidden>
+                            <!-- Per-Site Connecting State (Variant Router) -->
+                            <div class="modal-container-fullscreen">
+                                <!-- Connecting State Variant Slot -->
+                                <div 
+                                    id="perSiteConnectingVariantContainer" 
+                                    data-variant-group="perSiteConnecting" 
+                                    data-active-variant="compact"
+                                    data-variant-path="./variants"
+                                >
+                                    <!-- Per-Site Connecting State - Compact Variant -->
+                                    <div class="modal-container-fullscreen">
+                                        <!-- Connecting Header -->
+                                        <div class="px-4 pt-5 pb-4">
+                                            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-5 text-white shadow-xl relative overflow-hidden">
+                                                <div class="relative flex items-center gap-4">
+                                                    <!-- Site Favicon with clean spinner ring -->
+                                                    <div class="w-16 h-16 flex-shrink-0 rounded-xl flex items-center justify-center overflow-hidden relative bg-white/10">
+                                                        <!-- Static ring -->
+                                                        <div class="absolute inset-0 rounded-xl border border-white/25"></div>
+                                    
+                                                        <img
+                                                            src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%20viewBox%3D%220%200%20128%20128%22%3E%3Crect%20width%3D%22128%22%20height%3D%22128%22%20rx%3D%2224%22%20fill%3D%22%23F3F4F6%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%228%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M64%2028a36%2036%200%201%201-25.5%2010.5%22%3E%3CanimateTransform%20attributeName%3D%22transform%22%20type%3D%22rotate%22%20from%3D%220%2064%2064%22%20to%3D%22360%2064%2064%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fsvg%3E"
+                                                            alt="Site favicon"
+                                                            class="w-full h-full object-contain p-2 relative z-10"
+                                                            id="compactConnectingFavicon"
+                                                            width="64"
+                                                            height="64"
+                                                            loading="lazy"
+                                                            decoding="async"
+                                                            referrerpolicy="no-referrer"
+                                                        />
+                                                    </div>
+                                    
+                                                    <!-- Site Info -->
+                                                    <div class="flex-1 min-w-0">
+                                                        <div class="flex items-center gap-2 mb-1.5">
+                                                            <span class="text-xs font-bold uppercase tracking-wider opacity-95">Connecting</span>
+                                                        </div>
+                                                        <div id="compactConnectingDomain" class="text-xl font-black truncate">
+                                                            example.com
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                    
+                                                <!-- Connection Target Info (simplified) -->
+                                                <div class="relative mt-4 flex items-center justify-between bg-white/15 backdrop-blur-sm rounded-xl p-3 border border-white/25">
+                                                    <div class="flex items-center gap-3 min-w-0">
+                                                        <span id="compactConnectingFlag" class="text-2xl"></span>
+                                                        <div class="min-w-0">
+                                                            <div class="text-[10px] opacity-80 uppercase tracking-wider font-semibold mb-0.5">Connecting to</div>
+                                                            <div id="compactConnectingCountry" class="text-sm font-bold truncate">United States</div>
+                                                        </div>
+                                                    </div>
+                                    
+                                                    <div class="text-right">
+                                                        <div class="text-[10px] opacity-80 uppercase tracking-wider font-semibold mb-0.5">Status</div>
+                                                        <div class="text-sm font-bold tabular-nums">In progress</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    
+                                        <!-- Status Message (simplified) -->
+                                        <div class="px-4 pb-5">
+                                            <div class="bg-white border border-gray-200 rounded-xl p-4">
+                                                <!-- Subtle activity bar -->
+                                                <div class="mb-3">
+                                                    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                        <div
+                                                            class="h-full w-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full animate-pulse motion-reduce:animate-none"
+                                                        ></div>
+                                                    </div>
+                                                </div>
+                                    
+                                                <div class="flex items-center gap-2">
+                                                    <i data-icon="wifi" class="w-4 h-4 text-indigo-600"></i>
+                                                    <p class="text-sm text-gray-900 font-semibold">
+                                                        Establishing secure connection…
+                                                    </p>
+                                                </div>
+                                    
+                                                <p class="text-xs text-gray-600 leading-relaxed mt-1">
+                                                    Creating an encrypted tunnel to protect your traffic.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <!-- Active State (connected) -->
+                        <div id="perSiteActive" class="per-site-state" hidden>
+                            <!-- Per-Site Active State - Compact Variant -->
+                            <div class="modal-container-fullscreen">
+                                <!-- Compact Active Header -->
+                                <div class="px-4 pt-5 pb-4">
+                                    <div class="bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-2xl p-5 text-white shadow-xl relative overflow-hidden">
+                                        <!-- Decorative elements -->
+                                        <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
+                                        <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+                            
+                                        <div class="relative flex items-center gap-4 mb-4">
+                                            <!-- Site Favicon -->
+                                            <div class="w-16 h-16 flex-shrink-0 rounded-xl flex items-center justify-center overflow-hidden bg-white/10">
+                                                <img
+                                                    src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%20viewBox%3D%220%200%20128%20128%22%3E%3Crect%20width%3D%22128%22%20height%3D%22128%22%20rx%3D%2224%22%20fill%3D%22%23F3F4F6%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%228%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M64%2028a36%2036%200%201%201-25.5%2010.5%22%3E%3CanimateTransform%20attributeName%3D%22transform%22%20type%3D%22rotate%22%20from%3D%220%2064%2064%22%20to%3D%22360%2064%2064%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fsvg%3E"
+                                                    alt="Site favicon"
+                                                    class="w-full h-full object-contain p-1"
+                                                    id="compactActiveFavicon"
+                                                    width="64"
+                                                    height="64"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    referrerpolicy="no-referrer"
+                                                />
+                                            </div>
+                            
+                                            <!-- Site Info -->
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-center gap-2 mb-1.5">
+                                                    <div class="w-2 h-2 bg-white rounded-full animate-pulse motion-reduce:animate-none shadow-sm"></div>
+                                                    <span class="text-xs font-bold uppercase tracking-wider opacity-90">Connected</span>
+                                                </div>
+                                                <div id="compactActiveDomain" class="text-xl font-black truncate drop-shadow-sm">
+                                                    example.com
+                                                </div>
+                                            </div>
+                                        </div>
+                            
+                                        <!-- Connection Info -->
+                                        <div class="relative flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
+                                            <div class="flex items-center gap-3">
+                                                <span id="compactActiveFlag" class="text-3xl"></span>
+                                                <div>
+                                                    <div class="text-[10px] opacity-75 uppercase tracking-wider font-semibold mb-0.5">Location</div>
+                                                    <div id="compactActiveCountry" class="text-sm font-bold">United States</div>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <div class="text-[10px] opacity-75 uppercase tracking-wider font-semibold mb-0.5">Duration</div>
+                                                <div id="compactTimer" class="text-sm font-bold font-mono tabular-nums">00:00:00</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Compact Stats -->
+                                <div class="px-4 pb-4">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div class="border border-gray-200 rounded-lg p-2.5 text-center">
+                                            <div class="flex items-center justify-center gap-1.5 mb-1">
+                                                <i data-icon="activity" class="w-3.5 h-3.5 text-blue-600"></i>
+                                                <div class="text-[10px] text-blue-700 font-semibold uppercase tracking-wide">Data</div>
+                                            </div>
+                                            <div id="compactDataUsed" class="text-base font-bold text-blue-900">0 MB</div>
+                                        </div>
+                                        <div class="border border-gray-200 rounded-lg p-2.5 text-center">
+                                            <div class="flex items-center justify-center gap-1.5 mb-1">
+                                                <i data-icon="wifi" class="w-3.5 h-3.5 text-green-600"></i>
+                                                <div class="text-[10px] text-green-700 font-semibold uppercase tracking-wide">Latency</div>
+                                            </div>
+                                            <div id="compactPing" class="text-base font-bold text-green-900">—</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Action Buttons -->
+                                <div class="px-4">
+                                    <div class="space-y-3.5">
+                                        <button
+                                            id="compactChangeCountryBtn"
+                                            class="w-full py-4 px-4 bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-800 font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2.5 active:scale-[0.98]"
+                                        >
+                                            <i data-icon="map-pin" class="w-4 h-4"></i>
+                                            <span>Change Location</span>
+                                        </button>
+                            
+                                        <button
+                                            id="compactDisconnectBtn"
+                                            class="w-full py-4 px-4 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2.5 active:scale-[0.98]"
+                                        >
+                                            <i data-icon="power" class="w-5 h-5"></i>
+                                            <span>Disconnect</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <!-- Disconnecting State (terminating connection) -->
+                        <div id="perSiteDisconnecting" class="per-site-state" hidden>
+                            <!-- Per-Site Disconnecting State (Variant Router) -->
+                            <div class="modal-container-fullscreen">
+                                <!-- Disconnecting State Variant Slot -->
+                                <div 
+                                    id="perSiteDisconnectingVariantContainer" 
+                                    data-variant-group="perSiteDisconnecting" 
+                                    data-active-variant="compact"
+                                    data-variant-path="./variants"
+                                >
+                                    <!-- Per-Site Disconnecting State - Compact Variant -->
+                                    <div class="modal-container-fullscreen">
+                                        <!-- Disconnecting Header -->
+                                        <div class="px-4 pt-5 pb-4">
+                                            <div class="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-5 text-white shadow-xl relative overflow-hidden">
+                                                <div class="relative flex items-center gap-4">
+                                                    <!-- Site Favicon with clean spinner ring -->
+                                                    <div class="w-16 h-16 flex-shrink-0 rounded-xl flex items-center justify-center overflow-hidden relative bg-white/10">
+                                                        <!-- Static ring -->
+                                                        <div class="absolute inset-0 rounded-xl border border-white/25"></div>
+                                                        <img
+                                                            src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%20viewBox%3D%220%200%20128%20128%22%3E%3Crect%20width%3D%22128%22%20height%3D%22128%22%20rx%3D%2224%22%20fill%3D%22%23F3F4F6%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%228%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M64%2028a36%2036%200%201%201-25.5%2010.5%22%3E%3CanimateTransform%20attributeName%3D%22transform%22%20type%3D%22rotate%22%20from%3D%220%2064%2064%22%20to%3D%22360%2064%2064%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fsvg%3E"
+                                                            alt="Site favicon"
+                                                            class="w-full h-full object-contain p-2 relative z-10 opacity-75"
+                                                            id="compactDisconnectingFavicon"
+                                                            width="64"
+                                                            height="64"
+                                                            loading="lazy"
+                                                            decoding="async"
+                                                            referrerpolicy="no-referrer"
+                                                        />
+                                                    </div>
+                                    
+                                                    <!-- Site Info -->
+                                                    <div class="flex-1 min-w-0">
+                                                        <div class="flex items-center gap-2 mb-1.5">
+                                                            <span class="text-xs font-bold uppercase tracking-wider opacity-95">Disconnecting</span>
+                                                        </div>
+                                                        <div id="compactDisconnectingDomain" class="text-xl font-black truncate">
+                                                            example.com
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                    
+                                                <!-- Connection Info (simplified) -->
+                                                <div class="relative mt-4 flex items-center justify-between bg-white/15 backdrop-blur-sm rounded-xl p-3 border border-white/25">
+                                                    <div class="flex items-center gap-3 min-w-0">
+                                                        <span id="compactDisconnectingFlag" class="text-2xl opacity-70"></span>
+                                                        <div class="min-w-0">
+                                                            <div class="text-[10px] opacity-80 uppercase tracking-wider font-semibold mb-0.5">Disconnecting from</div>
+                                                            <div id="compactDisconnectingCountry" class="text-sm font-bold truncate">United States</div>
+                                                        </div>
+                                                    </div>
+                                    
+                                                    <div class="text-right">
+                                                        <div class="text-[10px] opacity-80 uppercase tracking-wider font-semibold mb-0.5">Status</div>
+                                                        <div class="text-sm font-bold tabular-nums">Closing</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    
+                                        <!-- Status Message (simplified) -->
+                                        <div class="px-4 pb-4">
+                                            <div class="bg-white border border-gray-200 rounded-xl p-4">
+                                                <!-- Subtle activity bar -->
+                                                <div class="mb-3">
+                                                    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                        <div
+                                                            class="h-full w-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full animate-pulse motion-reduce:animate-none"
+                                                        ></div>
+                                                    </div>
+                                                </div>
+                                    
+                                                <div class="flex items-center gap-2">
+                                                    <i data-icon="power" class="w-4 h-4 text-orange-600"></i>
+                                                    <p class="text-sm text-gray-900 font-semibold">
+                                                        Closing secure connection…
+                                                    </p>
+                                                </div>
+                                    
+                                                <p class="text-xs text-gray-600 leading-relaxed mt-1">
+                                                    Safely terminating the encrypted tunnel.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    
+                                        <!-- Safety Note (kept, simplified) -->
+                                        <div class="px-4 pb-5">
+                                            <div class="bg-orange-50 border border-orange-200 rounded-xl p-3">
+                                                <div class="flex items-start gap-2">
+                                                    <i data-icon="shield-alert" class="w-4 h-4 text-orange-600 flex-shrink-0 mt-0.5"></i>
+                                                    <p class="text-xs text-orange-900 leading-relaxed font-medium">
+                                                        <strong class="font-semibold">Please wait:</strong> finishing secure shutdown to avoid data leaks.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Locations Tab -->
+            <div 
+                id="locationsTabContainer"
+                data-tab="vpnLocations"
+                class="tab-container absolute inset-0 transition-all duration-300 ease-out opacity-0 translate-x-full pointer-events-none" >
+                <!-- Locations Tab Content -->
+                <div class="h-full flex flex-col overflow-hidden">
+                    <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+                        <div class="p-4 space-y-4">
+                            
+                            <!-- Hero Block -->
+                            <!-- Minimal Hero Variant -->
+                            <div class="text-center py-4 mb-3">
+                                <div class="w-14 h-14 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-md">
+                                    <i data-icon="crown" class="w-7 h-7 text-white"></i>
+                                </div>
+                                <h2 class="text-lg font-bold text-gray-800 mb-1">Premium Network</h2>
+                                <p class="text-sm text-gray-600">70+ Countries Available</p>
+                            </div>
+                
+                            <!-- Features Block -->
+                            <!-- Features Compact Variant (Horizontal Strip) -->
+                            <div class="bg-white rounded-lg border border-gray-200 px-2 py-2.5 mb-4">
+                                <div class="flex items-center justify-around text-center">
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-center gap-1 mb-1">
+                                            <i data-icon="globe" class="w-4 h-4 text-purple-600"></i>
+                                            <span class="font-semibold text-purple-600">70</span>
+                                        </div>
+                                        <div class="text-xs text-gray-600">Countries</div>
+                                    </div>
+                                    
+                                    <div class="w-px h-8 bg-gray-200"></div>
+                                    
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-center gap-1 mb-1">
+                                            <i data-icon="server" class="w-4 h-4 text-blue-600"></i>
+                                            <span class="font-semibold text-blue-600">500</span>
+                                        </div>
+                                        <div class="text-xs text-gray-600">Servers</div>
+                                    </div>
+                                    
+                                    <div class="w-px h-8 bg-gray-200"></div>
+                                    
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-center gap-1 mb-1">
+                                            <i data-icon="zap" class="w-4 h-4 text-green-600"></i>
+                                            <span class="font-semibold text-green-600">10Gb</span>
+                                        </div>
+                                        <div class="text-xs text-gray-600">Speed</div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <!-- Locations List Block -->
+                            <!-- Locations Detailed Variant -->
+                            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden mb-4">
+                                <!-- Header -->
+                                <div class="px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-100">
+                                    <h3 class="text-sm font-bold text-gray-800">Popular Locations</h3>
+                                    <p class="text-xs text-gray-600">Available with Premium</p>
+                                </div>
+                            
+                                <!-- Locations List -->
+                                <div class="divide-y divide-gray-100">
+                                    <!-- United States -->
+                                    <button
+                                        class="w-full px-4 py-3 flex items-center gap-3 opacity-75 hover:bg-indigo-50/50 transition-colors motion-reduce:transition-none location-premium-trigger"
+                                        data-location="United States"
+                                        data-country-code="US"
+                                    >
+                                        <span class="flag-icon us"></span>
+                                        <div class="flex-1 text-left">
+                                            <p class="text-sm font-semibold text-gray-800">United States</p>
+                                            <p class="text-xs text-gray-500">50+ servers • Ultra Fast</p>
+                                        </div>
+                                        <i data-icon="lock" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                            
+                                    <!-- United Kingdom -->
+                                    <button
+                                        class="w-full px-4 py-3 flex items-center gap-3 opacity-75 hover:bg-indigo-50/50 transition-colors motion-reduce:transition-none location-premium-trigger"
+                                        data-location="United Kingdom"
+                                        data-country-code="UK"
+                                    >
+                                        <span class="flag-icon uk"></span>
+                                        <div class="flex-1 text-left">
+                                            <p class="text-sm font-semibold text-gray-800">United Kingdom</p>
+                                            <p class="text-xs text-gray-500">30+ servers • Fast</p>
+                                        </div>
+                                        <i data-icon="lock" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                            
+                                    <!-- Germany -->
+                                    <button
+                                        class="w-full px-4 py-3 flex items-center gap-3 opacity-75 hover:bg-indigo-50/50 transition-colors motion-reduce:transition-none location-premium-trigger"
+                                        data-location="Germany"
+                                        data-country-code="DE"
+                                    >
+                                        <span class="flag-icon de"></span>
+                                        <div class="flex-1 text-left">
+                                            <p class="text-sm font-semibold text-gray-800">Germany</p>
+                                            <p class="text-xs text-gray-500">25+ servers • Fast</p>
+                                        </div>
+                                        <i data-icon="lock" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                            
+                                    <!-- Japan -->
+                                    <button
+                                        class="w-full px-4 py-3 flex items-center gap-3 opacity-75 hover:bg-indigo-50/50 transition-colors motion-reduce:transition-none location-premium-trigger"
+                                        data-location="Japan"
+                                        data-country-code="JP"
+                                    >
+                                        <span class="flag-icon jp"></span>
+                                        <div class="flex-1 text-left">
+                                            <p class="text-sm font-semibold text-gray-800">Japan</p>
+                                            <p class="text-xs text-gray-500">20+ servers • Fast</p>
+                                        </div>
+                                        <i data-icon="lock" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                            
+                                    <!-- Australia -->
+                                    <button
+                                        class="w-full px-4 py-3 flex items-center gap-3 opacity-75 hover:bg-indigo-50/50 transition-colors motion-reduce:transition-none location-premium-trigger"
+                                        data-location="Australia"
+                                        data-country-code="AU"
+                                    >
+                                        <span class="flag-icon au"></span>
+                                        <div class="flex-1 text-left">
+                                            <p class="text-sm font-semibold text-gray-800">Australia</p>
+                                            <p class="text-xs text-gray-500">15+ servers • Fast</p>
+                                        </div>
+                                        <i data-icon="lock" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                            
+                                    <!-- More Countries -->
+                                    <div class="px-4 py-3 text-center bg-gray-50">
+                                        <p class="text-xs font-semibold text-indigo-600">+ 65 More Countries</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Benefits Block -->
+                            <!-- Benefits Premium Variant -->
+                            <div class="bg-black rounded-xl p-5 shadow-lg text-white mb-4">
+                                <!-- Header -->
+                                <div class="flex items-center gap-2 mb-4">
+                                    <i data-icon="sparkles" class="w-5 h-5"></i>
+                                    <h3 class="text-base font-bold">Premium Benefits</h3>
+                                </div>
+                            
+                                <!-- Benefits List -->
+                                <ul class="space-y-2.5 mb-4">
+                                    <li class="flex items-center gap-2.5 text-sm">
+                                        <div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <i data-icon="check" class="w-3 h-3"></i>
+                                        </div>
+                                        <span>Access all 70+ countries</span>
+                                    </li>
+                                    <li class="flex items-center gap-2.5 text-sm">
+                                        <div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <i data-icon="check" class="w-3 h-3"></i>
+                                        </div>
+                                        <span>Unlimited bandwidth</span>
+                                    </li>
+                                    <li class="flex items-center gap-2.5 text-sm">
+                                        <div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <i data-icon="check" class="w-3 h-3"></i>
+                                        </div>
+                                        <span>Maximum connection speed</span>
+                                    </li>
+                                    <li class="flex items-center gap-2.5 text-sm">
+                                        <div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <i data-icon="check" class="w-3 h-3"></i>
+                                        </div>
+                                        <span>Ad-free experience</span>
+                                    </li>
+                                    <li class="flex items-center gap-2.5 text-sm">
+                                        <div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <i data-icon="check" class="w-3 h-3"></i>
+                                        </div>
+                                        <span>Priority 24/7 support</span>
+                                    </li>
+                                </ul>
+                            
+                                <!-- Pricing -->
+                                <div class="bg-white/20 backdrop-blur-sm rounded-lg p-3 mb-4">
+                                    <div class="flex items-baseline justify-center gap-1 mb-1">
+                                        <span class="text-3xl font-bold">$4.99</span>
+                                        <span class="text-sm opacity-90">/month</span>
+                                    </div>
+                                    <p class="text-xs text-center opacity-90">30-day money-back guarantee</p>
+                                </div>
+                            
+                                <!-- CTA Button -->
+                                <button
+                                    id="upgradeFromLocations"
+                                    class="w-full bg-white hover:bg-gray-50 text-gray-900 font-bold py-3 px-4 rounded-lg transition-all shadow-md hover:shadow-lg active:scale-95 motion-reduce:active:scale-100"
+                                >
+                                    Upgrade Now
+                                </button>
+                            </div>
+                            
+                            <!-- Trust Indicators Block -->
+                            <!-- Trust Detailed Variant -->
+                            <div class="bg-white rounded-xl p-4 border border-gray-200 mb-4">
+                                <h3 class="text-sm font-bold text-gray-800 mb-3">Why Trust Us</h3>
+                                
+                                <div class="space-y-3">
+                                    <!-- Secure -->
+                                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors motion-reduce:transition-none">
+                                        <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i data-icon="shield-check" class="w-5 h-5 text-green-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-gray-800">Bank-Grade Security</p>
+                                            <p class="text-xs text-gray-600">Military-level encryption</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Private -->
+                                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors motion-reduce:transition-none">
+                                        <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i data-icon="lock" class="w-5 h-5 text-blue-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-gray-800">Zero-Log Policy</p>
+                                            <p class="text-xs text-gray-600">Your privacy guaranteed</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Trusted -->
+                                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors motion-reduce:transition-none">
+                                        <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i data-icon="award" class="w-5 h-5 text-purple-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-gray-800">Trusted Worldwide</p>
+                                            <p class="text-xs text-gray-600">Millions of users</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Account Tab -->
+            <div 
+                id="accountTabContainer"
+                data-tab="account"
+                class="tab-container absolute inset-0 transition-all duration-300 ease-out opacity-0 translate-x-full pointer-events-none" >
+                <!-- Account Tab Content -->
+                <div id="accountTabContainer" class="h-full flex flex-col overflow-hidden">
+                    <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+                        <div class="p-4 space-y-4">
+                
+                            <!-- Header Block (Dynamic - loaded by account-controller.js) -->
+                            <div id="accountHeaderContainer">
+                                <!-- Will be populated dynamically based on authentication state -->
+                                <div
+                                    class="bg-gray-100 rounded-lg p-4 text-center text-gray-500 animate-pulse"
+                                    role="status"
+                                    aria-live="polite"
+                                >
+                                    <p class="text-sm">Loading account information...</p>
+                                </div>
+                            </div>
+                
+                            <!--
+                              Header templates (inline, no network fetch required).
+                              These compile at build time via Handlebars and are cloned at runtime.
+                            -->
+                            <template id="accountHeaderTemplate-compact">
+                                <!-- Compact Header Variant (Premium Sign-In CTA) -->
+                                <section
+                                    class="relative overflow-hidden bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg p-4 mb-4 text-white shadow-sm ring-1 ring-white/10"
+                                    role="region"
+                                    aria-label="Account summary"
+                                >
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div
+                                            class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center flex-shrink-0"
+                                            aria-hidden="true"
+                                        >
+                                            <i data-icon="user" class="w-6 h-6 text-white" aria-hidden="true"></i>
+                                        </div>
+                                
+                                        <div class="flex-1 min-w-0">
+                                            <h3 id="accountUserName" class="font-semibold text-base mb-0.5">Free User</h3>
+                                
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <span id="accountUserPlan" class="text-xs bg-white/20 px-2 py-0.5 rounded-full">
+                                                    Free Plan
+                                                </span>
+                                
+                                                <button
+                                                    id="upgradeFromAccount"
+                                                    type="button"
+                                                    class="min-h-[32px] text-xs bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-medium px-2 py-0.5 rounded-full transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-700"
+                                                    aria-label="Upgrade to Premium"
+                                                >
+                                                    Upgrade
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                                    <!-- Premium Sign-In CTA -->
+                                    <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <div
+                                                class="w-10 h-10 bg-yellow-400/20 rounded-full flex items-center justify-center flex-shrink-0"
+                                                aria-hidden="true"
+                                            >
+                                                <i data-icon="crown" class="w-5 h-5 text-yellow-400" aria-hidden="true"></i>
+                                            </div>
+                                
+                                            <div class="flex-1 min-w-0">
+                                                <h4 class="font-bold text-sm mb-0.5">Already Premium?</h4>
+                                                <p class="text-xs opacity-90">Sign in to your account</p>
+                                            </div>
+                                        </div>
+                                
+                                        <button
+                                            id="compactSignInBtn"
+                                            type="button"
+                                            class="min-h-[44px] w-full py-2.5 px-4 bg-white hover:bg-gray-50 text-indigo-600 font-bold rounded-lg transition-all duration-200 motion-reduce:transition-none flex items-center justify-center gap-2 active:scale-[0.98] motion-reduce:active:scale-100 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-700"
+                                            aria-label="Sign in to your account"
+                                        >
+                                            <i data-icon="log-in" class="w-4 h-4" aria-hidden="true"></i>
+                                            <span>Sign In</span>
+                                        </button>
+                                    </div>
+                                </section>
+                            </template>
+                
+                            <template id="accountHeaderTemplate-auth-free">
+                                <!-- Authenticated Free User Header -->
+                                <section
+                                    class="relative overflow-hidden bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg p-4 mb-4 text-white shadow-sm ring-1 ring-white/10"
+                                    role="region"
+                                    aria-label="Account summary"
+                                >
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div
+                                            class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center flex-shrink-0"
+                                            aria-hidden="true"
+                                        >
+                                            <i data-icon="user" class="w-6 h-6 text-white" aria-hidden="true"></i>
+                                        </div>
+                                
+                                        <div class="flex-1 min-w-0">
+                                            <h3 id="accountUserName" class="font-semibold text-base mb-0.5 truncate" aria-live="polite">
+                                                Loading...
+                                            </h3>
+                                
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <span id="accountUserPlan" class="text-xs bg-white/20 px-2 py-0.5 rounded-full">
+                                                    Free Plan
+                                                </span>
+                                
+                                                <button
+                                                    id="upgradeFromAccount"
+                                                    type="button"
+                                                    class="min-h-[32px] text-xs bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-medium px-2 py-0.5 rounded-full transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-700"
+                                                    aria-label="Upgrade to Premium"
+                                                >
+                                                    Upgrade
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                                    <!-- Account Actions -->
+                                    <div class="flex gap-2">
+                                        <button
+                                            id="accountSettingsBtn"
+                                            type="button"
+                                            data-modal-trigger="settings"
+                                            class="min-h-[44px] flex-1 py-2.5 px-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-medium rounded-lg transition-all duration-200 motion-reduce:transition-none flex items-center justify-center gap-2 active:scale-[0.98] motion-reduce:active:scale-100 border border-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-700 disabled:opacity-70 disabled:cursor-not-allowed"
+                                            aria-label="Open Settings"
+                                        >
+                                            <i data-icon="settings" class="w-4 h-4" aria-hidden="true"></i>
+                                            <span>Settings</span>
+                                        </button>
+                                
+                                        <button
+                                            id="signOutBtn"
+                                            type="button"
+                                            class="min-h-[44px] flex-1 py-2.5 px-4 bg-white/10 hover:bg-red-500/80 backdrop-blur-sm text-white font-medium rounded-lg transition-all duration-200 motion-reduce:transition-none flex items-center justify-center gap-2 active:scale-[0.98] motion-reduce:active:scale-100 border border-white/20 hover:border-red-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-700 disabled:opacity-70 disabled:cursor-not-allowed"
+                                            aria-label="Sign Out"
+                                        >
+                                            <span data-signout-icon aria-hidden="true" class="inline-flex">
+                                                <i data-icon="log-out" class="w-4 h-4" aria-hidden="true"></i>
+                                            </span>
+                                
+                                            <span data-signout-spinner aria-hidden="true" class="hidden w-4 h-4 rounded-full border-2 border-white/50 border-t-white animate-spin"></span>
+                                
+                                            <span data-signout-label>Sign Out</span>
+                                        </button>
+                                    </div>
+                                </section>
+                            </template>
+                
+                            <template id="accountHeaderTemplate-auth-premium">
+                                <!-- Authenticated Premium User Header -->
+                                <section
+                                    class="relative overflow-hidden bg-gradient-to-br from-amber-500 via-yellow-500 to-orange-500 rounded-lg p-4 mb-4 text-white shadow-lg ring-1 ring-white/20"
+                                    role="region"
+                                    aria-label="Account summary"
+                                >
+                                    <!-- Decorative sparkles -->
+                                    <div class="absolute top-2 right-2 w-8 h-8 opacity-20 pointer-events-none">
+                                        <i data-icon="sparkles" class="w-full h-full" aria-hidden="true"></i>
+                                    </div>
+                                
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div
+                                            class="w-12 h-12 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-white/40"
+                                            aria-hidden="true"
+                                        >
+                                            <i data-icon="crown" class="w-6 h-6 text-white" aria-hidden="true"></i>
+                                        </div>
+                                
+                                        <div class="flex-1 min-w-0">
+                                            <h3 id="accountUserName" class="font-bold text-base mb-0.5 truncate" aria-live="polite">
+                                                Loading...
+                                            </h3>
+                                
+                                            <div class="flex items-center gap-1.5">
+                                                <span
+                                                    id="accountUserPlan"
+                                                    class="text-xs bg-white/30 backdrop-blur-sm px-2.5 py-0.5 rounded-full font-semibold inline-flex items-center gap-1"
+                                                >
+                                                    <i data-icon="star" class="w-3 h-3" aria-hidden="true"></i>
+                                                    Premium
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                                    <!-- Premium status -->
+                                    <div class="bg-white/20 backdrop-blur-sm rounded-lg p-2.5 mb-3 border border-white/30">
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <i data-icon="check-circle" class="w-4 h-4 flex-shrink-0" aria-hidden="true"></i>
+                                            <span class="font-medium">All Premium features unlocked</span>
+                                        </div>
+                                    </div>
+                                
+                                    <!-- Account Actions -->
+                                    <div class="flex gap-2">
+                                        <button
+                                            id="accountSettingsBtn"
+                                            type="button"
+                                            data-modal-trigger="settings"
+                                            class="min-h-[44px] flex-1 py-2.5 px-4 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold rounded-lg transition-all duration-200 motion-reduce:transition-none flex items-center justify-center gap-2 active:scale-[0.98] motion-reduce:active:scale-100 border border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-amber-600 disabled:opacity-70 disabled:cursor-not-allowed"
+                                            aria-label="Open Settings"
+                                        >
+                                            <i data-icon="settings" class="w-4 h-4" aria-hidden="true"></i>
+                                            <span>Settings</span>
+                                        </button>
+                                
+                                        <button
+                                            id="signOutBtn"
+                                            type="button"
+                                            class="min-h-[44px] flex-1 py-2.5 px-4 bg-white/20 hover:bg-red-500/80 backdrop-blur-sm text-white font-semibold rounded-lg transition-all duration-200 motion-reduce:transition-none flex items-center justify-center gap-2 active:scale-[0.98] motion-reduce:active:scale-100 border border-white/30 hover:border-red-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-amber-600 disabled:opacity-70 disabled:cursor-not-allowed"
+                                            aria-label="Sign Out"
+                                        >
+                                            <span data-signout-icon aria-hidden="true" class="inline-flex">
+                                                <i data-icon="log-out" class="w-4 h-4" aria-hidden="true"></i>
+                                            </span>
+                                
+                                            <span data-signout-spinner aria-hidden="true" class="hidden w-4 h-4 rounded-full border-2 border-white/60 border-t-white animate-spin"></span>
+                                
+                                            <span data-signout-label>Sign Out</span>
+                                        </button>
+                                    </div>
+                                </section>
+                            </template>
+                
+                            <!-- Status Block -->
+                            <!-- Detailed Status Variant -->
+                            <div class="account-status-detailed bg-white rounded-xl border border-indigo-100 overflow-hidden mb-4">
+                                <!-- Header -->
+                                <div class="px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-100">
+                                    <h3 class="text-sm font-bold text-gray-800">Account Overview</h3>
+                                </div>
+                            
+                                <!-- Stats Grid -->
+                                <div class="p-4 grid grid-cols-2 gap-3">
+                                    <!-- Total Data Usage -->
+                                    <div class="text-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <div id="accountDataUsage" class="text-xl font-bold text-gray-800 mb-1" aria-live="polite">—</div>
+                                        <div class="text-xs text-gray-600">Total Usage</div>
+                                    </div>
+                            
+                                    <!-- Protected Sites Count -->
+                                    <div class="text-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <div id="accountProtectedSites" class="text-xl font-bold text-gray-800 mb-1" aria-live="polite">—</div>
+                                        <div class="text-xs text-gray-600">Protected Sites</div>
+                                    </div>
+                            
+                                    <!-- Member Since -->
+                                    <div class="col-span-2 text-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <div class="text-sm font-semibold text-gray-800 mb-1">Member Since</div>
+                                        <div id="accountMemberSince" class="text-xs text-gray-600" aria-live="polite">—</div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <!-- Settings Block -->
+                            <!-- Elegant Settings Variant (from old4) -->
+                            <div class="account-settings-elegant bg-white rounded-xl divide-y divide-gray-100 mb-4 overflow-hidden border border-gray-200">
+                                <button
+                                    type="button"
+                                    data-modal-trigger="settings"
+                                    class="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors group active:bg-gray-100 motion-reduce:transition-none"
+                                >
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center group-hover:from-indigo-100 group-hover:to-indigo-200 transition-all duration-200 motion-reduce:transition-none">
+                                            <i data-icon="settings" class="w-4 h-4 text-gray-600 group-hover:text-indigo-600 transition-colors motion-reduce:transition-none"></i>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-800">Settings</span>
+                                    </div>
+                                    <i data-icon="chevron-right" class="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors motion-reduce:transition-none"></i>
+                                </button>
+                            
+                                <button
+                                    type="button"
+                                    data-modal-trigger="about"
+                                    class="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors group active:bg-gray-100 motion-reduce:transition-none"
+                                >
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center group-hover:from-purple-100 group-hover:to-purple-200 transition-all duration-200 motion-reduce:transition-none">
+                                            <i data-icon="info" class="w-4 h-4 text-gray-600 group-hover:text-purple-600 transition-colors motion-reduce:transition-none"></i>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-800">About</span>
+                                    </div>
+                                    <i data-icon="chevron-right" class="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors motion-reduce:transition-none"></i>
+                                </button>
+                            </div>
+                
+                            <!-- Support Block -->
+                            <!-- Gradient Support Variant -->
+                            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100 mb-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i data-icon="help-circle" class="w-5 h-5 text-blue-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-sm font-semibold text-gray-800 mb-2">Need Help?</h4>
+                                        <p class="text-xs text-gray-600 mb-3 leading-relaxed">
+                                            Our support team is here to help you with any questions or issues.
+                                        </p>
+                                        <button
+                                            type="button"
+                                            data-modal-trigger="support"
+                                            class="w-full bg-white hover:bg-gray-50 text-indigo-600 font-semibold py-2 px-4 rounded-lg transition-all shadow-sm hover:shadow active:scale-95 motion-reduce:active:scale-100 text-sm flex items-center justify-center gap-2"
+                                        >
+                                            <i data-icon="message-circle" class="w-4 h-4"></i>
+                                            <span>Contact Support</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <!-- Features Block (Hidden for authenticated users via controller) -->
+                            <div id="accountFeaturesContainer">
+                                <!-- Premium Features Variant (Current Design) -->
+                                <div class="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl p-5 shadow-lg text-white mb-4">
+                                    <!-- Header -->
+                                    <div class="flex items-center gap-2 mb-4">
+                                        <i data-icon="star" class="w-5 h-5"></i>
+                                        <h3 class="text-base font-bold">Upgrade to Premium</h3>
+                                    </div>
+                                
+                                    <!-- Features List -->
+                                    <ul class="space-y-2.5 mb-4">
+                                        <li class="flex items-center gap-2.5 text-sm">
+                                            <div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                                <i data-icon="check" class="w-3 h-3"></i>
+                                            </div>
+                                            <span>70+ countries worldwide</span>
+                                        </li>
+                                        <li class="flex items-center gap-2.5 text-sm">
+                                            <div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                                <i data-icon="check" class="w-3 h-3"></i>
+                                            </div>
+                                            <span>Unlimited bandwidth</span>
+                                        </li>
+                                        <li class="flex items-center gap-2.5 text-sm">
+                                            <div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                                <i data-icon="check" class="w-3 h-3"></i>
+                                            </div>
+                                            <span>Ad-free experience</span>
+                                        </li>
+                                        <li class="flex items-center gap-2.5 text-sm">
+                                            <div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                                                <i data-icon="check" class="w-3 h-3"></i>
+                                            </div>
+                                            <span>Priority support</span>
+                                        </li>
+                                    </ul>
+                                
+                                    <!-- Pricing -->
+                                    <div class="bg-white/20 backdrop-blur-sm rounded-lg p-3 mb-4">
+                                        <div class="flex items-baseline justify-center gap-1 mb-1">
+                                            <span class="text-3xl font-bold">$4.99</span>
+                                            <span class="text-sm opacity-90">/month</span>
+                                        </div>
+                                    </div>
+                                
+                                    <!-- CTA Button -->
+                                    <button
+                                        id="upgradeFromAccount"
+                                        type="button"
+                                        class="w-full bg-white hover:bg-gray-50 text-gray-900 font-bold py-3 px-4 rounded-lg transition-all shadow-md hover:shadow-lg active:scale-95 motion-reduce:active:scale-100"
+                                    >
+                                        Upgrade Now
+                                    </button>
+                                </div>
+                            </div>
+                
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="relative z-10 border-t border-gray-100 bg-gradient-to-b from-gray-50 to-white px-3">
+            <nav class="mx-auto flex max-w-md items-center justify-around gap-2" role="navigation">
+                <!-- Per-Site Button -->
+                <div
+                    id="tab-perSite"
+                    class="footer-tab-btn group active min-w-0 flex-1 rounded-2xl transition-all duration-300 ease-out cursor-pointer"
+                    data-tab="perSite"
+                    role="button"
+                >
+                    <div class="footer-tab-content flex flex-col items-center gap-1 rounded-2xl bg-transparent px-4 py-1.5">
+                        <div class="footer-tab-icon-wrapper relative flex items-center justify-center">
+                            <div class="footer-tab-icon flex h-9 w-9 items-center justify-center rounded-2xl bg-gray-100 shadow-sm transition-all duration-300 group-hover:bg-gray-200 group-hover:shadow group-[.active]:bg-gradient-to-br group-[.active]:from-indigo-500 group-[.active]:via-indigo-600 group-[.active]:to-purple-600 group-[.active]:shadow-md group-[.active]:shadow-indigo-200">
+                                <i data-icon="toggle-right" class="h-5 w-5 text-gray-600 transition-colors duration-300 group-hover:text-indigo-600 group-[.active]:text-white"></i>
+                            </div>
+                        </div>
+                        <span class="footer-tab-label truncate text-[11px] font-semibold tracking-tight text-gray-600 transition-colors duration-300 group-hover:text-gray-900 group-[.active]:text-indigo-700">Per-Site</span>
+                    </div>
+                </div>
+        
+                <!-- Locations Button -->
+                <div
+                    id="tab-vpnLocations"
+                    class="footer-tab-btn group min-w-0 flex-1 rounded-2xl transition-all duration-300 ease-out cursor-pointer"
+                    data-tab="vpnLocations"
+                    role="button"
+                >
+                    <div class="footer-tab-content flex flex-col items-center gap-1 rounded-2xl bg-transparent px-4 py-1.5">
+                        <div class="footer-tab-icon-wrapper relative flex items-center justify-center">
+                            <div class="footer-tab-icon flex h-9 w-9 items-center justify-center rounded-2xl bg-gray-100 shadow-sm transition-all duration-300 group-hover:bg-gray-200 group-hover:shadow group-[.active]:bg-gradient-to-br group-[.active]:from-indigo-500 group-[.active]:via-indigo-600 group-[.active]:to-purple-600 group-[.active]:shadow-md group-[.active]:shadow-indigo-200">
+                                <i data-icon="globe" class="h-5 w-5 text-gray-600 transition-colors duration-300 group-hover:text-indigo-600 group-[.active]:text-white"></i>
+                            </div>
+                            <!-- Premium Crown Badge -->
+                            <div class="absolute -right-1 -top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shadow-sm shadow-amber-500/50 ring-2 ring-white transition-all duration-300 group-hover:scale-110 group-hover:shadow-md group-[.active]:from-yellow-300 group-[.active]:to-amber-400 group-[.active]:shadow-amber-400/60">
+                                <i data-icon="crown" class="h-2.5 w-2.5 text-white drop-shadow-sm"></i>
+                            </div>
+                        </div>
+                        <span class="footer-tab-label truncate text-[11px] font-semibold tracking-tight text-gray-600 transition-colors duration-300 group-hover:text-gray-900 group-[.active]:text-indigo-700">Locations</span>
+                    </div>
+                </div>
+        
+                <!-- Account Button -->
+                <div
+                    id="tab-account"
+                    class="footer-tab-btn group min-w-0 flex-1 rounded-2xl transition-all duration-300 ease-out cursor-pointer"
+                    data-tab="account"
+                    role="button"
+                >
+                    <div class="footer-tab-content flex flex-col items-center gap-1 rounded-2xl bg-transparent px-4 py-1.5">
+                        <div class="footer-tab-icon-wrapper relative flex items-center justify-center">
+                            <div class="footer-tab-icon flex h-9 w-9 items-center justify-center rounded-2xl bg-gray-100 shadow-sm transition-all duration-300 group-hover:bg-gray-200 group-hover:shadow group-[.active]:bg-gradient-to-br group-[.active]:from-indigo-500 group-[.active]:via-indigo-600 group-[.active]:to-purple-600 group-[.active]:shadow-md group-[.active]:shadow-indigo-200">
+                                <i data-icon="user" class="h-5 w-5 text-gray-600 transition-colors duration-300 group-hover:text-indigo-600 group-[.active]:text-white"></i>
+                            </div>
+                        </div>
+                        <span class="footer-tab-label truncate text-[11px] font-semibold tracking-tight text-gray-600 transition-colors duration-300 group-hover:text-gray-900 group-[.active]:text-indigo-700">Account</span>
+                    </div>
+                </div>
+            </nav>
+        </footer>
+        
+        <!-- Modals -->
+        <!-- About Modal - Elegant Variant -->
+        <div 
+            data-modal="about" 
+            class="hidden absolute inset-0 z-[1000] bg-white/80 flex items-center justify-center opacity-0 translate-y-4 transition-all duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="aboutModalTitle"
+        >
+            <!-- Modal Content Card -->
+            <div class="bg-white w-full h-full flex flex-col">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl flex items-center justify-center shadow-sm shadow-purple-200">
+                            <i data-icon="info" class="w-5 h-5 text-purple-600"></i>
+                        </div>
+                        <div>
+                            <h2 id="aboutModalTitle" class="font-bold text-gray-800">About DotVPN</h2>
+                        </div>
+                    </div>
+                    <button 
+                        data-modal-close 
+                        class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-600 bg-transparent hover:bg-gray-100 hover:text-gray-700 transition-all duration-200"
+                        aria-label="Close about"
+                    >
+                        <i data-icon="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+        
+                <!-- Modal Content -->
+                <div class="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 custom-scrollbar">
+                    
+                    <!-- App Logo & Info -->
+                    <div class="text-center mb-6 pt-2">
+                        <div class="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                            <img src="assets/logo.png" class="w-10 h-10" alt="DotVPN Logo" />
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">DotVPN</h3>
+                        <p class="text-sm text-gray-600 mb-2">Free Per-Site VPN Protection</p>
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-100 rounded-full">
+                            <span id="aboutAppVersion" class="text-xs font-semibold text-indigo-700">Version 1.0.0</span>
+                            <span class="w-1 h-1 bg-indigo-400 rounded-full"></span>
+                            <span class="text-xs text-indigo-600">Latest</span>
+                        </div>
+                    </div>
+        
+                    <!-- Description -->
+                    <div class="mb-6 pb-6 border-b border-gray-100">
+                        <h4 class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">
+                            <i data-icon="file-text" class="w-4 h-4"></i>
+                            Description
+                        </h4>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            DotVPN provides per-site VPN protection, allowing you to secure specific websites while browsing normally on others. Protect your privacy, bypass restrictions, and stay secure online.
+                        </p>
+                    </div>
+        
+                    <!-- Features -->
+                    <div class="mb-6 pb-6 border-b border-gray-100">
+                        <h4 class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">
+                            <i data-icon="star" class="w-4 h-4"></i>
+                            Key Features
+                        </h4>
+                        <ul class="space-y-2">
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check" class="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5"></i>
+                                <span>Unlimited per-site VPN protection</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check" class="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5"></i>
+                                <span>Military-grade encryption (AES-256)</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check" class="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5"></i>
+                                <span>No-logs policy - complete privacy</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check" class="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5"></i>
+                                <span>Easy-to-use interface</span>
+                            </li>
+                        </ul>
+                    </div>
+        
+                    <!-- Links -->
+                    <div class="mb-6 pb-6 border-b border-gray-100">
+                        <h4 class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">
+                            <i data-icon="external-link" class="w-4 h-4"></i>
+                            Links
+                        </h4>
+                        <div class="space-y-2">
+                            <a href="https://dotvpn.com/en/legal/privacy-policy/" class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 no-underline text-inherit">
+                                <span class="text-sm font-medium text-gray-700">Privacy Policy</span>
+                                <i data-icon="external-link" class="w-3.5 h-3.5 text-gray-400"></i>
+                            </a>
+                            <a href="https://dotvpn.com/en/legal/tos/" class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 no-underline text-inherit">
+                                <span class="text-sm font-medium text-gray-700">Terms of Service</span>
+                                <i data-icon="external-link" class="w-3.5 h-3.5 text-gray-400"></i>
+                            </a>
+                        </div>
+                    </div>
+        
+                    <!-- Copyright -->
+                    <div class="text-center pt-3 pb-1">
+                        <p class="text-xs text-gray-500">© 2025 DotVPN. All rights reserved.</p>
+                    </div>
+        
+                </div>
+        
+            </div>
+        </div>
+        <!-- Help & Support Modal - Elegant Variant -->
+        <div 
+            data-modal="helpSupport" 
+            class="hidden absolute inset-0 z-[1000] bg-white/80 flex items-center justify-center opacity-0 translate-y-4 transition-all duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="helpSupportModalTitle"
+        >
+            <!-- Modal Content Card -->
+            <div class="bg-white w-full h-full flex flex-col">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl flex items-center justify-center shadow-sm shadow-blue-200">
+                            <i data-icon="help-circle" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h2 id="helpSupportModalTitle" class="font-bold text-gray-800">Help & Support</h2>
+                        </div>
+                    </div>
+                    <button 
+                        data-modal-close 
+                        class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-600 bg-transparent hover:bg-gray-100 hover:text-gray-700 transition-all duration-200"
+                        aria-label="Close help"
+                    >
+                        <i data-icon="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+        
+                <!-- Modal Content -->
+                <div class="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 custom-scrollbar">
+                    
+                    <!-- Search Help -->
+                    <div class="mb-4">
+                        <div class="relative">
+                            <i data-icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                            <input 
+                                type="text" 
+                                id="helpSearchInput"
+                                placeholder="Search help articles..."
+                                class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                                aria-label="Search help articles"
+                            >
+                        </div>
+                    </div>
+        
+                    <!-- Quick Help Cards -->
+                    <div class="grid grid-cols-2 gap-2 mb-4">
+                        <button class="flex flex-col items-center p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 cursor-pointer" aria-label="Getting started guide">
+                            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mb-2">
+                                <i data-icon="play-circle" class="w-4 h-4 text-green-600"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-gray-800">Getting Started</span>
+                        </button>
+                        <button class="flex flex-col items-center p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 cursor-pointer" aria-label="Troubleshooting guide">
+                            <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mb-2">
+                                <i data-icon="zap" class="w-4 h-4 text-purple-600"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-gray-800">Troubleshooting</span>
+                        </button>
+                    </div>
+        
+                    <!-- FAQ Section -->
+                    <div class="mb-6 pb-6 border-b border-gray-100">
+                        <h3 class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">
+                            <i data-icon="message-circle" class="w-4 h-4"></i>
+                            Frequently Asked Questions
+                        </h3>
+                        
+                        <div class="space-y-2">
+                            <!-- FAQ Item 1 -->
+                            <details class="border border-gray-200 rounded-lg overflow-hidden">
+                                <summary class="flex items-center justify-between px-4 py-3 cursor-pointer select-none text-sm font-semibold text-gray-800 bg-white hover:bg-gray-50 transition-colors">
+                                    <span>How does per-site VPN protection work?</span>
+                                    <i data-icon="chevron-down" class="w-4 h-4 text-gray-400 transition-transform"></i>
+                                </summary>
+                                <div class="px-4 pb-4 text-sm leading-relaxed text-gray-600">
+                                    <p>Per-site VPN protection routes traffic from specific websites through our secure VPN servers. Add a site to your protected list, and all requests to that domain will be encrypted and routed through our network.</p>
+                                </div>
+                            </details>
+        
+                            <!-- FAQ Item 2 -->
+                            <details class="border border-gray-200 rounded-lg overflow-hidden">
+                                <summary class="flex items-center justify-between px-4 py-3 cursor-pointer select-none text-sm font-semibold text-gray-800 bg-white hover:bg-gray-50 transition-colors">
+                                    <span>What's the difference between Free and Premium?</span>
+                                    <i data-icon="chevron-down" class="w-4 h-4 text-gray-400 transition-transform"></i>
+                                </summary>
+                                <div class="px-4 pb-4 text-sm leading-relaxed text-gray-600">
+                                    <p><strong>Free Plan:</strong> Unlimited per-site VPN protection for any website you choose.</p>
+                                    <p class="mt-2"><strong>Premium Plan:</strong> Adds global VPN for all traffic, 70+ countries, faster speeds, and priority support.</p>
+                                </div>
+                            </details>
+        
+                            <!-- FAQ Item 3 -->
+                            <details class="border border-gray-200 rounded-lg overflow-hidden">
+                                <summary class="flex items-center justify-between px-4 py-3 cursor-pointer select-none text-sm font-semibold text-gray-800 bg-white hover:bg-gray-50 transition-colors">
+                                    <span>Is my browsing data logged?</span>
+                                    <i data-icon="chevron-down" class="w-4 h-4 text-gray-400 transition-transform"></i>
+                                </summary>
+                                <div class="px-4 pb-4 text-sm leading-relaxed text-gray-600">
+                                    <p>We have a strict no-logs policy. We don't track, collect, or store your browsing activity, connection logs, or IP addresses. Your privacy is our top priority.</p>
+                                </div>
+                            </details>
+        
+                            <!-- FAQ Item 4 -->
+                            <details class="border border-gray-200 rounded-lg overflow-hidden">
+                                <summary class="flex items-center justify-between px-4 py-3 cursor-pointer select-none text-sm font-semibold text-gray-800 bg-white hover:bg-gray-50 transition-colors">
+                                    <span>Can I use this on multiple devices?</span>
+                                    <i data-icon="chevron-down" class="w-4 h-4 text-gray-400 transition-transform"></i>
+                                </summary>
+                                <div class="px-4 pb-4 text-sm leading-relaxed text-gray-600">
+                                    <p>Yes! Install the extension on any browser that supports Chrome extensions. Your account syncs across all devices.</p>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+        
+                    <!-- Contact Support Section -->
+                    <div class="mb-6 pb-6 border-b border-gray-100">
+                        <h3 class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">
+                            <i data-icon="mail" class="w-4 h-4"></i>
+                            Contact Support
+                        </h3>
+                        
+                        <div class="space-y-2">
+                            <a href="mailto:support@securevpn.com" class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 hover:-translate-y-px transition-all duration-200 no-underline text-inherit">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center">
+                                        <i data-icon="mail" class="w-4 h-4 text-blue-600"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <div class="text-sm font-semibold text-gray-800">Email Support</div>
+                                        <div class="text-xs text-gray-500">support@securevpn.com</div>
+                                    </div>
+                                </div>
+                                <i data-icon="external-link" class="w-4 h-4 text-gray-400"></i>
+                            </a>
+        
+                            <a href="#" class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 hover:-translate-y-px transition-all duration-200 no-underline text-inherit">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
+                                        <i data-icon="message-circle" class="w-4 h-4 text-green-600"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <div class="text-sm font-semibold text-gray-800">Live Chat</div>
+                                        <div class="text-xs text-gray-500">Available 9am-5pm EST</div>
+                                    </div>
+                                </div>
+                                <i data-icon="external-link" class="w-4 h-4 text-gray-400"></i>
+                            </a>
+                        </div>
+                    </div>
+        
+                </div>
+        
+            </div>
+        </div>
+        <!-- No Internet Modal - Elegant Variant -->
+        <div 
+            data-modal="noInternet" 
+            class="hidden absolute inset-0 z-[1000] bg-white/80 flex items-center justify-center opacity-0 translate-y-4 transition-all duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="noInternetModalTitle"
+            aria-describedby="noInternetModalDescription"
+        >
+            <!-- Modal Content Card -->
+            <div class="bg-white w-full h-full flex flex-col">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-red-100 to-orange-100 rounded-xl flex items-center justify-center shadow-sm shadow-red-200">
+                            <i data-icon="wifi-off" class="w-5 h-5 text-red-600" aria-hidden="true"></i>
+                        </div>
+                        <div>
+                            <h2 id="noInternetModalTitle" class="font-bold text-gray-800">No Internet Connection</h2>
+                        </div>
+                    </div>
+                    <button 
+                        data-modal-close 
+                        class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-600 bg-transparent hover:bg-gray-100 hover:text-gray-700 transition-all duration-200"
+                        aria-label="Close no internet dialog"
+                    >
+                        <i data-icon="x" class="w-5 h-5" aria-hidden="true"></i>
+                    </button>
+                </div>
+        
+                <!-- Modal Content -->
+                <div class="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 custom-scrollbar">
+                    
+                    <!-- Warning Icon -->
+                    <div class="text-center mb-6 pt-2">
+                        <div class="w-20 h-20 bg-gradient-to-br from-red-500 to-orange-600 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-200">
+                            <i data-icon="wifi-off" class="w-10 h-10 text-white" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Connection Issue Detected</h3>
+                    </div>
+        
+                    <!-- Connection Status -->
+                    <div class="mb-6 pb-6 border-b border-gray-100">
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <p class="text-center text-xs text-red-800 mb-2 font-semibold uppercase tracking-wide">
+                                Network Status
+                            </p>
+                            <p 
+                                id="connectionStatus"
+                                data-connection-status
+                                role="status"
+                                aria-live="polite"
+                                aria-atomic="true"
+                                class="text-center text-lg font-bold text-red-900 mb-3"
+                            >
+                                No Internet Access
+                            </p>
+                            <div class="flex items-center justify-center gap-2 text-xs text-red-700">
+                                <i data-icon="alert-circle" class="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true"></i>
+                                <span>Chrome browser cannot connect to the internet</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <!-- Problem Description -->
+                    <div class="mb-6 pb-6 border-b border-gray-100">
+                        <h4 class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">
+                            <i data-icon="info" class="w-4 h-4" aria-hidden="true"></i>
+                            What's Happening?
+                        </h4>
+                        <div id="noInternetModalDescription" class="space-y-3 text-sm text-gray-600">
+                            <p class="leading-relaxed">
+                                <strong class="text-gray-800">DotVPN</strong> cannot establish a connection because your browser is unable to access the internet.
+                            </p>
+                            <p class="leading-relaxed">
+                                This is typically a local network issue and not related to DotVPN's service. Please check your internet connection and try again.
+                            </p>
+                        </div>
+                    </div>
+        
+                    <!-- Troubleshooting Steps -->
+                    <div class="mb-6">
+                        <h4 class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">
+                            <i data-icon="wrench" class="w-4 h-4" aria-hidden="true"></i>
+                            Troubleshooting Steps
+                        </h4>
+                        <ul class="space-y-2" role="list">
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check-circle" class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" aria-hidden="true"></i>
+                                <span>Check if your device is connected to Wi-Fi or Ethernet</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check-circle" class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" aria-hidden="true"></i>
+                                <span>Verify that other devices can access the internet</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check-circle" class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" aria-hidden="true"></i>
+                                <span>Restart your router or modem</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check-circle" class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" aria-hidden="true"></i>
+                                <span>Disable other VPN or proxy extensions temporarily</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check-circle" class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" aria-hidden="true"></i>
+                                <span>Check if your firewall is blocking Chrome</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check-circle" class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" aria-hidden="true"></i>
+                                <span>Try visiting other websites to confirm connectivity</span>
+                            </li>
+                        </ul>
+                    </div>
+        
+                    <!-- Technical Note -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4" role="note">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i data-icon="help-circle" class="w-4 h-4 text-blue-600" aria-hidden="true"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-blue-900 mb-1">Automatic Detection</p>
+                                <p class="text-xs text-blue-700 leading-relaxed">
+                                    This modal will close automatically once your internet connection is restored. You don't need to take any action.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+        
+                </div>
+            </div>
+        </div>
+        <!-- Proxy Access Modal - Elegant Variant -->
+        <div 
+            data-modal="proxyControl" 
+            class="hidden absolute inset-0 z-[1000] bg-white/80 flex items-center justify-center opacity-0 translate-y-4 transition-all duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="proxyAccessModalTitle"
+        >
+            <!-- Modal Content Card -->
+            <div class="bg-white w-full h-full flex flex-col">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center shadow-sm shadow-orange-200">
+                            <i data-icon="alert-triangle" class="w-5 h-5 text-orange-600"></i>
+                        </div>
+                        <div>
+                            <h2 id="proxyAccessModalTitle" class="font-bold text-gray-800">Permission Required</h2>
+                        </div>
+                    </div>
+                    <button 
+                        data-modal-close 
+                        class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-600 bg-transparent hover:bg-gray-100 hover:text-gray-700 transition-all duration-200"
+                        aria-label="Close proxy access"
+                    >
+                        <i data-icon="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+        
+                <!-- Modal Content -->
+                <div class="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 custom-scrollbar">
+                    
+                    <!-- Warning Icon -->
+                    <div class="text-center mb-6 pt-2">
+                        <div class="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-orange-200">
+                            <i data-icon="shield-alert" class="w-10 h-10 text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Proxy Settings Access</h3>
+                    </div>
+        
+                    <!-- Conflicting Extension Warning -->
+                    <div class="mb-6 pb-6 border-b border-gray-100">
+                        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                            <p class="text-center text-xs text-orange-800 mb-2 font-semibold uppercase tracking-wide">
+                                Conflicting Extension Detected
+                            </p>
+                            <p 
+                                class="text-center text-lg font-bold text-orange-900 mb-3" 
+                                id="conflictingExtensionName"
+                                aria-live="polite"
+                                aria-atomic="true"
+                            >
+                                Another Extension
+                            </p>
+                            <div class="flex items-center justify-center gap-2 text-xs text-orange-700">
+                                <i data-icon="info" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                                <span>Both extensions are trying to control your proxy settings</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <!-- Information -->
+                    <div class="mb-6 pb-6 border-b border-gray-100">
+                        <h4 class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">
+                            <i data-icon="info" class="w-4 h-4"></i>
+                            Why This Permission?
+                        </h4>
+                        <div class="space-y-3 text-sm text-gray-600">
+                            <p class="leading-relaxed">
+                                <strong class="text-gray-800">DotVPN</strong> requires permission to manage your proxy settings in order to establish secure, encrypted connections.
+                            </p>
+                            <p class="leading-relaxed">
+                                Granting access will allow DotVPN to take control of proxy settings, ensuring your internet traffic is properly routed through our secure servers.
+                            </p>
+                        </div>
+                    </div>
+        
+                    <!-- What Happens Next -->
+                    <div class="mb-6">
+                        <h4 class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">
+                            <i data-icon="check-circle" class="w-4 h-4"></i>
+                            What Happens Next
+                        </h4>
+                        <ul class="space-y-2">
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check" class="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5"></i>
+                                <span>DotVPN will manage proxy settings for protected sites</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check" class="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5"></i>
+                                <span>Other extensions will release proxy control</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check" class="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5"></i>
+                                <span>Your connection will be encrypted and secure</span>
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <i data-icon="check" class="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5"></i>
+                                <span>You can revoke this permission at any time</span>
+                            </li>
+                        </ul>
+                    </div>
+        
+                    <!-- Security Note -->
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i data-icon="shield" class="w-4 h-4 text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-indigo-900 mb-1">Security & Privacy</p>
+                                <p class="text-xs text-indigo-700 leading-relaxed">
+                                    DotVPN never logs your browsing activity and uses military-grade encryption to protect your data.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+        
+                </div>
+        
+                <!-- Modal Footer -->
+                <div class="flex gap-3 px-5 py-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+                    <button 
+                        id="btnGrantProxyAccess" 
+                        class="flex items-center justify-center gap-2 flex-1 px-4 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-base font-semibold border-0 cursor-pointer hover:-translate-y-px hover:shadow-lg hover:shadow-indigo-600/40 active:translate-y-0 transition-all duration-200" 
+                        aria-label="Allow proxy access"
+                    >
+                        <i data-icon="shield-check" class="w-4 h-4"></i>
+                        <span>Allow Access</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Rate Modal - Elegant Variant -->
+        <div 
+            data-modal="rate" 
+            class="hidden fixed inset-0 z-[1000] bg-white/60 backdrop-blur-sm flex items-center justify-center p-0 opacity-0 transition-all duration-[350ms] ease-out pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="rateModalTitle"
+        >
+            <div class="bg-white rounded-none w-full h-full flex flex-col transform scale-95 opacity-0 transition-all duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-xl flex items-center justify-center shadow-sm shadow-yellow-200">
+                            <i data-icon="star" class="w-5 h-5 text-yellow-600"></i>
+                        </div>
+                        <div>
+                            <h2 id="rateModalTitle" class="font-bold text-gray-800">Rate Our Service</h2>
+                        </div>
+                    </div>
+                    <button 
+                        data-modal-close 
+                        class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-600 bg-transparent hover:bg-gray-100 hover:text-gray-700 transition-all duration-200"
+                        aria-label="Close rate"
+                    >
+                        <i data-icon="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+        
+                <!-- Modal Content -->
+                <div class="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4">
+                    
+                    <!-- Rating Icon -->
+                    <div class="text-center mb-6 pt-2">
+                        <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <i data-icon="star" class="w-10 h-10 text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Please, Review Us!</h3>
+                    </div>
+        
+                    <!-- Description -->
+                    <div class="space-y-4 text-sm text-gray-600 leading-relaxed">
+                        <p class="text-center">
+                            Leave a comment about our application for people who are not yet with us.
+                        </p>
+                        <p class="text-center">
+                            They will also be able to take advantage of the free Internet without limits with the highest encryption.
+                        </p>
+                    </div>
+        
+                </div>
+        
+                <!-- Modal Footer -->
+                <div class="flex gap-3 px-5 py-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+                    <button id="btnRateNow" class="flex items-center justify-center gap-2 flex-1 px-4 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-base font-semibold border-0 cursor-pointer hover:-translate-y-px hover:shadow-lg hover:shadow-indigo-600/40 active:translate-y-0 transition-all duration-200" aria-label="Review in Chrome">
+                        <i data-icon="external-link" class="w-4 h-4"></i>
+                        Review in <span id="browserName">Chrome</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Select Country Modal - Compact Variant -->
+        <div
+            id="selectCountryModal"
+            data-modal="selectCountry"
+            class="hidden absolute inset-0 z-[1000] bg-white/80 flex items-center justify-center opacity-0 translate-y-4 transition-all duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] pointer-events-none"
+        >
+            <!-- Modal Content Card -->
+            <div
+                data-modal-dialog
+                aria-labelledby="selectCountryModalTitle"
+                class="bg-white w-full h-full flex flex-col"
+            >
+                <!-- Enhanced Header -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl flex items-center justify-center shadow-sm shadow-indigo-200">
+                            <i data-icon="map-pin" class="w-5 h-5 text-indigo-600"></i>
+                        </div>
+                        <div>
+                            <h2 id="selectCountryModalTitle" class="font-bold text-gray-800">Select Location</h2>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        data-modal-close
+                        class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-600 bg-transparent hover:bg-gray-100 hover:text-gray-700 transition-all duration-200"
+                        aria-label="Close modal"
+                    >
+                        <i data-icon="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+        
+                <!-- Search Bar -->
+                <div class="px-4 pt-4 pb-2 flex-shrink-0">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="countrySearchInputCompact"
+                            data-modal-initial-focus
+                            placeholder="Search countries..."
+                            class="w-full pl-12 pr-12 py-3.5 bg-white border-2 border-gray-200 rounded-xl text-sm placeholder:text-gray-400"
+                            aria-label="Search countries"
+                            autocomplete="off"
+                            spellcheck="false"
+                            inputmode="search"
+                            enterkeyhint="search"
+                        />
+                        <i data-icon="search" class="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        <button
+                            type="button"
+                            id="clearSearchBtnCompact"
+                            class="hidden absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-gray-100 hover:bg-gray-200 rounded-full items-center justify-center transition-all duration-200 active:scale-95"
+                            aria-label="Clear search"
+                        >
+                            <i data-icon="x" class="w-4 h-4 text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+        
+                <!-- Quick Filters -->
+                <div class="px-4 py-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden flex-shrink-0">
+                    <div class="flex gap-2 min-w-max">
+                        <button class="flex items-center gap-1.5 px-3.5 py-2 bg-white border-2 border-gray-200 rounded-xl text-xs font-semibold text-gray-600 transition-all duration-200 whitespace-nowrap cursor-pointer select-none hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 data-[active=true]:bg-gradient-to-r data-[active=true]:from-indigo-500 data-[active=true]:to-indigo-600 data-[active=true]:border-indigo-500 data-[active=true]:text-white data-[active=true]:shadow-md data-[active=true]:shadow-indigo-200"
+                                data-region="all"
+                                data-active="true"
+                                aria-label="Show all locations"
+                                type="button">
+                            <i data-icon="globe-2" class="w-3.5 h-3.5"></i>
+                            <span>All</span>
+                        </button>
+                        <button class="flex items-center gap-1.5 px-3.5 py-2 bg-white border-2 border-gray-200 rounded-xl text-xs font-semibold text-gray-600 transition-all duration-200 whitespace-nowrap cursor-pointer select-none hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 data-[active=true]:bg-gradient-to-r data-[active=true]:from-indigo-500 data-[active=true]:to-indigo-600 data-[active=true]:border-indigo-500 data-[active=true]:text-white data-[active=true]:shadow-md data-[active=true]:shadow-indigo-200"
+                                data-region="top"
+                                aria-label="Show top locations"
+                                type="button">
+                            <i data-icon="star" class="w-3.5 h-3.5"></i>
+                            <span>Popular</span>
+                        </button>
+                        <button class="flex items-center gap-1.5 px-3.5 py-2 bg-white border-2 border-gray-200 rounded-xl text-xs font-semibold text-gray-600 transition-all duration-200 whitespace-nowrap cursor-pointer select-none hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 data-[active=true]:bg-gradient-to-r data-[active=true]:from-indigo-500 data-[active=true]:to-indigo-600 data-[active=true]:border-indigo-500 data-[active=true]:text-white data-[active=true]:shadow-md data-[active=true]:shadow-indigo-200"
+                                data-region="europe"
+                                aria-label="Show Europe locations"
+                                type="button">
+                            <i data-icon="landmark" class="w-3.5 h-3.5"></i>
+                            <span>Europe</span>
+                        </button>
+                        <button class="flex items-center gap-1.5 px-3.5 py-2 bg-white border-2 border-gray-200 rounded-xl text-xs font-semibold text-gray-600 transition-all duration-200 whitespace-nowrap cursor-pointer select-none hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 data-[active=true]:bg-gradient-to-r data-[active=true]:from-indigo-500 data-[active=true]:to-indigo-600 data-[active=true]:border-indigo-500 data-[active=true]:text-white data-[active=true]:shadow-md data-[active=true]:shadow-indigo-200"
+                                data-region="americas"
+                                aria-label="Show Americas locations"
+                                type="button">
+                            <i data-icon="mountain" class="w-3.5 h-3.5"></i>
+                            <span>Americas</span>
+                        </button>
+                        <button class="flex items-center gap-1.5 px-3.5 py-2 bg-white border-2 border-gray-200 rounded-xl text-xs font-semibold text-gray-600 transition-all duration-200 whitespace-nowrap cursor-pointer select-none hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 data-[active=true]:bg-gradient-to-r data-[active=true]:from-indigo-500 data-[active=true]:to-indigo-600 data-[active=true]:border-indigo-500 data-[active=true]:text-white data-[active=true]:shadow-md data-[active=true]:shadow-indigo-200"
+                                data-region="asia"
+                                aria-label="Show Asia locations"
+                                type="button">
+                            <i data-icon="building-2" class="w-3.5 h-3.5"></i>
+                            <span>Asia</span>
+                        </button>
+                        <button class="flex items-center gap-1.5 px-3.5 py-2 bg-white border-2 border-gray-200 rounded-xl text-xs font-semibold text-gray-600 transition-all duration-200 whitespace-nowrap cursor-pointer select-none hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 data-[active=true]:bg-gradient-to-r data-[active=true]:from-indigo-500 data-[active=true]:to-indigo-600 data-[active=true]:border-indigo-500 data-[active=true]:text-white data-[active=true]:shadow-md data-[active=true]:shadow-indigo-200"
+                                data-region="oceania"
+                                aria-label="Show Oceania locations"
+                                type="button">
+                            <i data-icon="palmtree" class="w-3.5 h-3.5"></i>
+                            <span>Oceania</span>
+                        </button>
+                    </div>
+                </div>
+        
+                <!-- Country List -->
+                <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-4 pb-4">
+                    <div id="countryListCompact" class="flex flex-col gap-2">
+                        <!-- Countries will be dynamically rendered here by LocationsController -->
+                    </div>
+        
+                    <!-- Empty State -->
+                    <div id="emptyStateCompact" class="hidden flex-col items-center justify-center py-16 px-6">
+                        <div class="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl flex items-center justify-center mb-4 shadow-sm">
+                            <i data-icon="search-x" class="w-10 h-10 text-gray-400"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-gray-900 mb-1.5">No locations found</h3>
+                        <p class="text-sm text-gray-500 text-center max-w-xs">Try adjusting your search or filter criteria</p>
+                    </div>
+        
+                    <!-- Loading State -->
+                    <div id="loadingStateCompact" class="hidden flex-col items-center justify-center py-16 px-6">
+                        <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+                        <p class="text-sm text-gray-500">Loading locations...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Country Item Template -->
+        <template id="countryItemTemplate">
+            <div
+                data-country-item
+                class="flex items-center justify-between p-3.5 bg-white border-2 border-gray-200 rounded-xl hover:border-indigo-300 hover:shadow-md transition-all duration-200 cursor-pointer group active:scale-[0.98]"
+                role="button"
+                tabindex="0"
+            >
+                <!-- Left: Flag + Country Info -->
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                    <!-- Flag -->
+                    <span
+                        data-flag
+                        class="flag-icon flex-shrink-0 select-none"
+                        style="width: 32px; height: 24px; font-size: 32px;"
+                    ></span>
+        
+                    <!-- Country Details -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <span data-country-name class="font-semibold truncate text-gray-900"></span>
+                        </div>
+                        <div data-city-region class="text-xs text-gray-500"></div>
+                    </div>
+                </div>
+        
+                <!-- Right: Ping Info + Chevron -->
+                <div class="flex items-center gap-3 flex-shrink-0">
+                    <div class="text-right">
+                        <div class="flex items-center gap-1.5">
+                            <div data-ping-dot class="w-2 h-2 rounded-full"></div>
+                            <span data-ping-value class="font-bold text-sm"></span>
+                        </div>
+                        <div data-ping-label class="text-[10px] text-gray-500 font-medium mt-0.5"></div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <!-- Settings Modal - Elegant Variant -->
+        <div 
+            data-modal="settings" 
+            class="hidden absolute inset-0 z-[1000] bg-white/80 flex items-center justify-center opacity-0 translate-y-4 transition-all duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="settingsModalTitle"
+        >
+            <!-- Modal Content Card -->
+            <div class="bg-white w-full h-full flex flex-col">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl flex items-center justify-center shadow-sm shadow-indigo-200">
+                            <i data-icon="settings" class="w-5 h-5 text-indigo-600"></i>
+                        </div>
+                        <div>
+                            <h2 id="settingsModalTitle" class="font-bold text-gray-800">Settings</h2>
+                        </div>
+                    </div>
+                    <button 
+                        data-modal-close 
+                        class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-600 bg-transparent hover:bg-gray-100 hover:text-gray-700 transition-all duration-200"
+                        aria-label="Close settings"
+                    >
+                        <i data-icon="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+        
+                <!-- Modal Content -->
+                <div class="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 custom-scrollbar">
+                    
+                    <!-- Connection Options Section -->
+                    <div class="mb-6 pb-6 border-b border-gray-100">
+                        <h4 class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">
+                            <i data-icon="wifi" class="w-4 h-4"></i>
+                            Connection Options
+                        </h4>
+                        
+                        <div class="space-y-3">
+                            <!-- Auto-connect on Start -->
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex-1">
+                                    <label for="auto-start-switch" class="block text-sm font-semibold text-gray-800 mb-1 cursor-pointer">Connect on Start</label>
+                                    <p class="text-xs text-gray-600 leading-snug">Automatically connect to VPN when browser starts</p>
+                                </div>
+                                <label class="relative inline-block w-12 h-7 flex-shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="auto-start-switch" class="opacity-0 w-0 h-0 peer" aria-label="Toggle auto-connect on start">
+                                    <div class="toggle-track absolute cursor-pointer inset-0 bg-gray-300 rounded-full transition-all duration-300 before:content-[''] before:absolute before:h-5 before:w-5 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all before:duration-300 before:shadow-sm peer-checked:bg-gradient-to-r peer-checked:from-green-500 peer-checked:to-green-600 peer-checked:before:translate-x-5"></div>
+                                </label>
+                            </div>
+        
+                            <!-- Bandwidth Saver -->
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex-1">
+                                    <label for="bandwidth-saver-switch" class="block text-sm font-semibold text-gray-800 mb-1 cursor-pointer">Save Bandwidth</label>
+                                    <p class="text-xs text-gray-600 leading-snug">Optimize data usage for faster browsing on limited connections</p>
+                                </div>
+                                <label class="relative inline-block w-12 h-7 flex-shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="bandwidth-saver-switch" class="opacity-0 w-0 h-0 peer" aria-label="Toggle bandwidth saver">
+                                    <div class="toggle-track absolute cursor-pointer inset-0 bg-gray-300 rounded-full transition-all duration-300 before:content-[''] before:absolute before:h-5 before:w-5 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all before:duration-300 before:shadow-sm peer-checked:bg-gradient-to-r peer-checked:from-green-500 peer-checked:to-green-600 peer-checked:before:translate-x-5"></div>
+                                </label>
+                            </div>
+        
+                            <!-- DNS Leak Protection -->
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex-1">
+                                    <label for="dns-leak-protection-switch" class="block text-sm font-semibold text-gray-800 mb-1 cursor-pointer">DNS Leak Protection</label>
+                                    <p class="text-xs text-gray-600 leading-snug">Prevent DNS queries from bypassing the VPN tunnel</p>
+                                </div>
+                                <label class="relative inline-block w-12 h-7 flex-shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="dns-leak-protection-switch" class="opacity-0 w-0 h-0 peer" aria-label="Toggle DNS leak protection">
+                                    <div class="toggle-track absolute cursor-pointer inset-0 bg-gray-300 rounded-full transition-all duration-300 before:content-[''] before:absolute before:h-5 before:w-5 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all before:duration-300 before:shadow-sm peer-checked:bg-gradient-to-r peer-checked:from-green-500 peer-checked:to-green-600 peer-checked:before:translate-x-5"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <!-- Privacy & Security Section -->
+                    <div class="mb-6 pb-6 border-b border-gray-100">
+                        <h4 class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">
+                            <i data-icon="shield" class="w-4 h-4"></i>
+                            Privacy & Security
+                        </h4>
+                        
+                        <div class="space-y-3">
+                            <!-- Ad Block -->
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex-1">
+                                    <label for="adblock-switch" class="block text-sm font-semibold text-gray-800 mb-1 cursor-pointer">Block Ads</label>
+                                    <p class="text-xs text-gray-600 leading-snug">Block intrusive advertisements and pop-ups</p>
+                                </div>
+                                <label class="relative inline-block w-12 h-7 flex-shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="adblock-switch" class="opacity-0 w-0 h-0 peer" aria-label="Toggle ad blocking">
+                                    <div class="toggle-track absolute cursor-pointer inset-0 bg-gray-300 rounded-full transition-all duration-300 before:content-[''] before:absolute before:h-5 before:w-5 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all before:duration-300 before:shadow-sm peer-checked:bg-gradient-to-r peer-checked:from-green-500 peer-checked:to-green-600 peer-checked:before:translate-x-5"></div>
+                                </label>
+                            </div>
+        
+                            <!-- Tracking Protection -->
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex-1">
+                                    <label for="tracking-protection-switch" class="block text-sm font-semibold text-gray-800 mb-1 cursor-pointer">Protect from Tracking</label>
+                                    <p class="text-xs text-gray-600 leading-snug">Block third-party trackers and cookies</p>
+                                </div>
+                                <label class="relative inline-block w-12 h-7 flex-shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="tracking-protection-switch" class="opacity-0 w-0 h-0 peer" aria-label="Toggle tracking protection">
+                                    <div class="toggle-track absolute cursor-pointer inset-0 bg-gray-300 rounded-full transition-all duration-300 before:content-[''] before:absolute before:h-5 before:w-5 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all before:duration-300 before:shadow-sm peer-checked:bg-gradient-to-r peer-checked:from-green-500 peer-checked:to-green-600 peer-checked:before:translate-x-5"></div>
+                                </label>
+                            </div>
+        
+                            <!-- Block Analytics -->
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex-1">
+                                    <label for="block-analytics-switch" class="block text-sm font-semibold text-gray-800 mb-1 cursor-pointer">Block Analytics</label>
+                                    <p class="text-xs text-gray-600 leading-snug">Prevent analytics services from tracking your behavior</p>
+                                </div>
+                                <label class="relative inline-block w-12 h-7 flex-shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="block-analytics-switch" class="opacity-0 w-0 h-0 peer" aria-label="Toggle analytics blocking">
+                                    <div class="toggle-track absolute cursor-pointer inset-0 bg-gray-300 rounded-full transition-all duration-300 before:content-[''] before:absolute before:h-5 before:w-5 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all before:duration-300 before:shadow-sm peer-checked:bg-gradient-to-r peer-checked:from-green-500 peer-checked:to-green-600 peer-checked:before:translate-x-5"></div>
+                                </label>
+                            </div>
+        
+                            <!-- WebRTC IP Protection -->
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex-1">
+                                    <label for="block-webrtc-switch" class="block text-sm font-semibold text-gray-800 mb-1 cursor-pointer">WebRTC Hide IP</label>
+                                    <p class="text-xs text-gray-600 leading-snug">Prevent WebRTC from leaking your real IP address</p>
+                                </div>
+                                <label class="relative inline-block w-12 h-7 flex-shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="block-webrtc-switch" class="opacity-0 w-0 h-0 peer" aria-label="Toggle WebRTC IP hiding">
+                                    <div class="toggle-track absolute cursor-pointer inset-0 bg-gray-300 rounded-full transition-all duration-300 before:content-[''] before:absolute before:h-5 before:w-5 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all before:duration-300 before:shadow-sm peer-checked:bg-gradient-to-r peer-checked:from-green-500 peer-checked:to-green-600 peer-checked:before:translate-x-5"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <!-- Other Options Section -->
+                    <div class="mb-6">
+                        <h4 class="flex items-center gap-2 text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">
+                            <i data-icon="sliders" class="w-4 h-4"></i>
+                            Other Options
+                        </h4>
+                        
+                        <div class="space-y-3">
+                            <!-- Hide App Icon -->
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex-1">
+                                    <label for="hide-app-icon" class="block text-sm font-semibold text-gray-800 mb-1 cursor-pointer">Hide Application Icon</label>
+                                    <p class="text-xs text-gray-600 leading-snug">Hide the VPN icon from your browser toolbar</p>
+                                </div>
+                                <label class="relative inline-block w-12 h-7 flex-shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="hide-app-icon" class="opacity-0 w-0 h-0 peer" aria-label="Toggle hide application icon">
+                                    <div class="toggle-track absolute cursor-pointer inset-0 bg-gray-300 rounded-full transition-all duration-300 before:content-[''] before:absolute before:h-5 before:w-5 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all before:duration-300 before:shadow-sm peer-checked:bg-gradient-to-r peer-checked:from-green-500 peer-checked:to-green-600 peer-checked:before:translate-x-5"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+        
+                </div>
+            </div>
+        </div>
+        <!-- Sign In Modal - Elegant Variant (Three-Step Flow) -->
+        <div 
+            data-modal="signIn" 
+            class="hidden absolute inset-0 z-[1000] bg-white/80 flex items-center justify-center opacity-0 translate-y-4 transition-all duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="signInModalTitle"
+        >
+            <!-- Modal Content Card -->
+            <div class="bg-white w-full h-full flex flex-col" data-modal-dialog>
+                
+                <!-- Step 1: Email Entry -->
+                <div id="signinElegantEmailStep" class="flex flex-col w-full h-full">
+                    <!-- Modal Header -->
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl flex items-center justify-center shadow-sm shadow-indigo-200">
+                                <i data-icon="log-in" class="w-5 h-5 text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <h2 id="signInModalTitle" class="font-bold text-gray-800">Sign In</h2>
+                            </div>
+                        </div>
+                        <button 
+                            data-modal-close 
+                            type="button"
+                            class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-600 bg-transparent hover:bg-gray-100 hover:text-gray-700 transition-all duration-200"
+                            aria-label="Close sign in"
+                        >
+                            <i data-icon="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+        
+                    <!-- Modal Content -->
+                    <div class="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 custom-scrollbar">
+                        <!-- Welcome Section -->
+                        <div class="text-center mb-6 pt-2">
+                            <div class="w-20 h-20 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
+                                <i data-icon="shield" class="w-10 h-10 text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Welcome Back!</h3>
+                            <p class="text-sm text-gray-600">Sign in to access your Premium account</p>
+                        </div>
+        
+                        <!-- Email Form -->
+                        <form id="signinElegantEmailForm">
+                            <div>
+                                <label for="signinElegantEmail" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                                    Email Address
+                                </label>
+        
+                                <input 
+                                    type="email" 
+                                    id="signinElegantEmail" 
+                                    class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm"
+                                    placeholder="your.email@example.com"
+                                    required
+                                    autocomplete="email"
+                                    aria-describedby="signinElegantEmailHelp signinElegantEmailError"
+                                />
+        
+                                <p id="signinElegantEmailHelp" class="mt-2 text-xs text-gray-500">
+                                    We’ll email you a 4-digit verification code.
+                                </p>
+        
+                                <!-- Inline retry hint for Bridge state: email-retry -->
+                                <p
+                                    id="signinElegantEmailError"
+                                    class="hidden mt-2 text-xs text-red-600"
+                                    role="alert"
+                                    aria-live="polite"
+                                >
+                                    We couldn’t send the verification code. Please check the email and try again.
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+        
+                    <!-- Modal Footer -->
+                    <div class="flex gap-3 px-5 py-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+                        <button 
+                            type="button"
+                            class="flex items-center justify-center gap-2 flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold border-0 cursor-pointer hover:-translate-y-px transition-all duration-200 active:translate-y-0" 
+                            data-modal-close
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            id="btnElegantSubmitEmail"
+                            type="button"
+                            class="flex items-center justify-center gap-2 flex-1 px-4 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-base font-semibold border-0 cursor-pointer hover:-translate-y-px hover:shadow-lg hover:shadow-indigo-600/40 active:translate-y-0 transition-all duration-200"
+                            aria-label="Continue to verification"
+                        >
+                            <i data-icon="arrow-right" class="w-4 h-4"></i>
+                            Continue
+                        </button>
+                    </div>
+                </div>
+        
+                <!-- Step 2: OTP Verification -->
+                <div id="signinElegantOtpStep" class="hidden flex flex-col w-full h-full">
+                    <!-- Modal Header with Back Button -->
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
+                        <button 
+                            id="btnElegantBackToEmail"
+                            type="button"
+                            class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-600 bg-transparent hover:bg-gray-100 hover:text-gray-700 transition-all duration-200" 
+                            aria-label="Back to email"
+                        >
+                            <i data-icon="arrow-left" class="w-5 h-5"></i>
+                        </button>
+                        <h2 class="font-bold text-gray-800 flex-1 text-center mr-8">Verify Code</h2>
+                    </div>
+        
+                    <!-- Modal Content -->
+                    <div class="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 custom-scrollbar">
+                        <!-- Verification Section -->
+                        <div class="text-center mb-6 pt-2">
+                            <div class="w-20 h-20 bg-indigo-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                                <i data-icon="mail" class="w-10 h-10 text-indigo-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Check your email</h3>
+                            <p class="text-sm text-gray-600 mb-2">We sent a 4-digit code to</p>
+                            <p class="text-sm font-semibold text-gray-800" id="elegantDisplayEmail">email@example.com</p>
+                        </div>
+        
+                        <!-- OTP Form -->
+                        <form id="signinElegantOtpForm" class="mb-6">
+                            <div>
+                                <label for="signinElegantOtp" class="block text-sm font-semibold text-gray-700 mb-1.5 text-center">
+                                    Verification Code
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="signinElegantOtp" 
+                                    class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-center text-lg tracking-widest"
+                                    placeholder="0000"
+                                    maxlength="4"
+                                    inputmode="numeric"
+                                    pattern="[0-9]{4}"
+                                    required
+                                    autocomplete="off"
+                                    aria-describedby="signinElegantOtpHelp signinElegantOtpError"
+                                />
+        
+                                <p id="signinElegantOtpHelp" class="mt-2 text-xs text-gray-500 text-center">
+                                    Enter the 4-digit code from your email.
+                                </p>
+        
+                                <!-- Inline retry hint for Bridge state: code-retry -->
+                                <p
+                                    id="signinElegantOtpError"
+                                    class="hidden mt-2 text-xs text-red-600 text-center"
+                                    role="alert"
+                                    aria-live="polite"
+                                >
+                                    The verification code is invalid or expired. Please try again.
+                                </p>
+                            </div>
+                        </form>
+        
+                        <!-- Resend Link -->
+                        <div class="text-center">
+                            <button 
+                                id="btnElegantResendCode"
+                                type="button"
+                                class="text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
+                            >
+                                Didn't receive the code? Resend
+                            </button>
+                        </div>
+                    </div>
+        
+                    <!-- Modal Footer -->
+                    <div class="flex gap-3 px-5 py-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+                        <button 
+                            type="button"
+                            class="flex items-center justify-center gap-2 flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold border-0 cursor-pointer hover:-translate-y-px transition-all duration-200 active:translate-y-0" 
+                            id="btnElegantCancelOtp"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            id="btnElegantVerifyOtp"
+                            type="button"
+                            class="flex items-center justify-center gap-2 flex-1 px-4 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-base font-semibold border-0 cursor-pointer hover:-translate-y-px hover:shadow-lg hover:shadow-indigo-600/40 active:translate-y-0 transition-all duration-200"
+                            aria-label="Verify code"
+                        >
+                            <i data-icon="check" class="w-4 h-4"></i>
+                            Verify
+                        </button>
+                    </div>
+                </div>
+        
+                <!-- Step 3: Success & Redirect -->
+                <div id="signinElegantSuccessStep" class="hidden flex flex-col w-full h-full">
+                    <!-- Modal Content -->
+                    <div class="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 custom-scrollbar">
+                        <div class="flex flex-col items-center justify-center py-12">
+                            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4 animate-bounce motion-reduce:animate-none">
+                                <i data-icon="check-circle" class="w-10 h-10 text-green-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Congratulations!</h3>
+                            <p class="text-sm text-gray-600 text-center px-4 mb-6">
+                                You're now signed in to your Premium account
+                            </p>
+                            
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600 mb-2">Redirecting to Premium in</p>
+                                <div class="text-4xl font-bold text-indigo-600 tabular-nums" id="elegantCountdown">3</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+        <!-- SignupView Modal - Elegant Variant -->
+        <!-- Silent auto-registration screen: centered animated logo with status text -->
+        <div
+            data-modal="signupView"
+            class="hidden absolute inset-0 z-[1000] bg-white flex items-center justify-center opacity-0 transition-all duration-500 ease-out pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="signupViewTitle"
+            aria-describedby="signupViewStatus"
+        >
+            <div class="bg-white w-full h-full flex flex-col items-center justify-center relative overflow-hidden">
+        
+                <!-- Subtle radial background glow -->
+                <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-radial from-indigo-50/60 via-purple-50/30 to-transparent rounded-full blur-2xl"></div>
+                </div>
+        
+                <!-- Logo Container with Animations -->
+                <div class="relative z-10 flex flex-col items-center gap-8">
+        
+                    <!-- Animated Logo -->
+                    <div class="relative">
+                        <!-- Outer pulse ring -->
+                        <div class="absolute inset-0 -m-4 rounded-full bg-indigo-100/40 animate-signup-ring" aria-hidden="true"></div>
+                        <!-- Second pulse ring (delayed) -->
+                        <div class="absolute inset-0 -m-8 rounded-full bg-indigo-50/30 animate-signup-ring-delayed" aria-hidden="true"></div>
+        
+                        <!-- Logo wrapper -->
+                        <div class="relative w-24 h-24 animate-signup-breathe">
+                            <!-- Shimmer overlay -->
+                            <div class="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none" aria-hidden="true">
+                                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-signup-shimmer"></div>
+                            </div>
+        
+                            <!-- Actual logo image -->
+                            <img
+                                src="assets/logo.png"
+                                alt="DotVPN Logo"
+                                class="w-24 h-24 object-contain relative z-10 drop-shadow-lg"
+                            />
+                        </div>
+                    </div>
+        
+                    <!-- Title (hidden visually but available for a11y) -->
+                    <h2 id="signupViewTitle" class="sr-only">Initializing DotVPN</h2>
+        
+                    <!-- Brand Name -->
+                    <div class="flex flex-col items-center gap-1">
+                        <span class="text-2xl font-bold text-gray-900 tracking-tight">DotVPN</span>
+                        <span class="text-xs font-medium text-gray-400 tracking-widest uppercase">Free &amp; Secure VPN</span>
+                    </div>
+        
+                    <!-- Status Text -->
+                    <div class="flex flex-col items-center gap-3 mt-2">
+                        <!-- Minimal spinner -->
+                        <div class="flex items-center gap-1.5" aria-hidden="true">
+                            <span class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-signup-dot1"></span>
+                            <span class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-signup-dot2"></span>
+                            <span class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-signup-dot3"></span>
+                        </div>
+        
+                        <p
+                            id="signupViewStatus"
+                            data-signup-status
+                            class="text-sm text-gray-400 font-medium transition-opacity duration-300"
+                            role="status"
+                            aria-live="polite"
+                            aria-atomic="true"
+                        >
+                            Setting things up&hellip;
+                        </p>
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+        <!-- Support Modal - Elegant Variant -->
+        <div 
+            data-modal="support" 
+            class="hidden absolute inset-0 z-[1000] bg-white/80 flex items-center justify-center opacity-0 translate-y-4 transition-all duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="supportModalTitle"
+        >
+            <!-- Modal Content Card -->
+            <div class="bg-white w-full h-full flex flex-col">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl flex items-center justify-center shadow-sm shadow-blue-200">
+                            <i data-icon="headphones" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h2 id="supportModalTitle" class="font-bold text-gray-800">Customer Support</h2>
+                        </div>
+                    </div>
+                    <button 
+                        data-modal-close 
+                        class="flex items-center justify-center w-8 h-8 rounded-lg text-gray-600 bg-transparent hover:bg-gray-100 hover:text-gray-700 transition-all duration-200"
+                        aria-label="Close support"
+                    >
+                        <i data-icon="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+        
+                <!-- Form Content (Initial State) -->
+                <div id="supportFormContent" class="flex-1 overflow-y-auto overflow-x-hidden px-5 py-6 custom-scrollbar">
+                    
+                    <!-- Support Form -->
+                    <form id="supportForm" class="space-y-5 max-w-md mx-auto">
+                        <!-- Email Input -->
+                        <div>
+                            <label for="supportEmail" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Your Email
+                            </label>
+                            <input 
+                                type="email" 
+                                id="supportEmail" 
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm transition-shadow"
+                                placeholder="your.email@example.com"
+                                required
+                                autocomplete="email"
+                                aria-label="Your email address"
+                            />
+                        </div>
+        
+                        <!-- Subject Input -->
+                        <div>
+                            <label for="supportSubject" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Subject
+                            </label>
+                            <input 
+                                type="text" 
+                                id="supportSubject" 
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm transition-shadow"
+                                placeholder="What can we help you with?"
+                                required
+                                minlength="3"
+                                aria-label="Subject of your question"
+                            />
+                        </div>
+        
+                        <!-- Message Textarea -->
+                        <div>
+                            <label for="supportMessage" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Message
+                            </label>
+                            <textarea 
+                                id="supportMessage" 
+                                rows="6"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm resize-none transition-shadow"
+                                placeholder="Please describe your issue in detail..."
+                                required
+                                minlength="10"
+                                maxlength="5000"
+                                aria-label="Your message"
+                            ></textarea>
+                        </div>
+                    </form>
+        
+                </div>
+        
+                <!-- Loading State -->
+                <div id="supportLoadingContent" class="hidden flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 custom-scrollbar">
+                    <div class="flex flex-col items-center justify-center py-16">
+                        <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+                        <p class="text-sm text-gray-600 font-medium">Sending your message...</p>
+                    </div>
+                </div>
+        
+                <!-- Success State -->
+                <div id="supportSuccessContent" class="hidden flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 custom-scrollbar">
+                    <div class="flex flex-col items-center justify-center py-16">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-5 shadow-sm shadow-green-200">
+                            <i data-icon="check-circle" class="w-11 h-11 text-green-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Message Sent!</h3>
+                        <p class="text-sm text-gray-600 text-center px-4 leading-relaxed max-w-xs">
+                            We will get back to you soon.<br />Thank you for contacting us.
+                        </p>
+                    </div>
+                </div>
+        
+                <!-- Error State -->
+                <div id="supportErrorContent" class="hidden flex-1 overflow-y-auto overflow-x-hidden px-5 py-4 custom-scrollbar">
+                    <div class="flex flex-col items-center justify-center py-16">
+                        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-5 shadow-sm shadow-red-200">
+                            <i data-icon="alert-circle" class="w-11 h-11 text-red-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Send Failed</h3>
+                        <p id="supportErrorMessage" class="text-sm text-gray-600 text-center px-4 leading-relaxed max-w-xs">
+                            Failed to send message. Please try again.
+                        </p>
+                    </div>
+                </div>
+        
+                <!-- Modal Footer -->
+                <div class="flex gap-3 px-5 py-4 border-t border-gray-200 bg-gray-50 flex-shrink-0" id="supportModalFooter">
+                    <!-- Send Button (Initial State) -->
+                    <button 
+                        id="btnSupportSend" 
+                        type="submit"
+                        form="supportForm"
+                        class="flex items-center justify-center gap-2 flex-1 px-4 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-base font-semibold border-0 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-600/40 active:translate-y-0 transition-all duration-200" 
+                        aria-label="Send message"
+                    >
+                        <i data-icon="send" class="w-4 h-4"></i>
+                        Send
+                    </button>
+                    <!-- Close Button (Hidden by default) -->
+                    <button 
+                        id="btnSupportClose" 
+                        class="hidden flex items-center justify-center gap-2 flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold border-0 cursor-pointer hover:-translate-y-0.5 transition-all duration-200 active:translate-y-0" 
+                        aria-label="Close modal"
+                        data-modal-close
+                    >
+                        <i data-icon="x" class="w-4 h-4"></i>
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

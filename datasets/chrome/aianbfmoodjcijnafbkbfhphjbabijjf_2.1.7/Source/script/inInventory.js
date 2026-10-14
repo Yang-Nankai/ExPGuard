@@ -1,0 +1,1 @@
+injectScript(chrome.runtime.getURL("script/helper.js"),"body"),setTimeout(()=>{injectScript(chrome.runtime.getURL("script/inventoryContent.js"),"body")},300);

@@ -1,0 +1,1 @@
+const i=()=>new Promise(o=>{chrome.storage.local.get("hiddenFobDomains",e=>{const n=e.hiddenFobDomains?e.hiddenFobDomains:[];o(n)})}),d=o=>{chrome.storage.local.set({hiddenFobDomains:o})},s=()=>window.innerWidth-document.documentElement.clientWidth;export{i as a,s as g,d as s};

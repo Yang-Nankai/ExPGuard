@@ -1,0 +1,225 @@
+﻿<!doctype html>
+<!--
+ This page is shown when the extension button is clicked, because the
+ "browser_action" field in manifest.json contains the "default_popup" key with
+ value "popup.html".
+ -->
+<html>
+  <head>
+    <title>A+ FontSize Changer</title> <!-- Version 1.5.0d - Removed Lite -->
+    <!--
+      - JavaScript and HTML must be in separate files: see our Content Security
+      - Policy documentation[1] for details and explanation.
+      -
+      - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
+     -->
+    <link href="colorpicker.css" rel="stylesheet" type="text/css">
+
+    
+    <style>
+	
+    	body
+    	{
+    		min-width: 400px;
+			/* background-color: white;
+			color: black */
+			font-family: Arial, Helvetica, sans-serif; /* Version 1.3.7 */
+			/* font-size: 90%;*/ /* Version 1.5.1 - Chrome was defaulting to 75%. Removed because couldn't see pro features without scrolling */
+    	}
+		@media (prefers-color-scheme: dark) { 	/* Version 1.3.7 */
+			body, input, select, button {
+				background-color: black;
+				color: white;
+			}
+			#textcolorpicker, #bgcolorpicker {
+				background-color: black;
+			}
+			a:link { color: #0055ff; }
+			a:visited { color: #aa00aa; }
+			a:hover { color: #ff5555; }
+		}
+    	h1
+    	{
+    		font-size: 1.2em;
+    		-webkit-margin-before:0em;
+			-webkit-margin-after:0em;
+    		margin: 0px;
+    		padding: 2px;
+    		border: 1px solid #555555;
+    		text-align: center;
+    		/* user-select: none; */ /* Version 1.3.7 - Allow selecting header */
+    	}
+    	p
+    	{
+    		margin: .5em;
+    	}
+		#fontcolor, #bgcolor { /* Version 1.3.7 - inputs */
+			font-family: Consolas, monospace; /* Version 1.4.3 - changed from "Courier New", Courier, to Consolas */
+		}
+		input[type="text"] { /* Version 1.5.1 */
+			width:56%;
+		}
+    	.button
+    	{
+    		font-size: 1.2em;
+    		border: 2px solid #555555;
+			border-radius: 10px;
+			padding: 2px;
+			margin: 2px;
+			font-family: Consolas, monospace; /* Version 1.4.3 - changed from "Courier New", Courier, to Consolas */
+			cursor: pointer;
+			user-select: none; /* Version 1.3.7 for Pro */
+    	}
+    	.error
+    	{
+    		color: red;
+    		font-weight: bold;
+    	}
+    	label
+    	{
+    		display: inline-block;
+			vertical-align: top;
+    		width: 200px;
+    	}
+    	#textcolorpicker, #bgcolorpicker /* Version 1.2.2 - Color Picker for Mac OS X */
+    	{
+    		/* display: none; */
+    	}
+    	.profile_box 
+    	{
+    		border: 1px solid #555555;
+    		padding: 2px;
+    	}
+    	.profiles td 
+    	{
+    		padding: 5px;
+    	}
+		.pro_feature {
+			display: none;
+		}
+		.title { /* Version 1.3.9b */
+			text-decoration: none;
+		}
+		.footer { /* Version 1.4.0 */
+			background-color: #808080; /* Version 1.4.3 - Changed from 303030 to 808080 */
+			text-align: center;
+			padding: 10px;
+		}
+		.footer span { /* Version 1.4.3 */
+			display: block;
+			line-height: 2em;
+		}
+		.status { /* Version 1.4.1 */
+			width: 75%;
+		}
+		details {
+			margin: 0.5rem;
+		}
+		summary {
+			font-size: 1.2em;
+			width: 90%;
+			color: black;
+			border: 2px solid black;
+			border-radius: 5px;
+			padding: 5px;
+			margin: 5px;
+			cursor: pointer;
+			user-select: none;
+		}
+		textarea {
+			width: 95%;
+			height: 4em;
+			padding: 5px;
+			/*white-space: pre;
+			overflow-wrap: normal;
+			overflow-x: scroll;*/
+		}
+    </style>
+  </head>
+  <body>
+	<h1><a href="https://chrome.google.com/webstore/detail/a%20-fontsize-changer/ckihgechpahhpompcinglebkgcdgpkil" target="_blank">
+		<span class="title" data-lang="appName">
+			A+ FontSize Changer</span></a> <!-- Version 1.5.0d - Removed Lite -->
+		<span class="free_trial_msg"> <span id="trial" data-lang="trial">Trial</span> - 
+	<a href="http://www.seabreezecomputers.com/fontsize/purchase" target="_blank" class="upgrade" 
+	data-lang="upgrade">Upgrade</a></span>
+	</h1>
+	<div class="error" id="error"></div>
+	<p><span class="button" id="up" title="ALT+">A+</span>
+	<span class="button" id="down" title="ALT-">A-</span>
+	<span class="button" id="default" title="ALT Backspace" 
+		data-lang="default_size" data-lang-title="default_title">Default Size</span>
+	<p id="description" data-lang="description">Extension that lets the user increase and decrease the font size on a web page. 
+	You may use the keys ALT+ or ALT- at any time on any web page.</p>
+	
+	<p><label for="fontcolor" data-lang="fontcolor">Change Font Color:
+	<br /><input id="fontcolor" type="text" value="#FFEEDD" /> <!-- Version 1.3.0 - Changed from type="color" to "text" -->
+	<br /><span id="color_msg"></span> <!-- Version 1.3.7d -->
+	</label>
+	
+	<span id="textcolorpicker" class="cp-small"></span> <!-- Version 1.2.2 - Color Picker for Mac OS X -->
+	
+	<p><label for="bgcolor">Change Background Color: 
+	<br /><input id="bgcolor" type="text" value="#FEEEDD" /> <!-- Version 1.3.0 - Changed from type="color" to "text" -->
+	<br /><span id="bgcolor_msg"></span> <!-- Version 1.3.7d -->
+	</label>
+	
+	<span id="bgcolorpicker" class="cp-small"></span> <!-- Version 1.2.2 - Color Picker for Mac OS X -->
+	
+	<p><span class="button" id="reset_colors">Reset Colors</span>
+	
+	<p><label><input type="checkbox" id="underline" checked> Underline Links</label> <!-- Version 1.3.0 -->
+		<label><input type="checkbox" id="colorlinks" checked> Color Links</label> <!-- Version 1.3.7e -->
+	
+	<p id="font_type">Font: 
+	<select name='fontlist' id='fontlist'></select>
+	
+	<div class="free_trial_msg"> <!-- version 1.3.7f -->
+		<a href="http://www.seabreezecomputers.com/fontsize/purchase" target="_blank" class="upgrade">Upgrade to Pro</a><br>
+		<div id="pro_features">
+			<b>PRO FEATURES:</b><br>
+			* Saves font size for each website<br>
+			* Saves font color for each website<br>
+			* Saves font type for each website<br>
+			* Saves background color for each website<br>
+			* Save/Load Profiles<br>
+		</div>
+	</div>
+	
+	<div class="pro_feature"> <!-- Version 1.3.7f -->
+		<p id="profiles">Profiles:
+		<div id="profiles_div"></div>
+	
+	<details> <!-- Version 1.5.1 - Blacklist -->
+		<summary>Blacklist</summary>
+		<p id="blacklist_msg">If you check one of the profiles above to load those settings on each website
+		you visit, then you can also create a list of websites that will NOT load the profile
+		using the text box below: (Use a linefeed between each website url.)</p>
+		<textarea id="blacklist" spellcheck="false"></textarea>
+		<button id="blacklist_add">Add current website to blacklist</button>
+	</details>
+	
+	</div>
+	
+	<p><div id="shortcuts"></div>
+	
+	<form name="settings_form">
+	<p>License Key or Order ID: <br><input type="text" name="order_id"> 
+	<button name="check_order">Check</button> <br> <!-- 1.4.1 Added <br> here and class="status" below -->
+	Status: <input type="text" name="status" class="status" readonly>
+	</form>
+	
+	<div class='footer'>
+		<span>Copyright 2018 <a href="http://www.seabreezecomputers.com" target="_blank">Sea Breeze Computers</a></span> <!-- Version 1.4.3 -->
+		<span><a href="https://www.seabreezecomputers.com/fontsize" target="_blank">Support</a></span> <!-- Version 1.4.3 -->
+		<span><a href="https://chrome.google.com/webstore/detail/speech-recognition-anywhe/kdnnmhpmcakdilnofmllgcigkibjonof" target="_blank">Speech Recognition Anywhere Chrome Extension</a></span>
+	</div>
+	
+    <script src="colorpicker.min.js"></script>
+	<script src="popup.js"></script>
+	<script src="profiles.js"></script>
+	<script src="license2020.js"></script> <!-- Version 1.3.7f -->
+	<script src="license.js"></script> <!-- Version 1.3.7g - This should not really be in LITE Version -->
+  </body>
+</html>
+

@@ -1,0 +1,505 @@
+/* Channel-stats button + popover.
+   Namespace: ggsel-stats-*. Theme: dark by default, `.ggsel-stats-popover--light`
+   for light. Button picks up theme from Twitch's root `.tw-root--theme-light`. */
+
+.ggsel-stats-btn {
+  /* Figma 167:20 / 167:14 — icon-only, 35×32, radius 18 */
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 5px;
+  margin-right: 8px;
+  width: 35px;
+  height: 32px;
+  background: #2F2F35;
+  border: none;
+  border-radius: 18px;
+  color: #FFFFFF;
+  cursor: pointer;
+  flex-shrink: 0;
+  vertical-align: middle;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.ggsel-stats-btn:hover {
+  background: #3A3A40;
+}
+
+.ggsel-stats-btn:active {
+  transform: translateY(1px);
+}
+
+.ggsel-stats-btn:focus-visible {
+  outline: 2px solid #9147FF;
+  outline-offset: 2px;
+}
+
+.ggsel-stats-btn-icon {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  display: block;
+}
+
+/* Light theme is applied via JS modifier class (not via Twitch root class)
+   because Twitch's theme class isn't always reliable in deep DOM contexts. */
+.ggsel-stats-btn.ggsel-stats-btn--light {
+  background: #EFEFF1;
+  color: #0E0E10;
+}
+.ggsel-stats-btn.ggsel-stats-btn--light:hover {
+  background: #DEDEE3;
+}
+/* Legacy: keep tw-root selector as a fallback in case JS modifier missed */
+.tw-root--theme-light .ggsel-stats-btn:not(.ggsel-stats-btn--light) {
+  background: #EFEFF1;
+  color: #0E0E10;
+}
+
+/* NOTE on Twitch action-row background:
+   Twitch wraps the action row in a div with inline-style
+   `background-color: var(...) !important; border-radius: ... !important`.
+   Inline `!important` beats external CSS `!important` (cascade origin rule),
+   so we override it from JS in applyThemeToButton() — see the call to
+   row.style.setProperty('background-color', 'transparent', 'important'). */
+
+/* =====================
+   Popover (modal)
+   ===================== */
+
+.ggsel-stats-popover {
+  --gs-bg: #18181B;
+  --gs-surface: #1F1F23;
+  --gs-surface-soft: rgba(255, 255, 255, 0.04);
+  --gs-surface-hover: rgba(255, 255, 255, 0.08);
+  --gs-border: rgba(145, 71, 255, 0.28);
+  --gs-border-soft: rgba(255, 255, 255, 0.08);
+  --gs-text: #EFEFF1;
+  --gs-text-muted: #ADADB8;
+  --gs-text-dim: #6F6F7B;
+  --gs-accent: #9146FF;
+  --gs-accent-soft: #BF94FF;
+  --gs-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+
+  position: fixed;
+  width: 600px;
+  max-width: calc(100vw - 16px);
+  max-height: 560px;
+  background: var(--gs-bg);
+  border: 1px solid var(--gs-border);
+  border-radius: 16px;
+  box-shadow: var(--gs-shadow);
+  color: var(--gs-text);
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  animation: ggsel-stats-pop-in 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  overflow: hidden;
+}
+
+.ggsel-stats-popover--light {
+  --gs-bg: #FFFFFF;
+  --gs-surface: #F7F7F8;
+  --gs-surface-soft: rgba(0, 0, 0, 0.03);
+  --gs-surface-hover: rgba(0, 0, 0, 0.06);
+  --gs-border: rgba(145, 71, 255, 0.30);
+  --gs-border-soft: rgba(0, 0, 0, 0.08);
+  --gs-text: #0E0E10;
+  --gs-text-muted: #53535F;
+  --gs-text-dim: #898997;
+  --gs-shadow: 0 16px 40px rgba(14, 14, 16, 0.18);
+}
+
+@keyframes ggsel-stats-pop-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.ggsel-stats-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--gs-border-soft);
+}
+
+.ggsel-stats-popover-close {
+  background: transparent;
+  border: none;
+  color: var(--gs-text-muted);
+  font-size: 16px;
+  line-height: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.ggsel-stats-popover-close:hover {
+  background: var(--gs-surface-hover);
+  color: var(--gs-text);
+}
+
+.ggsel-stats-popover-body {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.ggsel-stats-popover-body::-webkit-scrollbar { width: 8px; }
+.ggsel-stats-popover-body::-webkit-scrollbar-thumb {
+  background: rgba(145, 71, 255, 0.25);
+  border-radius: 4px;
+}
+.ggsel-stats-popover-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(145, 71, 255, 0.4);
+}
+
+.ggsel-stats-popover-footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--gs-border-soft);
+  font-size: 11px;
+  color: var(--gs-text-dim);
+  text-align: center;
+}
+
+/* Loading / empty / error states inside the popover body. Shown when the
+   GQL channel-videos fetch is in flight, returned no VODs, or failed. */
+.ggsel-stats-popover-status {
+  padding: 32px 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--gs-text-dim);
+  line-height: 1.5;
+}
+
+.ggsel-stats-popover-retry {
+  margin-top: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  background: var(--gs-accent, #9147ff);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.ggsel-stats-popover-retry:hover {
+  background: #7a35e0;
+}
+
+.ggsel-stats-popover-retry:focus-visible {
+  outline: 2px solid var(--gs-accent, #9147ff);
+  outline-offset: 2px;
+}
+
+/* =====================
+   Segmented control
+   ===================== */
+
+.ggsel-stats-segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--gs-surface-soft);
+  border-radius: 10px;
+  border: 1px solid var(--gs-border-soft);
+}
+
+.ggsel-stats-segmented-btn {
+  background: transparent;
+  border: none;
+  color: var(--gs-text-muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  height: 28px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+  white-space: nowrap;
+}
+
+.ggsel-stats-segmented-btn:hover {
+  color: var(--gs-text);
+}
+
+.ggsel-stats-segmented-btn.is-active {
+  background: var(--gs-accent);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(145, 71, 255, 0.3);
+}
+
+/* =====================
+   Heatmap
+   ===================== */
+
+.ggsel-stats-heatmap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ggsel-stats-heatmap-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ggsel-stats-heatmap-hour-labels {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 2px;
+}
+
+.ggsel-stats-heatmap-corner {
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.ggsel-stats-heatmap-hour-label {
+  flex: 1;
+  min-width: 0;
+  height: 12px;
+  font-size: 9px;
+  color: var(--gs-text-dim);
+  text-align: center;
+  line-height: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ggsel-stats-heatmap-row {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.ggsel-stats-heatmap-day-label {
+  width: 28px;
+  font-size: 11px;
+  color: var(--gs-text-muted);
+  text-align: right;
+  padding-right: 6px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.ggsel-stats-heatmap-cell {
+  flex: 1;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  border-radius: 6px;
+  cursor: default;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.ggsel-stats-heatmap-cell:hover {
+  transform: scale(1.25);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4), 0 4px 12px rgba(145, 71, 255, 0.4);
+  z-index: 2;
+  position: relative;
+}
+
+.ggsel-stats-popover--light .ggsel-stats-heatmap-cell:hover {
+  box-shadow: 0 0 0 1px rgba(14, 14, 16, 0.15), 0 4px 12px rgba(145, 71, 255, 0.35);
+}
+
+.ggsel-stats-heatmap-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.ggsel-stats-heatmap-legend-label {
+  font-size: 10px;
+  color: var(--gs-text-dim);
+  text-transform: lowercase;
+}
+
+.ggsel-stats-heatmap-legend-scale {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.ggsel-stats-heatmap-legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.ggsel-stats-heatmap-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px;
+  background: var(--gs-surface-soft);
+  border: 1px solid var(--gs-border-soft);
+  border-radius: 12px;
+}
+
+.ggsel-stats-stat {
+  text-align: center;
+}
+
+.ggsel-stats-stat-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #EFEFF1;
+  font-variant-numeric: tabular-nums;
+}
+/* On light theme #EFEFF1 (almost white) would be invisible on white popover
+   background — switch to dark text for readability. */
+.ggsel-stats-popover--light .ggsel-stats-stat-value {
+  color: #0E0E10;
+}
+
+.ggsel-stats-stat-label {
+  font-size: 10px;
+  color: var(--gs-text-muted);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* =====================
+   Games list
+   ===================== */
+
+.ggsel-stats-games-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ggsel-stats-game-item { margin: 0; padding: 0; }
+
+.ggsel-stats-game-link {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  background: var(--gs-surface-soft);
+  border: 1px solid var(--gs-border-soft);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.ggsel-stats-game-link:hover {
+  background: var(--gs-surface-hover);
+  border-color: var(--gs-border);
+  transform: translateX(2px);
+}
+
+.ggsel-stats-game-art {
+  width: 44px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--gs-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.ggsel-stats-game-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ggsel-stats-game-art-empty {
+  background: linear-gradient(135deg, #9147FF, #BF94FF);
+  opacity: 0.5;
+}
+
+.ggsel-stats-game-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+.ggsel-stats-game-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ggsel-stats-game-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gs-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.ggsel-stats-game-hours {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gs-accent-soft);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.ggsel-stats-popover--light .ggsel-stats-game-hours {
+  color: #772CE8;
+}
+
+.ggsel-stats-game-bar {
+  height: 6px;
+  background: var(--gs-surface-soft);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ggsel-stats-game-bar-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #9147FF, #BF94FF);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.ggsel-stats-game-meta {
+  font-size: 11px;
+  color: var(--gs-text-dim);
+}
+
+.ggsel-stats-games-more {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--gs-text-dim);
+}
+
+.ggsel-stats-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--gs-text-muted);
+  font-size: 13px;
+}

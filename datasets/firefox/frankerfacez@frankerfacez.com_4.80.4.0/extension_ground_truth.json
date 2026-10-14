@@ -1,0 +1,455 @@
+{
+  "schema_version": "expguard-extension-dataset/v1",
+  "extension": {
+    "platform": "firefox",
+    "extension_id": "frankerfacez@frankerfacez.com",
+    "version": "4.80.4.0",
+    "name": "FrankerFaceZ",
+    "rank": 107,
+    "manifest_version": 3,
+    "catalog_manifest_version": 3,
+    "catalog_metadata": {
+      "rank": 107,
+      "manifest_version": 3,
+      "user_count": 103767,
+      "rating_count": 158,
+      "rating_average": 4.2215,
+      "name": "FrankerFaceZ"
+    },
+    "source": {
+      "directory": "Source",
+      "manifest_sha256": "fb0caec86d2cfbe563e9a883feba137781d621468f571f2db2a0c43a8df62307"
+    }
+  },
+  "tools": {
+    "ExPGuard": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "ExPGuard/analysis.log",
+          "ExPGuard/report.flows.json",
+          "ExPGuard/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 1,
+        "reported_no_duplicate": 1,
+        "tp_no_duplicate": 1,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [
+          {
+            "flow_id": "expguard-opti:firefox:frankerfacez@frankerfacez.com:4.80.4.0:dc5cf341baab2085:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-message-egress",
+            "rule_description": "Attacker-controlled message echoed back through an extension message sink — most matches are noise (postMessage round-trips); the suppress list below filters the safe ones.",
+            "severity": "HIGH",
+            "severity_reason": "Wildcard subdomain matching is allowed.",
+            "severity_evidence": [
+              "*://*.twitch.tv/*"
+            ],
+            "source": {
+              "type": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+              "remark": "chrome.runtime.onConnectExternal.addListener[onMessage]",
+              "file": "web/script.min",
+              "loc": "L1:C657 -> L1:C755",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://*.twitch.tv/*"
+                    ],
+                    "excludeGlobs": [
+                      "*://api.twitch.tv/*",
+                      "*://localhost.rig.twitch.tv/*",
+                      "*://blog.twitch.tv/*",
+                      "*://im.twitch.tv/*",
+                      "*://chatdepot.twitch.tv/*",
+                      "*://tmi.twitch.tv/*",
+                      "*://brand.twitch.tv/*",
+                      "*://dev.twitch.tv/*",
+                      "*://gql.twitch.tv/*",
+                      "*://passport.twitch.tv/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "web/worker",
+              "origin_frame_family": "BG",
+              "constraint": {
+                "matches": [
+                  "*://*.twitch.tv/*"
+                ],
+                "excludeGlobs": [
+                  "*://api.twitch.tv/*",
+                  "*://localhost.rig.twitch.tv/*",
+                  "*://blog.twitch.tv/*",
+                  "*://im.twitch.tv/*",
+                  "*://chatdepot.twitch.tv/*",
+                  "*://tmi.twitch.tv/*",
+                  "*://brand.twitch.tv/*",
+                  "*://dev.twitch.tv/*",
+                  "*://gql.twitch.tv/*",
+                  "*://passport.twitch.tv/*"
+                ]
+              },
+              "code_preview": "e:\"ffz-cs-bridge\"}),>>>t.onMessage.addListener(n=>{window.postMessage({ffz_from_worker:!0,...n},window.location.origin)})<<<,t.onDisconnect.addL"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "location.origin",
+              "file": "web/script.min",
+              "loc": "L1:C685 -> L1:C753",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://*.twitch.tv/*"
+                    ],
+                    "excludeGlobs": [
+                      "*://api.twitch.tv/*",
+                      "*://localhost.rig.twitch.tv/*",
+                      "*://blog.twitch.tv/*",
+                      "*://im.twitch.tv/*",
+                      "*://chatdepot.twitch.tv/*",
+                      "*://tmi.twitch.tv/*",
+                      "*://brand.twitch.tv/*",
+                      "*://dev.twitch.tv/*",
+                      "*://gql.twitch.tv/*",
+                      "*://passport.twitch.tv/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "age.addListener(n=>{>>>window.postMessage({ffz_from_worker:!0,...n},window.location.origin)<<<}),t.onDisconnect.ad"
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "web/worker",
+              "message_sender_provenance": "EXTERNAL_MESSAGE",
+              "channel": "runtime.connect.sender.message[web/worker->web/script.min]",
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ],
+        "no_duplicate": [
+          {
+            "flow_id": "expguard-opti:firefox:frankerfacez@frankerfacez.com:4.80.4.0:dc5cf341baab2085:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-message-egress",
+            "rule_description": "Attacker-controlled message echoed back through an extension message sink — most matches are noise (postMessage round-trips); the suppress list below filters the safe ones.",
+            "severity": "HIGH",
+            "severity_reason": "Wildcard subdomain matching is allowed.",
+            "severity_evidence": [
+              "*://*.twitch.tv/*"
+            ],
+            "source": {
+              "type": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+              "remark": "chrome.runtime.onConnectExternal.addListener[onMessage]",
+              "file": "web/script.min",
+              "loc": "L1:C657 -> L1:C755",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://*.twitch.tv/*"
+                    ],
+                    "excludeGlobs": [
+                      "*://api.twitch.tv/*",
+                      "*://localhost.rig.twitch.tv/*",
+                      "*://blog.twitch.tv/*",
+                      "*://im.twitch.tv/*",
+                      "*://chatdepot.twitch.tv/*",
+                      "*://tmi.twitch.tv/*",
+                      "*://brand.twitch.tv/*",
+                      "*://dev.twitch.tv/*",
+                      "*://gql.twitch.tv/*",
+                      "*://passport.twitch.tv/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "web/worker",
+              "origin_frame_family": "BG",
+              "constraint": {
+                "matches": [
+                  "*://*.twitch.tv/*"
+                ],
+                "excludeGlobs": [
+                  "*://api.twitch.tv/*",
+                  "*://localhost.rig.twitch.tv/*",
+                  "*://blog.twitch.tv/*",
+                  "*://im.twitch.tv/*",
+                  "*://chatdepot.twitch.tv/*",
+                  "*://tmi.twitch.tv/*",
+                  "*://brand.twitch.tv/*",
+                  "*://dev.twitch.tv/*",
+                  "*://gql.twitch.tv/*",
+                  "*://passport.twitch.tv/*"
+                ]
+              },
+              "code_preview": "e:\"ffz-cs-bridge\"}),>>>t.onMessage.addListener(n=>{window.postMessage({ffz_from_worker:!0,...n},window.location.origin)})<<<,t.onDisconnect.addL"
+            },
+            "sink": {
+              "type": "WINDOW_POSTMESSAGE",
+              "remark": "location.origin",
+              "file": "web/script.min",
+              "loc": "L1:C685 -> L1:C753",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "*://*.twitch.tv/*"
+                    ],
+                    "excludeGlobs": [
+                      "*://api.twitch.tv/*",
+                      "*://localhost.rig.twitch.tv/*",
+                      "*://blog.twitch.tv/*",
+                      "*://im.twitch.tv/*",
+                      "*://chatdepot.twitch.tv/*",
+                      "*://tmi.twitch.tv/*",
+                      "*://brand.twitch.tv/*",
+                      "*://dev.twitch.tv/*",
+                      "*://gql.twitch.tv/*",
+                      "*://passport.twitch.tv/*"
+                    ]
+                  }
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "age.addListener(n=>{>>>window.postMessage({ffz_from_worker:!0,...n},window.location.origin)<<<}),t.onDisconnect.ad"
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "web/worker",
+              "message_sender_provenance": "EXTERNAL_MESSAGE",
+              "channel": "runtime.connect.sender.message[web/worker->web/script.min]",
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ]
+      }
+    },
+    "CoCo": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "CoCo/report.flows.json",
+          "CoCo/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    },
+    "DoubleX": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "DoubleX/report.flows.json",
+          "DoubleX/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    }
+  },
+  "ground_truth": {
+    "verdict": "TP",
+    "flow_count": 1,
+    "flow_ids": [
+      "gtf-944f3fd7d4b7804e"
+    ],
+    "flows": [
+      {
+        "ground_truth_flow_id": "gtf-944f3fd7d4b7804e",
+        "verification": "TP",
+        "source_family": "external",
+        "sink_family": "WINDOW_POSTMESSAGE",
+        "matched_tools": [
+          "ExPGuard"
+        ],
+        "match_region": "ExPGuard only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "ExPGuard",
+            "flow_id": "expguard-opti:firefox:frankerfacez@frankerfacez.com:4.80.4.0:dc5cf341baab2085:01",
+            "source_report": "ExPGuard/report.flows.json",
+            "flow": {
+              "flow_id": "expguard-opti:firefox:frankerfacez@frankerfacez.com:4.80.4.0:dc5cf341baab2085:01",
+              "flow_index": 0,
+              "flow_order": 1,
+              "flow_label": "F001",
+              "flow_type": "PRIVILEGE_ESCALATION",
+              "rule_id": "attacker-input-message-egress",
+              "rule_description": "Attacker-controlled message echoed back through an extension message sink — most matches are noise (postMessage round-trips); the suppress list below filters the safe ones.",
+              "severity": "HIGH",
+              "severity_reason": "Wildcard subdomain matching is allowed.",
+              "severity_evidence": [
+                "*://*.twitch.tv/*"
+              ],
+              "source": {
+                "type": "CHROME_ONCONNECTEXTERNAL_ONMESSAGE",
+                "remark": "chrome.runtime.onConnectExternal.addListener[onMessage]",
+                "file": "web/script.min",
+                "loc": "L1:C657 -> L1:C755",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "*://*.twitch.tv/*"
+                      ],
+                      "excludeGlobs": [
+                        "*://api.twitch.tv/*",
+                        "*://localhost.rig.twitch.tv/*",
+                        "*://blog.twitch.tv/*",
+                        "*://im.twitch.tv/*",
+                        "*://chatdepot.twitch.tv/*",
+                        "*://tmi.twitch.tv/*",
+                        "*://brand.twitch.tv/*",
+                        "*://dev.twitch.tv/*",
+                        "*://gql.twitch.tv/*",
+                        "*://passport.twitch.tv/*"
+                      ]
+                    }
+                  }
+                ],
+                "provenance": "EXTERNAL_MESSAGE",
+                "origin_context": "web/worker",
+                "origin_frame_family": "BG",
+                "constraint": {
+                  "matches": [
+                    "*://*.twitch.tv/*"
+                  ],
+                  "excludeGlobs": [
+                    "*://api.twitch.tv/*",
+                    "*://localhost.rig.twitch.tv/*",
+                    "*://blog.twitch.tv/*",
+                    "*://im.twitch.tv/*",
+                    "*://chatdepot.twitch.tv/*",
+                    "*://tmi.twitch.tv/*",
+                    "*://brand.twitch.tv/*",
+                    "*://dev.twitch.tv/*",
+                    "*://gql.twitch.tv/*",
+                    "*://passport.twitch.tv/*"
+                  ]
+                },
+                "code_preview": "e:\"ffz-cs-bridge\"}),>>>t.onMessage.addListener(n=>{window.postMessage({ffz_from_worker:!0,...n},window.location.origin)})<<<,t.onDisconnect.addL"
+              },
+              "sink": {
+                "type": "WINDOW_POSTMESSAGE",
+                "remark": "location.origin",
+                "file": "web/script.min",
+                "loc": "L1:C685 -> L1:C753",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "*://*.twitch.tv/*"
+                      ],
+                      "excludeGlobs": [
+                        "*://api.twitch.tv/*",
+                        "*://localhost.rig.twitch.tv/*",
+                        "*://blog.twitch.tv/*",
+                        "*://im.twitch.tv/*",
+                        "*://chatdepot.twitch.tv/*",
+                        "*://tmi.twitch.tv/*",
+                        "*://brand.twitch.tv/*",
+                        "*://dev.twitch.tv/*",
+                        "*://gql.twitch.tv/*",
+                        "*://passport.twitch.tv/*"
+                      ]
+                    }
+                  }
+                ],
+                "url_taint_control": null,
+                "code_preview": "age.addListener(n=>{>>>window.postMessage({ffz_from_worker:!0,...n},window.location.origin)<<<}),t.onDisconnect.ad"
+              },
+              "structural": {
+                "constraint_kind": "EXTERNALLY_CONNECTABLE",
+                "privilege_crossing": true,
+                "privilege_reason": "sink grants capability beyond the source origin",
+                "message_passing": true,
+                "storage_passing": false,
+                "message_sender": "web/worker",
+                "message_sender_provenance": "EXTERNAL_MESSAGE",
+                "channel": "runtime.connect.sender.message[web/worker->web/script.min]",
+                "storage_area": null
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

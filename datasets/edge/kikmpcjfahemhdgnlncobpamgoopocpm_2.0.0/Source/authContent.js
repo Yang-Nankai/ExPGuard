@@ -1,0 +1,1 @@
+!function(){let e=0;function t(){const n=document.getElementById("extension-token");if(n&&n.dataset.token){const e=n.dataset.token;return console.log("[TikQuick] Token captured"),void chrome.runtime.sendMessage({type:"token-captured",token:e})}e++,e<600&&setTimeout(t,100)}"loading"===document.readyState?document.addEventListener("DOMContentLoaded",t):t()}();

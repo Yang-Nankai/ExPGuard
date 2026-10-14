@@ -1,0 +1,1 @@
+window.SQUADRATS_ENV={id:"development",squadratsUrl:"https://dev.squadrats.com",mainframeUrls:["https://mainframe-devel.squadrats.com"],tilesUrls:["https://tiles1-devel.squadrats.com","https://tiles2-devel.squadrats.com"]};

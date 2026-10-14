@@ -1,0 +1,1 @@
+document.addEventListener("upword-authenticate",(e=>{let t;chrome.storage.sync.set({user:e.detail.user},(()=>{})),t=e.detail.user?"upword-login":"upword-logout",chrome.runtime.sendMessage(t)}));

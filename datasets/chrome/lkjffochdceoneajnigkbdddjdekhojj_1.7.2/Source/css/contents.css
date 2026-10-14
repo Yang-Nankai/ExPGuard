@@ -1,0 +1,518 @@
+.selection_bubble_root {
+    position: fixed;
+    border-radius: var(--mz-radius-lg);
+    z-index: 99999;
+    padding: 5px;
+    background-color: var(--mz-surface);
+    min-width: 400px;
+    max-width: 500px;
+    color: var(--mz-text);
+    font-family: var(--mz-font);
+    font-size: 14px;
+    line-height: normal;
+    box-shadow: var(--mz-shadow);
+    border: 1px solid var(--mz-border);
+    max-height: 500px;
+    overflow-y: scroll;
+}
+
+#selection_bubble_more_action {
+    text-align: right;
+    color: var(--mz-link);
+    font-family: var(--mz-font);
+    position: absolute;
+    right: 5px;
+    top: 0;
+}
+
+#selection_bubble_more_action span a {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--mz-link);
+}
+
+#selection_bubble_more_action span a span {
+    font-size: 9px;
+}
+
+#dic_bubble {
+    text-align: left;
+    padding: 8px;
+    position: relative; /* mốc cho nút đóng (X) neo theo tab + nội dung, không dính góc/scrollbar */
+}
+
+#bubble_tip {
+    font-size: smaller;
+    color: var(--mz-text-3);
+    line-height: 10px;
+    margin-top: 16px;
+}
+
+.word-title-group {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    padding-right: 72px; /* chừa chỗ cho thanh action [+|🔊] (absolute góc phải), tránh chữ bị đè */
+}
+
+.han-viet {
+    margin-left: 10px;
+    position: relative;
+    color: var(--mz-text-2);
+    font-family: var(--mz-font);
+}
+
+.word-detail-content {}
+
+
+#selection_bubble_close {
+    position: absolute;
+    top: 8px;    /* thẳng hàng với tab bên trên */
+    right: 8px;  /* thẳng hàng mép phải nội dung */
+    width: 16px;
+    height: 16px;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAYUlEQVQYV12PwQ2AMAwD2w3YBEaAycsIsAkbgC+qowikeyCfHLe31l5xiUM8gm8RQ2x9hmuRECIUNwL2KSwhRCh2BFda4j9CTlbBtQi5ySfy5mzMTXWka3FyEwLPzJv/TR8o8xvGTnBWXwAAAABJRU5ErkJggg==');
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    opacity: 0.35;
+}
+
+#selection_bubble_close:hover {
+    opacity: 1;
+}
+
+.bubble-hide {
+    visibility: hidden;
+}
+
+.mazii_hide {
+    visibility: hidden;
+    display: none;
+}
+
+#tip-turnoff-fast-translate {
+    cursor: pointer;
+    color: var(--mz-link);
+    text-decoration: underline;
+}
+
+/* Nút loa cũ (dạng PNG) chỉ dùng cho kết quả Google Translate (printGT: div.pronoun-button). */
+div.pronoun-button {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAcUlEQVQ4y2P4//8/AyUYQhAH3gNxA7IAIQPmo/H3g/QA8XkgFiBkwHyoYnRQABVfj88AmGZcTuuHyjlgMwBZM7IE3NlQGhQe65EN+I8Dw8MLGgYoFpFqADK/YUAMwOsFigORatFIlYRElaRMWmaiBAMAp0n+3U0kqkAAAAAASUVORK5CYII=');
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    margin-left: 8px;
+    opacity: 0.5;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    float: left;
+}
+div.pronoun-button:hover {
+    opacity: 1;
+}
+
+/* Thanh action theo từng từ [ + | 🔊 ] — port từ Safari extension. */
+.word-actions {
+    position: absolute;
+    top: var(--mz-space-2xs);
+    right: 0;
+    display: inline-flex;
+    align-items: stretch;
+    height: 28px;
+    border: 1px solid var(--mz-border-2);
+    border-radius: var(--mz-radius-md);
+    background-color: var(--mz-surface);
+    overflow: hidden;
+}
+.word-action {
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mz-text-2);
+    cursor: pointer;
+}
+.word-action:hover {
+    color: var(--mz-text);
+}
+.word-action + .word-action {
+    border-left: 1px solid var(--mz-border-2);
+}
+.word-action svg {
+    width: 18px;
+    height: 18px;
+}
+.save-word-button.saved {
+    color: var(--mz-success);
+    cursor: default;
+}
+.save-word-button.save-error {
+    color: var(--mz-accent);
+}
+
+.selection_bubble_root {
+    border-radius: var(--mz-radius-lg);
+    box-shadow: var(--mz-shadow);
+    line-height: 24px;
+}
+
+.bub-option-value {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.bub-option-model {
+    margin-top: 8px;
+    margin-left: 10px;
+    display: inline-block;
+}
+
+select#bub-model-selector {
+    width: 120px;
+    font-size: 12px;
+    background-color: var(--mz-surface-2);
+    border-radius: var(--mz-radius-sm);
+    height: 30px;
+    -webkit-appearance: menulist;
+    appearance: menulist;
+    -moz-appearance: menulist;
+    cursor: pointer;
+    color: var(--mz-link);
+    font-weight: 500;
+    border: 1px solid var(--mz-border);
+}
+
+select#bub-model-selector:hover {
+    background-color: var(--mz-surface-3);
+}
+
+select#bub-model-selector:focus {
+    outline: none;
+}
+
+.premium-disabled {
+    color: var(--mz-text-3) !important;
+    background-color: var(--mz-surface-2) !important;
+}
+
+.premium-required {
+    color: var(--mz-accent);
+    font-size: 12px;
+    padding: 8px;
+    background-color: var(--mz-surface-2);
+    border-radius: var(--mz-radius-sm);
+    margin: 8px 0;
+}
+
+div#dic_bubble_synonyms {
+    padding-bottom: 40px;
+}
+
+select#bub-language-selector {
+    width: 100px;
+    font-size: 12px;
+    background-color: var(--mz-surface-2);
+    border-radius: var(--mz-radius-sm);
+    height: 30px;
+    -webkit-appearance: menulist;
+    appearance: menulist;
+    -moz-appearance: menulist;
+    cursor: pointer;
+    color: var(--mz-link);
+    font-weight: 500;
+    border: 1px solid var(--mz-border);
+}
+
+select#bub-language-selector:hover {
+    width: 100px;
+    background-color: var(--mz-surface-3);
+    border-radius: var(--mz-radius-sm);
+}
+
+.word-searched-pl {
+    color: var(--mz-text-brand);
+    font-weight: 500;
+    font-size: 18px;
+    /*line-height: 18px;*/
+    display: inline;
+    margin-right: .5em;
+}
+
+.word-mean {
+    font-size: 14px;
+    margin-bottom: 4px;
+    margin-top: 4px;
+    display: block;
+    position: relative;
+    padding-left: 18px;   /* bullet treo; text nghĩa bắt đầu ở 18px */
+    color: var(--mz-text-brand);
+    font-weight: 500;
+}
+.word-mean::before {
+    content: "•";
+    position: absolute;
+    left: 4px;
+}
+/* Ví dụ căn trái thẳng với text nghĩa (thụt vào bằng bullet + khoảng cách). */
+.word-example,
+.word-example-mean {
+    padding-left: 18px;
+}
+
+.word-mean-group {
+    clear: both;
+    padding-top: 10px;
+}
+
+/* Link "Chi tiết" góc dưới phải mỗi từ/kanji → mở trang mazii.net của từ đó. */
+.word-detail-link {
+    clear: both;
+    text-align: right;
+    margin-top: 8px;
+}
+.word-detail-link a {
+    color: var(--mz-brand);
+    font-size: 13px;
+    text-decoration: none;
+}
+.word-detail-link a:hover {
+    text-decoration: underline;
+}
+
+/* Nhãn từ loại (kind) trên mỗi nhóm nghĩa. */
+.word-kind {
+    color: var(--mz-text);
+    font-size: 13px;
+    font-weight: 400;
+    margin-top: var(--mz-space-xs);
+    margin-bottom: 2px;
+}
+.word-mean-group .word-kind:first-child {
+    margin-top: 0;
+}
+
+.word-search-phonetic {
+    clear: both;
+    padding-top: 10px;
+    float: left;
+}
+
+.word-entry:nth-child(n+2) {
+    margin-top: 12px;
+    border-top: 1px solid var(--mz-border-2);
+}
+
+.word-level {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--mz-on-brand);
+    background: var(--mz-brand);   /* fallback nếu level lạ */
+    border-radius: var(--mz-radius-sm);
+    padding: 1px 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+.word-level.level-n1 { background: var(--mz-level-n1); }
+.word-level.level-n2 { background: var(--mz-level-n2); }
+.word-level.level-n3 { background: var(--mz-level-n3); }
+.word-level.level-n4 { background: var(--mz-level-n4); }
+.word-level.level-n5 { background: var(--mz-level-n5); }
+.word-verify {
+    color: var(--mz-success);
+    font-weight: 700;
+    margin-left: 6px;
+}
+
+.word-entry {
+    position: relative; /* neo thanh action (.word-actions) theo từng từ */
+    padding-top: 12px;
+}
+/* Chứa float của .word-search-phonetic (nếu là phần tử cuối) để entry không bị sập
+   chiều cao → tránh nội dung tràn xuống đè lên divider / nút chọn model. */
+.word-entry::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+#save-word {
+    position: absolute;
+    left: 120px;
+    bottom: 25px;
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAQAAAD8x0bcAAAAkUlEQVR4AcWKuw3CQBAFJyCExJIjkOyUIviEbsCxXYHrcBkuxRVcjKiACiBcnsRLVyJAYkZ3wb7hpxwZGJF0QOf/cxm0AgdehF2B1X/YJ3u4EPRKJbUjqH3pCRVcCT2MI+P1r9HEwkMuTHlUUQhZqNLImZM8UiZJogSvZ4KZMXEmOMGOO5HLjS3AhoY2sdH6HW9VOFsNbhswEQAAAABJRU5ErkJggg==');
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.6;
+}
+
+#save-word:hover {
+    opacity: 1;
+}
+#bub-language-selector:focus {
+    outline: none;
+}
+
+.box-select-type .item-type {
+    display: inline-block;
+    width: 100px;
+    height: 32px;
+    line-height: 32px;
+    border: 1px solid var(--mz-border);
+    color: var(--mz-text);
+    background-color: var(--mz-surface);
+    text-align: center;
+    cursor: pointer;
+    position: relative; /* để z-index của tab active thắng border tab kề */
+}
+
+/* Gộp border giữa 2 tab liền kề (tránh dày gấp đôi). */
+.box-select-type .item-type + .item-type {
+    margin-left: -1px;
+}
+
+/* Bo góc trên-trái ở tab đầu, trên-phải ở tab cuối (đúng cả khi ẩn tab AI). */
+.box-select-type .item-type:first-child {
+    border-radius: var(--mz-radius-sm) 0 0 0;
+}
+.box-select-type .item-type:last-child {
+    border-radius: 0 var(--mz-radius-sm) 0 0;
+}
+
+.item-active {
+    background-color: var(--mz-brand);
+    color: var(--mz-on-brand);
+    border: 1px solid var(--mz-brand)!important;
+    font-weight: 500;
+    z-index: 1; /* border xanh của tab active phủ lên border xám tab kề */
+}
+.selection_bubble_content {
+    border: 1px solid var(--mz-border);
+    padding: 12px;
+    position: relative;
+    background-color: var(--mz-surface-2);
+    border-radius: 0 var(--mz-radius-sm) var(--mz-radius-sm) var(--mz-radius-sm);
+}
+
+.bottom-quick-search {
+    position: relative;
+}
+.mazii-result .popup-content-kanji {
+    padding: 5px 0;
+    font-weight: 400;
+    color: var(--mz-text-2);
+}
+
+.mazii-result .popup-content-kanji:last-child {
+    border-bottom: none;
+}
+
+/* Khung chứa các ô kanji = segmented selector giống iOS. */
+.mazii-result #box-kanji {
+    display: inline-flex;
+    align-items: stretch;
+    max-width: 100%;                 /* không tràn ngoài bubble/popup */
+    overflow-x: auto;                /* nhiều kanji → cuộn ngang */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    padding: 4px;
+    border: 1px solid var(--mz-border);
+    border-radius: var(--mz-radius-md);
+    background-color: var(--mz-surface);
+    margin-top: 12px;               /* cách tab bên trên = bằng khoảng cách của từ vựng */
+    margin-bottom: var(--mz-space-sm);
+}
+/* Ẩn thanh cuộn cho gọn. */
+.mazii-result #box-kanji::-webkit-scrollbar {
+    height: 0;
+}
+
+/* Chip chưa chọn: không viền, nền trong suốt, chữ secondary. */
+.mazii-result .popup-txt-kanji {
+    font-weight: 400;
+    font-size: 16px;
+    flex: 0 0 auto;                  /* giữ kích thước, không co/wrap */
+    white-space: nowrap;
+    min-width: 28px;
+    border: none;
+    color: var(--mz-text-2);
+    background-color: transparent;
+    border-radius: var(--mz-radius-md);
+    padding: 4px 8px;
+    text-align: center;
+    cursor: pointer;
+}
+/* Chip đang chọn: nền brand + chữ trắng. */
+.mazii-result .popup-txt-kanji.popup-kanji-active {
+    background-color: var(--mz-brand);
+    color: var(--mz-on-brand);
+    font-weight: 500;
+}
+
+/* Nhãn (Kun:/On:/JLPT:…) = text primary. */
+.mazii-result .popup-content-kanji span {
+    color: var(--mz-text);
+    font-size: 13px;
+    margin-right: var(--mz-space-xs);
+}
+/* Giá trị kun/on = brand. */
+.mazii-result .popup-content-kanji .kanji-reading-value {
+    color: var(--mz-text-brand);
+    font-size: inherit;
+    margin-right: 0;
+}
+.word-example-mean {
+    color: var(--mz-text-2);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+/* Tab Giải nghĩa AI — nút explain */
+/* Sub-tab giải nghĩa AI = segmented select giống list kanji. */
+.box-explain-select {
+    display: inline-flex;
+    align-items: stretch;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px;
+    border: 1px solid var(--mz-border);
+    border-radius: var(--mz-radius-md);
+    background-color: var(--mz-surface);
+    margin-top: 12px;
+    margin-bottom: var(--mz-space-sm);
+}
+.box-explain-select::-webkit-scrollbar { height: 0; }
+.explain-chip {
+    font-weight: 400;
+    font-size: 14px;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    border: none;
+    color: var(--mz-text-2);
+    background-color: transparent;
+    border-radius: var(--mz-radius-md);
+    padding: 4px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.explain-chip.explain-chip-active {
+    background-color: var(--mz-brand);
+    color: var(--mz-on-brand);
+    font-weight: 500;
+}
+
+#explain-content {
+    min-height: 50px;
+}

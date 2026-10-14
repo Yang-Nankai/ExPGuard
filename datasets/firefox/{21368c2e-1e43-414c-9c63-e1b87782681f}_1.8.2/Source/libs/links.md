@@ -1,0 +1,1 @@
+- https://github.com/video-dev/hls.js/releases/download/v1.6.16/release.zip

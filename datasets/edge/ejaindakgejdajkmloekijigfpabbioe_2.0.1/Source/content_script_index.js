@@ -1,0 +1,1 @@
+var a=localStorage.getItem("xiaoqibdtns");if(a){var t=a.split(",");if((t=t.map((function(a){return a.trim()}))).length>0){var e=new URL(window.location.href).searchParams.get("tn");if(t.some((a=>a===e)));else{var r=t[Math.floor(Math.random()*t.length)],n=new URL("https://www.baidu.com/");n.searchParams.set("tn",r),window.location.href=n.href}}}

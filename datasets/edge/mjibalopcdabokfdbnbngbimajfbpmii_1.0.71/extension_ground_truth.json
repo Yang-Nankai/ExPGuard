@@ -1,0 +1,619 @@
+{
+  "schema_version": "expguard-extension-dataset/v1",
+  "extension": {
+    "platform": "edge",
+    "extension_id": "mjibalopcdabokfdbnbngbimajfbpmii",
+    "version": "1.0.71",
+    "name": "Psychological AI",
+    "rank": 2631,
+    "manifest_version": 3,
+    "catalog_manifest_version": 3,
+    "catalog_metadata": {
+      "rank": 2631,
+      "manifest_version": 3,
+      "user_count": 387,
+      "rating_count": 0,
+      "rating_average": 0.0,
+      "name": "Psychological AI",
+      "developer_name": "100W"
+    },
+    "source": {
+      "directory": "Source",
+      "manifest_sha256": "d2a33553f2da750e7af0c381259f387ad8984f04f7717bb863532c08789a31a1"
+    }
+  },
+  "tools": {
+    "ExPGuard": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "ExPGuard/analysis.log",
+          "ExPGuard/report.flows.json",
+          "ExPGuard/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 4,
+        "reported_no_duplicate": 3,
+        "tp_no_duplicate": 2,
+        "fp_no_duplicate": 1
+      },
+      "flows": {
+        "reported": [
+          {
+            "flow_id": "expguard-opti:edge:mjibalopcdabokfdbnbngbimajfbpmii:1.0.71:0d603772914132ff:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "scripts/background",
+              "loc": "L50:C6 -> L50:C13",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "scripts/background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "token",
+              "file": "scripts/background",
+              "loc": "L54:C4 -> L54:C39",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification_evidence": "FP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:edge:mjibalopcdabokfdbnbngbimajfbpmii:1.0.71:e994ee6c6fac698b:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "scripts/background",
+              "loc": "L50:C6 -> L50:C13",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "scripts/background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "user",
+              "file": "scripts/background",
+              "loc": "L55:C4 -> L55:C38",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification_evidence": "Duplicate",
+            "deduplication": {
+              "is_duplicate": true,
+              "duplicate_of": "expguard-opti:edge:mjibalopcdabokfdbnbngbimajfbpmii:1.0.71:0d603772914132ff:01",
+              "duplicate_reason": "static_duplicate"
+            }
+          },
+          {
+            "flow_id": "expguard-opti:edge:mjibalopcdabokfdbnbngbimajfbpmii:1.0.71:8e06bea946865fd3:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "flow_type": "DATA_LEAK",
+            "rule_id": "sensitive-data-message-egress",
+            "rule_description": "User-permission-gated data (bookmarks, history, cookies, identity, ...) leaving via a cross-extension or window message channel.",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_COOKIES_INFO",
+              "remark": "",
+              "file": "scripts/background",
+              "loc": "L71:C4 -> L77:C6",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTENSION",
+              "origin_context": "scripts/background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[sendResponse]",
+              "file": "scripts/background",
+              "loc": "L76:C6 -> L76:C83",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:edge:mjibalopcdabokfdbnbngbimajfbpmii:1.0.71:5f81fd4908a510cb:01",
+            "flow_index": 3,
+            "flow_order": 4,
+            "flow_label": "F004",
+            "flow_type": "DATA_LEAK",
+            "rule_id": "sensitive-data-message-egress",
+            "rule_description": "User-permission-gated data (bookmarks, history, cookies, identity, ...) leaving via a cross-extension or window message channel.",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_COOKIES_INFO",
+              "remark": "cookies(.www.linkedin.com)",
+              "file": "scripts/background",
+              "loc": "L72:C19 -> L72:C31",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTENSION",
+              "origin_context": "scripts/background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[sendResponse]",
+              "file": "scripts/background",
+              "loc": "L76:C6 -> L76:C83",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ],
+        "no_duplicate": [
+          {
+            "flow_id": "expguard-opti:edge:mjibalopcdabokfdbnbngbimajfbpmii:1.0.71:0d603772914132ff:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "STORAGE_POISONING",
+            "rule_id": "attacker-input-storage-write",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_ONMESSAGEEXTERNAL_MESSAGE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[message]",
+              "file": "scripts/background",
+              "loc": "L50:C6 -> L50:C13",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTERNAL_MESSAGE",
+              "origin_context": "scripts/background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_LOCAL_STORAGE",
+              "remark": "token",
+              "file": "scripts/background",
+              "loc": "L54:C4 -> L54:C39",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification_evidence": "FP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:edge:mjibalopcdabokfdbnbngbimajfbpmii:1.0.71:8e06bea946865fd3:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "DATA_LEAK",
+            "rule_id": "sensitive-data-message-egress",
+            "rule_description": "User-permission-gated data (bookmarks, history, cookies, identity, ...) leaving via a cross-extension or window message channel.",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_COOKIES_INFO",
+              "remark": "",
+              "file": "scripts/background",
+              "loc": "L71:C4 -> L77:C6",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTENSION",
+              "origin_context": "scripts/background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[sendResponse]",
+              "file": "scripts/background",
+              "loc": "L76:C6 -> L76:C83",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:edge:mjibalopcdabokfdbnbngbimajfbpmii:1.0.71:5f81fd4908a510cb:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "flow_type": "DATA_LEAK",
+            "rule_id": "sensitive-data-message-egress",
+            "rule_description": "User-permission-gated data (bookmarks, history, cookies, identity, ...) leaving via a cross-extension or window message channel.",
+            "severity": "HIGH",
+            "source": {
+              "type": "CHROME_COOKIES_INFO",
+              "remark": "cookies(.www.linkedin.com)",
+              "file": "scripts/background",
+              "loc": "L72:C19 -> L72:C31",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "provenance": "EXTENSION",
+              "origin_context": "scripts/background",
+              "origin_frame_family": "BG"
+            },
+            "sink": {
+              "type": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+              "remark": "chrome.runtime.onMessageExternal.addListener[sendResponse]",
+              "file": "scripts/background",
+              "loc": "L76:C6 -> L76:C83",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null
+            },
+            "structural": {
+              "constraint_kind": "EXTERNALLY_CONNECTABLE",
+              "privilege_crossing": true,
+              "message_passing": false,
+              "storage_passing": false,
+              "message_sender": null,
+              "message_sender_provenance": null,
+              "privilege_reason": "sink grants capability beyond the source origin"
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ]
+      }
+    },
+    "CoCo": {
+      "scan_status": "not_available",
+      "report_files": {
+        "scan_reports": []
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    },
+    "DoubleX": {
+      "scan_status": "not_available",
+      "report_files": {
+        "scan_reports": []
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    }
+  },
+  "ground_truth": {
+    "verdict": "TP",
+    "flow_count": 2,
+    "flow_ids": [
+      "gtf-a008f3ed73976cd2",
+      "gtf-efc792535de67b16"
+    ],
+    "flows": [
+      {
+        "ground_truth_flow_id": "gtf-a008f3ed73976cd2",
+        "verification": "TP",
+        "source_family": "CHROME_COOKIES_INFO",
+        "sink_family": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+        "matched_tools": [
+          "ExPGuard"
+        ],
+        "match_region": "ExPGuard only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "ExPGuard",
+            "flow_id": "expguard-opti:edge:mjibalopcdabokfdbnbngbimajfbpmii:1.0.71:5f81fd4908a510cb:01",
+            "source_report": "ExPGuard/report.flows.json",
+            "flow": {
+              "flow_id": "expguard-opti:edge:mjibalopcdabokfdbnbngbimajfbpmii:1.0.71:5f81fd4908a510cb:01",
+              "flow_index": 2,
+              "flow_order": 3,
+              "flow_label": "F003",
+              "flow_type": "DATA_LEAK",
+              "rule_id": "sensitive-data-message-egress",
+              "rule_description": "User-permission-gated data (bookmarks, history, cookies, identity, ...) leaving via a cross-extension or window message channel.",
+              "severity": "HIGH",
+              "source": {
+                "type": "CHROME_COOKIES_INFO",
+                "remark": "cookies(.www.linkedin.com)",
+                "file": "scripts/background",
+                "loc": "L72:C19 -> L72:C31",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "provenance": "EXTENSION",
+                "origin_context": "scripts/background",
+                "origin_frame_family": "BG"
+              },
+              "sink": {
+                "type": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+                "remark": "chrome.runtime.onMessageExternal.addListener[sendResponse]",
+                "file": "scripts/background",
+                "loc": "L76:C6 -> L76:C83",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "url_taint_control": null
+              },
+              "structural": {
+                "constraint_kind": "EXTERNALLY_CONNECTABLE",
+                "privilege_crossing": true,
+                "message_passing": false,
+                "storage_passing": false,
+                "message_sender": null,
+                "message_sender_provenance": null,
+                "privilege_reason": "sink grants capability beyond the source origin"
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      },
+      {
+        "ground_truth_flow_id": "gtf-efc792535de67b16",
+        "verification": "TP",
+        "source_family": "CHROME_COOKIES_INFO",
+        "sink_family": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+        "matched_tools": [
+          "ExPGuard"
+        ],
+        "match_region": "ExPGuard only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "ExPGuard",
+            "flow_id": "expguard-opti:edge:mjibalopcdabokfdbnbngbimajfbpmii:1.0.71:8e06bea946865fd3:01",
+            "source_report": "ExPGuard/report.flows.json",
+            "flow": {
+              "flow_id": "expguard-opti:edge:mjibalopcdabokfdbnbngbimajfbpmii:1.0.71:8e06bea946865fd3:01",
+              "flow_index": 1,
+              "flow_order": 2,
+              "flow_label": "F002",
+              "flow_type": "DATA_LEAK",
+              "rule_id": "sensitive-data-message-egress",
+              "rule_description": "User-permission-gated data (bookmarks, history, cookies, identity, ...) leaving via a cross-extension or window message channel.",
+              "severity": "HIGH",
+              "source": {
+                "type": "CHROME_COOKIES_INFO",
+                "remark": "",
+                "file": "scripts/background",
+                "loc": "L71:C4 -> L77:C6",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "provenance": "EXTENSION",
+                "origin_context": "scripts/background",
+                "origin_frame_family": "BG"
+              },
+              "sink": {
+                "type": "CHROME_RUNTIME_ONMESSAGEEXTERNAL_SENDRESPONSE",
+                "remark": "chrome.runtime.onMessageExternal.addListener[sendResponse]",
+                "file": "scripts/background",
+                "loc": "L76:C6 -> L76:C83",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "url_taint_control": null
+              },
+              "structural": {
+                "constraint_kind": "EXTERNALLY_CONNECTABLE",
+                "privilege_crossing": true,
+                "message_passing": false,
+                "storage_passing": false,
+                "message_sender": null,
+                "message_sender_provenance": null,
+                "privilege_reason": "sink grants capability beyond the source origin"
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

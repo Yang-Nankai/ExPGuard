@@ -1,0 +1,1 @@
+chrome.runtime.onMessage.addListener((n,i,o)=>{if(n.action==="getDocument"){const e=document.documentElement.outerHTML,t=window.location.href,s=["Recipe","Ingredients","Instructions","Methods","Prep Time","Cook Time","Servings"].some(c=>e.includes(c));o({document:e,url:t,containsRecipe:s})}});

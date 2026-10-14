@@ -1,0 +1,1 @@
+const routeApp="veloplanner",isPathSupported=()=>location.pathname.includes("/plan")||location.pathname.includes("user-routes/"),reloadOnUrlChange=!0,findMap=()=>{for(const n of document.querySelectorAll('[class*="map"]')){const o=MAP.PDDwCZM(n);if(o)return appendLog("map found"),squadrats.mapbox=o,o}appendLog("map not found")};

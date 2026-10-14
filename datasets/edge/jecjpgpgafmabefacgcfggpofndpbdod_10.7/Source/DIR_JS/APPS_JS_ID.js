@@ -1,0 +1,4 @@
+// Privacy Test - Extension for Microsoft Edge™ - HOTCLEANER.COM - Copyright (c) 2024 Mixesoft. All Rights Reserved
+// Minified by Google Closure Compiler v20230802
+"use strict";(function(){chrome.management.getAll().then(d=>{var l=d.length,g=-1,e=document.createElement("img"),k=new OffscreenCanvas(32,32),m=k.getContext("2d"),h,b,f=function(){g++;if(g<l)if(h=d[g],b=h.icons,e.onload=function(){m.drawImage(this,0,0,this.naturalWidth,this.naturalHeight,0,0,32,32);k.convertToBlob().then(a=>a.arrayBuffer()).then(a=>{h.ico=Array.from(new Uint8Array(a));setTimeout(f,1)}).catch(a=>{setTimeout(f,1)})},e.onerror=function(a){setTimeout(f,1)},b&&0<b.length){let a;for(let c=0,n=b.length;c<
+n&&!(a=b[c],32<=a.size);c++);e.src=a.url}else e.src="DIR_IMG/app-on.svg";else chrome.runtime.sendMessage({i:89,r:d},a=>{chrome.tabs.update(a,{active:!0}).then(c=>{window.close()}).catch(c=>{window.close()})})};f()}).catch(d=>{window.close()})})();

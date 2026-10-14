@@ -1,0 +1,1 @@
+import{r as o,dZ as a}from"./store-g-2qfnwC.js";import{a as m}from"./react-redux-KHeLRFeQ.js";const n=()=>{const s=m(),e=o.useCallback((r,i,t)=>(r.messageType==="loggedOut"&&(s(a()),t()),!1),[s]);o.useEffect(()=>(chrome.runtime.onMessage.addListener(e),()=>{chrome.runtime.onMessage.removeListener(e)}),[e])};export{n as u};

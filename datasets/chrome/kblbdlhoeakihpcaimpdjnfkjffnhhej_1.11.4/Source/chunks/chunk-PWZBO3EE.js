@@ -1,0 +1,1 @@
+import{d as o}from"./chunk-A3K5JESS.js";o();function i(a){let t=window.location.href,n=()=>{let e=window.location.href;e!==t&&(t=e,a())};chrome.runtime.onMessage.addListener(e=>{e.message==="tabChanged"&&n()}),window.addEventListener("popstate",n),window.addEventListener("hashchange",n)}export{i as a};

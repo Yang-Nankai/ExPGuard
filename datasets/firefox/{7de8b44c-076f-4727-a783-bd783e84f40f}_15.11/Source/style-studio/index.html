@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Subtitle Style Studio</title>
+    <link rel="stylesheet" href="../resource/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/style-studio.css">
+    <script src="../resource/bootstrap/bootstrap.bundle.min.js"></script>
+  </head>
+  <body class="style-studio-body">
+    <div class="container-fluid style-studio-page">
+      <header class="style-studio-header">
+        <h1 class="style-studio-header-title" data-i18n="style_studio_title">Subtitle Style Studio</h1>
+        <div class="style-studio-header-actions">
+          <div class="style-studio-scope">
+            <label class="style-studio-scope-label" for="scope-select" data-i18n="style_studio_scope">Apply to</label>
+            <select id="scope-select" class="form-select form-select-sm style-studio-scope-select">
+              <option value="both" data-i18n="style_studio_scope_both">Both</option>
+              <option value="main" data-i18n="style_studio_scope_main">Primary</option>
+              <option value="second" data-i18n="style_studio_scope_second">Secondary</option>
+            </select>
+          </div>
+          <button id="btn-apply" type="button" class="btn btn-primary btn-sm" data-i18n="style_studio_apply">Apply</button>
+          <button id="btn-save-style" type="button" class="btn btn-outline-primary btn-sm" data-i18n="style_studio_save">Save style</button>
+          <button id="btn-delete-style" type="button" class="btn btn-outline-danger btn-sm d-none" data-i18n="style_studio_delete">Delete</button>
+          <button id="btn-close" type="button" class="btn btn-outline-secondary btn-sm" data-i18n="style_studio_close">Close</button>
+        </div>
+      </header>
+
+      <p id="apply-status" class="style-studio-status d-none" role="status"></p>
+
+      <div class="row g-3 g-xl-4">
+        <div class="col-xl-4 style-studio-column">
+          <p class="style-studio-section-label" data-i18n="style_studio_presets">Presets</p>
+          <div id="preset-grid" class="style-studio-grid"></div>
+
+          <div class="style-studio-google-section">
+            <p class="style-studio-section-label" data-i18n="style_studio_google_fonts">Google Fonts</p>
+            <p class="style-studio-google-hint" data-i18n="style_studio_google_hint">
+              Google Fonts load from the network; preview may briefly fall back.
+            </p>
+            <div class="style-studio-google-filters">
+              <label class="visually-hidden" for="google-font-subset" data-i18n="style_studio_google_filter_subset">Language</label>
+              <select id="google-font-subset" class="form-select form-select-sm style-studio-google-subset"></select>
+              <label class="visually-hidden" for="google-font-search" data-i18n="style_studio_google_search">Search fonts</label>
+              <input
+                id="google-font-search"
+                type="search"
+                class="form-control form-control-sm style-studio-google-search"
+                autocomplete="off"
+                data-i18n-placeholder="style_studio_google_search"
+                placeholder="Search fonts"
+              >
+            </div>
+            <div id="google-font-grid" class="style-studio-grid style-studio-google-grid"></div>
+          </div>
+        </div>
+        <div class="col-xl-4 style-studio-column">
+          <div class="style-studio-preview-stack">
+            <div class="style-studio-stage">
+              <div class="style-studio-stage-inner">
+                <div
+                  id="preview-main"
+                  class="textBasedSub style-studio-preview-line"
+                  contenteditable="true"
+                  spellcheck="false"
+                  role="textbox"
+                  aria-label="Primary preview text"
+                ></div>
+                <div
+                  id="preview-second"
+                  class="textBasedSub style-studio-preview-line mt-2"
+                  contenteditable="true"
+                  spellcheck="false"
+                  role="textbox"
+                  aria-label="Secondary preview text"
+                ></div>
+              </div>
+            </div>
+            <div class="style-studio-selected-meta">
+              <p id="selected-name" class="style-studio-selected-name"></p>
+              <label class="visually-hidden" for="selected-name-input" data-i18n="style_studio_rename">Style name</label>
+              <input
+                id="selected-name-input"
+                type="text"
+                maxlength="48"
+                class="form-control form-control-sm style-studio-name-input d-none"
+                autocomplete="off"
+              >
+              <div id="auto-lang-panel" class="style-studio-auto-lang d-none">
+                <p class="style-studio-auto-lang-label" data-i18n="style_studio_auto_languages">Auto-apply languages</p>
+                <label class="visually-hidden" for="auto-lang-search" data-i18n="style_studio_lang_search">Search languages</label>
+                <input
+                  id="auto-lang-search"
+                  type="search"
+                  class="form-control form-control-sm style-studio-auto-lang-search"
+                  autocomplete="off"
+                  data-i18n-placeholder="style_studio_lang_search"
+                  placeholder="Search languages"
+                >
+                <div id="auto-lang-list" class="style-studio-auto-lang-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4 style-studio-column">
+          <p class="style-studio-section-label" data-i18n="style_studio_adjust">Adjust</p>
+          <div id="style-editor" class="style-studio-editor">
+            <fieldset class="style-studio-fieldset">
+              <legend class="style-studio-legend" data-i18n="style_studio_group_type">Type</legend>
+              <div class="style-studio-field">
+                <label class="style-studio-field-label" data-i18n="popup_font_size">Size</label>
+                <input data-style="fontSizeRatio" type="range" class="form-range" step="0.1" min="0.5" max="1.5">
+              </div>
+              <div class="style-studio-field">
+                <label class="style-studio-field-label" data-i18n="popup_font_weight">Weight</label>
+                <input data-style="fontWeight" type="range" class="form-range" step="100" min="100" max="900">
+              </div>
+              <div class="style-studio-field style-studio-field-row">
+                <label class="style-studio-field-label" data-i18n="popup_font_color">Color</label>
+                <input data-style="fontColor" type="color" class="form-control form-control-color">
+              </div>
+              <div class="style-studio-field">
+                <label class="style-studio-field-label" data-i18n="popup_font_opacity">Opacity</label>
+                <input data-style="opacity" type="range" class="form-range" step="0.05" min="0.2" max="1">
+              </div>
+              <div class="style-studio-field">
+                <label class="style-studio-field-label" data-i18n="popup_font_family">Font family</label>
+                <select data-style="fontFamily" class="form-select form-select-sm">
+                  <option value="Netflix Sans,Helvetica Neue,Segoe UI,Roboto,Ubuntu,sans-serif">Sans</option>
+                  <option value="Arial, sans-serif">Arial</option>
+                  <option value="Verdana, sans-serif">Verdana</option>
+                  <option value="Tahoma, sans-serif">Tahoma</option>
+                  <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
+                  <option value="Times New Roman, serif">Times New Roman</option>
+                  <option value="Georgia, serif">Georgia</option>
+                  <option value="Garamond, serif">Garamond</option>
+                  <option value="Courier New, monospace">Courier New</option>
+                  <option value="Brush Script MT, cursive">Brush Script MT</option>
+                </select>
+              </div>
+            </fieldset>
+
+            <fieldset class="style-studio-fieldset">
+              <legend class="style-studio-legend" data-i18n="style_studio_group_stroke">Stroke &amp; shadow</legend>
+              <div class="style-studio-field">
+                <label class="style-studio-field-label" data-i18n="popup_font_stroke_width">Stroke width</label>
+                <input data-style="strokeWidth" type="range" class="form-range" step="0.5" min="0" max="10">
+              </div>
+              <div class="style-studio-field style-studio-field-row">
+                <label class="style-studio-field-label" data-i18n="popup_font_stroke_color">Stroke color</label>
+                <input data-style="strokeColor" type="color" class="form-control form-control-color">
+              </div>
+              <div class="style-studio-field">
+                <label class="style-studio-field-label" data-i18n="popup_font_shadow">Shadow</label>
+                <select data-style="shadow" class="form-select form-select-sm">
+                  <option value="">-</option>
+                  <option value="raised" data-i18n="popup_font_shadow_1">Raised</option>
+                  <option value="depressed" data-i18n="popup_font_shadow_2">Depressed</option>
+                  <option value="outline" data-i18n="popup_font_shadow_3">Outline</option>
+                  <option value="shadow" data-i18n="popup_font_shadow_4">Shadow</option>
+                </select>
+              </div>
+              <div class="style-studio-field style-studio-field-row">
+                <label class="style-studio-field-label" data-i18n="popup_font_shadow_color">Shadow color</label>
+                <input data-style="shadowColor" type="color" class="form-control form-control-color">
+              </div>
+              <div class="style-studio-field">
+                <label class="style-studio-field-label" data-i18n="popup_font_box_shadow">Box shadow</label>
+                <select data-style="boxShadow" class="form-select form-select-sm">
+                  <option value="">-</option>
+                  <option value="soft" data-i18n="popup_font_box_shadow_1">Soft</option>
+                  <option value="medium" data-i18n="popup_font_box_shadow_2">Medium</option>
+                </select>
+              </div>
+            </fieldset>
+
+            <fieldset class="style-studio-fieldset">
+              <legend class="style-studio-legend" data-i18n="style_studio_group_background">Background</legend>
+              <div class="style-studio-field style-studio-field-row">
+                <label class="style-studio-field-label" data-i18n="popup_font_background_color">Background</label>
+                <input data-style="fontBackgroundColor" type="color" class="form-control form-control-color">
+              </div>
+              <div class="style-studio-field">
+                <label class="style-studio-field-label" data-i18n="popup_font_background_opacity">Background opacity</label>
+                <input data-style="fontBackgroundColorOpacity" type="range" class="form-range" step="0.1" min="0" max="1">
+              </div>
+              <div class="style-studio-field">
+                <label class="style-studio-field-label" data-i18n="popup_font_padding">Padding</label>
+                <input data-style="padding" type="range" class="form-range" step="1" min="0" max="24">
+              </div>
+            </fieldset>
+
+            <fieldset class="style-studio-fieldset">
+              <legend class="style-studio-legend" data-i18n="style_studio_group_spacing">Spacing</legend>
+              <div class="style-studio-field">
+                <label class="style-studio-field-label" data-i18n="popup_font_letter_spacing">Letter spacing</label>
+                <input data-style="letterSpacing" type="range" class="form-range" step="0.01" min="-0.1" max="0.2">
+              </div>
+              <div class="style-studio-field">
+                <label class="style-studio-field-label" data-i18n="popup_font_line_height">Line height</label>
+                <input data-style="lineHeight" type="range" class="form-range" step="0.05" min="1" max="2">
+              </div>
+            </fieldset>
+
+            <fieldset class="style-studio-fieldset">
+              <legend class="style-studio-legend" data-i18n="style_studio_group_google">Google Fonts</legend>
+              <div class="style-studio-field">
+                <label class="style-studio-field-label" data-i18n="popup_font_google_families">Google Fonts (Font families)</label>
+                <input data-style="fontGoogleFamilies" type="text" class="form-control form-control-sm" placeholder="family=Noto+Sans:wght@400;700&amp;display=swap">
+              </div>
+              <div class="style-studio-field">
+                <label class="style-studio-field-label" data-i18n="popup_font_google_css_properties">Google Fonts (CSS properties)</label>
+                <textarea data-style="fontGoogleCssProperties" class="form-control form-control-sm" rows="4" placeholder='font-family: "Noto Sans", sans-serif;'></textarea>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="./style-studio.min.js"></script>
+  </body>
+</html>

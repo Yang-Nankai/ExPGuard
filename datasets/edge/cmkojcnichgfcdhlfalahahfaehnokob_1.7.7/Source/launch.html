@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="extPay.min.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Assist</title>
+    <style>
+      .banner {
+        font-family: Arvo;
+        font-weight: 700;
+        text-shadow: 0.05em 0.075em 0 rgb(0 0 0 / 10%);
+        font-size: 1.4em;
+        letter-spacing: 2px;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      input[type="text"],
+      select {
+        border: 1px solid #e6e6e6;
+        color: black;
+      }
+
+      input[type="text"]:focus {
+        border-color: blue;
+      }
+
+      select:focus {
+        border-color: blue;
+      }
+
+      .row {
+        padding-top: 6px;
+        padding-bottom: 6px;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      #waOptionsMessage {
+        font-size: 24px;
+      }
+
+      .setting {
+        display: inline-block;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        margin-top: 0px;
+        margin-right: 10px;
+        font-size: medium;
+        min-width: 270px;
+        font-weight: 500;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+        width: 70px;
+        height: 25px;
+        padding: 3px;
+        margin: 0 0px 0px 0;
+        background: linear-gradient(to bottom, #eeeeee, #ffffff 25px);
+        background-image: -webkit-linear-gradient(top, #eeeeee, #ffffff 25px);
+        border-radius: 18px;
+        box-shadow: inset 0 -1px white, inset 0 1px 1px rgba(0, 0, 0, 0.05);
+        cursor: pointer;
+        box-sizing: content-box;
+      }
+
+      .switch-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        box-sizing: content-box;
+      }
+
+      .switch-label {
+        position: relative;
+        display: block;
+        height: inherit;
+        font-size: 12px;
+        text-transform: uppercase;
+        background: #ca2222;
+        border-radius: inherit;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12),
+          inset 0 0 2px rgba(0, 0, 0, 0.15);
+        box-sizing: content-box;
+      }
+
+      .switch-label:before,
+      .switch-label:after {
+        position: absolute;
+        top: 50%;
+        margin-top: -0.5em;
+        line-height: 1;
+        -webkit-transition: inherit;
+        -moz-transition: inherit;
+        -o-transition: inherit;
+        transition: inherit;
+        box-sizing: content-box;
+      }
+
+      .switch-label:before {
+        content: attr(data-off);
+        right: 11px;
+        color: #ffffff;
+        text-shadow: 0 1px rgba(255, 255, 255, 0.5);
+      }
+
+      .switch-label:after {
+        content: attr(data-on);
+        left: 11px;
+        color: #ffffff;
+        text-shadow: 0 1px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+      }
+
+      .switch-input:checked ~ .switch-label {
+        background: #2ab934;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15),
+          inset 0 0 3px rgba(0, 0, 0, 0.2);
+      }
+
+      .switch-input:checked ~ .switch-label:before {
+        opacity: 0;
+      }
+
+      .switch-input:checked ~ .switch-label:after {
+        opacity: 1;
+      }
+
+      .switch-handle {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        width: 22px;
+        height: 22px;
+        background: linear-gradient(to bottom, #ffffff 40%, #f0f0f0);
+        background-image: -webkit-linear-gradient(top, #ffffff 40%, #f0f0f0);
+        border-radius: 100%;
+        box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      .switch-handle:before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin: -2px 0 0 -2px;
+        width: 8px;
+        height: 8px;
+        background: linear-gradient(to bottom, #eeeeee, #ffffff);
+        background-image: -webkit-linear-gradient(top, #eeeeee, #ffffff);
+        border-radius: 6px;
+        box-shadow: inset 0 1px rgba(0, 0, 0, 0.02);
+      }
+
+      .switch-input:checked ~ .switch-handle {
+        left: 50px;
+        box-shadow: -1px 1px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      #checkPage {
+        font-family: "Arial Black", Gadget, sans-serif;
+        font-size: 18px;
+        padding: 6px;
+        text-align: center;
+        transition: 0.5s;
+        background-size: 200% auto;
+        color: #fff;
+        box-shadow: 0 0 20px #eee;
+        border-radius: 10px;
+        width: 270px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        cursor: pointer;
+        display: inline-block;
+        border-radius: 10px;
+        border-color: lightblue;
+        color: white;
+      }
+
+      #checkPage:hover {
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19),
+          0 6px 6px rgba(0, 0, 0, 0.23);
+      }
+
+      /* Transition
+  ========================== */
+      .switch-label,
+      .switch-handle {
+        transition: All 0.3s ease;
+        -webkit-transition: All 0.3s ease;
+        -moz-transition: All 0.3s ease;
+        -o-transition: All 0.3s ease;
+      }
+
+      select,
+      input[type="text"] {
+        padding-left: 8px;
+        padding-right: 8px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      id="settingsContainer"
+      tabindex="0"
+      style="
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        color: black;
+        padding-top: 5px;
+        padding-left: 10px;
+        width: 360px;
+      "
+    >
+      <div class="banner">
+        <a
+          style="
+            text-decoration: none;
+            color: black;
+            font-size: 28px;
+            font-weight: bold;
+          "
+          href="#"
+          >Web Assist</a
+        >
+      </div>
+      <div style="font-size: 20px; padding-bottom: 10px; font-weight: 700">
+        Settings (premium only
+        <span style="font-weight: normal; font-size: larger; color: green"
+          >*</span
+        >)
+      </div>
+
+      <div class="row">
+        <div class="setting">
+          Start on page load
+          <span style="font-size: larger; color: green">*</span>
+        </div>
+        <div style="display: inline-block; vertical-align: middle">
+          <label class="switch">
+            <input
+              disabled
+              id="autostart"
+              class="switch-input"
+              type="checkbox"
+            />
+            <span class="switch-label" data-on="On" data-off="Off"></span>
+            <span class="switch-handle"></span>
+          </label>
+        </div>
+      </div>
+      <div class="row">
+        <div id="wakeupLabel" class="setting">
+          Voice activation
+          <span style="font-size: larger; color: green">*</span>
+        </div>
+        <div style="display: inline-block; vertical-align: middle">
+          <label class="switch">
+            <input
+              disabled
+              id="enableWakeup"
+              class="switch-input"
+              type="checkbox"
+            />
+            <span class="switch-label" data-on="On" data-off="Off"></span>
+            <span class="switch-handle"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- <div class="row">
+      <span class="setting">Minimize widget on page load</span>
+      <div style="display: inline-block; vertical-align: middle">
+        <label class="switch">
+          <input id='minimize' class="switch-input" type="checkbox" />
+          <span class="switch-label" data-on="On" data-off="Off"></span>
+          <span class="switch-handle"></span>
+        </label>
+      </div>
+    </div> -->
+
+      <div class="row">
+        <div class="setting">
+          Timeout (Set to 0 for no timeout)
+          <span style="font-size: larger; color: green">*</span>
+        </div>
+        <div
+          style="
+            display: inline-block;
+            margin-top: 10px;
+            padding-left: 10px;
+            padding-bottom: 4px;
+          "
+        >
+          <input
+            type="text"
+            disabled
+            id="timeout"
+            style="width: 55px"
+            value="30"
+          />
+        </div>
+      </div>
+
+      <div class="row">
+        <div id="waOptionsMessage" style="color: blue"></div>
+        <p style="font-size: 16px">
+          Please note for best performance you should use the voice activation
+          feature in a quiet environment. After subscribing, reload an existing tab or open a new one to enable the premium
+          features.
+        </p>
+        <div id="premium" style="text-align: center">
+          <button
+            style="font-size: 18px; background-color: #008cba"
+            id="checkPage"
+          >
+            Loading..
+          </button>
+        </div>
+      </div>
+    </div>
+    <script  src="settings.min.js"></script>
+  </body>
+  
+  
+</html>
+
+<!-- <span style="margin-right:38px; font-size: medium;">Language</span>
+      <div style="display: inline-block; vertical-align: middle; font-size: medium;">
+        <select id='language'>
+          <option value='Autodetect' selected>Autodetect</option>
+          <option value='Arabic (Algeria)'>Arabic (Algeria)</option>
+          <option value='Arabic (Algeria)'>Arabic (Algeria)</option>
+          <option value='Arabic (Bahrain)'>Arabic (Bahrain)</option>
+          <option value='Arabic (Egypt)'>Arabic (Egypt)</option>
+          <option value='Arabic (Iraq)'>Arabic (Iraq)</option>
+          <option value='Arabic (Israel)'>Arabic (Israel)</option>
+          <option value='Arabic (Jordan)'>Arabic (Jordan)</option>
+          <option value='Arabic (Kuwait)'>Arabic (Kuwait)</option>
+          <option value='Arabic (Lebanon)'>Arabic (Lebanon)</option>
+          <option value='Arabic (Libya)'>Arabic (Libya)</option>
+          <option value='Arabic (Morocco)'>Arabic (Morocco)</option>
+          <option value='Arabic (Oman)'>Arabic (Oman)</option>
+          <option value='Arabic (Qatar)'>Arabic (Qatar)</option>
+          <option value='Arabic (Saudi Arabia)'>Arabic (Saudi Arabia)</option>
+          <option value='Arabic (Palestinian Authority)'>Arabic (Palestinian Authority)</option>
+          <option value='Arabic (Syria)'>Arabic (Syria)</option>
+          <option value='Arabic (Tunisia)'>Arabic (Tunisia)</option>
+          <option value='Arabic (United Arab Emirates)'>Arabic (United Arab Emirates)</option>
+          <option value='Arabic (Yemen)'>Arabic (Yemen)</option>
+          <option value='Bulgarian (Bulgaria)'>Bulgarian (Bulgaria)</option>
+          <option value='Catalan (Spain)'>Catalan (Spain)</option>
+          <option value='Chinese (Cantonese, Traditional)'>Chinese (Cantonese, Traditional)</option>
+          <option value='Chinese (Mandarin, Simplified)'>Chinese (Mandarin, Simplified)</option>
+          <option value='Chinese (Taiwanese Mandarin)'>Chinese (Taiwanese Mandarin)</option>
+          <option value='Croatian (Croatia)'>Croatian (Croatia)</option>
+          <option value='Czech (Czech)'>Czech (Czech)</option>
+          <option value='Danish (Denmark)'>Danish (Denmark)</option>
+          <option value='Dutch (Netherlands)'>Dutch (Netherlands)</option>
+          <option value='English (Australia)'>English (Australia)</option>
+          <option value='English (Canada)'>English (Canada)</option>
+          <option value='English (Ghana)'>English (Ghana)</option>
+          <option value='English (Hong Kong)'>English (Hong Kong)</option>
+          <option value='English (India)'>English (India)</option>
+          <option value='English (Ireland)'>English (Ireland)</option>
+          <option value='English (Kenya)'>English (Kenya)</option>
+          <option value='English (New Zealand)'>English (New Zealand)</option>
+          <option value='English (Nigeria)'>English (Nigeria)</option>
+          <option value='English (Philippines)'>English (Philippines)</option>
+          <option value='English (Singapore)'>English (Singapore)</option>
+          <option value='English (South Africa)'>English (South Africa)</option>
+          <option value='English (Tanzania)'>English (Tanzania)</option>
+          <option value='English (United Kingdom)'>English (United Kingdom)</option>
+          <option value='English (United States)'>English (United States)</option>
+          <option value='Estonian (Estonia)'>Estonian (Estonia)</option>
+          <option value='Filipino (Philippines)'>Filipino (Philippines)</option>
+          <option value='Finnish (Finland)'>Finnish (Finland)</option>
+          <option value='French (Canada)'>French (Canada)</option>
+          <option value='French (France)'>French (France)</option>
+          <option value='French (Switzerland)'>French (Switzerland)</option>
+          <option value='German (Austria)'>German (Austria)</option>
+          <option value='German (Switzerland)'>German (Switzerland)</option>
+          <option value='German (Germany)'>German (Germany)</option>
+          <option value='Greek (Greece)'>Greek (Greece)</option>
+          <option value='Gujarati (Indian)'>Gujarati (Indian)</option>
+          <option value='Hebrew (Israel)'>Hebrew (Israel)</option>
+          <option value='Hindi (India)'>Hindi (India)</option>
+          <option value='Hungarian (Hungary)'>Hungarian (Hungary)</option>
+          <option value='Indonesian (Indonesia)'>Indonesian (Indonesia)</option>
+          <option value='Irish (Ireland)'>Irish (Ireland)</option>
+          <option value='Italian (Italy)'>Italian (Italy)</option>
+          <option value='Japanese (Japan)'>Japanese (Japan)</option>
+          <option value='Kannada (India)'>Kannada (India)</option>
+          <option value='Korean (Korea)'>Korean (Korea)</option>
+          <option value='Latvian (Latvia)'>Latvian (Latvia)</option>
+          <option value='Lithuanian (Lithuania)'>Lithuanian (Lithuania)</option>
+          <option value='Malay (Malaysia)'>Malay (Malaysia)</option>
+          <option value='Maltese (Malta)'>Maltese (Malta)</option>
+          <option value='Marathi (India)'>Marathi (India)</option>
+          <option value='Norwegian (Bokmål, Norway)'>Norwegian (Bokmål, Norway)</option>
+          <option value='Persian (Iran)'>Persian (Iran)</option>
+          <option value='Polish (Poland)'>Polish (Poland)</option>
+          <option value='Portuguese (Brazil)'>Portuguese (Brazil)</option>
+          <option value='Portuguese (Portugal)'>Portuguese (Portugal)</option>
+          <option value='Romanian (Romania)'>Romanian (Romania)</option>
+          <option value='Russian (Russia)'>Russian (Russia)</option>
+          <option value='Slovak (Slovakia)'>Slovak (Slovakia)</option>
+          <option value='Slovenian (Slovenia)'>Slovenian (Slovenia)</option>
+          <option value='Spanish (Argentina)'>Spanish (Argentina)</option>
+          <option value='Spanish (Bolivia)'>Spanish (Bolivia)</option>
+          <option value='Spanish (Chile)'>Spanish (Chile)</option>
+          <option value='Spanish (Colombia)'>Spanish (Colombia)</option>
+          <option value='Spanish (Costa Rica)'>Spanish (Costa Rica)</option>
+          <option value='Spanish (Cuba)'>Spanish (Cuba)</option>
+          <option value='Spanish (Dominican Republic)'>Spanish (Dominican Republic)</option>
+          <option value='Spanish (Ecuador)'>Spanish (Ecuador)</option>
+          <option value='Spanish (El Salvador)'>Spanish (El Salvador)</option>
+          <option value='Spanish (Equatorial Guinea)'>Spanish (Equatorial Guinea)</option>
+          <option value='Spanish (Guatemala)'>Spanish (Guatemala)</option>
+          <option value='Spanish (Honduras)'>Spanish (Honduras)</option>
+          <option value='Spanish (Mexico)'>Spanish (Mexico)</option>
+          <option value='Spanish (Nicaragua)'>Spanish (Nicaragua)</option>
+          <option value='Spanish (Panama)'>Spanish (Panama)</option>
+          <option value='Spanish (Paraguay)'>Spanish (Paraguay)</option>
+          <option value='Spanish (Peru)'>Spanish (Peru)</option>
+          <option value='Spanish (Puerto Rico)'>Spanish (Puerto Rico)</option>
+          <option value='Spanish (Spain)'>Spanish (Spain)</option>
+          <option value='Spanish (Uruguay)'>Spanish (Uruguay)</option>
+          <option value='Spanish (USA)'>Spanish (USA)</option>
+          <option value='Spanish (Venezuela)'>Spanish (Venezuela)</option>
+          <option value='Swahili (Kenya)'>Swahili (Kenya)</option>
+          <option value='Swedish (Sweden)'>Swedish (Sweden)</option>
+          <option value='Tamil (India)'>Tamil (India)</option>
+          <option value='Telugu (India)'>Telugu (India)</option>
+          <option value='Thai (Thailand)'>Thai (Thailand)</option>
+          <option value='Turkish (Turkey)'>Turkish (Turkey)</option>
+          <option value='Vietnamese (Vietnam)'>Vietnamese (Vietnam)</option>
+        </select>
+      </div> -->

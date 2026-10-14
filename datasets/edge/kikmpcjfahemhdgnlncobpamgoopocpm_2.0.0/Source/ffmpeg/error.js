@@ -1,0 +1,1 @@
+window.addEventListener("error",function(e){window.parent.postMessage({_tq_frame_error:!0,message:"Iframe Error: "+(e.message||e.error)},"*")}),window.addEventListener("unhandledrejection",function(e){window.parent.postMessage({_tq_frame_error:!0,message:"Iframe Promise: "+(e.reason?.message||e.reason)},"*")});

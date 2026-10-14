@@ -1,0 +1,1 @@
+import{j as c,c as i}from"./cn-DTPxTs8l.js";import{F as a,a as m}from"./index-DZNhJFB1.js";import{r as n}from"./store-g-2qfnwC.js";const t=m("inline-flex shrink-0 items-center justify-center"),f=n.forwardRef(({className:o,icon:e,...r},s)=>c.jsx(a,{ref:s,icon:e,color:r.color??"currentColor",className:i(t(),o),...r}));export{f as I};

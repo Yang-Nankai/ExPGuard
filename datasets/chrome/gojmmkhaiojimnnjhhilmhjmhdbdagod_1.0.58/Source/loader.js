@@ -1,0 +1,1 @@
+(function(){"use strict";const e=performance.now();(async()=>{const{onExecute:o}=await import(chrome.runtime.getURL("subloader.js"));o?.({perf:{injectTime:e,loadTime:performance.now()-e}})})().catch(console.error)})();

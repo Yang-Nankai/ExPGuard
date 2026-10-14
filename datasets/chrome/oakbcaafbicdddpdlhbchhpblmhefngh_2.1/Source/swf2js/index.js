@@ -1,0 +1,1 @@
+chrome.runtime.sendMessage({action:"get-active-tab"},(e=>{e&&chrome.tabs.sendMessage(e.id,{action:"get-links"},(e=>{e&&(document.title="Loading...",chrome.runtime.sendMessage({action:"get-swf",url:e[0].url},(e=>{let t=document.querySelector("#player");t&&setTimeout((()=>{t.contentWindow.postMessage({swf:e},"*"),document.title="Flash Player for Chrome"}),100)})))}))}));

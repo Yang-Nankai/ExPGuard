@@ -1,0 +1,4038 @@
+/** 
+ * Copyright (C) Growbot 2016-2023 - All Rights Reserved
+ *
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * Written by Growbot <growbotautomator@gmail.com>, 2016-2023
+ */
+
+
+@keyframes pulse {
+    0% {
+        transform: scale(1, 1);
+    }
+
+    50% {
+        transform: scale(1.03, 1.03);
+    }
+
+    100% {
+        transform: scale(1, 1);
+    }
+}
+
+@-webkit-keyframes igBotRotate {
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes igBotRotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+details,
+summary {
+    outline: 0;
+}
+
+summary {
+    user-select: none;
+    cursor: pointer;
+}
+
+.pulsing {
+    animation: pulse 1s linear infinite;
+}
+
+#igBotInjectedContainer * {
+    color: inherit;
+}
+
+#igBotInjectedContainer {
+    color: var(--gb-text);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+    display: none;
+    background-color: var(--gb-bg-page);
+    border: 1px solid var(--gb-border);
+    position: fixed;
+    width: 98%;
+    min-width: 260px;
+    top: 22px;
+    right: 1%;
+    z-index: 999;
+    height: 96%;
+    padding: 1%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+    overflow: auto;
+    resize: both;
+    box-sizing: border-box;
+}
+
+.igBotParent div {
+    box-sizing: border-box;
+}
+
+/* Batch scheduling progress (covers Growbot panel while posting to server) */
+#igBotInjectedContainer .ig-bot-scheduling-progress-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 100000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(1px);
+}
+
+#igBotInjectedContainer .ig-bot-scheduling-progress-card {
+    min-width: 240px;
+    max-width: 90%;
+    padding: 1rem 1.25rem;
+    border-radius: 6px;
+    background: var(--gb-bg-elevated);
+    border: 1px solid var(--gb-border-strong);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+#igBotInjectedContainer .ig-bot-scheduling-progress-text {
+    font-size: 11pt;
+    margin-bottom: 0.65rem;
+    text-align: center;
+    color: var(--gb-text);
+}
+
+#igBotInjectedContainer .ig-bot-scheduling-progress-track {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--gb-bg-muted);
+    overflow: hidden;
+    border: 1px solid var(--gb-border-subtle);
+}
+
+#igBotInjectedContainer .ig-bot-scheduling-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 3px;
+    background: var(--gb-accent);
+    transition: width 0.2s ease-out;
+}
+
+#igBotDialogScheduleConfig .ig-bot-schedule-evenly-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 10pt;
+    line-height: 1.35;
+    padding: 6px 4px 0 0;
+    margin-bottom: 0;
+}
+
+#igBotDialogScheduleConfig .ig-bot-schedule-evenly-label {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: var(--gb-text);
+    margin-bottom: 2px;
+}
+
+#igBotDialogScheduleConfig .ig-bot-schedule-evenly-option {
+    display: grid;
+    grid-template-columns: 15px 1fr;
+    column-gap: 8px;
+    row-gap: 2px;
+    align-items: start;
+    font-size: 9.5pt;
+    font-weight: normal;
+    cursor: pointer;
+    margin-bottom: 4px;
+}
+
+#igBotDialogScheduleConfig .ig-bot-schedule-evenly-option input[type="radio"] {
+    margin: 3px 0 0 0;
+    flex-shrink: 0;
+}
+
+/* Multi-IG scheduling wizard (collapsed <details> above Schedule) */
+#igBotInjectedContainer #igBotDialogScheduleIgAccountsWrap.ig-bot-schedule-ig-details {
+    margin: 14px 0 10px 0;
+    padding: 0 4px 10px 0;
+    border-top: 1px solid var(--gb-border-subtle);
+    padding-top: 12px;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgAccountsSummary.ig-bot-schedule-ig-summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 10.5pt;
+    color: var(--gb-text);
+    list-style-position: outside;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgAccountsWrap.ig-bot-schedule-ig-details .ig-bot-schedule-ig-inner {
+    margin-top: 10px;
+    padding-left: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgAccounts .ig-bot-schedule-ig-expl,
+#igBotInjectedContainer #igBotDialogScheduleIgAccounts .ig-bot-schedule-ig-empty {
+    font-size: 9.5pt;
+    line-height: 1.4;
+    color: var(--gb-text-muted, var(--gb-text-secondary, #889));
+    margin: 0;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgConsumeModeWrap .ig-bot-schedule-consume-label {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: var(--gb-text);
+    margin-bottom: 4px;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgConsumeModeWrap .ig-bot-schedule-consume-option {
+    display: grid;
+    grid-template-columns: 15px 1fr;
+    column-gap: 8px;
+    row-gap: 2px;
+    align-items: start;
+    font-size: 9.5pt;
+    line-height: 1.35;
+    cursor: pointer;
+    margin-bottom: 6px;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgConsumeModeWrap input[type="radio"] {
+    margin: 3px 0 0 0;
+    flex-shrink: 0;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgQuotaModeWrap.ig-bot-schedule-quota-mode-wrap {
+    margin-top: 2px;
+    padding: 8px 0 4px 0;
+    border-top: 1px solid var(--gb-border-subtle);
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgQuotaModeWrap .ig-bot-schedule-quota-mode-label {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: var(--gb-text);
+    margin-bottom: 4px;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgQuotaModeWrap .ig-bot-schedule-quota-mode-option {
+    display: grid;
+    grid-template-columns: 15px 1fr;
+    column-gap: 8px;
+    row-gap: 2px;
+    align-items: start;
+    font-size: 9.5pt;
+    line-height: 1.35;
+    cursor: pointer;
+    margin-bottom: 6px;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgQuotaModeWrap input[type="radio"] {
+    margin: 3px 0 0 0;
+    flex-shrink: 0;
+}
+
+#igBotInjectedContainer #igBotScheduleIgEvenPreview.ig-bot-schedule-ig-even-preview {
+    font-size: 9pt;
+    font-style: italic;
+    color: var(--gb-text-muted, var(--gb-text-secondary, #889));
+    margin: 6px 0 0 0;
+    line-height: 1.35;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgAccountsRows .ig-bot-schedule-ig-slot-quota[disabled] {
+    opacity: 0.9;
+    cursor: default;
+    color: var(--gb-text);
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgAccountsRows .ig-bot-schedule-ig-slot {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 4px;
+    margin-bottom: 6px;
+    font-size: 10pt;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgAccountsRows .ig-bot-schedule-ig-slot > .ig-bot-schedule-ig-slot-cb {
+    margin: 0;
+    align-self: center;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgAccountsRows .ig-bot-schedule-ig-slot-handle {
+    min-width: 0;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgAccountsRows .ig-bot-schedule-ig-slot-quota-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+#igBotInjectedContainer #igBotDialogScheduleIgAccountsRows .ig-bot-schedule-ig-slot-quota {
+    width: 64px !important;
+    padding: 4px 6px !important;
+    font-size: 10pt !important;
+    margin: 0;
+    text-align: center;
+    box-sizing: border-box;
+    border-radius: 3px;
+    border: 1px solid var(--gb-border);
+    background: var(--gb-bg-input);
+    color: var(--gb-text);
+}
+
+#igBotDialogScheduleStep1.ig-bot-dialog-schedule-step1 {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 0 4px;
+}
+
+#igBotDialogScheduleStep1 .ig-bot-schedule-step1-hint {
+    font-size: 10pt;
+    line-height: 1.4;
+    margin: 0;
+    color: var(--gb-text);
+}
+
+#igBotDialogScheduleStep1 .ig-bot-schedule-step1-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+#igBotDialogScheduleStep1 .ig-bot-schedule-step1-buttons .igBotInjectedButton {
+    flex: 1 1 140px;
+    min-width: 120px;
+    text-align: center;
+}
+
+#igBotDialogScheduleConfig .ig-bot-dialog-schedule-existing {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--gb-border-subtle);
+}
+
+#igBotDialogScheduleConfig .ig-bot-existing-until-line {
+    font-size: 10pt;
+    font-style: italic;
+    margin: 0;
+    color: var(--gb-text);
+}
+
+#igBotDialogScheduleConfig .ig-bot-schedule-start-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    font-size: 10pt;
+}
+
+#igBotDialogScheduleConfig .ig-bot-schedule-start-label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    font-weight: 600;
+}
+
+#igBotDialogScheduleConfig .ig-bot-schedule-start-row input[type="datetime-local"] {
+    width: auto;
+    min-width: 220px;
+    max-width: 100%;
+    padding: 5px 8px;
+    font-size: 10pt;
+    border: 1px solid var(--gb-border);
+    border-radius: 3px;
+    background: var(--gb-bg-input);
+    color: var(--gb-text);
+}
+
+#igBotInjectedContainer .ig-bot-link-button,
+#igBotDialog .ig-bot-link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 10pt;
+    color: var(--gb-accent);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#igBotDialog {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 12px;
+    transform: translateX(-50%);
+    width: min(600px, calc(100% - 24px));
+    max-width: 600px;
+    max-height: min(86vh, calc(100vh - 36px));
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    z-index: 99999;
+    border: 5px solid var(--gb-border-strong);
+    background-color: var(--gb-bg-elevated);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#igBotDialogQuestion {
+    margin-bottom: 20px;
+}
+
+#igBotDialog #btnDialogOK.ig-bot-dialog-btn-danger {
+    background-color: #e74c3c;
+}
+
+#igBotDialog #btnDialogCancel.ig-bot-dialog-btn-secondary {
+    background-color: #f1f2f6;
+    color: #2f3640;
+    border: 1px solid var(--gb-border-subtle);
+}
+
+#igBotDialog #btnDialogCancel.ig-bot-dialog-btn-secondary:hover {
+    background-color: #dfe4ea;
+}
+
+#igBotDialogScheduleConfig {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 12px;
+    border: 1px solid var(--gb-border-subtle);
+    border-radius: 4px;
+    background-color: var(--gb-bg-muted);
+}
+
+#igBotDialogScheduleConfig label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11pt;
+    font-weight: normal;
+    text-indent: 0;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+#igBotDialogScheduleConfig input[type="number"] {
+    width: 70px;
+    padding: 4px 6px;
+    border: 1px solid var(--gb-border);
+    border-radius: 3px;
+    font-size: 11pt;
+    text-align: center;
+    background: var(--gb-bg-input);
+    color: var(--gb-text);
+}
+
+#igBotDialogScheduleConfig .igBotScheduleTimeWindow {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 10px;
+    margin: 2px 0;
+    border: 1px solid var(--gb-border-subtle);
+    border-radius: 4px;
+    background: var(--gb-bg-elevated);
+}
+
+#igBotDialogScheduleConfig .igBotScheduleTimeHeading {
+    font-size: 10pt;
+    font-weight: 600;
+    color: var(--gb-text);
+    margin: 0 0 2px 0;
+    line-height: 1.3;
+}
+
+#timeWindowSlider.noUi-horizontal {
+    margin: 4px 8px 10px 8px;
+}
+
+#timeWindowSlider.noUi-target {
+    background: var(--gb-slider-track);
+}
+
+#timeWindowSlider .noUi-connect {
+    background: var(--gb-accent);
+}
+
+#timeWindowSlider .noUi-handle {
+    cursor: grab;
+}
+
+#timeWindowSlider .noUi-tooltip {
+    font-size: 9pt;
+    padding: 2px 6px;
+    white-space: nowrap;
+    border: 1px solid var(--gb-slider-tooltip-border);
+    background: var(--gb-slider-tooltip-bg);
+    color: var(--gb-text);
+    border-radius: 3px;
+}
+
+.igBotScheduleTimeInputs {
+    display: flex;
+    gap: 12px;
+    padding: 0 8px;
+}
+
+#igBotDialogTruncateConfig {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+    padding: 10px 12px;
+    border: 1px solid var(--gb-border-subtle);
+    border-radius: 4px;
+    background-color: var(--gb-bg-muted);
+    font-size: 11pt;
+}
+
+#igBotDialogTruncateConfig label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-indent: 0;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+#igBotDialogTruncateConfig input[type="number"] {
+    width: 80px;
+    padding: 4px 6px;
+    border: 1px solid var(--gb-border);
+    border-radius: 3px;
+    font-size: 11pt;
+    text-align: center;
+    background: var(--gb-bg-input);
+    color: var(--gb-text);
+}
+
+#dialogTruncateHelp {
+    font-size: 10pt;
+    color: var(--gb-text-muted);
+    line-height: 1.4;
+}
+
+#igBotDialogHeader {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin: -10px -10px 8px 0;
+}
+
+#btnDialogClose {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--gb-text-dim);
+    padding: 0 4px;
+    user-select: none;
+}
+
+#btnDialogClose:hover {
+    color: var(--gb-text);
+}
+
+#btnDialogHelp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid var(--gb-dialog-help-border);
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--gb-text-dim);
+    cursor: help;
+    user-select: none;
+}
+
+#btnDialogHelp:hover {
+    color: var(--gb-text);
+    border-color: var(--gb-border-strong);
+}
+
+#igBotDialogWelcome {
+    margin-bottom: 12px;
+}
+
+.growbot-hint {
+    background: var(--gb-hint-bg);
+    border: 1px solid var(--gb-hint-border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin: 6px 0;
+    font-size: 10pt;
+    font-style: normal;
+    color: var(--gb-hint-text);
+    line-height: 1.45;
+}
+
+.growbot-hint p {
+    margin: 0 0 6px 0;
+}
+
+.growbot-hint-dismiss {
+    font-size: 9pt;
+    color: var(--gb-hint-dismiss);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.growbot-hint-dismiss:hover {
+    color: var(--gb-hint-dismiss-hover);
+}
+
+/* Same external/new-tab icon as #igBotQueueContainer a[target="_blank"] and #iconHelp:after */
+#igBotDialog a.growbot-open-chrome-perf-link::after {
+    content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+    margin: 0px 3px 0px 5px;
+}
+
+#igBotInjectedContainer h1 {
+    font-size: 26px;
+    line-height: 24px;
+    font-weight: bold;
+    margin: 0px 10px 10px 0;
+}
+
+#igBotInjectedContainer h2 {
+    font-size: 14px;
+    font-weight: normal;
+    margin-top: 7px;
+}
+
+#igBotInjectedContainer h2#affiliateBanner {
+    font-weight: bold; margin: -4px 5px 0px 15px; background-color: green; color: white; padding: 10px; border-radius: 5px; cursor: pointer;
+}
+
+#igBotInjectedContainer h2#affiliateBanner:hover {
+    border-bottom: 1px solid var(--gb-affiliate-banner-hover);
+    border-right: 1px solid var(--gb-affiliate-banner-hover);
+}
+
+#igBotInjectedContainer h3 {
+    font-size: 24px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.1;
+    color: inherit;
+    text-align: left;
+}
+
+#igBotInjectedContainer p {
+    margin-bottom: 10px;
+}
+
+#igBotBottom {
+    display: flex;
+    flex-direction: column;
+}
+
+#igBotMediaButtonContainer {
+    width: 60%;
+    margin-left: 1%;
+    height: 10%;
+    display: flex;
+    flex-direction: row;
+}
+
+#instabotIcon {
+    cursor: pointer;
+    display: inline-block;
+    position: fixed;
+    z-index: 999999999999;
+    background-size: contain;
+    width: 28px;
+    height: 28px;
+    margin: 12px 12px 0 12px;
+}
+
+#linkBuyNow {
+    text-decoration: underline;
+}
+
+#textUnfollowOld,
+#textUnfollowNew {
+    width: 30px;
+}
+
+.processQueueRadioButtons {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: start;
+    margin: 4px;
+}
+
+.processQueueRadioButtons label {
+    white-space: nowrap;
+    margin: 5px;
+}
+
+.labelLikeLatestPics {
+    font-size: 9pt;
+}
+
+.processQueueOptions {
+    padding: 10px 0 0 0;
+    border: 1px dashed var(--gb-process-border);
+    border-bottom: 0px dashed var(--gb-process-border);
+    margin: 0px 0px -3px 0px;
+    text-align: center;
+    font-size: 12pt;
+}
+
+.unfollowOptions {
+    padding: 8px 0 0 2px;
+    border: 1px dashed var(--gb-process-border);
+    border-bottom: 0px dashed var(--gb-process-border);
+    margin: 0px 0px -3px 0px;
+}
+
+.followOptions {
+    padding: 8px 0 5px 10px;
+    border: 1px dashed var(--gb-process-border);
+    margin: 0 0 10px 0;
+}
+
+#bottomNotes {
+    margin-bottom: 10px;
+}
+
+.followOptions input[type="text"],
+.followOptions input[type="number"] {
+    width: 50px;
+}
+
+.followOptions label,
+.unfollowOptions label {
+    text-indent: -25px;
+    padding-left: 25px;
+    margin-bottom: 5px;
+}
+
+#emailAddress {
+    self-align: center;
+}
+
+#igBotInjectedContainer .igBotInjectedButton {
+    text-transform: uppercase;
+    text-align: center;
+    margin: 5px 0px;
+    border-radius: 3px;
+    color: white;
+    background-color: var(--gb-accent);
+    font-family: 12pt Helvetica;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    padding: 8px 2px;
+}
+
+#igBotInjectedContainer #btnStop,
+#igBotInjectedContainer #btnStop2 {
+    background-color: red;
+}
+
+.igBotInjectedButton.disabled,
+#btnStop.disabled,
+#btnStop.inactive,
+.igBotInjectedButton.inactive,
+#igBotQueueContainerButtons .igBotInjectedButton.inactive,
+#igBotMediaButtonContainer .igBotInjectedButton.inactive {
+    background-color: var(--gb-button-disabled-bg);
+    color: var(--gb-button-disabled-text);
+    cursor: not-allowed;
+}
+
+#igBotQueueContainerButtons #btnSaveQueueToStorage,
+#igBotQueueContainerButtons #btnSaveWhiteList,
+#igBotQueueContainerButtons #btnSaveBlackList,
+#igBotQueueContainerButtons #btnSaveAttempted {
+    display: none;
+}
+
+#btnLoadMenu,
+#btnLoadMediaMenu,
+#btnSelectionMenu,
+#btnMediaSelectionMenu,
+#btnProcessQueueHolder,
+#btnProcessQueue {
+    position: relative;
+    height: 60px;
+}
+
+/* Outranks #igBotInjectedContainer * { color: inherit } so labels are not forced white */
+#igBotInjectedContainer .hiddenHover {
+    cursor: default;
+    display: none;
+    position: absolute;
+    bottom: 60px;
+    left: 0px;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--gb-border);
+    border-bottom: 0px;
+    border-radius: 2px;
+    background-color: var(--gb-hidden-hover-bg);
+    padding: 0 0 6px 0;
+    z-index: 5;
+    color: var(--gb-text);
+}
+
+#igBotInjectedContainer .igBotInjectedButton:hover .hiddenHover {
+    display: block;
+}
+
+#igBotInjectedContainer .igBotInjectedButton .hiddenHover .igBotInjectedButton {
+    height: 40px;
+    margin: 10px;
+    color: var(--gb-text);
+    background-color: var(--gb-bg-elevated);
+    border: 1px solid var(--gb-accent);
+    box-sizing: border-box;
+}
+
+#igBotInjectedContainer .hiddenHover .igBotInjectedButton.inactive,
+#igBotInjectedContainer .hiddenHover .igBotInjectedButton.disabled {
+    color: var(--gb-button-disabled-text);
+    background-color: var(--gb-button-disabled-bg);
+    border-color: var(--gb-border);
+}
+
+#igBotInjectedContainer .igBotInjectedButton .hiddenHover .igBotInjectedButton:not(.inactive):not(.disabled):hover {
+    background-color: var(--gb-accent);
+    color: white;
+}
+
+#btnLikeFeed,
+#btnLikeHashtag {
+    color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+#btnLikeFeed span,
+#btnLikeHashtag span {
+    color: white;
+}
+
+.hashtagName {
+    display: inline-block;
+    margin-left: 5px;
+}
+
+#igBotInjectedContainer #numberToLike,
+#igBotInjectedContainer #numberToLikeHashtag {
+    width: 50px;
+    display: inline;
+    font-size: 12pt;
+    font-weight: bold;
+    background-color: transparent;
+    color: white;
+    margin: 0 4px;
+}
+
+#igBotInjectedContainer #numberToLike::-webkit-inner-spin-button,
+#igBotInjectedContainer #numberToLikeHashtag::-webkit-inner-spin-button {
+    opacity: 1;
+    height: 2em;
+    width: 1em;
+}
+
+#igBotInjectedContainer .igBotRotate {
+    -webkit-animation: igBotRotate 1.5s linear infinite;
+    animation: igBotRotate 1.5s linear infinite;
+}
+
+#igBotInjectedContainer .reloadDouble {
+    width: 25%;
+    /*display: none;*/
+    border-color: transparent black;
+    border-radius: 50%;
+    border-style: solid;
+    border-width: .125em;
+    height: 1.5em;
+    margin: .25em;
+    width: 1.5em;
+    cursor: pointer;
+    flex: 0 0 auto;
+}
+
+#igBotInjectedContainer .reloadDouble:before,
+#igBotInjectedContainer .reloadDouble:after {
+    border-style: solid;
+    content: '';
+    display: block;
+    position: absolute;
+    width: 0;
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+#igBotInjectedContainer .reloadDouble:after {
+    border-color: transparent transparent transparent black;
+    border-width: .3125em 0 .3125em .5em;
+    top: -.3125em;
+    left: .0625em;
+}
+
+#igBotInjectedContainer .reloadDouble:before {
+    border-color: transparent black transparent transparent;
+    border-width: .3125em .5em .3125em 0;
+    bottom: -.3125em;
+    right: .0625em;
+}
+
+/**********************************************************/
+/**   QUEUE STYLES  ***************************************/
+/**********************************************************/
+#igBotLeft {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: 100%;
+    max-height: 100%;
+}
+
+#igBotHeading {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    font-size: 12px;
+}
+
+#igBotQueueContainer,
+#igBotMediaQueueContainer,
+#igBotActionsQueueContainer {
+    overflow: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    flex-grow: 7 0 auto;
+    max-height: 96%;
+    min-height: 80%;
+    position: relative;
+}
+
+#igBotMediaQueueContainer {
+    min-height: 78%;
+}
+
+#mainSection {
+    max-height: 85%;
+}
+
+.gutter.gutter-horizontal {
+    cursor: ew-resize;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.igBotQueueContainerMessage {
+    margin: auto;
+    text-align: center;
+    color: var(--gb-message-text);
+    font-size: 14px;
+    font-weight: bold;
+    background-color: var(--gb-bg-section);
+    width: 80%;
+    height: 50%;
+    overflow: auto;
+    padding: 20px 50px 30px 50px;
+    top: 0px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    flex: 0 0 auto;
+}
+
+.igBotNewsAndUpdates {
+    text-align: center;
+    color: var(--gb-message-text);
+    font-size: 14px;
+    font-weight: bold;
+    background-color: var(--gb-bg-section);
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    padding: 10px 35% 10px 30px;
+    top: 0px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    flex: 0 0 auto;
+}
+
+.igBotNewsAndUpdates a,
+.igBotQueueContainerMessage a {
+    color: var(--gb-news-link);
+}
+
+.igBotNewsAndUpdates i,
+.igBotQueueContainerMessage i {
+    font-style: italic;
+}
+
+.igBotNewsAndUpdates p,
+.igBotQueueContainerMessage p {
+    text-align: left;
+    font-size: 16pt;
+    line-height: 22pt;
+    margin: 6px;
+}
+
+#growbotLanguageOptions {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+#growbotLanguageOptions label {
+    display: block;
+    text-indent: 0;
+    padding-left: 0;
+}
+
+.igBotNewsAndUpdates .igBotUpdateNote {
+    font-size: 12pt;
+    line-height: 16pt;
+    color: var(--gb-news-note);
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.igBotNewsAndUpdates p.igBotUpdateNote {
+    white-space: pre-line;
+}
+
+.igBotNewsAndUpdates details {
+    font-size: 14pt;
+    color: var(--gb-news-details);
+    text-align: left;
+    margin: 0px 0px 0px 5px;
+}
+
+.igBotNewsAndUpdates details ol li {
+    font-size: 11pt;
+    color: var(--gb-news-li);
+    text-align: left;
+    margin: 5px 0px 0px 30px;
+}
+
+
+#iframePurchase,
+#iframeFAQ,
+#iframeAffiliate,
+#iframeNews {
+    overflow: auto;
+    overflow-x: hidden;
+    width: 100%;
+    flex-grow: 3;
+    min-height: 80%;
+    max-height: 100%;
+    border: 0px;
+}
+
+.growbot-firefox-iframe-hidden {
+    display: none !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+}
+
+.growbot-firefox-external-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex-grow: 3;
+    min-height: 40%;
+    max-height: 100%;
+    padding: 1em;
+    box-sizing: border-box;
+}
+
+button.growbot-firefox-external-open {
+    font-size: 1.1em;
+    padding: 0.75em 1.25em;
+    cursor: pointer;
+}
+
+.growbot-firefox-external-note {
+    text-align: center;
+    margin: 0.5em 1em;
+    color: var(--gb-news-li, inherit);
+}
+
+.growbot-firefox-purchase-panel {
+    width: 100%;
+    flex-grow: 3;
+    min-height: 40%;
+}
+
+.growbot-firefox-purchase-links {
+    text-align: center;
+    margin: 10px;
+}
+
+#mainSection a.purchaseTextLink {
+    color: var(--gb-link);
+    text-decoration: underline;
+}
+
+#websiteSubscribeLink {
+    display: inline-block;
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+    color: white;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.flex5 {
+    flex: 0 1 19%;
+}
+
+.flex6 {
+    flex: 0 1 16%;
+}
+
+.flex7 {
+    /*    flex: 1 1 12%;*/
+    margin: 0 auto;
+}
+
+
+#igBotQueueCount,
+#igBotQueueSelectedCount,
+#igBotmediaQueueCount {
+    padding: 0;
+}
+
+#igBotQueueCount,
+#igBotmediaQueueCount {
+    display: none;
+}
+
+#igBotQueueOrderBy {
+    height: 32px;
+    align-self: flex-end;
+    justify-self: flex-end;
+    font-size: 11px;
+    background: var(--gb-bg-input);
+    color: var(--gb-text);
+    border-color: var(--gb-border);
+    display: none;
+}
+
+#lblLimitQueueSize {
+    align-self: flex-end;
+    justify-self: flex-end;
+    margin-left: 5px;
+}
+
+#cbLimitQueueSize {
+    margin-top: 1px;
+}
+
+#igBotQueueCount,
+#igBotQueueSelectedCount,
+#igBotQueueOrderBy,
+#lblLimitQueueSize {
+    align-self: center;
+}
+
+#igBotQueueSelectedCount {
+    margin-top: -17px;
+}
+
+#pager select {
+    position: relative;
+    top: -3px;
+    display: inline-block;
+}
+
+#pager img {
+    position: relative;
+    top: 2px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+#igBotmediaQueueCount,
+#igBotmediaQueueSelectedCount,
+#igBotmediaQueueOrderBy,
+#lblLimitQueueSize {
+    align-self: center;
+}
+
+#igBotmediaQueueSelectedCount {
+    margin-top: -17px;
+}
+
+#mediapager select {
+    position: relative;
+    top: -3px;
+    display: inline-block;
+}
+
+#mediapager img {
+    position: relative;
+    top: 2px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+#actionspager select {
+    position: relative;
+    top: -3px;
+    display: inline-block;
+    width: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+#actionspager img {
+    position: relative;
+    top: 2px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+/* Page # and page-size dropdowns — avoid stretching to longest option text */
+#actionspager select.gotoPage,
+#pager select.gotoPage,
+#mediapager select.gotoPage {
+    max-width: 4.5rem;
+    min-width: 2.75rem;
+    width: auto;
+    box-sizing: border-box;
+}
+
+#actionspager select.pagesize,
+#pager select.pagesize,
+#mediapager select.pagesize {
+    max-width: 4.25rem;
+    min-width: 3rem;
+    width: auto;
+    box-sizing: border-box;
+}
+
+/* Spacers in actions pager row (parity with queue count columns on other tabs) */
+.actions-queue-pager-meta {
+    min-width: 0;
+    flex: 0 0 auto;
+}
+
+
+#igBotStatusDiv {
+    width: auto;
+    font-size: 11pt;
+    text-align: right;
+    position: relative;
+    max-width: 60%;
+    background-color: var(--gb-status-bg);
+    border-radius: .5rem;
+    border: 1px solid var(--gb-status-border);
+    color: var(--gb-text);
+    border-top-right-radius: 0px;
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, .3), 0 0.0625rem 0.125rem rgba(0, 0, 0, .2);
+    margin: -6px 3px 0px 0px;
+    font-weight: bold;
+    height: auto;
+    min-height: 26px;
+    line-height: 1;
+    padding: 5px 10px;
+    vertical-align: middle;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+
+#igBotQueueContainerButtons,
+#igBotMediaButtonContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex: 0 0 auto;
+}
+
+#igBotQueueContainerButtons .igBotInjectedButton,
+#igBotMediaButtonContainer .igBotInjectedButton {
+    width: auto;
+    flex-grow: 1;
+    margin: 2px 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#igBotInjectedContainer #igBotQueueContainerButtons #btnProcessQueueHolder {
+    padding: 0;
+    border-radius: 2px;
+}
+
+#btnProcessQueueHolder #btnProcessQueue {
+    margin: 0;
+}
+
+#igBotQueueContainerButtons .igBotInjectedButton span {
+    display: inline;
+}
+
+.igBotQueueAcct {
+    margin: 0px 0 0 0;
+    width: 245px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+#igBotMediaQueueContainer .igBotQueueAcct {
+    margin: 0px 0 0 0;
+    width: 100%;
+    height: 250px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.igBotQueueAcctCheckbox {
+    display: none;
+}
+
+.igBotQueueAcctCheckboxVisible {
+    margin: 15px;
+}
+
+.igBotQueueAcctProfilePicture {
+    width: 60px;
+    height: 60px;
+    border: 3px solid white;
+    border-radius: 50px;
+    margin: 0 0 -5px 0;
+}
+
+#igBotMediaQueueContainer label {
+    width: auto;
+    height: 100%;
+    max-width: 42%;
+}
+
+#igBotMediaQueueContainer .igBotQueueAcctProfilePicture {
+    width: 150px;
+    height: 150px;
+    max-width: 100%;
+    border: 3px solid white;
+    border-radius: 10px;
+    margin: 0 3px 0 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.gridjs-tr-selected .igBotQueueAcctProfilePicture,
+#igBotMediaQueueContainer input[type="checkbox"]:checked+label .igBotQueueAcctProfilePicture {
+    border-color: var(--gb-accent);
+}
+
+.igBotQueueAcctName {
+    max-width: 150px;
+}
+
+.igBotQueueAcctNameHolder {
+    display: flex;
+    flex-direction: column;
+}
+
+#igBotMediaQueueContainer .igBotQueueAcctNameHolder {
+    margin-left: 3%;
+    max-width: 55%;
+    height: 100%;
+}
+
+#igBotMediaQueueContainer .igBotQueueCaption {
+    width: 100%;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 9;
+    -webkit-box-orient: vertical;
+}
+
+#igBotMediaQueueContainer .followerCounts {
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.iconPrivate,
+.iconVerified {
+    display: inline-block;
+    height: 15px;
+    width: 15px;
+    margin: 0 0 -3px 3px;
+    background-size: contain;
+    background-image: url('chrome-extension://__MSG_@@extension_id__/private.png');
+}
+
+.iconVerified {
+    background-image: url('chrome-extension://__MSG_@@extension_id__/verified.png');
+}
+
+
+
+.igBotQueueAcct label {
+    position: relative;
+}
+
+.stamp-div {
+    position: relative;
+    top: -50px;
+    left: 0%;
+    border-radius: .2em;
+    border-width: .2em;
+    border-style: solid;
+    color: #ef3e42;
+    text-transform: uppercase;
+    margin: 0 auto;
+    margin-left: -25%;
+    font-family: "source-sans-pro", sans-serif;
+    font-size: 1.5em;
+    font-style: normal;
+    font-weight: 900;
+    letter-spacing: -.1em;
+    text-align: center;
+    padding: .1em;
+    transform: rotate(-20deg);
+    opacity: .6;
+    filter: blur(5%);
+    background-color: white;
+}
+
+.stamp-div-green {
+    border-color: green;
+    color: green;
+}
+
+.stamp-div-grey {
+    border-color: black;
+    color: black;
+}
+
+.stamp-div-red {
+    border-color: red;
+    color: red;
+}
+
+.stamp-div-blue {
+    border-color: var(--gb-accent);
+    color: var(--gb-accent);
+}
+
+/* Feed convenience actions (injected next to usernames; outside #igBotInjectedContainer) */
+a.igBotConvenienceLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 4px;
+    padding: 2px 7px 2px 5px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    vertical-align: middle;
+    white-space: nowrap;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    transition: background-color 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+a.igBotConvenienceLink .igBotConvenienceIcon {
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
+    display: block;
+    object-fit: contain;
+    pointer-events: none;
+    border-radius: 2px;
+}
+
+a.igBotConvenienceLink .igBotConvenienceLabel {
+    position: relative;
+    top: 0.5px;
+}
+
+html._aa4c a.igBotConvenienceLink {
+    color: #262626;
+    background: rgba(250, 250, 250, 0.95);
+    border-color: rgba(0, 0, 0, 0.14);
+}
+
+html._aa4c a.igBotConvenienceLink:hover {
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+html._aa4d a.igBotConvenienceLink {
+    color: #f5f5f5;
+    background: rgba(38, 38, 38, 0.92);
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+html._aa4d a.igBotConvenienceLink:hover {
+    background: rgba(48, 48, 48, 0.98);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+html._aa4c .igBotInjectedLinkWhitelist {
+    border-left: 3px solid #1b7e4b;
+}
+
+html._aa4c .igBotInjectedLinkBlacklist {
+    border-left: 3px solid #b42318;
+}
+
+html._aa4c .igBotInjectedLinkUnfollow {
+    border-left: 3px solid #495057;
+}
+
+html._aa4c .igBotInjectedLinkAddQueue {
+    border-left: 3px solid #1864ab;
+}
+
+html._aa4d .igBotInjectedLinkWhitelist {
+    border-left: 3px solid #3ecf8e;
+}
+
+html._aa4d .igBotInjectedLinkBlacklist {
+    border-left: 3px solid #ff6b6b;
+}
+
+html._aa4d .igBotInjectedLinkUnfollow {
+    border-left: 3px solid #adb5bd;
+}
+
+html._aa4d .igBotInjectedLinkAddQueue {
+    border-left: 3px solid #74c0fc;
+}
+
+a.igBotConvenienceLink .igBotLoader {
+    margin-left: 2px;
+}
+
+.igBotLoader,
+.igBotLoader:before,
+.igBotLoader:after {
+    border-radius: 50%;
+    width: 1em;
+    height: 1em;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    -webkit-animation: igBotLoader 1.8s infinite ease-in-out;
+    animation: igBotLoader 1.8s infinite ease-in-out;
+}
+
+.igBotLoader {
+    color: #000000;
+    font-size: 10px;
+    margin: 1px auto;
+    position: relative;
+    text-indent: -9999em;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-animation-delay: -0.16s;
+    animation-delay: -0.16s;
+    top: -25px;
+    margin-bottom: -10px;
+}
+
+.igBotLoader:before,
+.igBotLoader:after {
+    content: '';
+    position: absolute;
+    top: 0;
+}
+
+.igBotLoader:before {
+    left: -1.5em;
+    -webkit-animation-delay: -0.32s;
+    animation-delay: -0.32s;
+}
+
+.igBotLoader:after {
+    left: 1.5em;
+}
+
+@-webkit-keyframes igBotLoader {
+
+    0%,
+    80%,
+    100% {
+        box-shadow: 0 1em 0 -.3em;
+    }
+
+    40% {
+        box-shadow: 0 1em 0 0;
+    }
+}
+
+@keyframes igBotLoader {
+
+    0%,
+    80%,
+    100% {
+        box-shadow: 0 1em 0 -.3em;
+    }
+
+    40% {
+        box-shadow: 0 1em 0 0;
+    }
+}
+
+
+
+
+
+/*! nouislider - 11.0.3 - 2018-01-21 14:04:07 */
+
+
+/* Functional styling;
+ * These styles are required for noUiSlider to function.
+ * You don't need to change these rules to apply your design.
+ */
+
+.noUi-target,
+.noUi-target * {
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-user-select: none;
+    -ms-touch-action: none;
+    touch-action: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.noUi-target {
+    position: relative;
+    direction: ltr;
+}
+
+.noUi-base,
+.noUi-connects {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+/* Wrapper for all connect elements.
+ */
+.noUi-connects {
+    overflow: hidden;
+    z-index: 0;
+}
+
+.noUi-connect,
+.noUi-origin {
+    will-change: transform;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+}
+
+/* Offset direction
+ */
+html:not([dir="rtl"]) .noUi-horizontal .noUi-origin {
+    left: auto;
+    right: 0;
+}
+
+/* Give origins 0 height/width so they don't interfere with clicking the
+ * connect elements.
+ */
+.noUi-vertical .noUi-origin {
+    width: 0;
+}
+
+.noUi-horizontal .noUi-origin {
+    height: 0;
+}
+
+.noUi-handle {
+    position: absolute;
+}
+
+.noUi-state-tap .noUi-connect,
+.noUi-state-tap .noUi-origin {
+    -webkit-transition: transform 0.3s;
+    transition: transform 0.3s;
+}
+
+.noUi-state-drag * {
+    cursor: inherit !important;
+}
+
+/* Slider size and handle placement;
+ */
+.noUi-horizontal {
+    height: 18px;
+}
+
+.noUi-horizontal .noUi-handle {
+    width: 34px;
+    height: 28px;
+    left: -17px;
+    top: -6px;
+}
+
+.noUi-vertical {
+    width: 18px;
+}
+
+.noUi-vertical .noUi-handle {
+    width: 28px;
+    height: 34px;
+    left: -6px;
+    top: -17px;
+}
+
+html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
+    right: -17px;
+    left: auto;
+}
+
+/* Styling;
+ * Giving the connect element a border radius causes issues with using transform: scale
+ */
+.noUi-target {
+    background: #FAFAFA;
+    border-radius: 4px;
+    border: 1px solid #D3D3D3;
+    box-shadow: inset 0 1px 1px #F0F0F0, 0 3px 6px -5px #BBB;
+}
+
+.noUi-connects {
+    border-radius: 3px;
+}
+
+.noUi-connect {
+    background: #3FB8AF;
+}
+
+/* Handles and cursors;
+ */
+.noUi-draggable {
+    cursor: ew-resize;
+}
+
+.noUi-vertical .noUi-draggable {
+    cursor: ns-resize;
+}
+
+.noUi-handle {
+    border: 1px solid #D9D9D9;
+    border-radius: 3px;
+    background: #FFF;
+    cursor: default;
+    box-shadow: inset 0 0 1px #FFF, inset 0 1px 7px #EBEBEB, 0 3px 6px -3px #BBB;
+}
+
+.noUi-active {
+    box-shadow: inset 0 0 1px #FFF, inset 0 1px 7px #DDD, 0 3px 6px -3px #BBB;
+}
+
+/* Handle stripes;
+ */
+.noUi-handle:before,
+.noUi-handle:after {
+    content: "";
+    display: block;
+    position: absolute;
+    height: 14px;
+    width: 1px;
+    background: #E8E7E6;
+    left: 14px;
+    top: 6px;
+}
+
+.noUi-handle:after {
+    left: 17px;
+}
+
+.noUi-vertical .noUi-handle:before,
+.noUi-vertical .noUi-handle:after {
+    width: 14px;
+    height: 1px;
+    left: 6px;
+    top: 14px;
+}
+
+.noUi-vertical .noUi-handle:after {
+    top: 17px;
+}
+
+/* Disabled state;
+ */
+[disabled] .noUi-connect {
+    background: #B8B8B8;
+}
+
+[disabled].noUi-target,
+[disabled].noUi-handle,
+[disabled] .noUi-handle {
+    cursor: not-allowed;
+}
+
+/* Base;
+ *
+ */
+.noUi-pips,
+.noUi-pips * {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.noUi-pips {
+    position: absolute;
+    color: #999;
+    font-size: 10px;
+}
+
+/* Values;
+ *
+ */
+.noUi-value {
+    position: absolute;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.noUi-value-sub {
+    color: #ccc;
+    font-size: 10px;
+}
+
+/* Markings;
+ *
+ */
+.noUi-marker {
+    position: absolute;
+    background: #CCC;
+}
+
+.noUi-marker-sub {
+    background: #AAA;
+}
+
+.noUi-marker-large {
+    background: #AAA;
+}
+
+/* Horizontal layout;
+ *
+ */
+.noUi-pips-horizontal {
+    padding: 10px 0;
+    height: 80px;
+    top: 100%;
+    left: 0;
+    width: 100%;
+}
+
+.noUi-value-horizontal {
+    -webkit-transform: translate(-50%, 50%);
+    transform: translate(-50%, 50%);
+}
+
+.noUi-rtl .noUi-value-horizontal {
+    -webkit-transform: translate(50%, 50%);
+    transform: translate(50%, 50%);
+}
+
+.noUi-marker-horizontal.noUi-marker {
+    margin-left: -1px;
+    width: 2px;
+    height: 5px;
+}
+
+.noUi-marker-horizontal.noUi-marker-sub {
+    height: 10px;
+}
+
+.noUi-marker-horizontal.noUi-marker-large {
+    height: 15px;
+}
+
+/* Vertical layout;
+ *
+ */
+.noUi-pips-vertical {
+    padding: 0 10px;
+    height: 100%;
+    top: 0;
+    left: 100%;
+}
+
+.noUi-value-vertical {
+    -webkit-transform: translate(0, -50%);
+    transform: translate(0, -50%, 0);
+    padding-left: 25px;
+}
+
+.noUi-rtl .noUi-value-vertical {
+    -webkit-transform: translate(0, 50%);
+    transform: translate(0, 50%);
+}
+
+.noUi-marker-vertical.noUi-marker {
+    width: 5px;
+    height: 2px;
+    margin-top: -1px;
+}
+
+.noUi-marker-vertical.noUi-marker-sub {
+    width: 10px;
+}
+
+.noUi-marker-vertical.noUi-marker-large {
+    width: 15px;
+}
+
+.noUi-tooltip {
+    display: block;
+    position: absolute;
+    border: 1px solid #D9D9D9;
+    border-radius: 3px;
+    background: #fff;
+    color: #000;
+    padding: 5px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.noUi-horizontal .noUi-tooltip {
+    -webkit-transform: translate(-50%, 0);
+    transform: translate(-50%, 0);
+    left: 50%;
+    bottom: 120%;
+}
+
+.noUi-vertical .noUi-tooltip {
+    -webkit-transform: translate(0, -50%);
+    transform: translate(0, -50%);
+    top: 50%;
+    right: 120%;
+}
+
+/* END nouislider */
+
+.igBotFlexRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+#queueQuantityRow,
+#mediaqueueQuantityRow {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    height: 40px;
+    justify-content: space-between;
+    width: 450px;
+    position: absolute;
+    right: 0px;
+    top: 24px;
+    z-index: 5;
+}
+
+/* Above .list-card (z-index:10) in Actions Queue so pager stays visible */
+#actionsqueueQuantityRow {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    height: 40px;
+    justify-content: space-between;
+    width: 450px;
+    position: absolute;
+    right: 0px;
+    top: 24px;
+    z-index: 15;
+}
+
+#iconHelp,
+#iconEmail,
+#iconYoutube,
+#iconInstagram {
+    cursor: pointer;
+    margin: 0 0 0 8px;
+    height: 30px;
+    color: var(--gb-accent);
+    font-size: 22px;
+    line-height: 30px;
+    border-radius: 20px;
+    align-self: flex-end;
+}
+
+#iconHelp:after,
+#iconEmail::after,
+#iconYoutube:after
+ {
+    content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+    margin: 0px 15px 0px 5px;
+}
+
+#igBotInjectedContainer #btnHide {
+    margin: 0;
+    border: 1px solid var(--gb-border-strong);
+    border-radius: 5px;
+    color: var(--gb-text-dim);
+    background-color: var(--gb-bg-elevated);
+    width: 70px;
+    margin-left: 10px;
+}
+
+#multiFilter {
+    /*    position: absolute;*/
+    background-color: var(--gb-bg-section);
+    width: 100%;
+    /*    margin: 1% 1%;*/
+    padding: 0px 50px 30px 50px;
+    /*border: 2px solid #ccc;
+    border-radius: 5px;*/
+    top: 0px;
+    z-index: 1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex: 0 0 auto;
+    /*    display: none;*/
+    justify-content: space-between;
+}
+
+#multiFilter input[type="text"] {
+    margin: 2px;
+}
+
+.TODO {
+    background-color: red;
+}
+
+#txtConsole {
+    font-family: monospace;
+    height: 80%;
+    width: 80%;
+    font-size: 13px;
+    line-height: 15px;
+    display: block;
+    background: var(--gb-bg-elevated);
+    color: var(--gb-text);
+    border: 1px solid var(--gb-border);
+    box-sizing: border-box;
+}
+
+#igBotOptions,
+#igBotLog,
+#faqhelp,
+#affiliatediv {
+    background-color: var(--gb-bg-section);
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    padding: 0px 50px 30px 50px;
+    top: 0px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    flex: 0 0 auto;
+    /*justify-content: space-between;*/
+}
+
+#igBotOptions summary {
+    font-size: 14px;
+    font-weight: bold;
+    width: 60%;
+}
+
+#igBotOptions details div {
+    display: flex;
+    flex-direction: column;
+}
+
+#igBotOptions .followOptions {
+    background-color: var(--gb-bg-elevated);
+    font-size: 14px;
+}
+
+#growbotAccountInfo > div:not(#growbot-account-status) {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+#growbotAccountInfo #btnGrowbotLogin,
+#growbotAccountInfo #btnGrowbotLogout {
+    width: auto;
+    max-width: 100%;
+    flex: 0 0 auto;
+    margin: 0;
+    padding-left: 14px;
+    padding-right: 14px;
+}
+
+
+#igBotInjectedContainer #igBotOptions details input {
+    margin: 1px;
+}
+
+#igBotInjectedContainer input[type="checkbox"] {
+    display: initial !important;
+    opacity: 1 !important;
+    position: initial !important;
+    left: initial !important;
+    visibility: visible !important;
+    margin: 1px 2px -1px 0px !important;
+}
+
+
+#igBotInjectedContainer h3
+ {
+    text-align: left;
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+#multiFilter label[for="cbApplyFilterAutomatically"] {
+    align-self: flex-end;
+    justify-self: flex-end;
+    width: 335px;
+    display: block;
+    margin: 20px 0;
+    /*text-align: right;*/
+    font-size: 11pt;
+    font-weight: bold;
+    border: 1px dashed var(--gb-process-border);
+    white-space: nowrap;
+    padding: 5px;
+}
+
+#multiFilter #sliders {
+    text-align: center;
+    margin: 30px 0 20px 0;
+}
+
+#multiFilter>div:not(.filter-checkbox-pair):not(.filter-column):not(.filter-columns-row) {
+    width: 100%;
+}
+
+.filter-columns-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: 100%;
+    flex: 0 0 100%;
+    align-items: flex-start;
+}
+
+.filter-column {
+    flex: 0 0 25%;
+    max-width: 25%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+#multiFilter .filter-column .filter-checkbox-pair {
+    width: 100%;
+    flex: 0 0 auto;
+}
+
+#multiFilter>.filter-checkbox-pair {
+    width: 25%;
+    flex: 0 0 25%;
+}
+
+#multiFilter .filter-checkbox-pair--matching label {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 4px;
+    width: 100%;
+    white-space: normal;
+}
+
+#multiFilter .filter-checkbox-pair--matching input[type="text"] {
+    display: inline-block;
+    width: 11em;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-size: 12px;
+    vertical-align: middle;
+    margin: 0;
+}
+
+#multiFilter>.igBotInjectedButton {
+    width: 49%;
+}
+
+#btnResetFilter {
+    background-color: var(--gb-text-dim);
+}
+
+#multiFilter label {
+    width: 25%;
+    display: inline-block;
+}
+
+#multiFilter label.width50 {
+    width: 50%;
+    margin-bottom: 8px;
+}
+
+.filter-checkbox-pair {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    padding: 4px 6px;
+    align-self: flex-start;
+}
+
+.filter-checkbox-pair-spacer {
+    width: 100%;
+    flex: 0 0 100%;
+    height: 0;
+}
+
+#multiFilter .filter-checkbox-pair label {
+    width: 100%;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.filter-checkbox-pair label:last-child {
+    margin-bottom: 0;
+}
+
+.filter-pair-warning {
+    display: none;
+    margin-left: 2px;
+}
+
+.filter-checkbox-pair--invalid {
+    border-color: #c62828;
+}
+
+.filter-checkbox-pair--invalid .filter-pair-warning {
+    display: inline;
+}
+
+.filter-checkbox-pair--invalid .filter-pair-label-text {
+    color: #c62828;
+}
+
+.close-icon {
+    border: 1px solid transparent;
+    background-color: transparent;
+    display: inline-block;
+    vertical-align: middle;
+    outline: 0;
+    cursor: pointer;
+    float: left;
+    width: 0px;
+    height: 0px;
+}
+
+.close-icon:after {
+    content: "X";
+    display: block;
+    width: 15px;
+    height: 15px;
+    line-height: 15px;
+    position: absolute;
+    background-color: var(--gb-button-disabled-bg);
+    z-index: 1;
+    right: -8px;
+    margin: auto;
+    top: -1px;
+    bottom: 0;
+    border-radius: 50%;
+    text-align: center;
+    color: white;
+    font-weight: normal;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.noUi-horizontal {
+    margin-bottom: 60px;
+}
+
+.noUi-connect {
+    background-color: var(--gb-accent);
+}
+
+.noUi-tooltip {
+    padding: 0px;
+    font-size: 11px;
+    bottom: 100%;
+    border: 0;
+    margin: 0;
+}
+
+.noUi-tooltip input {
+    width: 98%;
+    font-size: 10px;
+    padding: 1%;
+    text-align: center;
+}
+
+div.gridjs-th-content {
+    margin-top: 5px;
+}
+
+td[data-column-id="pic"] {
+    padding: 0px;
+}
+
+td[data-column-id="pic"] label {
+    position: relative;
+}
+
+td[data-column-id="pic"] .stamp-div {
+    position: absolute;
+    top: -30px;
+
+}
+
+#igBotQueueContainer td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#igBotQueueContainer a[target="_blank"]:not([href='']) {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 240px;
+    display: inline-block;
+}
+
+#igBotQueueContainer a[target="_blank"]:not([href=''])::after {
+    content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+    margin: 0px 3px 0px 5px;
+}
+
+div.gridjs-head {
+    padding: 2px;
+}
+
+input.gridjs-search-input {
+    padding: 3px 3px 3px 25px;
+    margin: 3px 0 0px -1px;
+    font-size: 11px;
+    min-width: 60px;
+    display: inline-block;
+    background-color: var(--gb-grid-search-bg);
+    color: var(--gb-text);
+    background-image: url('chrome-extension://__MSG_@@extension_id__/icon_search.png');
+    background-position: 5px center;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    outline: 0;
+    border: 1px solid var(--gb-border);
+    border-radius: 5px;
+}
+
+#txtLimitQueueSize,
+#txtLimitMediaQueueSize {
+    padding: 3px;
+    font-size: 11px;
+    width: 48px;
+    outline: 0;
+    border: 1px solid var(--gb-border);
+    background: var(--gb-bg-input);
+    color: var(--gb-text);
+}
+
+.pc-tab>input,
+.pc-tab section>div {   
+    display: none;
+}
+
+.pc-tab {
+    width: 100%;
+    height: 95%;
+    /*  max-width: 700px;*/
+    margin: 0 auto;
+    position: relative;
+}
+
+.pc-tab ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pc-tab ul li label {
+    cursor: pointer;
+    float: left;
+    padding: 15px 25px;
+    border: 1px solid var(--gb-tab-border);
+    background-color: var(--gb-tab-bg);
+    color: var(--gb-tab-text);
+    background-size: 20px;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+}
+
+.pc-tab ul li label[for="tab3"] {
+    background-image: url('chrome-extension://__MSG_@@extension_id__/icon_filter.png');
+    padding-left: 36px;
+}
+
+.pc-tab ul li label[for="tab4"] {
+    background-image: url('chrome-extension://__MSG_@@extension_id__/icon_options.png');
+    padding-left: 36px;
+}
+
+.pc-tab ul li label:hover {
+    background-color: var(--gb-tab-hover);
+}
+
+.pc-tab ul li label:active {
+    background-color: var(--gb-tab-active-bg);
+}
+
+.pc-tab ul li:not(:last-child) label {
+    border-right-width: 0;
+}
+
+.pc-tab section {
+    border-top: 1px solid var(--gb-tab-border);
+    height: 95%;
+    clear: both;
+}
+
+.pc-tab section>div {
+    background: var(--gb-bg-section);
+    /*padding: 20px;
+      width: 100%;
+      line-height: 1.5em;
+      letter-spacing: 0.3px;
+      color: #444;
+    */
+}
+
+#tab1:checked~section .tab1,
+#tab2:checked~section .tab2,
+#tab3:checked~section .tab3,
+#tab4:checked~section .tab4,
+#tab5:checked~section .tab5,
+#tab6:checked~section .tab6,
+#tab7:checked~section .tab7,
+#tab8:checked~section .tab8,
+#tab9:checked~section .tab9 {
+    display: block;
+    height: 100%;
+}
+
+#tab1:checked~nav .tab1 label,
+#tab2:checked~nav .tab2 label,
+#tab3:checked~nav .tab3 label,
+#tab4:checked~nav .tab4 label,
+#tab5:checked~nav .tab5 label,
+#tab6:checked~nav .tab6 label,
+#tab7:checked~nav .tab7 label,
+#tab8:checked~nav .tab8 label,
+#tab9:checked~nav .tab9 label {
+    background-color: var(--gb-tab-active-bg);
+    border-bottom: 1px solid var(--gb-tab-active-bg);
+    color: var(--gb-tab-active-text);
+    position: relative;
+}
+
+#tab1:checked~nav .tab1 label:after,
+#tab2:checked~nav .tab2 label:after,
+#tab3:checked~nav .tab3 label:after,
+#tab4:checked~nav .tab4 label:after,
+#tab5:checked~nav .tab5 label:after,
+#tab6:checked~nav .tab6 label:after,
+#tab7:checked~nav .tab7 label:after,
+#tab8:checked~nav .tab8 label:after,
+#tab9:checked~nav .tab9 label:after {
+    content: "";
+    display: block;
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    left: 0;
+}
+
+nav {
+    height: 5%;
+    position: relative;
+    z-index: 2;
+    bottom: -1px;
+    text-transform: uppercase;
+}
+
+#igBotInjectedContainer .schedule-row span.plus-sign {
+    font-weight: bold;
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+    line-height: 28px;
+    padding: 0px;
+    background: var(--gb-accent);
+    border-radius: 50%;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+}
+
+#tblScheduledActions span.minus-sign {
+    display: block;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 20px;
+    background: red;
+    border-radius: 50%;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    margin: auto;
+}
+
+.schedule-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+#tblScheduledActions {
+    border-collapse: collapse;
+    padding: 0px;
+}
+
+#tblScheduledActions th {
+    background-color: rgb(153, 191, 230);
+}
+
+#tblScheduledActions td,
+#tblScheduledActions th {
+    border: 1px solid var(--gb-border);
+    padding: 12px 8px;
+    font-size: 12pt;
+}
+
+.schedule-row select,
+.schedule-row label {
+    font-size: 12pt;
+    font-weight: normal;
+}
+
+
+/* Scheduled Actions Component - Scoped to #divScheduledActions */
+#divScheduledActions {
+    --primary: #3498db;
+    --primary-hover: #2980b9;
+    --bg-light: #f5f8fa;
+    --card-bg: #ffffff;
+    --border-color: #dcdde1;
+    --text-main: #2f3640;
+    --text-dim: #7f8c8d;
+    --accent: #2980b9;
+    --success: #27ae60;
+    --danger: #e74c3c;
+    --table-header-bg: #3498db;
+    --table-row-alt: #e8f4f8;
+
+    font-family: Helvetica, Arial, sans-serif;
+    color: var(--text-main);
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 1.25rem;
+    align-items: start;
+    padding: 1rem;
+    padding-top: 3.5rem; /* room for #actionsqueueQuantityRow (same band as Accounts/Media pagers) */
+    box-sizing: border-box;
+    height: 100%;
+    transition: grid-template-columns 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#divScheduledActions.scheduler-hidden {
+    grid-template-columns: 1fr 0px;
+    gap: 0;
+}
+
+#divScheduledActions *,
+#divScheduledActions *::before,
+#divScheduledActions *::after {
+    box-sizing: border-box;
+}
+
+@media (max-width: 1100px) {
+    #divScheduledActions {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Cards */
+#divScheduledActions .schedule-card,
+#divScheduledActions .list-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+#divScheduledActions .schedule-card {
+    order: 2;
+    overflow: hidden;
+    width: 320px;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, padding 0.4s ease, border 0.4s ease;
+    box-sizing: border-box;
+    transform-origin: right center;
+}
+
+#divScheduledActions .list-card {
+    order: 1;
+    z-index: 10;
+    transition: width 0.4s ease;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-bottom: 1.25rem;
+}
+
+#divScheduledActions .list-card #igBotActionsQueueContainer {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    max-height: none;
+}
+
+#divScheduledActions #actions-table {
+    margin-top: 0;
+}
+
+#divScheduledActions .list-card .list-header {
+    flex-shrink: 0;
+}
+
+#divScheduledActions .list-card .actions-bottom-buttons {
+    flex-shrink: 0;
+}
+
+#divScheduledActions.scheduler-hidden .schedule-card {
+    /* Instead of display:none, we hide it visually */
+    width: 0;
+    /* Though grid handles the space, this helps */
+    padding: 0;
+    border: none;
+    opacity: 0;
+    transform: translateX(20px);
+    pointer-events: none;
+}
+
+#divScheduledActions h2 {
+    font-size: 1.4rem;
+    margin: 0 0 1rem 0;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.4rem;
+    font-weight: 700;
+}
+
+/* Form Styles */
+#divScheduledActions .form-group {
+    margin-bottom: 0.75rem;
+}
+
+#divScheduledActions label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 0.3rem;
+    font-weight: 700;
+}
+
+#divScheduledActions input:not([type="checkbox"]),
+#divScheduledActions select,
+#divScheduledActions textarea {
+    width: 100%;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: 0.5rem 0.7rem;
+    color: var(--text-main);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+#divScheduledActions textarea {
+    height: 100px;
+    resize: vertical;
+    font-family: monospace;
+}
+
+/* Buttons */
+#divScheduledActions button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#divScheduledActions button:hover {
+    background: var(--primary-hover);
+}
+
+#divScheduledActions .secondary-btn {
+    background: #f1f2f6;
+    color: #2f3640;
+    border: 1px solid var(--border-color);
+}
+
+#divScheduledActions .secondary-btn:hover {
+    background: #dfe4ea;
+}
+
+#divScheduledActions .secondary-btn.edit-btn {
+    padding: 0.25rem 0.5rem;
+    width: auto;
+    font-size: 0.65rem;
+    margin-right: 0.4rem;
+}
+
+#divScheduledActions .form-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+#divScheduledActions .form-actions button {
+    flex: 1;
+}
+
+#divScheduledActions #cancel-edit-btn {
+    display: none;
+}
+
+/* Refresh Button */
+#divScheduledActions #refresh-btn {
+    width: auto;
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    padding: 0.35rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+#divScheduledActions #btn-toggle-scheduler {
+    width: auto;
+    height: auto;
+    padding: 0.35rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+#divScheduledActions #refresh-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* Table Styles */
+#divScheduledActions .list-header {
+    background-color: var(--card-bg) !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+#divScheduledActions .list-header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+#divScheduledActions .checkbox-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    cursor: pointer;
+    white-space: nowrap;
+    margin: 0;
+}
+
+#divScheduledActions .checkbox-toggle:hover {
+    background: none;
+    color: var(--text-main);
+}
+
+#divScheduledActions .checkbox-toggle input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+#divScheduledActions .list-header h2 {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+#divScheduledActions .header-left {
+    display: flex;
+    flex-direction: column;
+}
+
+#divScheduledActions .actions-hidden-by-filters-hint {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-weight: 400;
+    margin-left: 0.35rem;
+    white-space: nowrap;
+}
+
+#divScheduledActions .action-stats {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    margin-top: 0.25rem;
+}
+
+#divScheduledActions .action-stats .stat-avg-pending-per-day {
+    font-weight: 600;
+}
+
+#divScheduledActions .action-stats span {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+#divScheduledActions .action-buttons-cell {
+    white-space: nowrap;
+    text-align: right;
+    width: 1%;
+}
+
+
+#divScheduledActions .account-info {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+#divScheduledActions .type-tag {
+    background: #ebf5fb;
+    color: var(--primary);
+    padding: 0.15rem 0.4rem;
+    border-radius: 2px;
+    font-size: 0.7rem;
+    border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+#divScheduledActions .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.7rem;
+    color: var(--success);
+    font-weight: 700;
+}
+
+#divScheduledActions .status-badge::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    background: var(--success);
+    border-radius: 50%;
+}
+
+#divScheduledActions .status-completed {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-weight: 700;
+}
+
+#divScheduledActions .status-completed::before {
+    content: '✓';
+    font-size: 0.6rem;
+}
+
+#divScheduledActions .delete-btn {
+    background: transparent;
+    color: var(--danger);
+    padding: 0.25rem 0.5rem;
+    width: auto;
+    font-size: 0.65rem;
+    border: 1px solid rgba(231, 76, 60, 0.2);
+    text-transform: uppercase;
+}
+
+#divScheduledActions .delete-btn:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* Action Type Selector */
+#divScheduledActions .action-type-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+#divScheduledActions .action-option {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#divScheduledActions .action-option:hover {
+    border-color: var(--primary);
+    background: var(--table-row-alt);
+}
+
+#divScheduledActions .action-option.selected {
+    border-color: var(--primary);
+    background: var(--table-row-alt);
+    box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+#divScheduledActions .action-icon {
+    font-size: 1rem;
+}
+
+#divScheduledActions .action-name {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* Toast */
+#divScheduledActions .toast {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: var(--success);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 3px;
+    transform: translateY(150%);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 1000;
+    font-size: 0.85rem;
+}
+
+#divScheduledActions .toast.show {
+    transform: translateY(0);
+}
+
+/* Input with Action Button */
+#divScheduledActions .input-with-action {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+}
+
+#divScheduledActions .input-with-action input {
+    flex: 1;
+}
+
+#divScheduledActions .icon-btn {
+    width: 38px;
+    min-width: 38px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#divScheduledActions .icon-btn:hover {
+    background: var(--primary-hover);
+}
+
+#divScheduledActions .icon-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Bottom Buttons Section */
+#divScheduledActions .actions-bottom-buttons {
+    background-color: var(--card-bg) !important;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    gap: 1rem;
+}
+
+#divScheduledActions .left-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+#divScheduledActions .reschedule-box {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+#divScheduledActions .reschedule-box label {
+    display: inline;
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-main);
+}
+
+#divScheduledActions .reschedule-box input[type="number"] {
+    width: 55px !important;
+    padding: 0.4rem;
+    text-align: center;
+}
+
+#divScheduledActions .actions-bottom-buttons .secondary-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+}
+
+#divScheduledActions .actions-bottom-buttons .delete-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+}
+
+/* Checkbox styling */
+#divScheduledActions .action-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* Redistribute Modal */
+#divScheduledActions .redistribute-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#divScheduledActions .redistribute-modal-content {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 1.5rem;
+    width: 420px;
+    max-width: 90%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+#divScheduledActions .redistribute-modal-content h3 {
+    font-size: 1.1rem;
+    margin: 0 0 0.5rem 0;
+    color: var(--text-main);
+}
+
+#divScheduledActions .redistribute-modal-content p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin: 0 0 1rem 0;
+}
+
+#divScheduledActions .redistribute-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+#divScheduledActions .redistribute-fields label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    font-weight: normal;
+}
+
+#divScheduledActions .redistribute-fields .ig-bot-schedule-evenly-row {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+    line-height: 1.35;
+}
+
+#divScheduledActions .redistribute-fields .ig-bot-schedule-evenly-row input[type="checkbox"] {
+    width: auto !important;
+    min-width: auto;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+#divScheduledActions .redist-avg-pending-line {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin: 0;
+    line-height: 1.35;
+}
+
+#divScheduledActions .redistribute-fields input[type="number"] {
+    width: 80px !important;
+    padding: 0.4rem;
+    text-align: center;
+}
+
+#divScheduledActions .redistribute-buttons {
+    display: flex;
+    gap: 0.75rem;
+}
+
+#divScheduledActions .redistribute-buttons button {
+    flex: 1;
+}
+
+#divScheduledActions .reassign-field {
+    margin-bottom: 1.25rem;
+}
+
+#divScheduledActions .reassign-field label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    margin-bottom: 0.35rem;
+}
+
+#divScheduledActions .reassign-field select {
+    width: 100%;
+    padding: 0.45rem;
+    font-size: 0.85rem;
+    box-sizing: border-box;
+}
+
+#divScheduledActions .reassign-modal-expl {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin: 0 0 0.75rem 0;
+    line-height: 1.4;
+}
+
+#divScheduledActions .reassign-accounts-empty {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin: 0 0 1rem 0;
+    line-height: 1.35;
+}
+
+/* Target column link / placeholder (avoid per-row inline styles) */
+#divScheduledActions .action-target-ig-link {
+    color: var(--accent);
+}
+
+#divScheduledActions .action-target-placeholder {
+    color: var(--text-dim);
+}
+
+#divScheduledActions .repeat-none-muted {
+    color: var(--text-dim);
+}
+
+#divScheduledActions .actions-queue-empty-row {
+    text-align: center;
+    color: var(--text-dim);
+}
+
+/* Profile popover: one floating layer (filled on hover; not duplicated per row) */
+#divScheduledActions .target-cell-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+#divScheduledActions .target-popover {
+    width: 300px;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #dcdde1);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 14px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+#divScheduledActions #action-queue-target-popover {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    pointer-events: auto;
+}
+
+#divScheduledActions #action-queue-target-popover.is-visible {
+    display: block;
+}
+
+#divScheduledActions .tp-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#divScheduledActions .tp-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid var(--border-color, #dcdde1);
+}
+
+#divScheduledActions .tp-identity {
+    min-width: 0;
+    overflow: hidden;
+}
+
+#divScheduledActions .tp-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-main, #2f3640);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#divScheduledActions .tp-verified {
+    color: #3897f0;
+    font-size: 0.8rem;
+    margin-left: 3px;
+}
+
+#divScheduledActions .tp-username {
+    font-size: 0.8rem;
+    color: var(--text-dim, #7f8c8d);
+}
+
+#divScheduledActions .tp-pronouns {
+    font-size: 0.75rem;
+    color: var(--text-dim, #7f8c8d);
+    font-style: italic;
+}
+
+#divScheduledActions .tp-bio {
+    font-size: 0.8rem;
+    color: var(--text-main, #2f3640);
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+}
+
+#divScheduledActions .tp-link {
+    font-size: 0.75rem;
+    color: var(--accent, #2980b9);
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#divScheduledActions .tp-stats {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 0.78rem;
+    color: var(--text-dim, #7f8c8d);
+}
+
+#divScheduledActions .tp-stats strong {
+    color: var(--text-main, #2f3640);
+    font-weight: 600;
+}
+
+#divScheduledActions .tp-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+#divScheduledActions .tp-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: var(--bg-light, #f5f8fa);
+    color: var(--text-dim, #7f8c8d);
+    border: 1px solid var(--border-color, #dcdde1);
+    white-space: nowrap;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Mobile / narrow viewport (injected panel only)                              */
+/* -------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+
+    #igBotInjectedContainer {
+        left: 0;
+        right: 0;
+        top: 0;
+        width: 100%;
+        max-width: 100vw;
+        height: 100%;
+        max-height: 100vh;
+        max-height: 100dvh;
+        padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));
+        padding-right: calc(0.75rem + env(safe-area-inset-right, 0px));
+        padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+        padding-left: calc(0.75rem + env(safe-area-inset-left, 0px));
+        resize: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #igBotInjectedContainer #igBotHeading {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    #igBotInjectedContainer #igBotHeading > div:first-child {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    #igBotInjectedContainer #igBotStatusDiv {
+        max-width: 100%;
+        align-self: stretch;
+        text-align: left;
+        margin: 0;
+        font-size: 0.8rem;
+        line-height: 1.28;
+        padding: 6px 8px;
+    }
+
+    #igBotInjectedContainer #igBotLeft {
+        min-height: 0;
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #igBotInjectedContainer .pc-tab {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        height: auto;
+        max-height: 100%;
+    }
+
+    #igBotInjectedContainer #mainSection {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #igBotInjectedContainer #tab1:checked ~ section .tab1,
+    #igBotInjectedContainer #tab2:checked ~ section .tab2,
+    #igBotInjectedContainer #tab3:checked ~ section .tab3,
+    #igBotInjectedContainer #tab4:checked ~ section .tab4,
+    #igBotInjectedContainer #tab5:checked ~ section .tab5,
+    #igBotInjectedContainer #tab6:checked ~ section .tab6,
+    #igBotInjectedContainer #tab7:checked ~ section .tab7,
+    #igBotInjectedContainer #tab8:checked ~ section .tab8,
+    #igBotInjectedContainer #tab9:checked ~ section .tab9 {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        height: auto;
+        overflow: hidden;
+    }
+
+    #igBotInjectedContainer nav {
+        height: auto;
+        min-height: 0;
+    }
+
+    #igBotInjectedContainer .pc-tab ul {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        gap: 0;
+    }
+
+    #igBotInjectedContainer .pc-tab ul li {
+        float: none;
+        flex: 0 0 auto;
+    }
+
+    #igBotInjectedContainer .pc-tab ul li label {
+        float: none;
+        display: block;
+        padding: 12px 16px;
+        font-size: 0.72rem;
+        white-space: nowrap;
+    }
+
+    #igBotInjectedContainer .pc-tab ul li:not(:last-child) label {
+        border-right-width: 1px;
+    }
+
+    #igBotInjectedContainer .pc-tab ul li label[for="tab3"],
+    #igBotInjectedContainer .pc-tab ul li label[for="tab4"] {
+        padding-left: 32px;
+        background-position: 8px center;
+    }
+
+    #igBotInjectedContainer .pc-tab section {
+        clear: none;
+    }
+
+    #igBotInjectedContainer #queueQuantityRow,
+    #igBotInjectedContainer #mediaqueueQuantityRow,
+    #igBotInjectedContainer #actionsqueueQuantityRow {
+        position: relative;
+        left: auto;
+        right: auto;
+        top: auto;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        gap: 8px;
+    }
+
+    #igBotInjectedContainer #igBotQueueSelectedCount,
+    #igBotInjectedContainer #igBotmediaQueueSelectedCount {
+        margin-top: 0;
+        align-self: flex-start;
+        width: 100%;
+    }
+
+    #igBotInjectedContainer #queueQuantityRow .pager,
+    #igBotInjectedContainer #mediaqueueQuantityRow .mediapager,
+    #igBotInjectedContainer #actionsqueueQuantityRow .actionspager {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        align-content: flex-start;
+        gap: 8px 10px;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    #igBotInjectedContainer #queueQuantityRow .pager .pagedisplay,
+    #igBotInjectedContainer #mediaqueueQuantityRow .mediapager .pagedisplay,
+    #igBotInjectedContainer #actionsqueueQuantityRow .actionspager .pagedisplay {
+        flex: 1 0 100%;
+        width: 100%;
+        order: -1;
+        line-height: 1.35;
+    }
+
+    #igBotInjectedContainer #pager img,
+    #igBotInjectedContainer #mediapager img,
+    #igBotInjectedContainer #actionspager img {
+        min-width: 44px;
+        min-height: 44px;
+        width: 44px;
+        height: 44px;
+        padding: 10px;
+        box-sizing: border-box;
+        object-fit: contain;
+        top: 0;
+    }
+
+    #igBotInjectedContainer #pager select,
+    #igBotInjectedContainer #mediapager select,
+    #igBotInjectedContainer #actionspager select {
+        min-height: 44px;
+        font-size: 14px;
+        top: 0;
+        padding: 4px 8px;
+    }
+
+    #igBotInjectedContainer #igBotMediaButtonContainer {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        height: auto;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainerButtons .igBotInjectedButton {
+        min-width: 0;
+    }
+
+    #igBotInjectedContainer .igBotNewsAndUpdates {
+        padding: 10px 12px;
+    }
+
+    #igBotInjectedContainer #multiFilter,
+    #igBotInjectedContainer #igBotOptions,
+    #igBotInjectedContainer #igBotLog,
+    #igBotInjectedContainer #faqhelp,
+    #igBotInjectedContainer #affiliatediv {
+        padding: 0.5rem 12px 1.25rem 12px;
+    }
+
+    #igBotInjectedContainer #multiFilter > .igBotInjectedButton {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    #igBotInjectedContainer #igBotMediaQueueContainer {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+        overflow-x: auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+    }
+
+    #igBotInjectedContainer #igBotMediaQueueContainer .igBotQueueAcct {
+        flex-wrap: wrap;
+        height: auto;
+        min-height: 0;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    #igBotInjectedContainer #igBotMediaQueueContainer .igBotQueueAcctProfilePicture {
+        width: min(150px, 40vw);
+        height: min(150px, 40vw);
+    }
+
+    #igBotInjectedContainer #igBotMediaQueueContainer .igBotQueueAcctNameHolder {
+        max-width: 100%;
+        margin-left: 0;
+        margin-top: 6px;
+    }
+
+    #igBotInjectedContainer #igBotMediaQueueContainer label {
+        max-width: 100%;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainer {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+        overflow-x: auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+    }
+
+    #igBotInjectedContainer .igBotQueueContainerMessage {
+        padding: 16px 14px 20px 14px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainer table,
+    #igBotInjectedContainer #igBotMediaQueueContainer table,
+    #igBotInjectedContainer #gridjsMediaQueueWrapper {
+        max-width: none;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainer a[target="_blank"]:not([href='']) {
+        max-width: min(240px, 85vw);
+    }
+
+    #igBotInjectedContainer #divScheduledActions {
+        padding-top: 1rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    #igBotInjectedContainer #divScheduledActions .list-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    #igBotInjectedContainer #divScheduledActions .list-header-actions {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    #igBotInjectedContainer #divScheduledActions .action-stats {
+        white-space: normal;
+        line-height: 1.4;
+    }
+
+    #igBotInjectedContainer #divScheduledActions .actions-hidden-by-filters-hint {
+        white-space: normal;
+    }
+
+    #igBotInjectedContainer #divScheduledActions .schedule-card {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    #igBotInjectedContainer #igBotActionsQueueContainer {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+        overflow-x: auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+    }
+
+    #igBotInjectedContainer #igBotDialog {
+        padding: 14px 16px;
+        max-height: min(90vh, calc(100vh - 20px));
+        max-height: min(90dvh, calc(100dvh - 20px));
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(600px, calc(100vw - 16px));
+    }
+
+    #igBotInjectedContainer #igBotDialogScheduleConfig .igBotScheduleTimeInputs {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    #igBotInjectedContainer #multiFilter label[for="cbApplyFilterAutomatically"] {
+        width: 100%;
+        max-width: 100%;
+        white-space: normal;
+    }
+
+    #igBotInjectedContainer #multiFilter label {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    #igBotInjectedContainer #multiFilter .filter-columns-row {
+        flex-direction: column;
+    }
+
+    #igBotInjectedContainer #multiFilter .filter-column {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    #igBotInjectedContainer #multiFilter .filter-checkbox-pair {
+        width: 100%;
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    #igBotInjectedContainer #igBotBottom {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainer .tablesorter-blue thead tr:first-child > th:nth-child(1),
+    #igBotInjectedContainer #igBotQueueContainer .tablesorter-blue thead tr:first-child > th:nth-child(2) {
+        position: sticky;
+        z-index: 6;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.12);
+    }
+
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue thead tr:first-child > th:nth-child(1),
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue thead tr:first-child > th:nth-child(2) {
+        background-color: #99bfe6;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainer .tablesorter-blue thead tr:first-child > th:nth-child(1) {
+        left: 0;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainer .tablesorter-blue thead tr:first-child > th:nth-child(2) {
+        left: 52px;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainer .tablesorter-blue thead tr.tablesorter-filter-row > td:nth-child(1),
+    #igBotInjectedContainer #igBotQueueContainer .tablesorter-blue thead tr.tablesorter-filter-row > td:nth-child(2) {
+        position: sticky;
+        z-index: 5;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+    }
+
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue thead tr.tablesorter-filter-row > td:nth-child(1),
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue thead tr.tablesorter-filter-row > td:nth-child(2) {
+        background-color: #eee;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainer .tablesorter-blue thead tr.tablesorter-filter-row > td:nth-child(1) {
+        left: 0;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainer .tablesorter-blue thead tr.tablesorter-filter-row > td:nth-child(2) {
+        left: 52px;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainer .tablesorter-blue tbody tr.odd > td:nth-child(1),
+    #igBotInjectedContainer #igBotQueueContainer .tablesorter-blue tbody tr.odd > td:nth-child(2) {
+        position: sticky;
+        z-index: 3;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.06);
+    }
+
+    #igBotInjectedContainer #igBotQueueContainer .tablesorter-blue tbody tr.even > td:nth-child(1),
+    #igBotInjectedContainer #igBotQueueContainer .tablesorter-blue tbody tr.even > td:nth-child(2) {
+        position: sticky;
+        z-index: 3;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.06);
+    }
+
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue tbody tr.odd > td:nth-child(1),
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue tbody tr.odd > td:nth-child(2) {
+        background-color: #ebf2fa;
+    }
+
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue tbody tr.even > td:nth-child(1),
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue tbody tr.even > td:nth-child(2) {
+        background-color: #d9e8fa;
+    }
+
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue tbody > tr.hover > td:nth-child(1),
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue tbody > tr.hover > td:nth-child(2),
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue tbody > tr:hover > td:nth-child(1),
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue tbody > tr:hover > td:nth-child(2) {
+        background-color: #d9d9d9;
+    }
+
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue tbody > tr.odd.hover > td:nth-child(1),
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue tbody > tr.odd.hover > td:nth-child(2),
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue tbody > tr.odd:hover > td:nth-child(1),
+    #igBotInjectedContainer:not(.growbot-theme-dark):not(.growbot-theme-easter):not(.growbot-theme-darkred) #igBotQueueContainer .tablesorter-blue tbody > tr.odd:hover > td:nth-child(2) {
+        background-color: #bfbfbf;
+    }
+
+    #igBotInjectedContainer.growbot-theme-dark #igBotQueueContainer .tablesorter-blue thead tr:first-child > th:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-dark #igBotQueueContainer .tablesorter-blue thead tr:first-child > th:nth-child(2) {
+        background-color: #3d5a80;
+    }
+
+    #igBotInjectedContainer.growbot-theme-dark #igBotQueueContainer .tablesorter-blue thead tr.tablesorter-filter-row > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-dark #igBotQueueContainer .tablesorter-blue thead tr.tablesorter-filter-row > td:nth-child(2) {
+        background-color: var(--gb-bg-muted);
+    }
+
+    #igBotInjectedContainer.growbot-theme-dark #igBotQueueContainer .tablesorter-blue tbody tr.odd > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-dark #igBotQueueContainer .tablesorter-blue tbody tr.odd > td:nth-child(2),
+    #igBotInjectedContainer.growbot-theme-dark #igBotQueueContainer .tablesorter-blue tbody tr.even > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-dark #igBotQueueContainer .tablesorter-blue tbody tr.even > td:nth-child(2) {
+        background-color: var(--gb-bg-elevated);
+    }
+
+    #igBotInjectedContainer.growbot-theme-dark #igBotQueueContainer .tablesorter-blue tbody > tr.hover > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-dark #igBotQueueContainer .tablesorter-blue tbody > tr.hover > td:nth-child(2),
+    #igBotInjectedContainer.growbot-theme-dark #igBotQueueContainer .tablesorter-blue tbody > tr:hover > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-dark #igBotQueueContainer .tablesorter-blue tbody > tr:hover > td:nth-child(2) {
+        background-color: #404040;
+    }
+
+    #igBotInjectedContainer.growbot-theme-easter #igBotQueueContainer .tablesorter-blue thead tr:first-child > th:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-easter #igBotQueueContainer .tablesorter-blue thead tr:first-child > th:nth-child(2) {
+        background-color: #f8bbd0;
+    }
+
+    #igBotInjectedContainer.growbot-theme-easter #igBotQueueContainer .tablesorter-blue thead tr.tablesorter-filter-row > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-easter #igBotQueueContainer .tablesorter-blue thead tr.tablesorter-filter-row > td:nth-child(2) {
+        background-color: var(--gb-bg-muted);
+    }
+
+    #igBotInjectedContainer.growbot-theme-easter #igBotQueueContainer .tablesorter-blue tbody tr.odd > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-easter #igBotQueueContainer .tablesorter-blue tbody tr.odd > td:nth-child(2),
+    #igBotInjectedContainer.growbot-theme-easter #igBotQueueContainer .tablesorter-blue tbody tr.even > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-easter #igBotQueueContainer .tablesorter-blue tbody tr.even > td:nth-child(2) {
+        background-color: var(--gb-bg-elevated);
+    }
+
+    #igBotInjectedContainer.growbot-theme-easter #igBotQueueContainer .tablesorter-blue tbody > tr.hover > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-easter #igBotQueueContainer .tablesorter-blue tbody > tr.hover > td:nth-child(2),
+    #igBotInjectedContainer.growbot-theme-easter #igBotQueueContainer .tablesorter-blue tbody > tr:hover > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-easter #igBotQueueContainer .tablesorter-blue tbody > tr:hover > td:nth-child(2) {
+        background-color: #fff9c4;
+    }
+
+    #igBotInjectedContainer.growbot-theme-darkred #igBotQueueContainer .tablesorter-blue thead tr:first-child > th:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-darkred #igBotQueueContainer .tablesorter-blue thead tr:first-child > th:nth-child(2) {
+        background-color: #4a3232;
+    }
+
+    #igBotInjectedContainer.growbot-theme-darkred #igBotQueueContainer .tablesorter-blue thead tr.tablesorter-filter-row > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-darkred #igBotQueueContainer .tablesorter-blue thead tr.tablesorter-filter-row > td:nth-child(2) {
+        background-color: var(--gb-bg-muted);
+    }
+
+    #igBotInjectedContainer.growbot-theme-darkred #igBotQueueContainer .tablesorter-blue tbody tr.odd > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-darkred #igBotQueueContainer .tablesorter-blue tbody tr.odd > td:nth-child(2),
+    #igBotInjectedContainer.growbot-theme-darkred #igBotQueueContainer .tablesorter-blue tbody tr.even > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-darkred #igBotQueueContainer .tablesorter-blue tbody tr.even > td:nth-child(2) {
+        background-color: var(--gb-bg-elevated);
+    }
+
+    #igBotInjectedContainer.growbot-theme-darkred #igBotQueueContainer .tablesorter-blue tbody > tr.hover > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-darkred #igBotQueueContainer .tablesorter-blue tbody > tr.hover > td:nth-child(2),
+    #igBotInjectedContainer.growbot-theme-darkred #igBotQueueContainer .tablesorter-blue tbody > tr:hover > td:nth-child(1),
+    #igBotInjectedContainer.growbot-theme-darkred #igBotQueueContainer .tablesorter-blue tbody > tr:hover > td:nth-child(2) {
+        background-color: #352a2a;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainer .tablesorter-blue td {
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainer input[type="checkbox"] {
+        min-width: 22px !important;
+        min-height: 22px !important;
+        width: 22px !important;
+        height: 22px !important;
+    }
+
+    #igBotInjectedContainer #multiFilter label.width50 {
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+
+    #igBotInjectedContainer #igBotQueueContainerButtons {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    #igBotInjectedContainer #igBotQueueContainerButtons .igBotInjectedButton {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    #igBotInjectedContainer #igBotMediaButtonContainer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    #igBotInjectedContainer #igBotMediaButtonContainer .igBotInjectedButton {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    #igBotInjectedContainer .tab1 #igBotBottom {
+        position: sticky;
+        bottom: 0;
+        z-index: 20;
+        background: var(--gb-bg-page);
+        padding-top: 8px;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.14);
+    }
+
+    #igBotInjectedContainer .tab2 #igBotMediaButtonContainer {
+        position: sticky;
+        bottom: 0;
+        z-index: 20;
+        background: var(--gb-bg-page);
+        padding-top: 8px;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.14);
+    }
+
+    #igBotInjectedContainer .tab1 #igBotQueueContainer {
+        padding-bottom: 6rem;
+    }
+
+    #igBotInjectedContainer .tab2 #igBotMediaQueueContainer {
+        padding-bottom: 6rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    #igBotInjectedContainer h1 {
+        font-size: 1.1rem;
+        line-height: 1.25;
+    }
+
+    #igBotInjectedContainer .pc-tab ul li label {
+        padding: 10px 12px;
+        font-size: 0.68rem;
+    }
+
+    #igBotInjectedContainer .pc-tab ul li label[for="tab3"],
+    #igBotInjectedContainer .pc-tab ul li label[for="tab4"] {
+        padding-left: 28px;
+        background-size: 16px;
+    }
+
+    #igBotInjectedContainer #igBotDialog {
+        padding: 12px;
+        width: calc(100vw - 12px);
+    }
+
+    #igBotInjectedContainer #igBotDialogScheduleConfig label {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    #igBotInjectedContainer #igBotDialogScheduleConfig input[type="number"] {
+        width: 100%;
+        max-width: 120px;
+        align-self: flex-start;
+    }
+
+    #igBotInjectedContainer #igBotDialogTruncateConfig label {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+}

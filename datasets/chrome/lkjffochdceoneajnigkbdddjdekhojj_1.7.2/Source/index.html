@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html ng-app="main">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Mazii</title>
+        <script type="text/javascript" src="js/common.js"></script>
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="/libs/bootstrap/css/bootstrap.min.css"
+        />
+        <script src="/libs/bootstrap/js/jquery.min.js"></script>
+        <script src="/libs/bootstrap/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/style1.css" />
+
+        <script src="js/bundle.js"></script>
+        <script src="libs/angular-audio/app/angular.audio.js"></script>
+        <script src="libs/angular-ui-router/release/angular-ui-router.min.js"></script>
+        <script src="libs/bootstrap/ui-bootstrap-tpls-2.0.1.min.js"></script>
+        <script src="service/MainService.js"></script>
+        <script src="Controller/MainController.js"></script>
+        <script src="config/app.js"></script>
+        <script type="text/javascript" src="js/option.js"></script>
+        <script type="text/javascript" src="js/popup.js"></script>
+    </head>
+    <body>
+        <div id="wrap" ng-controller="mainController">
+            <div class="bg-mazii"></div>
+            <div id="page">
+                <header class="header">
+                    <div class="logo">
+                        <a
+                            class="mazii_home"
+                            href="https://mazii.net/"
+                            target="_blank"
+                            ><img
+                                class="image_logo"
+                                src="images/64.png"
+                                alt="EUP"
+                        /></a>
+                    </div>
+                    <nav>
+                        <a id="lnk_share" class="click-share">Share</a>
+                        <div
+                            class="nav_menu"
+                            id="share_menu"
+                            style="display: none;"
+                        >
+                            <div>
+                                <a id="click-ShareFB" href="#"
+                                    ><i
+                                        style="background-image:url('https://www.google.com/s2/favicons?domain=www.facebook.com');background-size:cover;"
+                                    ></i
+                                    >Facebook</a
+                                >
+                            </div>
+                            <hr />
+                            <div>
+                                <a id="click-ShareGG" href="#"
+                                    ><i
+                                        style="background-image:url('https://www.google.com/s2/favicons?domain=plus.google.com');background-size:cover;"
+                                    ></i
+                                    >Google+</a
+                                >
+                            </div>
+                        </div>
+                        <p
+                            id="click-Rate"
+                            class="click-rate"
+                            ng-click="ratingFunction()"
+                        >
+                            Rate
+                        </p>
+                        <p id="click-Option" class="option-link">Options</p>
+                    </nav>
+
+                    <div
+                        id="search-box-wrapper-gg"
+                        ng-class="{'isSearch' : isSearch }"
+                    >
+                        <div id="search-box">
+                            <input
+                                id="search-input"
+                                dir="auto"
+                                type="text"
+                                autofocus
+                                tabindex="1"
+                                placeholder="Search Google or type a URL"
+                                class="custom"
+                            />
+                        </div>
+                    </div>
+                    <div class="search-suggestion-gg">
+                        <ul
+                            id="search-suggestion-pad"
+                            ng-class="{ 'is-active': listSearch.length > 0 }"
+                        >
+                            <li
+                                ng-repeat="(key,search) in listSearch"
+                                ng-click="redirect(search);"
+                                id="auto-suggest-row{{key}}"
+                                ng-class="{ 'selected': key == 0 }"
+                            >
+                                {{search}}
+                            </li>
+                        </ul>
+                    </div>
+                </header>
+                <div class="box-main">
+                    <div ng-if="listWord && listWord.length > 0">
+                        <div id="flashcard">
+                            <div
+                                id="myCarousel"
+                                class="carousel slide"
+                                data-ride="carousel"
+                                data-interval="false"
+                                data-wrap="false"
+                            >
+                                <div
+                                    class="carousel-inner content-flashcard"
+                                    role="listbox"
+                                >
+                                    <div
+                                        class="item item-{{ data.mobileId ? data.mobileId : data.word }}"
+                                        ng-repeat="data in listWord track by $index"
+                                    >
+                                        <input
+                                            type="hidden"
+                                            value="{{ data.mobileId ? data.mobileId : data.word }}"
+                                            class="flash-id"
+                                            data-index="{{$index+1}}"
+                                        />
+                                        <div class="flip" ng-click="flip()">
+                                            <div class="card card-item">
+                                                <div class="face front">
+                                                    <div
+                                                        ng-if="!data.idDefault"
+                                                    >
+                                                        <p
+                                                            class="txt-word"
+                                                            ng-if="checkFront.word"
+                                                        >
+                                                            {{ data.word }}<span
+                                                                class="box-audio"
+                                                                ng-if="checkFront.audio"
+                                                                ng-click="playAudio($index, $event); $event.stopPropagation()"
+                                                                ><img
+                                                                    src="images/volume.png"
+                                                            /></span>
+                                                        </p>
+                                                        <p
+                                                            class="txt-phonetic"
+                                                            ng-if="checkFront.phonetic"
+                                                        >
+                                                            {{ data.phonetic }}
+                                                        </p>
+                                                        <div
+                                                            ng-if="checkFront.mean"
+                                                            ng-repeat="mean in data.means track by $index"
+                                                            ng-show="$index < 3"
+                                                        >
+                                                            <p class="txt-mean">
+                                                                {{mean.mean}}
+                                                            </p>
+                                                        </div>
+                                                        <div
+                                                            ng-click="more($index, data, $event); $event.stopPropagation()"
+                                                            class="view-more"
+                                                        >
+                                                            <a
+                                                                class="link-more"
+                                                            ></a>
+                                                        </div>
+                                                    </div>
+                                                    <div ng-if="data.idDefault">
+                                                        <p class="txt-example">
+                                                            {{
+                                                            data.means[0].examples[0].content}}
+                                                        </p>
+                                                        <p class="mean-example">
+                                                            {{
+                                                            data.means[0].examples[0].mean}}
+                                                        </p>
+                                                    </div>
+
+                                                    <div
+                                                        ng-if="!hideGuide"
+                                                        class="txt-bottom flip-flashcard"
+                                                    >
+                                                        Click vào để lật thẻ
+                                                    </div>
+                                                    <div
+                                                        ng-if="hideGuide"
+                                                        class="txt-bottom txt-mark"
+                                                        ng-click="deleteWord($index, $event); $event.stopPropagation()"
+                                                    >
+                                                        Đánh dấu đã nhớ từ này
+                                                    </div>
+                                                </div>
+                                                <div class="face back">
+                                                    <div
+                                                        ng-if="!data.idDefault"
+                                                    >
+                                                        <p
+                                                            class="txt-word"
+                                                            ng-if="checkBack.word"
+                                                        >
+                                                            {{ data.word }}<span
+                                                                class="box-audio"
+                                                                ng-if="checkFront.audio"
+                                                                ng-click="playAudio($index, $event); $event.stopPropagation()"
+                                                                ><img
+                                                                    src="images/volume.png"
+                                                            /></span>
+                                                        </p>
+                                                        <p
+                                                            class="txt-phonetic"
+                                                            ng-if="checkBack.phonetic"
+                                                        >
+                                                            {{ data.phonetic }}
+                                                        </p>
+                                                        <div
+                                                            ng-if="checkBack.mean"
+                                                            ng-repeat="mean in data.means track by $index"
+                                                        >
+                                                            <p class="txt-mean">
+                                                                {{mean.mean}}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div ng-if="data.idDefault">
+                                                        <p class="txt-example">
+                                                            {{
+                                                            data.means[0].examples[0].content}}
+                                                        </p>
+                                                        <p class="mean-example">
+                                                            {{
+                                                            data.means[0].examples[0].mean}}
+                                                        </p>
+                                                    </div>
+                                                    <div
+                                                        class="txt-bottom flip-flashcard"
+                                                    >
+                                                        Click vào để lật thẻ
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a
+                                class="left carousel-control btn-flashcard"
+                                role="button"
+                                data-slide="prev"
+                                href="#myCarousel"
+                            >
+                                <div id="left">&#706;</div>
+                            </a>
+                            <a
+                                class="right carousel-control btn-flashcard"
+                                role="button"
+                                data-slide="next"
+                                href="#myCarousel"
+                            >
+                                <div id="right">&#707;</div>
+                            </a>
+                        </div>
+                        <div class="box-btn">
+                            <div
+                                class="cust-btn btn-setting"
+                                ng-click="clickSetting()"
+                            >
+                                <img src="images/setting.png" />
+                            </div>
+                            <div class="content-setting" ng-if="showSetting">
+                                <div class="info" id="showSettingFlashcard">
+                                    <div class="btnAudio">
+                                        <div>
+                                            <span>Âm thanh</span>
+                                        </div>
+                                        <div class="box-audio-toggle">
+                                            <label>
+                                                <input
+                                                    type="checkbox"
+                                                    checked=""
+                                                    ng-model="checkFront.audio"
+                                                />
+                                                <span
+                                                    class="slider round"
+                                                ></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="set-main">
+                                        <div class="box-face">
+                                            <div
+                                                class="sl-tab btn-tab1 active-tab"
+                                                ng-click="selectTab('tab1')"
+                                            >
+                                                Mặt trước
+                                            </div>
+                                            <div
+                                                class="sl-tab btn-tab2"
+                                                ng-click="selectTab('tab2')"
+                                            >
+                                                Mặt sau
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="set-content"
+                                            ng-if="showTabSetting == 'tab1'"
+                                        >
+                                            <label class="cust-box"
+                                                >Từ
+                                                <input
+                                                    type="checkbox"
+                                                    ng-model="checkFront.word"
+                                                    checked="checked"
+                                                />
+                                                <span class="checkmark"></span>
+                                            </label>
+                                            <label class="cust-box"
+                                                >Nghĩa
+                                                <input
+                                                    type="checkbox"
+                                                    ng-model="checkFront.mean"
+                                                />
+                                                <span class="checkmark"></span>
+                                            </label>
+                                            <label class="cust-box"
+                                                >Phiên âm
+                                                <input
+                                                    type="checkbox"
+                                                    ng-model="checkFront.phonetic"
+                                                />
+                                                <span class="checkmark"></span>
+                                            </label>
+                                            <!-- <label class="cust-box">Ví dụ
+                                            <input type="checkbox" ng-model="checkFront.example">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                        <label class="cust-box">Nghĩa ví dụ
+                                            <input type="checkbox" ng-model="checkFront.example_mean">
+                                            <span class="checkmark"></span>
+                                        </label> -->
+                                        </div>
+                                        <div
+                                            class="set-content"
+                                            ng-if="showTabSetting == 'tab2'"
+                                        >
+                                            <label class="cust-box"
+                                                >Từ
+                                                <input
+                                                    type="checkbox"
+                                                    ng-model="checkBack.word"
+                                                    checked="checked"
+                                                />
+                                                <span class="checkmark"></span>
+                                            </label>
+                                            <label class="cust-box"
+                                                >Nghĩa
+                                                <input
+                                                    type="checkbox"
+                                                    ng-model="checkBack.mean"
+                                                />
+                                                <span class="checkmark"></span>
+                                            </label>
+                                            <label class="cust-box"
+                                                >Phiên âm
+                                                <input
+                                                    type="checkbox"
+                                                    ng-model="checkBack.phonetic"
+                                                />
+                                                <span class="checkmark"></span>
+                                            </label>
+                                            <!-- <label class="cust-box">Ví dụ
+                                            <input type="checkbox" ng-model="checkBack.example">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                        <label class="cust-box">Nghĩa ví dụ
+                                            <input type="checkbox" ng-model="checkBack.example_mean">
+                                            <span class="checkmark"></span>
+                                        </label> -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <div class="cust-btn btn-learn">
+                            <i class="fa fa-book"></i>
+                        </div> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="box-bottom">
+                    <!-- <div class="hsChorme">
+                    <div class="top-site" ng-repeat= "site in topSites track by $index">
+                        <a href="{{site.url}}">
+                            <div class="img-site">
+                                <img src="https://www.google.com/s2/favicons?domain={{site.url}}" alt="">
+                            </div>
+                            <div class="txt-site">{{converHS(site.title)}}</div>
+                        </a>
+                    </div>
+                </div> -->
+                    <p id="click-guide" ng-click="Guide()">Hướng dẫn</p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

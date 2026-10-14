@@ -1,0 +1,1 @@
+!function(){"use strict";var e=localStorage.getItem("ccac-theme");e||(e=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"),document.documentElement.setAttribute("data-theme",e)}();

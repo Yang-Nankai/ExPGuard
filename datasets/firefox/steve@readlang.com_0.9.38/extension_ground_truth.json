@@ -1,0 +1,671 @@
+{
+  "schema_version": "expguard-extension-dataset/v1",
+  "extension": {
+    "platform": "firefox",
+    "extension_id": "steve@readlang.com",
+    "version": "0.9.38",
+    "name": "Readlang Web Reader",
+    "rank": 4394,
+    "manifest_version": 3,
+    "catalog_manifest_version": 3,
+    "catalog_metadata": {
+      "rank": 4394,
+      "manifest_version": 3,
+      "user_count": 492,
+      "rating_count": 2,
+      "rating_average": 5.0,
+      "name": "Readlang Web Reader"
+    },
+    "source": {
+      "directory": "Source",
+      "manifest_sha256": "c33e95e81b6d851a006e0c327b34dce3e1407a5ff16394d51d8d93945cd477bd"
+    }
+  },
+  "tools": {
+    "ExPGuard": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "ExPGuard/analysis.log",
+          "ExPGuard/report.flows.json",
+          "ExPGuard/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 3,
+        "reported_no_duplicate": 2,
+        "tp_no_duplicate": 2,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [
+          {
+            "flow_id": "expguard-opti:firefox:steve@readlang.com:0.9.38:0a7978d5cc9c98fb:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "rule_description": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://readlang.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "src/contentScript",
+              "loc": "L20:C13 -> L20:C35",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://readlang.com/*",
+                      "https://test.readlang.com/*",
+                      "http://localhost/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "src/contentScript",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://readlang.com/*",
+                  "https://test.readlang.com/*",
+                  "http://localhost/*"
+                ]
+              },
+              "code_preview": "his.READLANG_EXTENSI>>>ON_CONFIG.hostname;\n\nc<<<onst activeTabIds = "
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "src/background",
+              "loc": "L159:C27 -> L170:C12",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "FULL",
+              "code_preview": "   response = await >>>fetch(url, {\n            method: data.method,\n            headers: {\n              Client: \"readlang-chrome-extension\",\n              \"X-Extension-Version\": chrome.runtime.getManifest().version,\n              ...(data.data ? { \"Content-Type\": \"application/json\" } : {}),\n            },\n            body:\n              data.method !== \"GET\" && data.data\n                ? JSON.stringify(data.data)\n                : undefined,\n          })<<<;\n        } catch (e"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "src/contentScript",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[src/contentScript->src/background]",
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:steve@readlang.com:0.9.38:91fdb3864f8862ab:01",
+            "flow_index": 1,
+            "flow_order": 2,
+            "flow_label": "F002",
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "rule_description": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://readlang.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "src/contentScript",
+              "loc": "L20:C13 -> L20:C35",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://readlang.com/*",
+                      "https://test.readlang.com/*",
+                      "http://localhost/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "src/contentScript",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://readlang.com/*",
+                  "https://test.readlang.com/*",
+                  "http://localhost/*"
+                ]
+              },
+              "code_preview": "his.READLANG_EXTENSI>>>ON_CONFIG.hostname;\n\nc<<<onst activeTabIds = "
+            },
+            "sink": {
+              "type": "FETCH_BODY",
+              "remark": "[Unknown URL]",
+              "file": "src/background",
+              "loc": "L159:C27 -> L170:C12",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "   response = await >>>fetch(url, {\n            method: data.method,\n            headers: {\n              Client: \"readlang-chrome-extension\",\n              \"X-Extension-Version\": chrome.runtime.getManifest().version,\n              ...(data.data ? { \"Content-Type\": \"application/json\" } : {}),\n            },\n            body:\n              data.method !== \"GET\" && data.data\n                ? JSON.stringify(data.data)\n                : undefined,\n          })<<<;\n        } catch (e"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "src/contentScript",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[src/contentScript->src/background]",
+              "storage_area": null
+            },
+            "verification_evidence": "Duplicate",
+            "deduplication": {
+              "is_duplicate": true,
+              "duplicate_of": "expguard-opti:firefox:steve@readlang.com:0.9.38:0a7978d5cc9c98fb:01",
+              "duplicate_reason": "same_source_and_sink_site"
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:steve@readlang.com:0.9.38:871a062065c8ee3f:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "rule_description": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://readlang.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "src/contentScript",
+              "loc": "L20:C13 -> L20:C35",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://readlang.com/*",
+                      "https://test.readlang.com/*",
+                      "http://localhost/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "src/contentScript",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://readlang.com/*",
+                  "https://test.readlang.com/*",
+                  "http://localhost/*"
+                ]
+              },
+              "code_preview": "his.READLANG_EXTENSI>>>ON_CONFIG.hostname;\n\nc<<<onst activeTabIds = "
+            },
+            "sink": {
+              "type": "CHROME_WINDOWS_CREATE_OPTIONS",
+              "remark": null,
+              "file": "src/background",
+              "loc": "L259:C4 -> L271:C5",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "\n      }\n    }\n\n    >>>chrome.windows.create(\n      {\n        url: url,\n        top: currentWindow.top,\n        left: left,\n        width: windowWidth,\n        height: currentWindow.height,\n        type: \"popup\",\n      },\n      function (newWindow) {\n        dictionaryWindow = newWindow;\n      }\n    )<<<;\n  });\n};\n\nconst up"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "src/contentScript",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[src/contentScript->src/background]",
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ],
+        "no_duplicate": [
+          {
+            "flow_id": "expguard-opti:firefox:steve@readlang.com:0.9.38:0a7978d5cc9c98fb:01",
+            "flow_index": 0,
+            "flow_order": 1,
+            "flow_label": "F001",
+            "flow_type": "REQUEST_FORGERY",
+            "rule_id": "attacker-input-network-send",
+            "rule_description": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://readlang.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "src/contentScript",
+              "loc": "L20:C13 -> L20:C35",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://readlang.com/*",
+                      "https://test.readlang.com/*",
+                      "http://localhost/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "src/contentScript",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://readlang.com/*",
+                  "https://test.readlang.com/*",
+                  "http://localhost/*"
+                ]
+              },
+              "code_preview": "his.READLANG_EXTENSI>>>ON_CONFIG.hostname;\n\nc<<<onst activeTabIds = "
+            },
+            "sink": {
+              "type": "FETCH_RESOURCE",
+              "remark": "[Unknown URL]",
+              "file": "src/background",
+              "loc": "L159:C27 -> L170:C12",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": "FULL",
+              "code_preview": "   response = await >>>fetch(url, {\n            method: data.method,\n            headers: {\n              Client: \"readlang-chrome-extension\",\n              \"X-Extension-Version\": chrome.runtime.getManifest().version,\n              ...(data.data ? { \"Content-Type\": \"application/json\" } : {}),\n            },\n            body:\n              data.method !== \"GET\" && data.data\n                ? JSON.stringify(data.data)\n                : undefined,\n          })<<<;\n        } catch (e"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "src/contentScript",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[src/contentScript->src/background]",
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          },
+          {
+            "flow_id": "expguard-opti:firefox:steve@readlang.com:0.9.38:871a062065c8ee3f:01",
+            "flow_index": 2,
+            "flow_order": 3,
+            "flow_label": "F003",
+            "flow_type": "PRIVILEGE_ESCALATION",
+            "rule_id": "attacker-input-privileged-operation",
+            "rule_description": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+            "severity": "MEDIUM",
+            "severity_reason": "Host is restricted, but path is wildcarded.",
+            "severity_evidence": [
+              "https://readlang.com/*"
+            ],
+            "source": {
+              "type": "WINDOW_MESSAGE_EVENT",
+              "remark": "window.addEventListener(message)",
+              "file": "src/contentScript",
+              "loc": "L20:C13 -> L20:C35",
+              "frame": "CS_1",
+              "frames": [
+                {
+                  "id": "CS_1",
+                  "family": "CS",
+                  "constraint": {
+                    "matches": [
+                      "https://readlang.com/*",
+                      "https://test.readlang.com/*",
+                      "http://localhost/*"
+                    ]
+                  }
+                }
+              ],
+              "provenance": "CONTENT_SCRIPT",
+              "origin_context": "src/contentScript",
+              "origin_frame_family": "CS",
+              "constraint": {
+                "matches": [
+                  "https://readlang.com/*",
+                  "https://test.readlang.com/*",
+                  "http://localhost/*"
+                ]
+              },
+              "code_preview": "his.READLANG_EXTENSI>>>ON_CONFIG.hostname;\n\nc<<<onst activeTabIds = "
+            },
+            "sink": {
+              "type": "CHROME_WINDOWS_CREATE_OPTIONS",
+              "remark": null,
+              "file": "src/background",
+              "loc": "L259:C4 -> L271:C5",
+              "frame": "BG_1",
+              "frames": [
+                {
+                  "id": "BG_1",
+                  "family": "BG"
+                }
+              ],
+              "url_taint_control": null,
+              "code_preview": "\n      }\n    }\n\n    >>>chrome.windows.create(\n      {\n        url: url,\n        top: currentWindow.top,\n        left: left,\n        width: windowWidth,\n        height: currentWindow.height,\n        type: \"popup\",\n      },\n      function (newWindow) {\n        dictionaryWindow = newWindow;\n      }\n    )<<<;\n  });\n};\n\nconst up"
+            },
+            "structural": {
+              "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+              "privilege_crossing": true,
+              "privilege_reason": "sink grants capability beyond the source origin",
+              "message_passing": true,
+              "storage_passing": false,
+              "message_sender": "src/contentScript",
+              "message_sender_provenance": "CONTENT_SCRIPT",
+              "channel": "runtime.single.sender.message[src/contentScript->src/background]",
+              "storage_area": null
+            },
+            "verification_evidence": "TP",
+            "deduplication": {
+              "is_duplicate": false,
+              "duplicate_of": null,
+              "duplicate_reason": null
+            }
+          }
+        ]
+      }
+    },
+    "CoCo": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "CoCo/report.flows.json",
+          "CoCo/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    },
+    "DoubleX": {
+      "scan_status": "available",
+      "report_files": {
+        "scan_reports": [
+          "DoubleX/report.flows.json",
+          "DoubleX/summary.json"
+        ]
+      },
+      "flow_counts": {
+        "reported": 0,
+        "reported_no_duplicate": 0,
+        "tp_no_duplicate": 0,
+        "fp_no_duplicate": 0
+      },
+      "flows": {
+        "reported": [],
+        "no_duplicate": []
+      }
+    }
+  },
+  "ground_truth": {
+    "verdict": "TP",
+    "flow_count": 2,
+    "flow_ids": [
+      "gtf-a84c2b46268622dd",
+      "gtf-ff53fe15cc53293c"
+    ],
+    "flows": [
+      {
+        "ground_truth_flow_id": "gtf-a84c2b46268622dd",
+        "verification": "TP",
+        "source_family": "page",
+        "sink_family": "FETCH_RESOURCE",
+        "matched_tools": [
+          "ExPGuard"
+        ],
+        "match_region": "ExPGuard only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "ExPGuard",
+            "flow_id": "expguard-opti:firefox:steve@readlang.com:0.9.38:0a7978d5cc9c98fb:01",
+            "source_report": "ExPGuard/report.flows.json",
+            "flow": {
+              "flow_id": "expguard-opti:firefox:steve@readlang.com:0.9.38:0a7978d5cc9c98fb:01",
+              "flow_index": 0,
+              "flow_order": 1,
+              "flow_label": "F001",
+              "flow_type": "REQUEST_FORGERY",
+              "rule_id": "attacker-input-network-send",
+              "rule_description": "Attacker-controlled data flowing into outbound network requests — request-forgery / SSRF surface.",
+              "severity": "MEDIUM",
+              "severity_reason": "Host is restricted, but path is wildcarded.",
+              "severity_evidence": [
+                "https://readlang.com/*"
+              ],
+              "source": {
+                "type": "WINDOW_MESSAGE_EVENT",
+                "remark": "window.addEventListener(message)",
+                "file": "src/contentScript",
+                "loc": "L20:C13 -> L20:C35",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "https://readlang.com/*",
+                        "https://test.readlang.com/*",
+                        "http://localhost/*"
+                      ]
+                    }
+                  }
+                ],
+                "provenance": "CONTENT_SCRIPT",
+                "origin_context": "src/contentScript",
+                "origin_frame_family": "CS",
+                "constraint": {
+                  "matches": [
+                    "https://readlang.com/*",
+                    "https://test.readlang.com/*",
+                    "http://localhost/*"
+                  ]
+                },
+                "code_preview": "his.READLANG_EXTENSI>>>ON_CONFIG.hostname;\n\nc<<<onst activeTabIds = "
+              },
+              "sink": {
+                "type": "FETCH_RESOURCE",
+                "remark": "[Unknown URL]",
+                "file": "src/background",
+                "loc": "L159:C27 -> L170:C12",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "url_taint_control": "FULL",
+                "code_preview": "   response = await >>>fetch(url, {\n            method: data.method,\n            headers: {\n              Client: \"readlang-chrome-extension\",\n              \"X-Extension-Version\": chrome.runtime.getManifest().version,\n              ...(data.data ? { \"Content-Type\": \"application/json\" } : {}),\n            },\n            body:\n              data.method !== \"GET\" && data.data\n                ? JSON.stringify(data.data)\n                : undefined,\n          })<<<;\n        } catch (e"
+              },
+              "structural": {
+                "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+                "privilege_crossing": true,
+                "privilege_reason": "sink grants capability beyond the source origin",
+                "message_passing": true,
+                "storage_passing": false,
+                "message_sender": "src/contentScript",
+                "message_sender_provenance": "CONTENT_SCRIPT",
+                "channel": "runtime.single.sender.message[src/contentScript->src/background]",
+                "storage_area": null
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      },
+      {
+        "ground_truth_flow_id": "gtf-ff53fe15cc53293c",
+        "verification": "TP",
+        "source_family": "page",
+        "sink_family": "CHROME_WINDOWS_CREATE_OPTIONS",
+        "matched_tools": [
+          "ExPGuard"
+        ],
+        "match_region": "ExPGuard only",
+        "match_basis": "single_tool_report",
+        "reports": [
+          {
+            "tool": "ExPGuard",
+            "flow_id": "expguard-opti:firefox:steve@readlang.com:0.9.38:871a062065c8ee3f:01",
+            "source_report": "ExPGuard/report.flows.json",
+            "flow": {
+              "flow_id": "expguard-opti:firefox:steve@readlang.com:0.9.38:871a062065c8ee3f:01",
+              "flow_index": 2,
+              "flow_order": 3,
+              "flow_label": "F003",
+              "flow_type": "PRIVILEGE_ESCALATION",
+              "rule_id": "attacker-input-privileged-operation",
+              "rule_description": "Externally-controlled input reaching a privileged chrome.* operation. The flagship privilege-escalation pattern.",
+              "severity": "MEDIUM",
+              "severity_reason": "Host is restricted, but path is wildcarded.",
+              "severity_evidence": [
+                "https://readlang.com/*"
+              ],
+              "source": {
+                "type": "WINDOW_MESSAGE_EVENT",
+                "remark": "window.addEventListener(message)",
+                "file": "src/contentScript",
+                "loc": "L20:C13 -> L20:C35",
+                "frame": "CS_1",
+                "frames": [
+                  {
+                    "id": "CS_1",
+                    "family": "CS",
+                    "constraint": {
+                      "matches": [
+                        "https://readlang.com/*",
+                        "https://test.readlang.com/*",
+                        "http://localhost/*"
+                      ]
+                    }
+                  }
+                ],
+                "provenance": "CONTENT_SCRIPT",
+                "origin_context": "src/contentScript",
+                "origin_frame_family": "CS",
+                "constraint": {
+                  "matches": [
+                    "https://readlang.com/*",
+                    "https://test.readlang.com/*",
+                    "http://localhost/*"
+                  ]
+                },
+                "code_preview": "his.READLANG_EXTENSI>>>ON_CONFIG.hostname;\n\nc<<<onst activeTabIds = "
+              },
+              "sink": {
+                "type": "CHROME_WINDOWS_CREATE_OPTIONS",
+                "remark": null,
+                "file": "src/background",
+                "loc": "L259:C4 -> L271:C5",
+                "frame": "BG_1",
+                "frames": [
+                  {
+                    "id": "BG_1",
+                    "family": "BG"
+                  }
+                ],
+                "url_taint_control": null,
+                "code_preview": "\n      }\n    }\n\n    >>>chrome.windows.create(\n      {\n        url: url,\n        top: currentWindow.top,\n        left: left,\n        width: windowWidth,\n        height: currentWindow.height,\n        type: \"popup\",\n      },\n      function (newWindow) {\n        dictionaryWindow = newWindow;\n      }\n    )<<<;\n  });\n};\n\nconst up"
+              },
+              "structural": {
+                "constraint_kind": "CONTENT_SCRIPT_MATCHES",
+                "privilege_crossing": true,
+                "privilege_reason": "sink grants capability beyond the source origin",
+                "message_passing": true,
+                "storage_passing": false,
+                "message_sender": "src/contentScript",
+                "message_sender_provenance": "CONTENT_SCRIPT",
+                "channel": "runtime.single.sender.message[src/contentScript->src/background]",
+                "storage_area": null
+              },
+              "verification_evidence": "TP",
+              "deduplication": {
+                "is_duplicate": false,
+                "duplicate_of": null,
+                "duplicate_reason": null
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

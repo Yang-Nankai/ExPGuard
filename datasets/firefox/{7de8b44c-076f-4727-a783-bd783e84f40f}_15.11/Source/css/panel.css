@@ -1,0 +1,255 @@
+/* Subtitle list panel — dense, scannable cue list over video hosts */
+
+.unisubs-panel-container,
+.unisubs-panel-side-container {
+  --panel-font: medium;
+  --panel-font-secondary: 0.9375rem;
+  --panel-icon: 1.85rem;
+  --panel-hit: 2.5rem;
+  --panel-control-pad-y: 0.4rem;
+  --panel-control-pad-x: 0.7rem;
+
+  display: flex;
+  flex-direction: column;
+  background-color: inherit;
+  z-index: 0;
+  overflow: hidden;
+  color: var(--yt-spec-text-primary, #f1f1f1);
+  font-size: var(--panel-font);
+}
+
+.unisubs-panel-container {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 30%;
+  height: 100%;
+}
+
+.unisubs-panel-side-container {
+  width: 100%;
+  height: 70vh;
+  margin-bottom: 3rem;
+}
+
+.unisubs-panel-slider {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  cursor: ew-resize;
+  z-index: 999;
+  background: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.unisubs-panel-slider:hover,
+.unisubs-panel-slider:focus-visible {
+  background-color: rgba(22, 122, 198, 0.55);
+}
+
+.unisubs-panel-slider-detect {
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  cursor: ew-resize;
+}
+
+/* —— Top bar —— */
+
+.unisubs-panel-topbar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.65rem 0.7rem 0.65rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(8px);
+}
+
+.unisubs-panel-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.unisubs-panel-topbar-left-select {
+  color: var(--yt-spec-text-primary, #f1f1f1);
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.4rem;
+  font-size: var(--panel-font);
+  font-weight: 500;
+  line-height: 1.35;
+  padding: var(--panel-control-pad-y) var(--panel-control-pad-x);
+  margin: 0;
+  max-width: 14rem;
+  min-width: 0;
+  min-height: var(--panel-hit);
+  box-sizing: border-box;
+}
+
+.unisubs-panel-topbar-left-select:focus {
+  outline: none;
+  border-color: rgba(22, 122, 198, 0.85);
+  box-shadow: 0 0 0 2px rgba(22, 122, 198, 0.28);
+}
+
+.unisubs-panel-topbar-left-select option {
+  color: #111;
+  background: #fff;
+  font-size: var(--panel-font);
+}
+
+.unisubs-panel-icon {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--panel-hit);
+  height: var(--panel-hit);
+  box-sizing: border-box;
+  padding: 0.3rem;
+  opacity: 0.72;
+  border-radius: 0.35rem;
+  transition: opacity 0.12s ease, background-color 0.12s ease;
+}
+
+.unisubs-panel-icon:hover,
+.unisubs-panel-icon:focus-visible {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.08);
+  outline: none;
+}
+
+.unisubs-panel-icon > svg,
+.unisubs-panel-icon > *,
+.unisubs-panel-icon svg {
+  fill: var(--yt-spec-text-primary, #f1f1f1);
+  display: block;
+  width: var(--panel-icon) !important;
+  height: var(--panel-icon) !important;
+  margin: auto;
+}
+
+/* Close (X) reads smaller in its viewBox — bump glyph + hit target */
+.unisubs-panel-icon-close {
+  width: 2.85rem;
+  height: 2.85rem;
+  padding: 0.25rem;
+}
+
+.unisubs-panel-icon-close > svg,
+.unisubs-panel-icon-close > *,
+.unisubs-panel-icon-close svg {
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+}
+
+/* —— Cue list —— */
+
+.unisubs-panel-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  height: auto;
+  scrollbar-gutter: stable;
+}
+
+.unisubs-panel-content-hint {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.unisubs-panel-content-hint-text {
+  color: var(--yt-spec-text-secondary, rgba(255, 255, 255, 0.65));
+  font-size: var(--panel-font);
+  line-height: 1.45;
+  text-align: center;
+  max-width: 16rem;
+}
+
+.unisubs-panel-content-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 0.7rem 0.65rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  user-select: text;
+  transition: background-color 0.12s ease;
+}
+
+.unisubs-panel-content-item:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.unisubs-panel-content-item.highlighted {
+  background-color: rgba(22, 122, 198, 0.18);
+  box-shadow: inset 3px 0 0 var(--yt-live-chat-new-moderator-color, #167ac6);
+}
+
+.unisubs-panel-content-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.unisubs-panel-content-time {
+  font-size: var(--panel-font-secondary);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--yt-spec-text-secondary, rgba(255, 255, 255, 0.55));
+  line-height: 1.2;
+}
+
+.unisubs-panel-content-item.highlighted .unisubs-panel-content-time {
+  color: var(--yt-live-chat-new-moderator-color, #6eb6e8);
+}
+
+.unisubs-panel-content-text {
+  color: var(--yt-spec-text-primary, #f1f1f1);
+  font-size: var(--panel-font);
+  line-height: 1.4;
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+.unisubs-panel-content-item.highlighted .unisubs-panel-content-text {
+  color: var(--yt-live-chat-new-moderator-color, #8ec8f0);
+  font-weight: 600;
+}
+
+.unisubs-panel-content-translation {
+  color: var(--yt-spec-text-secondary, rgba(255, 255, 255, 0.62));
+  font-size: var(--panel-font-secondary);
+  line-height: 1.35;
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+.unisubs-panel-content-item .unisubs-panel-icon {
+  align-self: center;
+  opacity: 0.45;
+}
+
+.unisubs-panel-content-item:hover .unisubs-panel-icon,
+.unisubs-panel-content-item.highlighted .unisubs-panel-icon {
+  opacity: 0.9;
+}

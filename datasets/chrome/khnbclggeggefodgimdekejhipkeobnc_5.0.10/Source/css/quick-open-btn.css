@@ -1,0 +1,73 @@
+.quick-open-btn {
+  /* Layout */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 1px;
+  margin-right: 4px;
+
+  border-radius: 4px;
+  border: 1px solid var(--border-grey-light);
+  background: var(--ll-white);
+  box-shadow:
+    0px 0px 4px 0px var(--shadow-4),
+    0px 4px 8px 0px var(--shadow-6);
+  color: var(--text-light);
+
+  cursor: pointer;
+
+  &.hidden,
+  .hidden {
+    display: none;
+  }
+
+  .lemlist-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  /* Lead row without the "Lead → Contact (Primary)" column: not importable yet */
+  &.quick-open-btn-disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+
+    .lemlist-logo svg {
+      filter: grayscale(1);
+    }
+  }
+}
+
+/* Company page: button swaps with avatar in normal flow */
+.hs-avatar-quick-open-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .quick-open-btn {
+    margin: 0;
+    display: none;
+  }
+}
+
+/* Keep button visible when already in lemlist (isExisting) */
+.hs-avatar-quick-open-wrapper .quick-open-btn:not(.hidden) {
+  display: flex;
+}
+
+/* Hide avatar when button is visible — target stable data-test-id to survive React re-renders */
+/* position: absolute removes it from flex flow so the button centers properly */
+.hs-avatar-quick-open-wrapper:has(.quick-open-btn:not(.hidden))
+  [data-test-id='AvatarDisplay-switchComponent'] {
+  visibility: hidden;
+  position: absolute;
+}

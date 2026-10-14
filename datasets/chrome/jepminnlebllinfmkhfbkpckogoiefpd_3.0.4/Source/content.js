@@ -1,0 +1,4 @@
+/* Copyright 2026 X Corp.
+By installing or using this extension, you agree to the X Master Services Agreement at https://ads.x.com/terms/ and the X Privacy Policy at https://x.com/privacy
+ */
+(()=>{function t(){for(var t=0,e=Array.from(document.getElementsByTagName("script"));t<e.length;t++){"https://static.ads-twitter.com/uwt.js"===e[t].src&&chrome.runtime.sendMessage({type:"UWT_SCRIPT_FOUND"})}}window.addEventListener("securitypolicyviolation",function(t){try{var e=new URL(t.blockedURI).origin;["https://www.googletagmanager.com","https://analytics.twitter.com","https://analytics.x.com","https://static.ads-twitter.com"].includes(e)&&chrome.runtime.sendMessage({type:"CSP_VIOLATION",details:{violatedDirective:t.violatedDirective,blockedURI:new URL(t.blockedURI).host}})}catch(t){}}),window.addEventListener("DOMContentLoaded",t),window.addEventListener("load",t)})();

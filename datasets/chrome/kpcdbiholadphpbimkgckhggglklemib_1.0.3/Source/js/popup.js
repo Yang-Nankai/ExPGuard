@@ -1,0 +1,1 @@
+$((function(){$("#openSettings").on("click",(function(t){var e=chrome.runtime.getURL("settings.html");chrome.tabs.query({url:e},(function(t){t.length?chrome.tabs.update(t[0].id,{active:!0}):chrome.tabs.create({url:e})})),t.preventDefault()}))}));

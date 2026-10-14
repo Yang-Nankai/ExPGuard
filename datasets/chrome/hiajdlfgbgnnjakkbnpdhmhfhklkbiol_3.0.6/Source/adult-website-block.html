@@ -1,0 +1,359 @@
+<html>
+<head>
+  <title>JustBlock Security Options</title>
+  <link rel="shortcut icon" href="images/128.png">  
+  <style>
+  body {
+    background-color: #ebeff9;
+    font-family: arial,sans-serif;
+    font-size: 13px;
+  }
+
+  #i18_title {
+    color: #212121;
+    margin-top: 0;
+    font-size:34px;
+    display: none;
+    margin-bottom: 8px;
+  }
+  .info {
+    color: #808080;
+    font-size:12px;
+    display: none;
+    font-weight: 300
+    padding-bottom: 40px;
+    margin-top:60px;
+  }
+
+  #upgrade{
+    padding:4px 0px 12px;
+    font-size: 13px;
+    display: none;
+  }
+
+  h2 {
+    color: #103c94;
+  }
+
+  #contentout{
+    background-color: #4285f4;
+    padding-left: 128px;
+    position: relative;
+    height: 262px;
+  }
+  #content {
+    background-color: #ffffff;
+    padding:64px 0px 160px 0px;
+    display: block;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
+    width:82%;
+    box-sizing: border-box;
+    position: absolute;
+    margin-bottom: 40px;
+
+  }
+  #contenttext{
+    display: block;
+  }
+  label {
+    color: #434343;
+    font-size: 20px;
+  }
+  .header{
+    background-color: #4285f4;
+    color: #ffffff;
+    font-size:20px;
+    line-height: 64px;
+    width: 100%;
+    display:block;
+  }
+  .header span{padding-left:80px;}
+  #link{
+    float:right;
+    font-size:14px;
+    padding:0 24px;
+    cursor:pointer;
+  }
+  body{padding:0;margin:0;}
+
+  table.blockers{
+  font-size:8px;
+  border-spacing: 0px;
+  width: 586px;
+  display: block;
+  padding-left:7px;
+  border-collapse: collapse;
+  padding-right:16px;
+  padding-top:10px;
+  margin: 0 auto;
+
+}
+
+.blockers tr{height:64px;background-color: #FFF;}
+.blockers tr:hover{background-color:#ffffff;}
+tr.clickable{cursor:pointer;}
+tr.clickable:hover{background-color: #fafafa;}
+.blockers tr.nonactive img{filter:grayscale(1);opacity:0.2;}
+.blockers tr.nonactive td{color:#999999;}
+.blockers tr.selected{background-color: #ffffff;}
+.blockers td{font-size:13px;font-weight: 300;border:0;color:#808080;}
+.blockers td:first-child > img{width:35px;height: 35px;}
+.blockers td:first-child{max-width:56px;min-width:56px;width:56px;text-align: left;}
+.blockers td:nth-child(2){max-width:600px;min-width:600px;width:600px;text-align: left;}
+.blockers td:nth-child(3){max-width:50px;min-width:50px;width:50px;}
+.blockers td:nth-child(4){max-width:78px;min-width:78px;width:78px;text-align:left;}
+
+.blockers tr.selected td:first-child{/*border-left: 2px solid #ccc;*/max-width:60px;min-width:60px;width:60px;}
+.blockers tr.selected td:first-child img{padding-left:6px!important;}
+.blockers > tbody{box-shadow: 0px 2px 2px 1px #bbbbbb;}
+
+.showmore{display: inline-block;vertical-align: middle;}
+.showless{display:none;vertical-align: middle;}
+tr[show]>td>.showmore{display:none;}
+tr[show]>td>.showless{display:inline-block;}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 12px;
+  margin-left:7px;
+  top: 3px;
+  z-index: 10;
+}
+.switch input {display:none;}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #B4CFF9;
+  -webkit-transition: .4s;
+  transition: .4s;
+  width: 32px;
+  margin: 0 auto;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 0px;
+  bottom: -2px;
+  background-color: #FAFAFA; /*Bola grande desactivada*/
+  -webkit-transition: .4s;
+  transition: .4s;
+  box-shadow:0px 0px 3px #444;
+
+}
+
+input:checked + .slider {
+  /*background-color: #2196F3;*/
+  background-color: #B4CFF9; /*Barra activada*/
+}
+input[disabled]:checked + .slider {
+  background-color: #999;
+}
+input + .slider {
+  background-color: #999;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #4688F1;
+}
+
+.slider.round {
+  border-radius: 8px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+  z-index: 3;
+}
+.slider.round:active:before {
+  width:  22px;
+  height: 22px;
+  bottom: -6px;
+}
+input:checked + .slider.round:active:before {
+  transform: translateX(20px);
+}
+input:checked + .slider:before {
+  -webkit-transform: translateX(16px);
+  -ms-transform: translateX(16px);
+  transform: translateX(16px);
+  background-color: #4688F1; /*Bola grande activada*/
+}
+input[disabled]:checked + .slider:before {
+  background-color: #999;
+  transform: translateX(0px);
+}
+#i18_selectallbutton{
+  display: block;
+  margin: 20px auto;
+  text-align: center;
+  width: 500px;
+  color: #FFFFFF;
+  background-color: #4285f4;
+  padding:22px 10px 10px 10px;
+  border-radius: 4px;
+  height: 28px;
+}
+
+.infoicon{
+  width:16px;
+  height:16px;
+  padding-top:6px;
+  float:right;
+  opacity: 0.1;
+}
+tr > td > span > a{
+  display: inline-block;
+  position: absolute;
+  margin: -6px 0 0 7px;
+}
+tr:hover > td > span > a > .infoicon{opacity: 1;}
+
+#upgradingcontainer{display: none;}
+#i18_upgradingtitle{
+  color: rgba(0,0,0,0.54);
+  font-size: 13px;
+  line-height: 24px;
+  padding: 9px 0;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  display: block;
+}
+#upgrading{
+  margin:auto;
+  width: 200px;
+  height: 4px;
+  overflow:hidden;
+  position: relative;
+  transition: opacity 250ms linear;
+  display: block;
+  -webkit-tap-highlight-color: transparent;
+  }
+  .upg{
+    background-size: 10px 4px;
+    background-repeat: repeat-x;
+    background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20version%3D%271.1%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20xmlns%3Axlink%3D%27http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%27%20x%3D%270px%27%20y%3D%270px%27%20enable-background%3D%27new%200%200%205%202%27%20xml%3Aspace%3D%27preserve%27%20viewBox%3D%270%200%205%202%27%20preserveAspectRatio%3D%27none%20slice%27%3E%3Ccircle%20cx%3D%271%27%20cy%3D%271%27%20r%3D%271%27%20fill%3D%27%23e6e6e6%27%2F%3E%3C%2Fsvg%3E');
+    visibility: hidden;
+    height: 100%;
+    position:absolute;
+    width: 100%;
+    -webkit-tap-highlight-color: transparent;
+    display: block;
+  }
+  .upgblue{
+    background-color: #4285f4;
+    opacity: .12;
+    height: 100%;
+    transform-origin: top left;
+    transition: transform 250ms ease;
+    width: 100%;
+    position: absolute;
+    -webkit-tap-highlight-color: transparent;
+    display: block;
+  }
+  .upgelem{
+    transform:scaleX(1);
+    transform-origin: top left;
+    transition: transform 250ms ease;
+    animation: none;
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    -webkit-tap-highlight-color: transparent;
+    display: block;
+  }
+  .upgspan{
+    background-color: #4285f4;
+    display: inline-block;
+    animation: none;
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .upgend{
+    visibility: hidden;
+    transform-origin: top left;
+    transition: transform 250ms ease;
+    animation:none;
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    -webkit-tap-highlight-color: transparent;
+    display: block;
+  }
+  #i18_upgradesubtitle{
+    color: rgba(0,0,0,0.38);
+    font-size: 13px;
+    line-height: 16px;
+    padding-top: 16px;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+    display: block;
+  }
+  #protected{
+    width: 500px;
+    height: 80px;
+    display: none;
+    margin: 0px auto;
+    padding:10px;
+  }
+  #protected img{padding-left:80px;height: 60px;display: inline-block;vertical-align: middle;}
+  #protected span{
+    display: inline-block;
+    vertical-align: middle;
+    padding-left: 20px;
+    text-transform: uppercase;
+    font-size: 24px;
+    font-family: "Roboto", sans-serif, arial;
+    font-weight: 200;
+    color: #808080;
+  }
+  #flyingadulticon{position:absolute; z-index: 20; display: none;}
+  #flyingadulticon img{height: 60px;}
+  </style>
+  
+</head>
+<body>
+  <div id="flyingadulticon"><img src='images/logoblue.svg'></div>
+  <div class="header">
+    <span><svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" style="pointer-events: none; width:32px;height:32px;vertical-align:middle; display:inline-block;"><g><path fill="#ffffff" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"></path></g></svg> JustBlock Security</span>
+    <span id="link">JUSTBLOCK.ORG <svg viewBox="0 0 24 24" style='display:inline-block;width:24px;height: 24px;vertical-align: middle;margin-bottom: 4px;'><path fill="#ffffff" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"></path></svg></span>
+  </div>
+  <div id="contentout">
+    <div id="content">
+      <div id="contenttext">
+    
+        <span id="i18_title">Secure your Chrome browser</span>
+
+        <div id="protected"><img src='images/logoblue.svg'><span id="i18_protected">You are protected</span></div>
+        <table class='blockers' style="padding-top:28px;">
+          <tbody style="box-shadow: none;">
+            <tr class="selected">
+            <td><img src='images/blocked.svg' style="pointer-events: none; display: block; width: 16px; height:16px;padding-left:20px!important;"/></td>
+            <td><span class='title' style="display:block;width: 100%;padding:3px 0px;" id="i18_adultalert_title">Family Shield</span><span class='subtitle' id="i18_adultalert_sub">Block adult content and enable parental control</span></td>
+            <td></td>
+            </tr>
+            <tr class="selected">
+            <td></td>
+            <td><span class='info' style="display:block;width: 100%;padding:3px 0px;" id="i18_adultalert_info">Family Shield</span></td>
+            <td></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="js/flyAdult.js"></script>
+</body>
+</html>
+

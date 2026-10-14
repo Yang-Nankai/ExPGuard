@@ -1,0 +1,1 @@
+import{j as s}from"./cn-DTPxTs8l.js";import{u as e,T as m,b as p,a as d}from"./useToast-B8B7oClr.js";const x=()=>{const{toasts:i}=e();return s.jsxs(m,{children:[i.map(({id:t,title:o,description:r,action:a,onDismiss:n,...c})=>s.jsx(p,{onDismiss:n,title:o,description:r,...c,children:a},t)),s.jsx(d,{})]})};export{x as T};

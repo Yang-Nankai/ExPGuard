@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 300px;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2563eb;
+      margin-bottom: 5px;
+    }
+    
+    .subtitle {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .toggle-section {
+      margin-bottom: 20px;
+    }
+    
+    .toggle-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .toggle-label {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 24px;
+      background-color: #ccc;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .toggle-switch.active {
+      background-color: #2563eb;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background-color: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+    
+    .toggle-switch.active .toggle-slider {
+      transform: translateX(26px);
+    }
+    
+    .site-info {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .site-url {
+      font-size: 12px;
+      color: #666;
+      word-break: break-all;
+      margin-bottom: 10px;
+    }
+    
+    .site-toggle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .stats {
+      text-align: center;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+
+    .stats-number {
+      font-size: 28px;
+      font-weight: bold;
+      color: #2563eb;
+      line-height: 1.1;
+    }
+
+    .stats-label {
+      font-size: 12px;
+      color: #666;
+      margin-top: 2px;
+    }
+    
+    .disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    
+    .logs-container {
+      margin-top: 15px;
+    }
+    .logs-container h4 {
+      margin: 0 0 5px 0;
+      font-size: 14px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    #debugLog {
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin: 0;
+    }
+    .action-button {
+      width: 100%;
+      padding: 10px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    .action-button:hover {
+      background-color: #1d4ed8;
+    }
+    .action-button:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+    #debugSnippet {
+      background-color: #eef2ff;
+      border: 1px solid #c7d2fe;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin: 0;
+      color: #4338ca;
+    }
+    .rating-widget {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+    .rating-widget .star {
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .rating-widget .star::before {
+      content: '\2606';
+      color: #ccc;
+      transition: color 0.2s;
+    }
+    .rating-widget:hover .star::before {
+      content: '\2605';
+      color: #f39c12;
+    }
+    .rating-widget .star:hover ~ .star::before {
+      content: '\2606';
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">Ad Blocker</div>
+    <div class="subtitle">Focus on what matters</div>
+  </div>
+  
+  <div class="toggle-section">
+    <div class="toggle-item">
+      <span class="toggle-label">Global Protection</span>
+      <div class="toggle-switch active" id="globalToggle">
+        <div class="toggle-slider"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="site-info">
+    <div class="site-url" id="currentSite">Loading...</div>
+    <div class="site-toggle">
+      <span class="toggle-label">Enable on this site</span>
+      <div class="toggle-switch active" id="siteToggle">
+        <div class="toggle-slider"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="stats">
+    <div class="stats-number" id="adsBlockedCount">0</div>
+    <div class="stats-label">ads blocked</div>
+  </div>
+  
+  <div class="rating-widget">
+    <span class="star" data-rating="1"></span>
+    <span class="star" data-rating="2"></span>
+    <span class="star" data-rating="3"></span>
+    <span class="star" data-rating="4"></span>
+    <span class="star" data-rating="5"></span>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
+

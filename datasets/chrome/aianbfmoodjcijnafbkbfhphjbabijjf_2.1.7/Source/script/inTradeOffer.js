@@ -1,0 +1,1 @@
+""==window.location.search&&(injectScript(chrome.runtime.getURL("script/helper.js"),"body"),injectScript(chrome.runtime.getURL("script/tradeOffer.js"),"body"));

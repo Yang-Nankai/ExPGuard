@@ -1,0 +1,1 @@
+(()=>{"use strict";console.log("in options"),(o=>{let e=document.getElementById("buttonDiv");for(let o of["#3aa757","#e8453c","#f9bb2d","#4688f1"]){let t=document.createElement("button");t.style.backgroundColor=o,t.addEventListener("click",(function(){chrome.storage.sync.set({color:o},(function(){console.log("color is "+o)}))})),e.appendChild(t)}})()})();

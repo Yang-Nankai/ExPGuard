@@ -1,0 +1,1 @@
+import{i as n}from"./sidepanelActiveLifecycle-B52e0DNH.js";n();const e=async()=>{chrome.runtime.sendMessage({messageType:"checkServerAvailability"})};e(),window.addEventListener("online",()=>e()),window.addEventListener("offline",()=>e());

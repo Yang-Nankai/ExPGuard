@@ -1,0 +1,1 @@
+const routeApp="naviki",isPathSupported=()=>!!naviki.map,findMap=()=>{let a=naviki.map._map;if(a)return appendLog("map found"),squadrats.map=a,squadrats.mapbox=squadrats.map,squadrats.routeApp="naviki",squadrats.OSM=!!squadrats.mapbox.getLayer("simple-tiles"),a;appendLog("map not found")};

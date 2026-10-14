@@ -1,0 +1,1 @@
+export const squadratsEnv={id:"production",squadratsUrl:"https://squadrats.com",mainframeUrls:["https://mainframe-proxy-01.squadrats.com","https://mainframe-proxy-02.squadrats.com"],tilesUrls:["https://tiles1.squadrats.com","https://tiles2.squadrats.com"]};window.squadrats=window.squadrats||{},window.squadrats.env=squadratsEnv;

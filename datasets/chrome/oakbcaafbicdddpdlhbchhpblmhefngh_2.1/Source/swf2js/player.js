@@ -1,0 +1,1 @@
+window.addEventListener("message",(function(a){if(a.data.swf)try{swf2js.load(a.data.swf)}catch(a){}}));

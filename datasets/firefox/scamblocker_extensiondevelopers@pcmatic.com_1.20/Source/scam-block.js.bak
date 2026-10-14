@@ -1,0 +1,298 @@
+var loggingOn = false;
+var whitelist = '';
+
+function log(message)
+{
+   if(loggingOn) console.log(message);
+}
+
+window.addEventListener("message", function(event) {
+  if (event.source != window)
+    return;
+  if (event.data.type && (event.data.type == "close_me")) {
+      log("Received close command");
+      chrome.runtime.sendMessage({command: "close_me"}, function(response) {});
+  }
+}, false);
+
+
+
+var scriptToInsertInPage = function pcpitstop()
+{
+
+	function closeOverlay() {
+		const scmoverlay = document.getElementById('pcmaticscamblockeroverlay');
+		scmoverlay.remove();
+		clickedlink.setAttribute('data-scamblocker-check','');
+		clickedlink.click();
+
+	}
+
+	function backtoSafety() {
+		const scmoverlay = document.getElementById('pcmaticscamblockeroverlay');
+		scmoverlay.remove();
+	}
+
+
+	function addBadURLOverlay(title, text1, text2) {
+		console.log('adding bad!!!!!!!')
+		// create a new div element
+		const body = document.body;
+		const outerdiv = document.createElement('div');
+		outerdiv.id='pcmaticscamblockeroverlay';
+		outerdiv.style.position='fixed';
+		outerdiv.style.top = '0';
+		outerdiv.style.left = '0';
+		outerdiv.style.width = '100%';
+		outerdiv.style.height = '100%';
+		outerdiv.style.backgroundColor = 'rgba(0,0,0,0.5)';
+		outerdiv.style.zIndex = '9999';
+		outerdiv.style.display = 'flex';
+		outerdiv.style.justifyContent = 'center';
+		outerdiv.style.alignItems = 'center';
+		outerdiv.style.fontFamily = 'Arial, sans-serif';
+
+		const innerdiv = document.createElement('div');
+		innerdiv.style.backgroundColor = 'white';
+		innerdiv.style.color = 'black';
+		innerdiv.style.width = '500px';
+		innerdiv.style.paddingTop = '50px';
+		innerdiv.style.paddingBottom = '30px';
+		innerdiv.style.paddingLeft = '50px';
+		innerdiv.style.paddingRight = '50px';
+		innerdiv.style.borderRadius = '14px';
+		innerdiv.style.textAlign = 'center';
+		innerdiv.style.fontFamily = 'Arial, sans-serif';
+
+		const imageDiv = document.createElement('div');
+		imageDiv.style.width = '100px';
+		imageDiv.style.height = '100px';
+		imageDiv.style.marginLeft = 'auto';
+		imageDiv.style.marginRight = 'auto';
+		imageDiv.style.marginTop = '-80px';
+
+
+		var mySVG64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIGlkPSJMYXllcl8yIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2ZmZjt9LmNscy0ye2ZpbGw6IzMzZjFiNzt9LmNscy0ze29wYWNpdHk6LjE1O30uY2xzLTR7ZmlsbDojMGM0MTNhO308L3N0eWxlPjwvZGVmcz48ZyBpZD0iTGF5ZXJfMS0yIj48cmVjdCBjbGFzcz0iY2xzLTQiIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiByeD0iMzAuMjkiIHJ5PSIzMC4yOSIvPjxnIGNsYXNzPSJjbHMtMyI+PHBhdGggY2xhc3M9ImNscy0yIiBkPSJNNDguOTgsMTEuMDZjNS4xMy0xLjY3LDEwLjA5LTMuODUsMTUuMjYtNS40LDUuMTUsMS42NSwxMC4wNiwzLjk0LDE1LjIxLDUuNTksMCw1LjExLS40MiwxMC4yLS41NCwxNS4zMSw1LjE1LDEuODYsMTAuNCwzLjQyLDE1LjY3LDQuODYtLjMzLTUuNDYtLjM0LTEwLjkzLS41NC0xNi4zOSw4LjA0LDIuOTIsMTYuMjQsNS4zNiwyNC4yOCw4LjI4LjAzLDEzLjk4LS45OCwyOC4wNi00LjM4LDQxLjY2LTIuNzIsMTAuOTctNy4xOCwyMS41Ni0xMy41MywzMC45My00LjI3LDYuMjktOS40OSwxMS45Ny0xNS42MywxNi40OS02LjAxLDQuNDUtMTIuODUsNy43Mi0yMC4wMyw5Ljc3LS4zMi4wNy0uNjQuMjYtLjk3LjE5LTUuMTktMS4zMS0xMC4xOS0zLjM4LTE0LjgtNi4wOS04LjgyLTUuMTgtMTYuMTQtMTIuNjMtMjEuODgtMjEuMDMtNi43NS05LjktMTEuNS0yMS4xNC0xMy45NC0zMi44Ny0yLjY5LTEyLjc2LTIuOTUtMjUuODYtMy40Ny0zOC44NCw4LjA5LTIuOTYsMTYuMjUtNS42OSwyNC4zNC04LjY1LS4yNSw1LjM5LS4zNiwxMC43OS0uNDgsMTYuMTksNS4zNy0xLjA5LDEwLjU5LTIuNzUsMTUuODItNC4zNiwwLTUuMjEtLjM4LTEwLjQtLjM5LTE1LjYxTTMzLjAxLDQxLjAzYy00LjQ0LDEuMzMtOC44OCwyLjY2LTEzLjI2LDQuMTYsMS4wNCw4LjIsMi40OSwxNi4zNyw0Ljg0LDI0LjMxLDEuNjYsNS41OSwzLjc4LDExLjA1LDYuNTUsMTYuMTgsMi4yNSw0LjIsNS4xMyw4LjAzLDguMjksMTEuNTksMy41OSw0LjAxLDcuNTcsNy42OCwxMS45MiwxMC44NSwzLjcxLDIuNjgsNy43LDUuMDUsMTIuMDUsNi41Mi02LjM4LTIxLjgxLTEzLjU3LTQzLjM3LTE5Ljk0LTY1LjE5LDYuMTcsMy4zMywxMi4wNSw3LjE1LDE4LjA0LDEwLjgxLTIuNTItOC41MS00LjczLTE3LjEyLTcuMjMtMjUuNjMtNy4wNSwyLjI1LTE0LjE2LDQuMy0yMS4yNSw2LjQyTTc4LjUsMzUuMjZjMCwxMC43NiwwLDIxLjUyLS4wNCwzMi4yOS0uMDQsNy4wOC0uMDUsMTQuMTYtLjIyLDIxLjI0LTUuNjgtMi41My0xMC43LTYuMjUtMTYuMTEtOS4yOC0uMDQuNTMuMDYsMS4wNi4wOSwxLjYuOTEsMTEuMTcsMS43NywyMi4zNSwyLjY5LDMzLjUzLDUuODUtMi4wNywxMS4xOS01LjQsMTUuOS05LjQsNC4yNi0zLjYxLDguMDQtNy43OCwxMS4yOS0xMi4zMiwyLjg2LTQsNS4zMi04LjI4LDcuMTgtMTIuODMsMi4xNS01LjI0LDMuODgtMTAuNjUsNS4zNi0xNi4xMiwxLjY1LTYuMTcsMy0xMi40MywzLjkxLTE4Ljc2LTEwLTMuMzctMTkuOTgtNi43OC0zMC4wNC05Ljk1aDBaIi8+PC9nPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTExLjY5LDY4Ljk4aDcuM2MuMTQsMS41My44OCwyLjc4LDMuNCwyLjc4LDEuOCwwLDIuNjgtLjgxLDIuNjgtMiwwLTEuMjktLjg1LTEuNy0zLjQ2LTIuMDctNi45OS0uNzgtOS4zNy0yLjgyLTkuMzctNy44MSwwLTQuNDgsMy42Ny03Ljc0LDkuNzEtNy43NHM5LjM3LDIuNDQsOS43OCw3Ljc0aC03LjEzYy0uMTctMS40OS0xLjAyLTIuMzQtMi42NS0yLjM0cy0yLjQxLjcxLTIuNDEsMS43N2MwLDEuMTUuNzEsMS43LDMuNCwyLjA0LDYuMTEuNjUsOS41MSwyLjIxLDkuNTEsNy42MSwwLDQuNTEtMy41Myw4LjI1LTEwLjA1LDguMjUtNi44NiwwLTEwLjUyLTIuNzUtMTAuNjktOC4yMloiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0zNC4xNiw2NC43N3YtLjI3YzAtNy41LDUuNC0xMi4zOSwxMi41Ni0xMi4zOSw2LjU1LDAsMTAuOTcsMi45OSwxMS41NCw5LjU3aC03Ljk0Yy0uMjQtMi4yNC0xLjQzLTMuNS0zLjU2LTMuNS0yLjc4LDAtNC40OCwyLjE3LTQuNDgsNi4yOHYuMjdjMCw0LjA0LDEuNjMsNi4yOCw0LjYyLDYuMjgsMi4xNywwLDMuNzMtMS4xMiw0LjAxLTMuNTZoNy42N2MtLjQxLDYuMzgtNS4wOSw5Ljc0LTExLjUxLDkuNzQtOC43NiwwLTEyLjktNC45OS0xMi45LTEyLjQzWiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTY2LjU4LDUyLjQ4aDkuOTVsNy42MSwyNC4yOGgtOC4xNWwtMS4xMi00LjA0aC03LjY3bC0xLjA5LDQuMDRoLTcuMTZsNy42NC0yNC4yOFpNNjguNjUsNjcuNDloNC43OWwtMi4zOC04Ljc5LTIuNDEsOC43OVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik04Ni42NCw1Mi40OGg5Ljk4bDQuMTEsMTEuNzgsNC4xOC0xMS43OGg5Ljc4djI0LjI4aC03LjY0di0xNC4zM2wtNS41MywxNC4zM2gtMi41OGwtNS40My0xNC4zM3YxNC4zM2gtNi44NnYtMjQuMjhaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTIuNiw4MS43NWg3LjI3YzMuNzgsMCw1LjI1LDEuNzQsNS4yNSw0LjAydi4wOWMwLDEuNzgtLjk1LDIuOS0yLjY3LDMuMzEsMS44MS4zMiwzLjA3LDEuNDQsMy4wNywzLjU5di4wOWMwLDIuNzMtMS43NCw0LjI4LTUuNyw0LjI4aC03LjIydi0xNS4zN1pNMTguODQsODcuNzVjMS4yLDAsMS42OC0uNDEsMS42OC0xLjM1di0uMDljMC0uOTItLjQ5LTEuMzgtMS43LTEuMzhoLTEuNDZ2Mi44MmgxLjQ4Wk0xOC45LDkzLjkyYzEuMjUsMCwxLjgzLS41OCwxLjgzLTEuNjF2LS4wOWMwLTEuMDEtLjU2LTEuNTctMS45NC0xLjU3aC0xLjQ0djMuMjdoMS41NVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yNy40NCw4MS43NWg0Ljg4djExLjYxaDUuNTl2My43NmgtMTAuNDd2LTE1LjM3WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTM4LjcxLDg5LjUzdi0uMTdjMC00Ljc1LDMuNjEtNy44NSw4LjIxLTcuODVzOC4yNiwyLjg2LDguMjYsNy43MnYuMTdjMCw0Ljc5LTMuMjksOC04LjM0LDhzLTguMTMtMy4yLTguMTMtNy44N1pNNTAuMSw4OS41MXYtLjE3YzAtMi42LTEuMjUtNC4wMi0zLjE4LTQuMDJzLTMuMTIsMS40LTMuMTIsNC4wMnYuMTdjMCwyLjYyLDEuMjMsNC4wNiwzLjE2LDQuMDZzMy4xNC0xLjUsMy4xNC00LjA2WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTU2LjM2LDg5LjUzdi0uMTdjMC00Ljc1LDMuNDItNy44NSw3Ljk1LTcuODUsNC4xNSwwLDYuOTQsMS44OSw3LjMxLDYuMDZoLTUuMDNjLS4xNS0xLjQyLS45LTIuMjEtMi4yNi0yLjIxLTEuNzYsMC0yLjg0LDEuMzgtMi44NCwzLjk4di4xN2MwLDIuNTYsMS4wMywzLjk4LDIuOTIsMy45OCwxLjM4LDAsMi4zNy0uNzEsMi41NC0yLjI2aDQuODZjLS4yNiw0LjA0LTMuMjIsNi4xNy03LjI5LDYuMTctNS41NSwwLTguMTctMy4xNi04LjE3LTcuODdaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNzMuNTgsODEuNzVoNC44OHY1LjgzbDQuMjYtNS44M2g1LjA1bC01LjQsNy4wOSw1LjcsOC4yOGgtNS42MWwtNC02LjE1djYuMTVoLTQuODh2LTE1LjM3WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTg5LjU5LDgxLjc1aDEwLjkydjMuNzRoLTYuMDZ2Mi4xN2g0LjgydjMuNDJoLTQuODJ2Mi4zaDYuNDF2My43NGgtMTEuMjd2LTE1LjM3WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTEwMi45Miw4MS43NWg2LjI4YzQuMjQsMCw2LjQzLDEuNyw2LjQzLDQuOTl2LjA5YzAsMi4xMy0xLjA4LDMuMzMtMi42LDQuMDJsMy41LDYuMjhoLTUuMTJsLTIuODYtNS4yN2gtLjc3djUuMjdoLTQuODZ2LTE1LjM3Wk0xMDguOTIsODguNzJjMS4zNSwwLDItLjU2LDItMS42OHYtLjA5YzAtMS4xMi0uNjctMS41NS0xLjk4LTEuNTVoLTEuMTZ2My4zMWgxLjE0WiIvPjxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTIyLjMxLDM0LjkzaDQuODRjMy41LDAsNSwxLjU2LDUsNC4xNnYuMDdjMCwyLjUzLTEuNjgsMy45Ni00LjgzLDMuOTZoLTEuMTd2My45NmgtMy44NHYtMTIuMTVaTTI2Ljk1LDQwLjU0YzEuMDIsMCwxLjU1LS40NiwxLjU1LTEuMzZ2LS4wN2MwLS45NC0uNTMtMS4zMS0xLjUzLTEuMzFoLS44MnYyLjc0aC44WiIvPjxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTMzLjE0LDQxLjA5di0uMTRjMC0zLjc2LDIuNy02LjIsNi4yOS02LjIsMy4yOCwwLDUuNDksMS41LDUuNzgsNC43OWgtMy45OGMtLjEyLTEuMTItLjcxLTEuNzUtMS43OS0xLjc1LTEuMzksMC0yLjI0LDEuMDktMi4yNCwzLjE0di4xNGMwLDIuMDIuODIsMy4xNSwyLjMxLDMuMTUsMS4wOSwwLDEuODctLjU2LDIuMDEtMS43OWgzLjg0Yy0uMiwzLjItMi41NSw0Ljg4LTUuNzYsNC44OC00LjM5LDAtNi40Ni0yLjUtNi40Ni02LjIyWiIvPjxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTQ5LjksMzQuOTNoNWwyLjA2LDUuOSwyLjA5LTUuOWg0Ljl2MTIuMTVoLTMuODJ2LTcuMTdsLTIuNzcsNy4xN2gtMS4yOWwtMi43Mi03LjE3djcuMTdoLTMuNDN2LTEyLjE1WiIvPjxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTY5LjA2LDM0LjkzaDQuOThsMy44MSwxMi4xNWgtNC4wOGwtLjU2LTIuMDJoLTMuODRsLS41NCwyLjAyaC0zLjU5bDMuODItMTIuMTVaTTcwLjA5LDQyLjQ1aDIuNGwtMS4xOS00LjQtMS4yMSw0LjRaIi8+PHBhdGggY2xhc3M9ImNscy0yIiBkPSJNODAuMjksMzcuODloLTMuMDZ2LTIuOTZoMTAuMDF2Mi45NmgtMy4wOHY5LjJoLTMuODh2LTkuMloiLz48cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik04OC43NCwzNC45M2gzLjg5djEyLjE1aC0zLjg5di0xMi4xNVoiLz48cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik05NC4yOCw0MS4wOXYtLjE0YzAtMy43NiwyLjctNi4yLDYuMjktNi4yLDMuMjgsMCw1LjQ5LDEuNSw1Ljc4LDQuNzloLTMuOThjLS4xMi0xLjEyLS43MS0xLjc1LTEuNzktMS43NS0xLjM5LDAtMi4yNCwxLjA5LTIuMjQsMy4xNHYuMTRjMCwyLjAyLjgyLDMuMTUsMi4zMSwzLjE1LDEuMDksMCwxLjg3LS41NiwyLjAxLTEuNzloMy44NGMtLjIsMy4yLTIuNTUsNC44OC01Ljc2LDQuODgtNC4zOSwwLTYuNDYtMi41LTYuNDYtNi4yMloiLz48L2c+PC9zdmc+";
+		imageDiv.style.backgroundImage = "url('data:image/svg+xml;base64," + mySVG64 + "')";
+
+		const h1 = document.createElement('h1');
+		h1.style.fontSize='28px';
+		h1.style.fontWeight='800';
+		h1.textContent = title;
+		h1.style.fontFamily = 'Arial, sans-serif';
+		h1.style.backgroundColor= 'white';
+		
+
+		const p = document.createElement('p');
+		p.style.fontWeight='300';
+		p.style.fontSize='13px';
+		p.textContent = 'Attackers on the site you are attempting to visit might trick you into installing software or revealing things like your passwords, phone, or credit card numbers.';
+		p.style.fontFamily = 'Arial, sans-serif';
+		p.style.backgroundColor= 'white';
+
+		const p2 = document.createElement('p');
+		p2.style.fontWeight='600';
+		p2.style.color='#b10a10';
+		p2.style.fontSize='13px';
+		p2.textContent = 'PCMatic strongly recommends going back to safety';
+		p2.style.fontFamily = 'Arial, sans-serif';
+		p2.style.backgroundColor= 'white';
+		p2.style.display = 'block';
+
+		const button1 = document.createElement('button');
+		button1.style.cursor='pointer';
+		button1.style.borderRadius = '14px';
+		button1.style.backgroundColor='white';
+		button1.style.width='330px';
+		button1.style.color='black';
+		button1.textContent = 'Continue Anyway';
+		button1.addEventListener('click', closeOverlay);
+		button1.style.fontFamily = 'Arial, sans-serif';
+		button1.style.fontSize='13px';
+		button1.style.padding = '14px';
+		button1.style.border='1px solid #c0c0c0';
+		button1.style.fontWeight='600';
+		
+		button1.addEventListener('mouseenter', () => {
+			button1.style.backgroundColor = 'lightgray';
+		});
+		
+		button1.addEventListener('mouseleave', () => {
+			button1.style.backgroundColor = 'white'; 
+		});
+
+		const button2 = document.createElement('button');
+		button2.style.padding = '14px';
+		button2.style.cursor='pointer';
+		button2.style.borderRadius = '14px';
+		button2.style.marginTop = "50px";
+		button2.style.width='330px';
+		button2.style.backgroundColor='#40ce7c';
+		button2.style.border='1px solid #40ce7c';
+		button2.style.color='white';
+		button2.textContent = 'Back to safety';
+		button2.addEventListener('click', backtoSafety);
+		button2.style.fontFamily = 'Arial, sans-serif';
+		button2.style.fontSize='13px';
+		button2.style.fontWeight='600';
+
+		button2.addEventListener('mouseenter', () => {
+			button2.style.backgroundColor = '#27814e';
+		});
+		
+		button2.addEventListener('mouseleave', () => {
+			button2.style.backgroundColor = '#40ce7c'; 
+		});
+
+		const emptyDiv = document.createElement('div');
+		emptyDiv.style.height = '10px';
+
+		innerdiv.appendChild(imageDiv)
+		innerdiv.appendChild(h1)
+		innerdiv.appendChild(p)
+		innerdiv.appendChild(p2)
+		//innerdiv.appendChild(emptyDiv)
+		innerdiv.appendChild(button2)
+		innerdiv.appendChild(emptyDiv)
+		innerdiv.appendChild(button1)
+
+		outerdiv.appendChild(innerdiv)
+
+	body.before(outerdiv);
+	}
+
+		var clickedlink = '';
+
+    //var serverAddress = "https://utilities.pcpitstop.com";
+	var serverAddress = "http://staging.local";
+
+
+		const links = document.querySelectorAll('a[href]');
+
+		links.forEach(function(link) {
+
+			link.setAttribute("data-scamblocker-check","check");
+
+			link.addEventListener('click', function(event) {
+				if (this.getAttribute('data-scamblocker-check') != 'check') return;
+				event.preventDefault();
+				event.stopImmediatePropagation();
+
+				clickedlink=this;
+				checkWithServerToBlockURL(clickedlink);
+			},true);
+		});
+
+		let scamblockerelement_whitelist = document.getElementById('scamblocker-whitelist')
+		scamblockerelement_whitelist.addEventListener("scamblocker-whitelist",
+			function(event) {
+				whitelist = scamblockerelement_whitelist.getAttribute('whitelist')
+			}
+		);
+
+		let scamblockerelement_ismalicious = document.getElementById('scamblocker-ismalicious')
+		scamblockerelement_ismalicious.addEventListener("scamblocker-ismalicious",
+			function(evt) {
+					let event = {
+						detail: {
+							url: scamblockerelement_ismalicious.getAttribute('url'),
+							data: {
+								block: scamblockerelement_ismalicious.getAttribute('data-block')=='true'? true:false,
+								error: scamblockerelement_ismalicious.getAttribute('data-error'),
+							},
+							form: {
+								req: scamblockerelement_ismalicious.getAttribute('form-req'),
+								url: scamblockerelement_ismalicious.getAttribute('form-url'),
+								atype: scamblockerelement_ismalicious.getAttribute('form-atype'),
+								phone: scamblockerelement_ismalicious.getAttribute('form-phone'),
+								message: scamblockerelement_ismalicious.getAttribute('form-message')
+							}
+						}
+					};
+					
+					let checkedurl = scamblockerelement_ismalicious.getAttribute('data-checkurl')=='true'? true:false;
+					let overlayTitle = scamblockerelement_ismalicious.getAttribute('data-title');
+					let overlayText1 = scamblockerelement_ismalicious.getAttribute('data-text1');
+					let overlayText2 = scamblockerelement_ismalicious.getAttribute('data-text2');
+
+
+					if (checkedurl) {
+						console.log('checked url blocked?')
+						console.log(scamblockerelement_ismalicious.getAttribute('data-block')=='true')
+						if(scamblockerelement_ismalicious.getAttribute('data-block')=='true') {
+							//display bad
+							console.log('BAD!!!')
+							addBadURLOverlay(overlayTitle,overlayText1,overlayText2);
+						} else {
+							clickedlink.setAttribute('data-scamblocker-check','');
+							clickedlink.click();
+						}
+
+					} else {
+						handle_isMaliciousEvent(false,event);
+					}
+
+			}
+		);
+
+
+		document.dispatchEvent(new CustomEvent("contentEvent", {
+			detail: {callingFunc: 'getStorage'}
+		}));
+
+
+    
+    function blockingPost(url, form, callingFunc)
+    {
+			document.dispatchEvent(new CustomEvent("contentEvent", {
+				detail: {type: 'serviceworker', callingFunc: callingFunc, url: url, form: form}
+			}));
+			
+    }
+
+		function checkWithServerToBlockURL(event)
+    {
+			//console.log('checkWithServerToBlockURL')
+			//console.log(event)
+			let href = event.getAttribute('href');
+
+			let url = '';
+
+			if(href.substring(0,4)!='http') {
+				url =  window.location.origin + href;
+			} else {
+				url = href;
+			}
+			//console.log('checking url....')
+			//console.log(url)
+
+			blockingPost(serverAddress + "/plugin/check-risk2.asp",
+					     {
+						 		'url': url,
+								'message': url
+					     }
+					    , 'isMalicious');
+		
+    }
+
+	
+};
+
+
+var insertHandler = function(){
+	if (window.trustedTypes && window.trustedTypes.createPolicy) {
+		window.trustedTypes.createPolicy('default', {
+		createHTML: string => string,
+		createScriptURL: string => string,
+		createScript: string => string,
+		});
+	}
+
+    var disablerScriptElement = document.createElement('script');
+		disablerScriptElement.type="text/javascript";
+    disablerScriptElement.text= scriptToInsertInPage.toString()+";pcpitstop();";
+    var insertLocation = document.head?document.head:(document.body?document.body:document.documentElement);
+    insertLocation.appendChild(disablerScriptElement);
+}
+
+insertHandler();

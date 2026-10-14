@@ -1,0 +1,1 @@
+"use strict";(()=>{var a="https://workona.com/ext/popup/tasks?v=3.1.0",e=document.getElementById("iframe");e&&(e.src=`${a}?${Math.floor(Date.now()/(60*60*1e3))}`);window.addEventListener("message",t=>{if(t.data){if(t.data.closeWindow){window.close();return}e&&(t.data.height&&(e.style.height=`${t.data.height}px`),t.data.width&&(e.style.width=`${t.data.width}px`))}},!1);})();

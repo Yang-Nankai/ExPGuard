@@ -1,0 +1,295 @@
+.textBasedSub {
+  display: block;
+  white-space: initial; /* insert */
+  text-align: center;
+  left: 0px;
+  right: 0px;
+  height: auto;
+  font-size: 25px;
+  line-height: normal;
+  font-weight: normal;
+  color: #ffffff;
+  text-shadow: #000000 0px 0px 7px;
+  font-family: Helvetica Nueue,Helvetica,Arial,sans-serif;
+  font-weight: bolder;
+  width: fit-content;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.2rem;
+  padding-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  white-space: pre-line
+}
+
+/* Hover-only drag grip centered above the cue block (learning/select mode safe). */
+.unisubs-sub-drag-handle {
+  --sub-drag-gap: 8px;
+  --sub-drag-bg: rgba(12, 16, 22, 0.38);
+  --sub-drag-bg-hover: rgba(12, 16, 22, 0.5);
+  --sub-drag-bg-active: rgba(12, 16, 22, 0.58);
+  appearance: none;
+  -webkit-appearance: none;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  z-index: 30;
+  transform: translate(-50%, calc(-100% - var(--sub-drag-gap)));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 3.25rem;
+  height: auto;
+  margin: 0;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background-color: var(--sub-drag-bg);
+  background-image: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  color: #fff;
+  cursor: grab;
+  opacity: 0;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  box-sizing: border-box;
+  transition:
+    opacity 0.14s ease,
+    transform 0.14s ease,
+    background-color 0.14s ease,
+    border-color 0.14s ease,
+    box-shadow 0.14s ease;
+}
+
+.unisubs-sub-drag-handle:hover {
+  background-color: var(--sub-drag-bg-hover);
+  border-color: rgba(255, 255, 255, 0.4);
+  /* Do not translateY on hover — moving the node under the cursor causes flicker. */
+}
+
+.unisubs-sub-drag-handle:focus {
+  outline: none;
+}
+
+.unisubs-sub-drag-handle:focus-visible {
+  outline: 2px solid rgba(110, 168, 254, 0.95);
+  outline-offset: 2px;
+}
+
+.unisubs-sub-drag-handle.is-dragging {
+  cursor: grabbing;
+  opacity: 1;
+  background-color: var(--sub-drag-bg-active);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.24);
+  transform: translate(-50%, calc(-100% - var(--sub-drag-gap))) scale(1.05);
+}
+
+.unisubs-sub-drag-grip {
+  display: grid;
+  grid-template-columns: repeat(3, 0.28rem);
+  grid-template-rows: repeat(2, 0.28rem);
+  gap: 0.28rem 0.38rem;
+  pointer-events: none;
+}
+
+.unisubs-sub-drag-grip > span {
+  display: block;
+  width: 0.28rem;
+  height: 0.28rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Slightly larger invisible hit box so the grip is findable without cue hover. */
+.unisubs-sub-drag-handle::before {
+  content: '';
+  position: absolute;
+  inset: -0.45rem -0.65rem;
+}
+
+.unisubs-sub-drag-handle:hover,
+.unisubs-sub-drag-handle.is-dragging,
+.unisubs-sub-drag-handle:focus-visible {
+  opacity: 1;
+}
+
+/* Shadowing: lane hover (full track width at handle Y) only reveals — not operable. */
+.unisubs-dubbing .unisubs-sub-drag-handle.is-lane-reveal {
+  opacity: 1;
+}
+
+.hideSub {
+  display: none!important;
+}
+
+.selectable {
+  -webkit-user-select: text;
+  user-select: text;
+  cursor: text;
+  z-index: 999;
+}
+
+/* Stacking for drag hover without enabling text selection (see OverlayRenderer). */
+.unisubs-sub-layer {
+  z-index: 999;
+}
+
+/*
+ * Interactive slots (learning / dictation / selectable): container is inert;
+ * only the cue and drag grip receive hits so their ranges do not collide.
+ */
+#mainSub:not(.unisubs-sub-pass-through),
+#secondSub:not(.unisubs-sub-pass-through) {
+  pointer-events: none !important;
+}
+
+#mainSub:not(.unisubs-sub-pass-through) .textBasedSub,
+#mainSub:not(.unisubs-sub-pass-through) .hContainer,
+#mainSub:not(.unisubs-sub-pass-through) .vContainer,
+#secondSub:not(.unisubs-sub-pass-through) .textBasedSub,
+#secondSub:not(.unisubs-sub-pass-through) .hContainer,
+#secondSub:not(.unisubs-sub-pass-through) .vContainer,
+#mainSub:not(.unisubs-sub-pass-through) .unisubs-sub-drag-handle,
+#secondSub:not(.unisubs-sub-pass-through) .unisubs-sub-drag-handle {
+  pointer-events: auto;
+}
+
+/*
+ * Non-interactive watch: cue is click-through; only the (often invisible) grip
+ * keeps pointer-events so it can be hovered / dragged.
+ */
+.unisubs-sub-pass-through {
+  pointer-events: none !important;
+}
+
+.unisubs-sub-pass-through .unisubs-sub-drag-handle {
+  pointer-events: auto;
+}
+
+/* Dubbing mode: horizontal ticker; past (left of center) is gray via clipped overlay. */
+.unisubs-dubbing {
+  /* Do not clip — vertical drag handle sits above the container. */
+  overflow: visible;
+}
+
+.unisubs-dubbing-track {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.unisubs-dubbing .unisubs-sub-drag-handle {
+  /* Above sliding cues; pass-through still allows grip hits. */
+  z-index: 40;
+  /* Vertical = subY; horizontal = temporary center line. */
+  cursor: move;
+}
+
+.unisubs-dubbing .unisubs-sub-drag-handle.is-dragging {
+  cursor: grabbing;
+}
+
+.unisubs-dubbing-cue {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  white-space: pre;
+  width: max-content;
+  max-width: none;
+  will-change: transform;
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.unisubs-dubbing-cue.is-timing-drag {
+  cursor: grabbing;
+  z-index: 2;
+}
+
+.unisubs-dubbing-base.textBasedSub {
+  position: relative;
+  left: auto;
+  right: auto;
+  width: max-content;
+  max-width: none;
+  min-width: max-content;
+  white-space: pre;
+  display: block;
+}
+
+.unisubs-dubbing-past.textBasedSub {
+  /* Full twin of base; reveal left-of-center with clip-path (never shrink width). */
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: auto;
+  width: max-content;
+  max-width: none;
+  min-width: max-content;
+  white-space: pre;
+  display: block;
+  pointer-events: none;
+}
+
+/* Nested spans (furigana / styled HTML) must inherit the gray pass color. */
+.unisubs-dubbing-past.textBasedSub,
+.unisubs-dubbing-past.textBasedSub * {
+  color: #9e9e9e !important;
+  -webkit-text-stroke-color: #9e9e9e !important;
+}
+
+/* Learning mode: Intl.Segmenter tokens (no native text selection). */
+.unisubs-learning {
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+  z-index: 999;
+}
+
+/* Netflix native A/V menu open: hide dual-sub overlay so it does not cover the menu. */
+.unisubs-nf-menu-open #mainSub,
+.unisubs-nf-menu-open #secondSub {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.unisubs-token {
+  cursor: pointer;
+  border-radius: 0.15em;
+}
+
+.unisubs-token:hover {
+  background-color: rgba(255, 214, 10, 0.28);
+}
+
+.unisubs-token.is-selected,
+.unisubs-token.is-selected:hover {
+  background-color: rgba(255, 214, 10, 0.45);
+}
+
+.unisubs-token-gap {
+  cursor: default;
+}
+
+.vContainer {
+  position: absolute;
+  width: fit-content;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.hContainer {
+  position: absolute;
+  width: fit-content;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-radius: 0.5rem;
+}
